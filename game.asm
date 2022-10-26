@@ -168,8 +168,8 @@ nmi:
     sta $4014        ; set the high byte (02) of the RAM address, start the transfer
 
     jsr ReadController
-    jsr CheckStartButton 
-    
+    jsr CheckStartButton
+
     lda #GAME_STATE
     cmp GameState
     bne endOfNmi    ;if the states is not game, update the sound and finish
@@ -183,20 +183,20 @@ nmi:
     jsr UpdateCharacter
     jsr UpdateHpDigits
 
-    ;;This is the PPU clean up section, so rendering the next frame starts properly.
-    LDA #%10010000   ; enable NMI, sprites from Pattern Table 0, background from Pattern Table 1
-    STA $2000
-    LDA #%00011110   ; enable sprites, enable background, no clipping on left side
-    STA $2001
+    ;This is the PPU clean up section, so rendering the next frame starts properly.
+    lda #%10010000   ; enable NMI, sprites from Pattern Table 0, background from Pattern Table 1
+    sta $2000
+    lda #%00011110   ; enable sprites, enable background, no clipping on left side
+    sta $2001
 
 
-    LDA #$00
-    STA $2006        ; clean up PPU address registers
-    STA $2006
-  
-    LDA #$00         ; start with no scroll for status bar
-    STA $2005
-    STA $2005
+    lda #$00
+    sta $2006        ; clean up PPU address registers
+    sta $2006
+
+    lda #$00         ; start with no scroll for status bar
+    sta $2005
+    sta $2005
 
 
 WaitNotSprite0:
@@ -303,10 +303,10 @@ gameOver:
     lda #$00
     sta $2000
     sta $2001
-    STA $2006
-    STA $2006
-    STA $2005
-    STA $2005
+    sta $2006
+    sta $2006
+    sta $2005
+    sta $2005
 
     lda #<title
     sta pointer
@@ -338,7 +338,7 @@ ResetEntityVariables:
 CheckStartButton:
 
     lda Buttons
-    AND #%00010000
+    and #%00010000
     beq dontStart
     
     lda GameState
@@ -430,7 +430,7 @@ UpdateCharacter:
     inx
     inx
     lda PlayerX
-    STA DUDE_SPRITE, x
+    sta DUDE_SPRITE, x
     inx
 
     lda PlayerY
@@ -441,7 +441,7 @@ UpdateCharacter:
     lda PlayerX
     clc
     adc #$08
-    STA DUDE_SPRITE, x
+    sta DUDE_SPRITE, x
     inx
 
     lda PlayerY
@@ -452,7 +452,7 @@ UpdateCharacter:
     inx
     inx
     lda PlayerX
-    STA DUDE_SPRITE, x
+    sta DUDE_SPRITE, x
     inx
 
     lda PlayerY
@@ -465,7 +465,7 @@ UpdateCharacter:
     lda PlayerX
     clc
     adc #$08
-    STA DUDE_SPRITE, x
+    sta DUDE_SPRITE, x
 
     rts
 
@@ -495,7 +495,7 @@ OutsideLoop:
 
 InsideLoop:
 
-    LDA (pointer),y     ;
+    lda (pointer),y       ;
     sta $2007             ; write to PPU
     iny
     cpy #0
