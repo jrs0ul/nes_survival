@@ -29,6 +29,7 @@
 
 .include "field_bg.asm"
 .include "title.asm"
+.include "collision_data.asm"
 
 zerosprite:
     .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
@@ -73,11 +74,15 @@ PlayerAlive:
 Buttons:
     .res 1
 
+Temp:
+    .res 1
+
 ;--------------
                         ; constants
     DUDE_SPRITE      = $0204
     TITLE_STATE      = $00
     GAME_STATE       = $01
+    PLAYER_SPEED     = $02
 
 .segment "CODE"
 
@@ -383,7 +388,13 @@ go_Left:
     beq LeftDone
     lda PlayerX
     sec
-    sbc #$02
+    sbc #PLAYER_SPEED
+    sta PlayerX
+    jsr CanPlayerGo
+    beq LeftDone
+    lda PlayerX
+    clc
+    adc #PLAYER_SPEED
     sta PlayerX
 LeftDone:
     rts
@@ -394,7 +405,13 @@ go_Right:
     beq RightDone
     lda PlayerX
     clc
-    adc #$02
+    adc #PLAYER_SPEED
+    sta PlayerX
+    jsr CanPlayerGo
+    beq RightDone
+    lda PlayerX
+    sec
+    sbc #PLAYER_SPEED
     sta PlayerX
 RightDone:
     rts
@@ -405,7 +422,13 @@ go_Up:
     beq UpNotPressed
     lda PlayerY
     sec
-    sbc #2
+    sbc #PLAYER_SPEED
+    sta PlayerY
+    jsr CanPlayerGo
+    beq UpNotPressed
+    lda PlayerY
+    clc
+    adc #PLAYER_SPEED
     sta PlayerY
 UpNotPressed:
     rts
@@ -416,11 +439,50 @@ go_Down:
     beq DownNotPressed
     lda PlayerY
     clc
-    adc #2
+    adc #PLAYER_SPEED
+    sta PlayerY
+    jsr CanPlayerGo
+    beq DownNotPressed
+    lda PlayerY
+    sec
+    sbc #PLAYER_SPEED
     sta PlayerY
 DownNotPressed:
     rts
 ;----------------------------------
+CanPlayerGo:
+    ldx PlayerX
+    lda x_collision_pattern, x
+    sta Temp        ;save the pattern
+    txa
+    ldx #0
+divide_by_8:
+    cmp #8
+    bcc load_collision_segment
+    inx
+    sec
+    sbc #8
+    bne divide_by_8
+load_collision_segment:
+
+    txa
+    clc
+    adc PlayerY
+    tax
+
+    lda bg_collision, x
+    and Temp
+    beq not_Colliding
+    lda #1
+    jmp exit_collision_check
+
+not_Colliding:
+    lda #0
+
+exit_collision_check:
+    rts
+
+;-----------------------------------
 UpdateCharacter:
 
     ldx #$00
