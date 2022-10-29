@@ -76,6 +76,8 @@ Buttons:
 
 Temp:
     .res 1
+TempY:
+    .res 1
 
 ;--------------
                         ; constants
@@ -451,35 +453,65 @@ DownNotPressed:
     rts
 ;----------------------------------
 CanPlayerGo:
-    ldx PlayerX
+
+    lda PlayerX
+    ldx #0
+@div_x:
+    cmp #8
+    bcc @load_collision_pattern
+    inx
+    sec
+    sbc #8
+    bne @div_x
+
+@load_collision_pattern:
+
     lda x_collision_pattern, x
     sta Temp        ;save the pattern
     txa
     ldx #0
-divide_by_8:
+@divide_by_8:
     cmp #8
-    bcc load_collision_segment
+    bcc @load_collision_segment
     inx
     sec
     sbc #8
-    bne divide_by_8
-load_collision_segment:
+    bne @divide_by_8
+@load_collision_segment:
+
+    ;divide player Y by 8
+    lda PlayerY
+    ldy #0
+@div_y:
+    cmp #8
+    bcc @done_dividing
+    iny
+    sec
+    sbc #8
+    bne @div_y
+
+@done_dividing:
+
+    sty TempY
 
     txa
     clc
-    adc PlayerY
+    adc TempY
+    adc TempY
+    adc TempY
+    adc TempY
     tax
 
     lda bg_collision, x
     and Temp
-    beq not_Colliding
+    beq @not_Colliding
     lda #1
-    jmp exit_collision_check
+    jmp @exit_collision_check
 
-not_Colliding:
+@not_Colliding:
     lda #0
 
-exit_collision_check:
+@exit_collision_check:
     rts
 
 ;-----------------------------------
