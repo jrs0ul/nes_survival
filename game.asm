@@ -78,6 +78,10 @@ Temp:
     .res 1
 TempY:
     .res 1
+TempPointX:
+    .res 1
+TempPointY:
+    .res 1
 
 ;--------------
                         ; constants
@@ -452,51 +456,90 @@ go_Down:
 DownNotPressed:
     rts
 ;----------------------------------
+;Checks 4 points against the collision map
 CanPlayerGo:
 
     lda PlayerX
-    ldx #0
-@div_x:
-    cmp #8
-    bcc @load_collision_pattern
-    inx
-    sec
-    sbc #8
-    bne @div_x
+    clc
+    adc #3
+    sta TempPointX
+    lda PlayerY
+    clc
+    adc #8
+    sta TempPointY
 
-@load_collision_pattern:
+    jsr TestPointAgainstCollisionMap
+    bne @collides
+
+    lda PlayerY
+    clc
+    adc #8
+    sta TempPointY
+
+    jsr TestPointAgainstCollisionMap
+    bne @collides
+
+    lda PlayerX
+    clc
+    adc #13 ;16 - 3
+    sta TempPointX
+
+    jsr TestPointAgainstCollisionMap
+    bne @collides
+
+    lda PlayerY
+    clc
+    adc #8
+    sta TempPointY
+
+    jsr TestPointAgainstCollisionMap
+    bne @collides
+
+    lda #0
+    jmp @end
+    
+@collides:
+    lda #1
+@end:
+    rts
+;----------------------------------
+;Set TempPointX and TempPointY as point to be tested
+;sets A=1 if point collides
+TestPointAgainstCollisionMap:
+
+    lda TempPointX
+
+    ; X / 8
+
+    lsr
+    lsr
+    lsr
+    tax
 
     lda x_collision_pattern, x
     sta Temp        ;save the pattern
+
     txa
-    ldx #0
-@divide_by_8:
-    cmp #8
-    bcc @load_collision_segment
-    inx
-    sec
-    sbc #8
-    bne @divide_by_8
-@load_collision_segment:
 
-    ;divide player Y by 8
-    lda PlayerY
-    ldy #0
-@div_y:
-    cmp #8
-    bcc @done_dividing
-    iny
-    sec
-    sbc #8
-    bne @div_y
+    ; X / 8 one more time
+    lsr
+    lsr
+    lsr
+    tax
 
-@done_dividing:
+    ;divide point Y by 8
+    lda TempPointY
+
+    lsr
+    lsr
+    lsr
+    tay
 
     sty TempY
 
     txa
     clc
-    adc TempY
+    adc TempY ;add y four times, because there are 4 one byte collision segments in one row
     adc TempY
     adc TempY
     adc TempY
