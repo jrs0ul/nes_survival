@@ -28,6 +28,7 @@
 .segment "RODATA" ; data in rom
 
 .include "field_bg.asm"
+.include "house.asm"
 .include "title.asm"
 .include "collision_data.asm"
 
@@ -72,6 +73,8 @@ GameState:
 PlayerAlive:
     .res 1
 Buttons:
+    .res 1
+InHouse:    ;is the player inside his hut?
     .res 1
 
 Temp:
@@ -191,6 +194,7 @@ nmi:
     jsr go_Up
 
     jsr CheckIfEnteredHouse
+    jsr CheckIfExitedHouse
     jsr CheckGameOver
 
     jsr UpdateCharacter
@@ -338,6 +342,7 @@ ResetEntityVariables:
 
     lda #0
     sta scroll
+    sta InHouse
     lda #$50
     sta PlayerX
     lda #$90
@@ -560,7 +565,11 @@ TestPointAgainstCollisionMap:
     rts
 ;----------------------------------
 CheckIfEnteredHouse:
-    
+
+    lda InHouse
+    cmp #1
+    beq @nope
+
     lda PlayerX
     clc
     adc #8
@@ -577,11 +586,62 @@ CheckIfEnteredHouse:
     cmp #120
     bcs @nope
 
-    lda #0
-    sta PlayerAlive
+    lda #$00
+    sta $2000
+    sta $2001
+
+    lda #1
+    sta InHouse
+
+    lda #<house
+    sta pointer
+    lda #>house
+    sta pointer+1
+
+    jsr LoadNametable
+    jsr LoadStatusBar
+    lda #128
+    sta PlayerX
+    lda #152
+    sta PlayerY
+
+
 
 @nope:
     rts
+;-----------------------------------
+CheckIfExitedHouse:
+
+    lda InHouse
+    beq @nope
+
+    lda PlayerY
+    cmp #168
+    bcc @nope
+
+    lda #0
+    sta InHouse
+
+    lda #$00
+    sta $2000
+    sta $2001
+
+    lda #<background
+    sta pointer
+    lda #>background
+    sta pointer+1
+
+    jsr LoadNametable
+    jsr LoadStatusBar
+    lda #72
+    sta PlayerX
+    lda #120
+    sta PlayerY
+
+
+@nope:
+    rts
+
 
 ;-----------------------------------
 UpdateCharacter:
