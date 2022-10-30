@@ -190,7 +190,9 @@ nmi:
     jsr go_Down
     jsr go_Up
 
+    jsr CheckIfEnteredHouse
     jsr CheckGameOver
+
     jsr UpdateCharacter
     jsr UpdateHpDigits
 
@@ -556,6 +558,30 @@ TestPointAgainstCollisionMap:
 
 @exit_collision_check:
     rts
+;----------------------------------
+CheckIfEnteredHouse:
+    
+    lda PlayerX
+    clc
+    adc #8
+
+    cmp #72
+    bcc @nope
+    cmp #96
+    bcs @nope
+    lda PlayerY
+    clc
+    adc #10
+    cmp #112
+    bcc @nope
+    cmp #120
+    bcs @nope
+
+    lda #0
+    sta PlayerAlive
+
+@nope:
+    rts
 
 ;-----------------------------------
 UpdateCharacter:
@@ -627,7 +653,7 @@ LoadNametable:
     sta $2006             ; write the low byte of $2000 address
 
     ldx #$00
-    ldx #$00
+    ldy #$00
 OutsideLoop:
 
 InsideLoop:
