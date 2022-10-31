@@ -19,7 +19,7 @@
 ; ||||+---- 1: Ignore mirroring control or above mirroring bit; instead provide four-screen VRAM
 ; ++++----- Lower nybble of mapper number
 ;============================================================================================
-  .byte %00000000                   ; NROM mapper 0, other mappers have more complicated values here
+  .byte %00000001                   ; NROM mapper 0, other mappers have more complicated values here
   .byte $0, $0, $0, $0, $0, $0
 
 .segment "VECTORS"
@@ -28,6 +28,7 @@
 .segment "RODATA" ; data in rom
 
 .include "field_bg.asm"
+.include "field_bg1.asm"
 .include "house.asm"
 .include "title.asm"
 .include "collision_data.asm"
@@ -61,6 +62,8 @@ pointer:
 .segment "BSS" ; variables in ram
 
 scroll:
+    .res 1
+NametableAddress:
     .res 1
 PlayerX:
     .res 1
@@ -160,6 +163,9 @@ LoadPalettesLoop:
     lda #>title
     sta pointer+1
 
+    lda #$20
+    sta NametableAddress
+
     jsr LoadNametable
 
     lda #%10010000   ; enable NMI, sprites from Pattern Table 0
@@ -238,7 +244,7 @@ WaitScanline:
     bne WaitScanline
 
     ;uncoment the call for some scrolling
-    ;jsr scrollBackground
+    jsr scrollBackground
 
     lda #%10010000 
     sta $2000
@@ -370,6 +376,7 @@ CheckStartButton:
     
     lda #GAME_STATE
     sta GameState
+    
     lda #$00
     sta $2000
     sta $2001
@@ -378,6 +385,24 @@ CheckStartButton:
     sta pointer
     lda #>background
     sta pointer+1
+
+    lda #$20
+    sta NametableAddress
+
+    jsr LoadNametable
+    
+    ;---
+    lda #$00
+    sta $2000
+    sta $2001
+
+    lda #<field_bg1
+    sta pointer
+    lda #>field_bg1
+    sta pointer+1
+
+    lda #$24
+    sta NametableAddress
 
     jsr LoadNametable
     jsr LoadStatusBar
@@ -400,7 +425,7 @@ dontStart:
 ;--------------------------------------
 scrollBackground:
 
-    inc scroll       ; add one to our scroll variable each frame
+    ;inc scroll
     lda scroll
     sta $2005        ; write the horizontal scroll count register
 
@@ -413,6 +438,9 @@ go_Left:
     lda Buttons
     and #%00000010
     beq LeftDone
+    dec scroll
+    dec scroll
+
     lda PlayerX
     sec
     sbc #PLAYER_SPEED
@@ -430,6 +458,8 @@ go_Right:
     lda Buttons
     and #%00000001
     beq RightDone
+    inc scroll
+    inc scroll
     lda PlayerX
     clc
     adc #PLAYER_SPEED
@@ -611,6 +641,8 @@ CheckIfEnteredHouse:
     sta pointer
     lda #>house
     sta pointer+1
+    lda #$20
+    sta NametableAddress
 
     jsr LoadNametable
     jsr LoadStatusBar
@@ -669,6 +701,9 @@ CheckIfExitedHouse:
     sta pointer
     lda #>background
     sta pointer+1
+
+    lda #$20
+    sta NametableAddress
 
     jsr LoadNametable
     jsr LoadStatusBar
@@ -768,9 +803,12 @@ spriteLoadLoop:
     rts
 ;---------------------------------
 ; Feeds stuff that the pointer points to, to PPU
+; pointer points to the nametable data
+; NametableAddress stores the ppu adress
+
 LoadNametable:
     lda $2002             ; read PPU status to reset the high/low latch
-    lda #$20
+    lda NametableAddress
     sta $2006             ; write the high byte of $2000 address
     lda #$00
     sta $2006             ; write the low byte of $2000 address
