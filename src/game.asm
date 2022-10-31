@@ -425,7 +425,6 @@ dontStart:
 ;--------------------------------------
 scrollBackground:
 
-    ;inc scroll
     lda scroll
     sta $2005        ; write the horizontal scroll count register
 
