@@ -39,9 +39,11 @@ zerosprite:
     .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
 
 palette:
-
     .byte $0f,$00,$21,$31, $0f,$27,$21,$31, $0f,$17,$21,$31, $31,$10,$0f,$01    ;background
     .byte $0f,$00,$21,$31, $0f,$27,$21,$31, $0f,$17,$21,$31, $0f,$0f,$37,$16    ;OAM sprites
+
+house_bg_palette:
+    .byte $0f,$16,$27,$37, $0f,$07,$00,$31, $0f,$17,$27,$31, $31,$10,$0f,$01    ;background
 
 sprites:
     .byte $0A, $0A, $00000011, $08   ; sprite 0 
@@ -76,6 +78,9 @@ Buttons:
     .res 1
 InHouse:    ;is the player inside his hut?
     .res 1
+
+CollisionMap:
+    .res 120
 
 Temp:
     .res 1
@@ -378,6 +383,15 @@ CheckStartButton:
     jsr LoadStatusBar
     jsr ResetEntityVariables
 
+    ldx #0
+@copyCollisionMapLoop:
+    lda bg_collision, x
+    sta CollisionMap, x
+    inx
+    cpx #120
+    bne @copyCollisionMapLoop
+
+
     
 dontStart:
     rts
@@ -552,7 +566,7 @@ TestPointAgainstCollisionMap:
     adc TempY
     tax
 
-    lda bg_collision, x
+    lda CollisionMap, x
     and Temp
     beq @not_Colliding
     lda #1
@@ -606,6 +620,31 @@ CheckIfEnteredHouse:
     sta PlayerY
 
 
+    ;--
+    lda $2002    ; read PPU status to reset the high/low latch
+    lda #$3F
+    sta $2006    ; write the high byte of $3F00 address
+    lda #$00
+    sta $2006    ; write the low byte of $3F00 address
+
+    ldx #$00
+@LoadPalettesLoop:
+    lda house_bg_palette, x
+    sta $2007
+    inx
+    cpx #$10
+    bne @LoadPalettesLoop  
+    ;--
+
+    ldx #0
+@copyCollisionMapLoop:
+    lda hut_collision, x
+    sta CollisionMap, x
+    inx
+    cpx #120
+    bne @copyCollisionMapLoop
+
+
 
 @nope:
     rts
@@ -637,6 +676,30 @@ CheckIfExitedHouse:
     sta PlayerX
     lda #120
     sta PlayerY
+
+    lda $2002    ; read PPU status to reset the high/low latch
+    lda #$3F
+    sta $2006    ; write the high byte of $3F00 address
+    lda #$00
+    sta $2006    ; write the low byte of $3F00 address
+
+    ldx #$00
+@LoadPalettesLoop:
+    lda palette, x
+    sta $2007
+    inx
+    cpx #$10
+    bne @LoadPalettesLoop
+    ;---
+    ldx #0
+@copyCollisionMapLoop:
+    lda bg_collision, x
+    sta CollisionMap, x
+    inx
+    cpx #120
+    bne @copyCollisionMapLoop
+
+
 
 
 @nope:
