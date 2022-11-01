@@ -1,6 +1,6 @@
 NSTssTXT
 
-BtnTiles=1
+BtnTiles=0
 BtnChecker=0
 BtnSelTiles=0
 BtnChrBank1=0
@@ -9,7 +9,7 @@ BtnGridAll=0
 BtnGridTile=1
 BtnGridAtr=0
 BtnGridBlock=0
-BtnPal=1
+BtnPal=0
 BtnTypeIn=0
 BtnFrameAll=1
 BtnFrameSelected=0
@@ -69,6 +69,6 @@ MetaSprites=380c0038[2]0d0040[2]1c0038401d0040ff[fff0]
 FilterCHR=0
 FilterName=1
 FileNameCHR=\\?\unix\home\jrs0ul\Projects\nes_survival\tile
-FileNameName=
+FileNameName=\\?\unix\home\jrs0ul\Projects\nes_survival\src\field_bg1.asm
 FileNamePal=
 FileNameMetaSpriteBank=

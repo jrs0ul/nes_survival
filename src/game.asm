@@ -436,40 +436,100 @@ scrollBackground:
 go_Left:
     lda Buttons
     and #%00000010
-    beq LeftDone
-    dec scroll
-    dec scroll
+    beq @exit
 
     lda PlayerX
+    clc
+    adc #8
+    cmp #128
+    bcs @moveLeft
+
+
+    lda scroll
+    beq @moveLeft ; it's zero
+    sec
+    sbc #PLAYER_SPEED
+    cmp #2
+    bcc @moveLeft
+
+    sta scroll
+
+
+    ;jsr CanPlayerGo
+    ;beq @exit
+
+    ;lda scroll
+    ;clc
+    ;adc #PLAYER_SPEED
+    ;sta scroll
+
+    jmp @exit
+
+@moveLeft:
+    lda PlayerX
+    beq @exit ; already x=0
     sec
     sbc #PLAYER_SPEED
     sta PlayerX
     jsr CanPlayerGo
-    beq LeftDone
+    beq @exit
     lda PlayerX
     clc
     adc #PLAYER_SPEED
     sta PlayerX
-LeftDone:
+
+@exit:
     rts
 ;----------------------------------
 go_Right:
     lda Buttons
     and #%00000001
-    beq RightDone
-    inc scroll
-    inc scroll
+    beq @exit
+    
     lda PlayerX
+    clc
+    adc #8
+    cmp #128
+    bcc @moveRight
+
+    jsr CanPlayerGo
+    cmp #1
+    beq @exit
+
+    lda scroll
+    cmp #255
+    beq @moveRight
+    clc
+    adc #PLAYER_SPEED
+    cmp #254
+    bcs @moveRight
+
+    sta scroll
+
+    ;jsr CanPlayerGo
+    ;beq @exit
+
+    ;lda scroll
+    ;sec
+    ;sbc #PLAYER_SPEED
+    ;sta scroll
+
+    jmp @exit
+
+@moveRight:
+    lda PlayerX
+    cmp #246 ;254 - 8
+    beq @exit
     clc
     adc #PLAYER_SPEED
     sta PlayerX
     jsr CanPlayerGo
-    beq RightDone
+    beq @exit
     lda PlayerX
     sec
     sbc #PLAYER_SPEED
     sta PlayerX
-RightDone:
+@exit:
     rts
 ;----------------------------------
 go_Up:
