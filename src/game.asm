@@ -61,14 +61,27 @@ pointer:
 ;--------------
 .segment "BSS" ; variables in ram
 
+
+oldScroll:
+    .res 1
 scroll:
     .res 1
+
+
 NametableAddress:
     .res 1
+
+OldPlayerX:
+    .res 1
+OldPlayerY:
+    .res 1
+
 PlayerX:
     .res 1
 PlayerY:
     .res 1
+
+
 hp0:
     .res 1
 hp1:
@@ -199,11 +212,28 @@ nmi:
     cmp GameState
     bne endOfNmi    ;if the states is not game, update the sound and finish
 
+    lda PlayerX
+    sta OldPlayerX
+    lda PlayerY
+    sta OldPlayerY
+    lda scroll
+    sta oldScroll
+
     jsr go_Left     ; left
     jsr go_Right    ;right
     jsr go_Down
     jsr go_Up
+    jsr CanPlayerGo
+    beq continueNmi
 
+    lda OldPlayerX
+    sta PlayerX
+    lda OldPlayerY
+    sta PlayerY
+    lda oldScroll
+    sta scroll
+
+continueNmi:
     jsr CheckIfEnteredHouse
     jsr CheckIfExitedHouse
     jsr CheckGameOver
@@ -445,6 +475,9 @@ go_Left:
     bcs @moveLeft
 
 
+    lda InHouse
+    cmp #1
+    beq @moveLeft
     lda scroll
     beq @moveLeft ; it's zero
     sec
@@ -454,15 +487,6 @@ go_Left:
 
     sta scroll
 
-
-    ;jsr CanPlayerGo
-    ;beq @exit
-
-    ;lda scroll
-    ;clc
-    ;adc #PLAYER_SPEED
-    ;sta scroll
-
     jmp @exit
 
 @moveLeft:
@@ -471,13 +495,6 @@ go_Left:
     sec
     sbc #PLAYER_SPEED
     sta PlayerX
-    jsr CanPlayerGo
-    beq @exit
-    lda PlayerX
-    clc
-    adc #PLAYER_SPEED
-    sta PlayerX
-
 @exit:
     rts
 ;----------------------------------
@@ -492,10 +509,9 @@ go_Right:
     cmp #128
     bcc @moveRight
 
-    jsr CanPlayerGo
+    lda InHouse
     cmp #1
-    beq @exit
-
+    beq @moveRight
     lda scroll
     cmp #255
     beq @moveRight
@@ -506,14 +522,6 @@ go_Right:
 
     sta scroll
 
-    ;jsr CanPlayerGo
-    ;beq @exit
-
-    ;lda scroll
-    ;sec
-    ;sbc #PLAYER_SPEED
-    ;sta scroll
-
     jmp @exit
 
 @moveRight:
@@ -522,12 +530,6 @@ go_Right:
     beq @exit
     clc
     adc #PLAYER_SPEED
-    sta PlayerX
-    jsr CanPlayerGo
-    beq @exit
-    lda PlayerX
-    sec
-    sbc #PLAYER_SPEED
     sta PlayerX
 @exit:
     rts
@@ -540,30 +542,30 @@ go_Up:
     sec
     sbc #PLAYER_SPEED
     sta PlayerY
-    jsr CanPlayerGo
-    beq UpNotPressed
-    lda PlayerY
-    clc
-    adc #PLAYER_SPEED
-    sta PlayerY
+    ;jsr CanPlayerGo
+    ;beq UpNotPressed
+    ;lda PlayerY
+    ;clc
+    ;adc #PLAYER_SPEED
+    ;sta PlayerY
 UpNotPressed:
     rts
 ;----------------------------------
 go_Down:
     lda Buttons
     and #%00000100
-    beq DownNotPressed
+    beq @exit
     lda PlayerY
     clc
     adc #PLAYER_SPEED
     sta PlayerY
-    jsr CanPlayerGo
-    beq DownNotPressed
-    lda PlayerY
-    sec
-    sbc #PLAYER_SPEED
-    sta PlayerY
-DownNotPressed:
+    ;jsr CanPlayerGo
+    ;beq DownNotPressed
+    ;lda PlayerY
+    ;sec
+    ;sbc #PLAYER_SPEED
+    ;sta PlayerY
+@exit:
     rts
 ;----------------------------------
 ;Checks 4 points against the collision map
