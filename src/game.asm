@@ -98,6 +98,10 @@ InHouse:    ;is the player inside his hut?
 CollisionMap:
     .res 120
 
+
+FrameCount:
+    .res 1
+
 Temp:
     .res 1
 TempY:
@@ -191,10 +195,42 @@ LoadPalettesLoop:
     lda #TITLE_STATE
     sta GameState
 
+    lda #64
+    sta FrameCount
 
+endlessLoop:
 
-forever:
-    jmp forever
+    dec FrameCount
+    bne doInput
+    jmp continueForever
+doInput:
+    lda PlayerX
+    sta OldPlayerX
+    lda PlayerY
+    sta OldPlayerY
+    lda scroll
+    sta oldScroll
+
+    jsr go_Left     ; left
+    jsr go_Right    ;right
+    jsr go_Down
+    jsr go_Up
+    lda #0
+    sta Buttons
+    jsr CanPlayerGo
+    beq contInput
+
+    lda OldPlayerX
+    sta PlayerX
+    lda OldPlayerY
+    sta PlayerY
+    lda oldScroll
+    sta scroll
+contInput:
+    lda #64
+    sta FrameCount
+continueForever:
+    jmp endlessLoop
 
 ;=========================================================
 
@@ -212,27 +248,7 @@ nmi:
     cmp GameState
     bne endOfNmi    ;if the states is not game, update the sound and finish
 
-    lda PlayerX
-    sta OldPlayerX
-    lda PlayerY
-    sta OldPlayerY
-    lda scroll
-    sta oldScroll
-
-    jsr go_Left     ; left
-    jsr go_Right    ;right
-    jsr go_Down
-    jsr go_Up
-    jsr CanPlayerGo
-    beq continueNmi
-
-    lda OldPlayerX
-    sta PlayerX
-    lda OldPlayerY
-    sta PlayerY
-    lda oldScroll
-    sta scroll
-
+   
 continueNmi:
     jsr CheckIfEnteredHouse
     jsr CheckIfExitedHouse
