@@ -53,6 +53,15 @@ sprites:
     .byte $00, $10, %00000011, $00
     .byte $00, $11, %00000011, $00
 
+;--------------
+; CONSTANTS
+    DUDE_SPRITE        = $0204
+    TITLE_STATE        = 00
+    GAME_STATE         = 01
+    PLAYER_SPEED       = 02
+    INPUT_DELAY        = 128
+    COLLISION_MAP_SIZE = 120
+    
 ;===================================================================
 .segment "ZEROPAGE"
 
@@ -62,9 +71,13 @@ pointer:
 .segment "BSS" ; variables in ram
 
 
-oldScroll:
+OldGlobalScroll:
     .res 1
-scroll:
+GlobalScroll:
+    .res 1
+TilesScroll:
+    .res 1
+OldTileScroll:
     .res 1
 
 
@@ -96,7 +109,18 @@ InHouse:    ;is the player inside his hut?
     .res 1
 
 CollisionMap:
-    .res 120
+    .res COLLISION_MAP_SIZE
+
+ScrollCollisionColumn:  ;column of data from next collision screen
+    .res 30
+CurrentCollisionColumnIndex:
+    .res 1
+
+
+MustLoadHouseInterior:
+    .res 1
+MustLoadOutside:
+    .res 1
 
 
 FrameCount:
@@ -106,18 +130,16 @@ Temp:
     .res 1
 TempY:
     .res 1
+TempZ:
+    .res 1
+TempPush:
+    .res 1
 TempPointX:
     .res 1
 TempPointY:
     .res 1
 
-;--------------
-                        ; constants
-    DUDE_SPRITE      = $0204
-    TITLE_STATE      = $00
-    GAME_STATE       = $01
-    PLAYER_SPEED     = $02
-
+;====================================================================================
 .segment "CODE"
 
 
@@ -195,46 +217,69 @@ LoadPalettesLoop:
     lda #TITLE_STATE
     sta GameState
 
-    lda #64
+    lda #INPUT_DELAY
     sta FrameCount
+    lda #0
+    sta MustLoadHouseInterior
+
+;---------------------------------
 
 endlessLoop:
+
+    lda MustLoadHouseInterior
+    bne continueForever ; don't do logics until the house is not loaded to the PPU
+    lda MustLoadOutside
+    bne continueForever ; the same is with the map of outside
 
     dec FrameCount
     bne doInput
     jmp continueForever
+
 doInput:
     lda PlayerX
     sta OldPlayerX
     lda PlayerY
     sta OldPlayerY
-    lda scroll
-    sta oldScroll
+    lda GlobalScroll
+    sta OldGlobalScroll
+    lda TilesScroll
+    sta OldTileScroll
 
-    jsr go_Left     ; left
-    jsr go_Right    ;right
-    jsr go_Down
-    jsr go_Up
-    lda #0
-    sta Buttons
+    jsr ProcessButtons
     jsr CanPlayerGo
-    beq contInput
+    beq contInput; all good, no obstacles
 
+    ;obstacle ahead, restore previous position
     lda OldPlayerX
     sta PlayerX
     lda OldPlayerY
     sta PlayerY
-    lda oldScroll
-    sta scroll
+    lda OldGlobalScroll
+    sta GlobalScroll
+    lda OldTileScroll
+    sta TilesScroll
+
 contInput:
-    lda #64
+    lda #INPUT_DELAY
     sta FrameCount
+
 continueForever:
+
+    jsr CheckIfEnteredHouse
+    jsr CheckIfExitedHouse
+
     jmp endlessLoop
 
 ;=========================================================
 
 nmi:
+    ;push registers to stack
+    pha
+    tya
+    pha
+    txa
+    pha
+    ;---
 
     lda #$00
     sta $2003        ; set the low byte (00) of the RAM address
@@ -248,12 +293,17 @@ nmi:
     cmp GameState
     bne endOfNmi    ;if the states is not game, update the sound and finish
 
+    lda MustLoadHouseInterior
+    beq checkIfOutsideNeedsToLoad
+    jsr LoadTheHouseInterior
+checkIfOutsideNeedsToLoad:
+    lda MustLoadOutside
+    beq continueNmi
+    jsr LoadOutsideMap
+
    
 continueNmi:
-    jsr CheckIfEnteredHouse
-    jsr CheckIfExitedHouse
     jsr CheckGameOver
-
     jsr UpdateCharacter
     jsr UpdateHpDigits
 
@@ -296,6 +346,12 @@ WaitScanline:
     sta $2000
 
 endOfNmi:
+
+    pla
+    tax
+    pla
+    tay
+    pla
 
     rti        ; return from interrupt
 
@@ -386,6 +442,8 @@ gameOver:
     sta pointer
     lda #>title
     sta pointer+1
+    lda #$20
+    sta NametableAddress
     jsr LoadNametable
 
 noGameOver:
@@ -398,7 +456,7 @@ ResetEntityVariables:
     sta hp1
 
     lda #0
-    sta scroll
+    sta GlobalScroll
     sta InHouse
     lda #$50
     sta PlayerX
@@ -459,30 +517,41 @@ CheckStartButton:
     lda bg_collision, x
     sta CollisionMap, x
     inx
-    cpx #120
+    cpx #COLLISION_MAP_SIZE
     bne @copyCollisionMapLoop
+;----
+    ldx #0
+@loadColumn:
+    txa
+    asl
+    asl
+    tay ; x * 4 move to y
 
+    lda bg_collision1, y
+    sta ScrollCollisionColumn, x
+    inx
+    cpx #30
+    bcc @loadColumn
 
-    
 dontStart:
     rts
-
 
 ;--------------------------------------
 scrollBackground:
 
-    lda scroll
+    lda GlobalScroll
     sta $2005        ; write the horizontal scroll count register
 
     lda #0           ; no vertical scrolling
     sta $2005
     rts
 ;---------------------------------
+ProcessButtons:
 
-go_Left:
+;Check if LEFT is pressed
     lda Buttons
     and #%00000010
-    beq @exit
+    beq @CheckRight
 
     lda PlayerX
     clc
@@ -493,32 +562,43 @@ go_Left:
 
     lda InHouse
     cmp #1
-    beq @moveLeft
-    lda scroll
+    beq @moveLeft ; no scrolling inside the house :)
+;--
+    lda TilesScroll
+    beq @ScrollGlobalyLeft
+    sec
+    sbc #PLAYER_SPEED
+    sta TilesScroll
+    cmp #0
+    bne @ScrollGlobalyLeft
+
+    jsr PushCollisionMapRight
+;--
+@ScrollGlobalyLeft:
+    lda GlobalScroll
     beq @moveLeft ; it's zero
     sec
     sbc #PLAYER_SPEED
     cmp #2
     bcc @moveLeft
 
-    sta scroll
+    sta GlobalScroll
 
-    jmp @exit
+    jmp @CheckRight
 
 @moveLeft:
     lda PlayerX
-    beq @exit ; already x=0
+    beq @CheckRight ; already x=0
     sec
     sbc #PLAYER_SPEED
     sta PlayerX
-@exit:
-    rts
-;----------------------------------
-go_Right:
+
+
+@CheckRight:
     lda Buttons
     and #%00000001
-    beq @exit
-    
+    beq @CheckUp
+
     lda PlayerX
     clc
     adc #8
@@ -527,8 +607,22 @@ go_Right:
 
     lda InHouse
     cmp #1
-    beq @moveRight
-    lda scroll
+    beq @moveRight ; no scrolling
+;--
+    lda TilesScroll
+    cmp #8
+    beq @ScrollGlobalyRight
+    clc
+    adc #PLAYER_SPEED
+    sta TilesScroll
+    cmp #8
+    bne @ScrollGlobalyRight
+
+    jsr PushCollisionMapLeft
+
+;--
+@ScrollGlobalyRight:
+    lda GlobalScroll
     cmp #255
     beq @moveRight
     clc
@@ -536,38 +630,30 @@ go_Right:
     cmp #254
     bcs @moveRight
 
-    sta scroll
+    sta GlobalScroll
 
-    jmp @exit
+    jmp @CheckUp
 
 @moveRight:
     lda PlayerX
     cmp #246 ;254 - 8
-    beq @exit
+    beq @CheckUp
     clc
     adc #PLAYER_SPEED
     sta PlayerX
-@exit:
-    rts
-;----------------------------------
+
+
+@CheckUp:
 go_Up:
     lda Buttons
     and #%00001000
-    beq UpNotPressed
+    beq @CheckDown
     lda PlayerY
     sec
     sbc #PLAYER_SPEED
     sta PlayerY
-    ;jsr CanPlayerGo
-    ;beq UpNotPressed
-    ;lda PlayerY
-    ;clc
-    ;adc #PLAYER_SPEED
-    ;sta PlayerY
-UpNotPressed:
-    rts
-;----------------------------------
-go_Down:
+
+@CheckDown:
     lda Buttons
     and #%00000100
     beq @exit
@@ -575,13 +661,60 @@ go_Down:
     clc
     adc #PLAYER_SPEED
     sta PlayerY
-    ;jsr CanPlayerGo
-    ;beq DownNotPressed
-    ;lda PlayerY
-    ;sec
-    ;sbc #PLAYER_SPEED
-    ;sta PlayerY
 @exit:
+    lda #0
+    sta Buttons
+    rts
+;----------------------------------
+PushCollisionMapRight:
+    rts
+;----------------------------------
+PushCollisionMapLeft:
+    ;starting from the bottom row
+    clc
+    ldx #29
+    stx TempY; save row index
+
+    lda ScrollCollisionColumn, x
+    asl
+    sta ScrollCollisionColumn, x
+
+    ldx #COLLISION_MAP_SIZE - 1
+    ldy #4
+@loop:
+    lda #0
+    ;adc #0
+    adc TempZ
+    sta Temp; save carry, because asl will ruin it
+
+    lda CollisionMap,x
+    asl
+    ;save carry
+    sta TempPush
+    lda #0
+    adc #0
+    sta TempZ
+
+    lda TempPush
+    adc Temp ;add saved carry
+    sta CollisionMap,x
+    dey
+    bne @cont
+    ldy #4
+    dec TempY
+    stx Temp
+    ldx TempY
+    lda ScrollCollisionColumn, x
+    asl
+    sta ScrollCollisionColumn, x
+    ldx Temp
+@cont:
+    dex
+    bpl @loop
+
+    lda #0
+    sta TilesScroll
+
     rts
 ;----------------------------------
 ;Checks 4 points against the collision map
@@ -590,6 +723,7 @@ CanPlayerGo:
     lda PlayerX
     clc
     adc #3
+    adc TilesScroll
     sta TempPointX
     lda PlayerY
     clc
@@ -610,6 +744,7 @@ CanPlayerGo:
     lda PlayerX
     clc
     adc #13 ;16 - 3
+    adc TilesScroll
     sta TempPointX
 
     jsr TestPointAgainstCollisionMap
@@ -707,6 +842,23 @@ CheckIfEnteredHouse:
     cmp #120
     bcs @nope
 
+    ldx #0
+@copyCollisionMapLoop:
+    lda hut_collision, x
+    sta CollisionMap, x
+    inx
+    cpx #COLLISION_MAP_SIZE
+    bne @copyCollisionMapLoop
+
+    lda #1
+    sta MustLoadHouseInterior
+
+@nope:
+    rts
+;---------------------------
+
+LoadTheHouseInterior:
+
     lda #$00
     sta $2000
     sta $2001
@@ -744,14 +896,9 @@ CheckIfEnteredHouse:
     cpx #$10
     bne @LoadPalettesLoop  
     ;--
-
-    ldx #0
-@copyCollisionMapLoop:
-    lda hut_collision, x
-    sta CollisionMap, x
-    inx
-    cpx #120
-    bne @copyCollisionMapLoop
+    
+    lda #0
+    sta MustLoadHouseInterior
 
 
 
@@ -767,8 +914,25 @@ CheckIfExitedHouse:
     cmp #168
     bcc @nope
 
+    ldx #0
+@copyCollisionMapLoop:
+    lda bg_collision, x
+    sta CollisionMap, x
+    inx
+    cpx #COLLISION_MAP_SIZE
+    bne @copyCollisionMapLoop
+
+
     lda #0
     sta InHouse
+
+    lda #1
+    sta MustLoadOutside
+
+@nope:
+    rts
+;-------------------------------
+LoadOutsideMap:
 
     lda #$00
     sta $2000
@@ -802,21 +966,11 @@ CheckIfExitedHouse:
     inx
     cpx #$10
     bne @LoadPalettesLoop
-    ;---
-    ldx #0
-@copyCollisionMapLoop:
-    lda bg_collision, x
-    sta CollisionMap, x
-    inx
-    cpx #120
-    bne @copyCollisionMapLoop
 
+    lda #0
+    sta MustLoadOutside
 
-
-
-@nope:
     rts
-
 
 ;-----------------------------------
 UpdateCharacter:
