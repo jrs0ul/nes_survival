@@ -683,23 +683,23 @@ PushCollisionMapLeft:
     ldy #4
 @loop:
     lda #0
-    ;adc #0
     adc TempZ
     sta Temp; save carry, because asl will ruin it
 
     lda CollisionMap,x
     asl
-    ;save carry
+    ;save carry for next byte
     sta TempPush
     lda #0
     adc #0
     sta TempZ
-
+    ;--
     lda TempPush
     adc Temp ;add saved carry
     sta CollisionMap,x
     dey
     bne @cont
+    ;new row
     ldy #4
     dec TempY
     stx Temp
