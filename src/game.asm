@@ -120,6 +120,9 @@ ScrollCollisionColumn:  ;column of data from next collision screen
 CurrentCollisionColumnIndex:
     .res 1
 
+TimesShiftedLeft:
+    .res 1
+
 
 MustLoadHouseInterior:
     .res 1
@@ -523,24 +526,35 @@ CheckStartButton:
     inx
     cpx #COLLISION_MAP_SIZE
     bne @copyCollisionMapLoop
-;----
-    ldx #0
-@loadColumn:
-    txa
-    asl
-    asl
-    tay ; x * 4 move to y
 
-    lda bg_collision1, y
-    sta ScrollCollisionColumn, x
-    inx
-    cpx #30
-    bcc @loadColumn
+    lda #0      ;load the first column
+    sta CurrentCollisionColumnIndex
+    jsr LoadCollisionColumn
 
 dontStart:
     rts
 
 ;--------------------------------------
+;Loads collision data where CurrentCollisionColumnIndex is the column index
+LoadCollisionColumn:
+    ldx #0
+@loadColumn:
+    txa
+    asl
+    asl
+    clc
+    adc CurrentCollisionColumnIndex
+    tay ; x * 4 move to y
+
+    lda bg_collision1, y
+    sta ScrollCollisionColumn, x
+    inx
+    cpx #SCREEN_ROW_COUNT
+    bcc @loadColumn
+
+    rts
+;--------------------------------------
+
 scrollBackground:
 
     lda GlobalScroll
@@ -607,11 +621,17 @@ ProcessButtons:
     clc
     adc #8
     cmp #128
-    bcc @moveRight
+    bcc @moveRight  ;not gonna scroll until playerx < 128
+    lda GlobalScroll
+    cmp #252        ;hacky constant, it means the map stopped scrolling
+    beq @moveRight
 
     lda InHouse
     cmp #1
     beq @moveRight ; no scrolling
+    lda GlobalScroll
+    cmp #254
+    bcs @ScrollGlobalyRight
 ;--
     lda TilesScroll
     cmp #8
@@ -676,7 +696,7 @@ PushCollisionMapRight:
 PushCollisionMapLeft:
     ;starting from the bottom row
     clc
-    ldx #29
+    ldx #SCREEN_ROW_COUNT - 1
     stx TempY; save row index
 
     lda ScrollCollisionColumn, x
@@ -708,6 +728,17 @@ PushCollisionMapLeft:
     lda #0
     sta TilesScroll
 
+    inc TimesShiftedLeft
+    lda TimesShiftedLeft
+    cmp #8
+    bcc @exit
+
+    inc CurrentCollisionColumnIndex
+    jsr LoadCollisionColumn
+    lda #0
+    sta TimesShiftedLeft
+
+@exit:
     rts
 ;----------------------------------
 ;Checks 4 points against the collision map
