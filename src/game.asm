@@ -55,13 +55,17 @@ sprites:
 
 ;--------------
 ; CONSTANTS
-    DUDE_SPRITE        = $0204
-    TITLE_STATE        = 00
-    GAME_STATE         = 01
-    PLAYER_SPEED       = 02
-    INPUT_DELAY        = 128
-    COLLISION_MAP_SIZE = 120
-    
+    DUDE_SPRITE                = $0204
+    TITLE_STATE                = 00
+    GAME_STATE                 = 01
+    PLAYER_SPEED               = 02
+    INPUT_DELAY                = 128
+
+    COLLISION_MAP_SIZE         = 120
+    COLLISION_MAP_COLUMN_COUNT = 4
+
+    SCREEN_ROW_COUNT           = 30
+
 ;===================================================================
 .segment "ZEROPAGE"
 
@@ -680,27 +684,16 @@ PushCollisionMapLeft:
     sta ScrollCollisionColumn, x
 
     ldx #COLLISION_MAP_SIZE - 1
-    ldy #4
+    ldy #COLLISION_MAP_COLUMN_COUNT
 @loop:
-    lda #0
-    adc TempZ
-    sta Temp; save carry, because asl will ruin it
 
     lda CollisionMap,x
-    asl
-    ;save carry for next byte
-    sta TempPush
-    lda #0
-    adc #0
-    sta TempZ
-    ;--
-    lda TempPush
-    adc Temp ;add saved carry
+    rol ;shift collision map and add carry
     sta CollisionMap,x
     dey
     bne @cont
     ;new row
-    ldy #4
+    ldy #COLLISION_MAP_COLUMN_COUNT
     dec TempY
     stx Temp
     ldx TempY
