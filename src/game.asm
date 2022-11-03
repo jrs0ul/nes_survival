@@ -117,6 +117,9 @@ CollisionMap:
 
 ScrollCollisionColumn:  ;column of data from next collision screen
     .res 30
+ScrollCollisionColumnLeft:
+    .res 30
+
 CurrentCollisionColumnIndex:
     .res 1
 
@@ -554,6 +557,26 @@ LoadCollisionColumn:
 
     rts
 ;--------------------------------------
+;copy-paste hack
+LoadCollisionColumnLeft:
+    ldx #0
+@loadColumn:
+    txa
+    asl
+    asl
+    clc
+    adc CurrentCollisionColumnIndex
+    tay ; x * 4 move to y
+
+    lda bg_collision, y
+    sta ScrollCollisionColumnLeft, x
+    inx
+    cpx #SCREEN_ROW_COUNT
+    bcc @loadColumn
+
+    rts
+
+;--------------------------------------
 
 scrollBackground:
 
@@ -691,6 +714,53 @@ go_Up:
     rts
 ;----------------------------------
 PushCollisionMapRight:
+    clc
+    ldx #0
+    stx TempY
+
+    lda ScrollCollisionColumnLeft
+    lsr
+    sta ScrollCollisionColumnLeft
+    
+    ldx #0
+    ldy #0
+@loop:
+
+    lda CollisionMap, x
+    ror
+    sta CollisionMap, x
+    iny
+    cpy #COLLISION_MAP_COLUMN_COUNT
+    bcc @cont
+    ;new row
+    ldy #0
+    inc TempY
+    stx Temp
+    ldx TempY ; load collision column cell position
+    lda ScrollCollisionColumnLeft, x
+    lsr
+    sta ScrollCollisionColumnLeft, x
+    ldx Temp ; restore prev X
+
+@cont:
+    inx
+    cpx #COLLISION_MAP_SIZE
+    bcc @loop
+
+    lda #8
+    sta TilesScroll
+
+    dec TimesShiftedLeft
+    lda TimesShiftedLeft
+    bne @exit
+
+    dec CurrentCollisionColumnIndex
+    jsr LoadCollisionColumnLeft
+
+    lda #8
+    sta TimesShiftedLeft
+
+@exit:
     rts
 ;----------------------------------
 PushCollisionMapLeft:
