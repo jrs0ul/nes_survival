@@ -122,6 +122,8 @@ ScrollCollisionColumnLeft:
 
 CurrentCollisionColumnIndex:
     .res 1
+CurrentCollisionColumnLeftIndex:
+    .res 1
 
 TimesShiftedLeft:
     .res 1
@@ -132,6 +134,8 @@ MustLoadHouseInterior:
 MustLoadOutside:
     .res 1
 
+CarrySet:
+    .res 1
 
 FrameCount:
     .res 1
@@ -533,6 +537,9 @@ CheckStartButton:
     lda #0      ;load the first column
     sta CurrentCollisionColumnIndex
     jsr LoadCollisionColumn
+    lda #3
+    sta CurrentCollisionColumnLeftIndex
+    jsr LoadCollisionColumnLeft
 
 dontStart:
     rts
@@ -563,9 +570,9 @@ LoadCollisionColumnLeft:
 @loadColumn:
     txa
     asl
-    asl
+    asl 
     clc
-    adc CurrentCollisionColumnIndex
+    adc CurrentCollisionColumnLeftIndex
     tay ; x * 4 move to y
 
     lda bg_collision, y
@@ -604,6 +611,9 @@ ProcessButtons:
     lda InHouse
     cmp #1
     beq @moveLeft ; no scrolling inside the house :)
+    lda GlobalScroll
+    cmp #2
+    beq @moveLeft   ;hack
 ;--
     lda TilesScroll
     beq @ScrollGlobalyLeft
@@ -717,23 +727,30 @@ PushCollisionMapRight:
     clc
     ldx #0
     stx TempY
+    stx CarrySet
 
     lda ScrollCollisionColumnLeft
     lsr
     sta ScrollCollisionColumnLeft
     
     ldx #0
-    ldy #0
+    ldy #COLLISION_MAP_COLUMN_COUNT
 @loop:
 
+    lda CarrySet
+    bne @RestoreCarry
+    jmp @ShiftBits
+@RestoreCarry:
+    sec
+
+@ShiftBits:
     lda CollisionMap, x
     ror
     sta CollisionMap, x
-    iny
-    cpy #COLLISION_MAP_COLUMN_COUNT
-    bcc @cont
+    dey
+    bne @cont
     ;new row
-    ldy #0
+    ldy #COLLISION_MAP_COLUMN_COUNT
     inc TempY
     stx Temp
     ldx TempY ; load collision column cell position
@@ -743,9 +760,19 @@ PushCollisionMapRight:
     ldx Temp ; restore prev X
 
 @cont:
+
+    ;gotta save carry
+    bcs @saveCarry
+    lda #0
+    jmp @next_element
+@saveCarry:
+    lda #1
+@next_element:
+    sta CarrySet
     inx
     cpx #COLLISION_MAP_SIZE
     bcc @loop
+    ;--
 
     lda #8
     sta TilesScroll
@@ -754,7 +781,7 @@ PushCollisionMapRight:
     lda TimesShiftedLeft
     bne @exit
 
-    dec CurrentCollisionColumnIndex
+    dec CurrentCollisionColumnLeftIndex
     jsr LoadCollisionColumnLeft
 
     lda #8
