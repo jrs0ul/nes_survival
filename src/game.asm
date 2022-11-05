@@ -56,13 +56,29 @@ sprites:
 ;--------------
 ; CONSTANTS
     DUDE_SPRITE                = $0204
-    TITLE_STATE                = 00
-    GAME_STATE                 = 01
-    PLAYER_SPEED               = 02
+
+    TITLE_STATE                = 0
+    GAME_STATE                 = 1
+
+    PLAYER_SPEED               = 2
     INPUT_DELAY                = 64
 
-    COLLISION_MAP_SIZE         = 120
+    COLLISION_MAP_SIZE         = 120 ; 4 columns * 30 rows
     COLLISION_MAP_COLUMN_COUNT = 4
+    COLLISION_MAP_COLUMN_SIZE  = 8
+
+    PLAYER_COLLISION_BOX_X1    = 3
+    PLAYER_COLLISION_BOX_X2    = 13 ;16 - 3
+
+    MAX_TILE_SCROLL_LEFT       = 248; -8
+    MAX_TILE_SCROLL_RIGHT      = 8
+
+    HOUSE_DOOR_X1              = 72
+    HOUSE_DOOR_Y1              = 112
+    HOUSE_DOOR_X2              = 96
+    HOUSE_DOOR_Y2              = 120
+
+    HOUSE_EXIT_Y               = 168
 
     SCREEN_ROW_COUNT           = 30
 
@@ -171,7 +187,7 @@ reset:
     txs          ; Set up stack
     inx          ; now X = 0
     stx $2000    ; disable NMI
-    stx $2001  ; disable rendering
+    stx $2001    ; disable rendering
     stx $4010    ; disable DMC IRQs
 
 vblankwait1:       ; First wait for vblank to make sure PPU is ready
@@ -624,7 +640,7 @@ ProcessButtons:
     sec
     sbc #PLAYER_SPEED
     sta TilesScroll
-    cmp #248;-8
+    cmp #MAX_TILE_SCROLL_LEFT
     bne @ScrollGlobalyLeft
 
     jsr PushCollisionMapRight
@@ -651,7 +667,7 @@ ProcessButtons:
     sbc #PLAYER_SPEED
     sta PlayerX
 
-
+;Check if RIGHT is pressed
 @CheckRight:
     lda Buttons
     and #%00000001
@@ -678,7 +694,7 @@ ProcessButtons:
     clc
     adc #PLAYER_SPEED
     sta TilesScroll
-    cmp #8
+    cmp #MAX_TILE_SCROLL_RIGHT
     bne @ScrollGlobalyRight
 
     jsr PushCollisionMapLeft
@@ -702,7 +718,7 @@ ProcessButtons:
 
 @moveRight:
     lda PlayerX
-    cmp #246 ;254 - 8
+    cmp #238 ;254 - 16
     beq @CheckUp
     clc
     adc #PLAYER_SPEED
@@ -732,6 +748,7 @@ go_Up:
     sta Buttons
     rts
 ;----------------------------------
+;Pushing collision map right when moving left
 PushCollisionMapRight:
     clc
     ldx #0
@@ -741,10 +758,9 @@ PushCollisionMapRight:
     lda ScrollCollisionColumnLeft
     lsr
     sta ScrollCollisionColumnLeft
-    
+
     ldx #0
     ldy #COLLISION_MAP_COLUMN_COUNT
-
 
 @loop:
 
@@ -756,7 +772,7 @@ PushCollisionMapRight:
 
 @ShiftBits:
     lda CollisionMap, x
-    ror
+    ror ;shifts right and inserts carry as least significant bit
     sta CollisionMap, x
     dey
     bne @cont ; continue with the next element in the row
@@ -795,21 +811,22 @@ PushCollisionMapRight:
     lda #0
     sta TilesScroll
 
-
     lda TimesShiftedLeft
     bne @revert         ;TimesShiftedLeft > 0
 
     inc TimesShiftedRight
     lda TimesShiftedRight
-    cmp #8
+    cmp #COLLISION_MAP_COLUMN_SIZE
     beq @update_columns
     jmp @exit
 
 @revert:
     dec TimesShiftedLeft
+    lda TimesShiftedLeft
+    beq @reloadLeftColumn ;TimesShiftedLeft = 0, reload left column
     jmp @exit
 
-@update_columns:
+@update_columns: ;update left and right side columns
     dec LeftCollisionColumnIndex
     jsr LoadLeftCollisionColumn
     dec RightCollisionColumnIndex
@@ -817,7 +834,9 @@ PushCollisionMapRight:
 
     lda #0
     sta TimesShiftedRight
-
+    jmp @exit
+@reloadLeftColumn:
+    jsr LoadLeftCollisionColumn
 @exit:
     rts
 ;----------------------------------
@@ -870,12 +889,14 @@ PushCollisionMapLeft:
 
     inc TimesShiftedLeft
     lda TimesShiftedLeft
-    cmp #8
+    cmp #COLLISION_MAP_COLUMN_SIZE
     beq @update_columns
     jmp @exit
 
 @revert:
     dec TimesShiftedRight
+    lda TimesShiftedRight
+    beq @reloadRightColumn
     jmp @exit
 
 @update_columns:
@@ -886,6 +907,9 @@ PushCollisionMapLeft:
 
     lda #0
     sta TimesShiftedLeft
+    jmp @exit
+@reloadRightColumn:
+    jsr LoadRightCollisionColumn
 
 @exit:
     rts
@@ -895,9 +919,10 @@ CanPlayerGo:
 
     lda PlayerX
     clc
-    adc #3
+    adc #PLAYER_COLLISION_BOX_X1
     adc TilesScroll
     sta TempPointX
+
     lda PlayerY
     clc
     adc #8
@@ -916,7 +941,7 @@ CanPlayerGo:
 
     lda PlayerX
     clc
-    adc #13 ;16 - 3
+    adc #PLAYER_COLLISION_BOX_X2
     adc TilesScroll
     sta TempPointX
 
@@ -1003,16 +1028,16 @@ CheckIfEnteredHouse:
     clc
     adc #8
 
-    cmp #72
+    cmp #HOUSE_DOOR_X1
     bcc @nope
-    cmp #96
+    cmp #HOUSE_DOOR_X2
     bcs @nope
     lda PlayerY
     clc
     adc #10
-    cmp #112
+    cmp #HOUSE_DOOR_Y1
     bcc @nope
-    cmp #120
+    cmp #HOUSE_DOOR_Y2
     bcs @nope
 
     ldx #0
@@ -1084,7 +1109,7 @@ CheckIfExitedHouse:
     beq @nope
 
     lda PlayerY
-    cmp #168
+    cmp #HOUSE_EXIT_Y
     bcc @nope
 
     ldx #0
