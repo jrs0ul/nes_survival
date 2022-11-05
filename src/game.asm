@@ -59,7 +59,7 @@ sprites:
     TITLE_STATE                = 00
     GAME_STATE                 = 01
     PLAYER_SPEED               = 02
-    INPUT_DELAY                = 128
+    INPUT_DELAY                = 64
 
     COLLISION_MAP_SIZE         = 120
     COLLISION_MAP_COLUMN_COUNT = 4
@@ -115,17 +115,22 @@ InHouse:    ;is the player inside his hut?
 CollisionMap:
     .res COLLISION_MAP_SIZE
 
-ScrollCollisionColumn:  ;column of data from next collision screen
+ScrollCollisionColumnRight:  ;column of data from next collision screen
     .res 30
 ScrollCollisionColumnLeft:
     .res 30
 
-CurrentCollisionColumnIndex:
+DummyHack:
+    .res 2
+
+LeftCollisionColumnIndex:
     .res 1
-CurrentCollisionColumnLeftIndex:
+RightCollisionColumnIndex:
     .res 1
 
 TimesShiftedLeft:
+    .res 1
+TimesShiftedRight:
     .res 1
 
 
@@ -535,29 +540,29 @@ CheckStartButton:
     bne @copyCollisionMapLoop
 
     lda #0      ;load the first column
-    sta CurrentCollisionColumnIndex
-    jsr LoadCollisionColumn
-    lda #3
-    sta CurrentCollisionColumnLeftIndex
-    jsr LoadCollisionColumnLeft
+    sta RightCollisionColumnIndex
+    jsr LoadRightCollisionColumn
+    lda #255;-1
+    sta LeftCollisionColumnIndex
+    ;jsr LoadLeftCollisionColumn
 
 dontStart:
     rts
 
 ;--------------------------------------
 ;Loads collision data where CurrentCollisionColumnIndex is the column index
-LoadCollisionColumn:
+LoadRightCollisionColumn:
     ldx #0
 @loadColumn:
     txa
     asl
     asl
     clc
-    adc CurrentCollisionColumnIndex
+    adc RightCollisionColumnIndex
     tay ; x * 4 move to y
 
     lda bg_collision1, y
-    sta ScrollCollisionColumn, x
+    sta ScrollCollisionColumnRight, x
     inx
     cpx #SCREEN_ROW_COUNT
     bcc @loadColumn
@@ -565,14 +570,14 @@ LoadCollisionColumn:
     rts
 ;--------------------------------------
 ;copy-paste hack
-LoadCollisionColumnLeft:
+LoadLeftCollisionColumn:
     ldx #0
 @loadColumn:
     txa
     asl
     asl 
     clc
-    adc CurrentCollisionColumnLeftIndex
+    adc LeftCollisionColumnIndex
     tay ; x * 4 move to y
 
     lda bg_collision, y
@@ -611,12 +616,16 @@ ProcessButtons:
     lda InHouse
     cmp #1
     beq @moveLeft ; no scrolling inside the house :)
+
     lda GlobalScroll
-    cmp #2
     beq @moveLeft   ;hack
 ;--
     lda TilesScroll
-    beq @ScrollGlobalyLeft
+    beq @set_eight
+    jmp @subtract
+@set_eight:
+    lda #8
+@subtract:
     sec
     sbc #PLAYER_SPEED
     sta TilesScroll
@@ -627,12 +636,17 @@ ProcessButtons:
 ;--
 @ScrollGlobalyLeft:
     lda GlobalScroll
-    beq @moveLeft ; it's zero
+    cmp #1
+    beq @clampLeft
+
     sec
     sbc #PLAYER_SPEED
-    cmp #2
-    bcc @moveLeft
-
+    jmp @saveLeft
+    ;cmp #2
+    ;bcc @moveLeft
+@clampLeft:
+    lda #0
+@saveLeft:
     sta GlobalScroll
 
     jmp @CheckRight
@@ -654,21 +668,26 @@ ProcessButtons:
     clc
     adc #8
     cmp #128
-    bcc @moveRight  ;not gonna scroll until playerx < 128
+    bcc @moveRight  ;not gonna scroll until playerx >= 128
     lda GlobalScroll
-    cmp #252        ;hacky constant, it means the map stopped scrolling
+    cmp #255        ;hacky constant, it means the map stopped scrolling
     beq @moveRight
 
     lda InHouse
     cmp #1
     beq @moveRight ; no scrolling
+
     lda GlobalScroll
-    cmp #254
+    cmp #255
     bcs @ScrollGlobalyRight
 ;--
     lda TilesScroll
     cmp #8
-    beq @ScrollGlobalyRight
+    beq @Set_Zero
+    jmp @add
+@Set_Zero:
+    lda #0
+@add:
     clc
     adc #PLAYER_SPEED
     sta TilesScroll
@@ -680,13 +699,16 @@ ProcessButtons:
 ;--
 @ScrollGlobalyRight:
     lda GlobalScroll
-    cmp #255
-    beq @moveRight
+    cmp #254
+    beq @clamp
     clc
     adc #PLAYER_SPEED
-    cmp #254
-    bcs @moveRight
-
+    cmp #255
+    bcs @clamp
+    jmp @save
+@clamp:
+    lda #255
+@save:
     sta GlobalScroll
 
     jmp @CheckUp
@@ -761,7 +783,7 @@ PushCollisionMapRight:
 
 @cont:
 
-    ;gotta save carry
+    ;gotta save carry for ror
     bcs @saveCarry
     lda #0
     jmp @next_element
@@ -777,28 +799,42 @@ PushCollisionMapRight:
     lda #8
     sta TilesScroll
 
-    dec TimesShiftedLeft
+
     lda TimesShiftedLeft
-    bne @exit
+    bne @revert         ;TimesShiftedLeft > 0
 
-    dec CurrentCollisionColumnLeftIndex
-    jsr LoadCollisionColumnLeft
+    inc TimesShiftedRight
+    lda TimesShiftedRight
+    cmp #8
+    beq @update_columns
+    jmp @exit
 
-    lda #8
-    sta TimesShiftedLeft
+@revert:
+    dec TimesShiftedLeft
+    jmp @exit
+
+@update_columns:
+    dec LeftCollisionColumnIndex
+    jsr LoadLeftCollisionColumn
+    dec RightCollisionColumnIndex
+    jsr LoadRightCollisionColumn
+
+    lda #0
+    sta TimesShiftedRight
 
 @exit:
     rts
 ;----------------------------------
+;Pushing collision map left when moving right
 PushCollisionMapLeft:
     ;starting from the bottom row
     clc
     ldx #SCREEN_ROW_COUNT - 1
     stx TempY; save row index
 
-    lda ScrollCollisionColumn, x
+    lda ScrollCollisionColumnRight, x
     asl
-    sta ScrollCollisionColumn, x
+    sta ScrollCollisionColumnRight, x
 
     ldx #COLLISION_MAP_SIZE - 1
     ldy #COLLISION_MAP_COLUMN_COUNT
@@ -814,9 +850,9 @@ PushCollisionMapLeft:
     dec TempY
     stx Temp
     ldx TempY
-    lda ScrollCollisionColumn, x
+    lda ScrollCollisionColumnRight, x
     asl
-    sta ScrollCollisionColumn, x
+    sta ScrollCollisionColumnRight, x
     ldx Temp
 @cont:
     dex
@@ -825,13 +861,25 @@ PushCollisionMapLeft:
     lda #0
     sta TilesScroll
 
+    lda TimesShiftedRight
+    bne @revert
+
     inc TimesShiftedLeft
     lda TimesShiftedLeft
     cmp #8
-    bcc @exit
+    beq @update_columns
+    jmp @exit
 
-    inc CurrentCollisionColumnIndex
-    jsr LoadCollisionColumn
+@revert:
+    dec TimesShiftedRight
+    jmp @exit
+
+@update_columns:
+    inc RightCollisionColumnIndex
+    jsr LoadRightCollisionColumn
+    inc LeftCollisionColumnIndex
+    jsr LoadLeftCollisionColumn
+
     lda #0
     sta TimesShiftedLeft
 
