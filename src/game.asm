@@ -621,15 +621,10 @@ ProcessButtons:
     beq @moveLeft   ;hack
 ;--
     lda TilesScroll
-    beq @set_eight
-    jmp @subtract
-@set_eight:
-    lda #8
-@subtract:
     sec
     sbc #PLAYER_SPEED
     sta TilesScroll
-    cmp #0
+    cmp #248;-8
     bne @ScrollGlobalyLeft
 
     jsr PushCollisionMapRight
@@ -642,8 +637,6 @@ ProcessButtons:
     sec
     sbc #PLAYER_SPEED
     jmp @saveLeft
-    ;cmp #2
-    ;bcc @moveLeft
 @clampLeft:
     lda #0
 @saveLeft:
@@ -682,12 +675,6 @@ ProcessButtons:
     bcs @ScrollGlobalyRight
 ;--
     lda TilesScroll
-    cmp #8
-    beq @Set_Zero
-    jmp @add
-@Set_Zero:
-    lda #0
-@add:
     clc
     adc #PLAYER_SPEED
     sta TilesScroll
@@ -757,6 +744,8 @@ PushCollisionMapRight:
     
     ldx #0
     ldy #COLLISION_MAP_COLUMN_COUNT
+
+
 @loop:
 
     lda CarrySet
@@ -770,12 +759,19 @@ PushCollisionMapRight:
     ror
     sta CollisionMap, x
     dey
-    bne @cont
+    bne @cont ; continue with the next element in the row
+
+    ;push bits in the Right column as well
+    stx Temp ; save x
+    ldx TempY ; load collision column cell position
+    lda ScrollCollisionColumnRight, x
+    ror
+    sta ScrollCollisionColumnRight, x
+
     ;new row
     ldy #COLLISION_MAP_COLUMN_COUNT
     inc TempY
-    stx Temp
-    ldx TempY ; load collision column cell position
+    ldx TempY
     lda ScrollCollisionColumnLeft, x
     lsr
     sta ScrollCollisionColumnLeft, x
@@ -796,7 +792,7 @@ PushCollisionMapRight:
     bcc @loop
     ;--
 
-    lda #8
+    lda #0
     sta TilesScroll
 
 
@@ -845,10 +841,18 @@ PushCollisionMapLeft:
     sta CollisionMap,x
     dey
     bne @cont
+
+    ;scroll left column
+
+    stx Temp
+    ldx TempY
+    lda ScrollCollisionColumnLeft, x
+    rol
+    sta ScrollCollisionColumnLeft, x
+
     ;new row
     ldy #COLLISION_MAP_COLUMN_COUNT
     dec TempY
-    stx Temp
     ldx TempY
     lda ScrollCollisionColumnRight, x
     asl
