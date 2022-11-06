@@ -141,8 +141,6 @@ ScrollCollisionColumnRight:  ;column of data from next collision screen
 ScrollCollisionColumnLeft:
     .res SCREEN_ROW_COUNT
 
-BigChungus:
-    .res 100
 
 LeftCollisionColumnIndex:
     .res 1
@@ -276,6 +274,10 @@ endlessLoop:
     jmp continueForever
 
 doInput:
+
+    lda Buttons
+    beq finishInput ; no input
+
     lda PlayerX
     sta OldPlayerX
     lda PlayerY
@@ -286,11 +288,6 @@ doInput:
     sta OldTileScroll
 
     jsr ProcessButtons
-    lda DirectionX
-    clc
-    adc DirectionY
-    cmp #0
-    beq finishInput  ; no input
 
     jsr CanPlayerGo
     beq contInput; all good, no obstacles
@@ -853,9 +850,12 @@ PushCollisionMapRight:
     ldy #COLLISION_MAP_COLUMN_COUNT
     inc TempY
     ldx TempY
+    cpx #SCREEN_ROW_COUNT
+    bcs @restoreX
     lda ScrollCollisionColumnLeft, x
     lsr
     sta ScrollCollisionColumnLeft, x
+@restoreX:
     ldx Temp ; restore prev X
 
 @cont:
@@ -938,9 +938,12 @@ PushCollisionMapLeft:
     ldy #COLLISION_MAP_COLUMN_COUNT
     dec TempY
     ldx TempY
+    cpx #255
+    beq @restoreX
     lda ScrollCollisionColumnRight, x
     asl
     sta ScrollCollisionColumnRight, x
+@restoreX:
     ldx Temp
 @cont:
     dex
