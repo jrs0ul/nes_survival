@@ -132,9 +132,9 @@ CollisionMap:
     .res COLLISION_MAP_SIZE
 
 ScrollCollisionColumnRight:  ;column of data from next collision screen
-    .res 30
+    .res SCREEN_ROW_COUNT
 ScrollCollisionColumnLeft:
-    .res 30
+    .res SCREEN_ROW_COUNT
 
 DummyHack:
     .res 2
@@ -508,14 +508,16 @@ CheckStartButton:
     lda Buttons
     and #%00010000
     beq dontStart
-    
+
     lda GameState
     cmp #$00
     bne dontStart
-    
+
     lda #GAME_STATE
     sta GameState
-    
+
+    ;Load Nametable 1
+
     lda #$00
     sta $2000
     sta $2001
@@ -525,12 +527,13 @@ CheckStartButton:
     lda #>background
     sta pointer+1
 
-    lda #$20
+    lda #$20    ;$20000
     sta NametableAddress
 
     jsr LoadNametable
-    
-    ;---
+
+    ;Load Nametable 2
+
     lda #$00
     sta $2000
     sta $2001
@@ -540,7 +543,7 @@ CheckStartButton:
     lda #>field_bg1
     sta pointer+1
 
-    lda #$24
+    lda #$24    ;$2400
     sta NametableAddress
 
     jsr LoadNametable
@@ -560,7 +563,6 @@ CheckStartButton:
     jsr LoadRightCollisionColumn
     lda #255;-1
     sta LeftCollisionColumnIndex
-    ;jsr LoadLeftCollisionColumn
 
 dontStart:
     rts
@@ -931,14 +933,6 @@ CanPlayerGo:
     jsr TestPointAgainstCollisionMap
     bne @collides
 
-    lda PlayerY
-    clc
-    adc #8
-    sta TempPointY
-
-    jsr TestPointAgainstCollisionMap
-    bne @collides
-
     lda PlayerX
     clc
     adc #PLAYER_COLLISION_BOX_X2
@@ -948,17 +942,9 @@ CanPlayerGo:
     jsr TestPointAgainstCollisionMap
     bne @collides
 
-    lda PlayerY
-    clc
-    adc #8
-    sta TempPointY
-
-    jsr TestPointAgainstCollisionMap
-    bne @collides
-
     lda #0
     jmp @end
-    
+
 @collides:
     lda #1
 @end:
