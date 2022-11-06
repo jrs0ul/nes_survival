@@ -114,6 +114,11 @@ PlayerX:
 PlayerY:
     .res 1
 
+DirectionX:
+    .res 1
+DirectionY:
+    .res 1
+
 
 hp0:
     .res 1
@@ -136,8 +141,8 @@ ScrollCollisionColumnRight:  ;column of data from next collision screen
 ScrollCollisionColumnLeft:
     .res SCREEN_ROW_COUNT
 
-DummyHack:
-    .res 2
+BigChungus:
+    .res 100
 
 LeftCollisionColumnIndex:
     .res 1
@@ -281,6 +286,12 @@ doInput:
     sta OldTileScroll
 
     jsr ProcessButtons
+    lda DirectionX
+    clc
+    adc DirectionY
+    cmp #0
+    beq finishInput  ; no input
+
     jsr CanPlayerGo
     beq contInput; all good, no obstacles
 
@@ -294,7 +305,28 @@ doInput:
     lda OldTileScroll
     sta TilesScroll
 
+    jmp finishInput
+
 contInput:
+    lda TilesScroll
+    cmp #MAX_TILE_SCROLL_RIGHT
+    bne checkAnother
+    lda DirectionX
+    cmp #2
+    bne checkAnother
+    jsr PushCollisionMapLeft
+    jmp finishInput
+checkAnother:
+    lda TilesScroll
+    cmp #MAX_TILE_SCROLL_LEFT
+    bne finishInput
+    lda DirectionX
+    cmp #1
+    bne finishInput
+    jsr PushCollisionMapRight
+
+
+finishInput:
     lda #INPUT_DELAY
     sta FrameCount
 
@@ -570,6 +602,11 @@ dontStart:
 ;--------------------------------------
 ;Loads collision data where CurrentCollisionColumnIndex is the column index
 LoadRightCollisionColumn:
+
+    lda RightCollisionColumnIndex
+    cmp #COLLISION_MAP_COLUMN_COUNT
+    bcs @exit
+
     ldx #0
 @loadColumn:
     txa
@@ -585,10 +622,16 @@ LoadRightCollisionColumn:
     cpx #SCREEN_ROW_COUNT
     bcc @loadColumn
 
+@exit:
     rts
 ;--------------------------------------
 ;copy-paste hack
 LoadLeftCollisionColumn:
+
+    lda LeftCollisionColumnIndex
+    cmp #COLLISION_MAP_COLUMN_COUNT
+    bcs @exit
+
     ldx #0
 @loadColumn:
     txa
@@ -604,6 +647,7 @@ LoadLeftCollisionColumn:
     cpx #SCREEN_ROW_COUNT
     bcc @loadColumn
 
+@exit:
     rts
 
 ;--------------------------------------
@@ -618,11 +662,17 @@ scrollBackground:
     rts
 ;---------------------------------
 ProcessButtons:
+    lda #0
+    sta DirectionX
+    sta DirectionY
 
 ;Check if LEFT is pressed
     lda Buttons
     and #%00000010
     beq @CheckRight
+
+    lda #1
+    sta DirectionX
 
     lda PlayerX
     clc
@@ -642,10 +692,10 @@ ProcessButtons:
     sec
     sbc #PLAYER_SPEED
     sta TilesScroll
-    cmp #MAX_TILE_SCROLL_LEFT
-    bne @ScrollGlobalyLeft
+    ;cmp #MAX_TILE_SCROLL_LEFT
+    ;bne @ScrollGlobalyLeft
 
-    jsr PushCollisionMapRight
+    ;jsr PushCollisionMapRight
 ;--
 @ScrollGlobalyLeft:
     lda GlobalScroll
@@ -660,20 +710,24 @@ ProcessButtons:
 @saveLeft:
     sta GlobalScroll
 
-    jmp @CheckRight
+    jmp @CheckUp
 
 @moveLeft:
     lda PlayerX
-    beq @CheckRight ; already x=0
+    beq @CheckUp ; already x=0
     sec
     sbc #PLAYER_SPEED
     sta PlayerX
-
+    jmp @CheckUp
+;-----
 ;Check if RIGHT is pressed
 @CheckRight:
     lda Buttons
     and #%00000001
     beq @CheckUp
+
+    lda #2
+    sta DirectionX
 
     lda PlayerX
     clc
@@ -696,10 +750,10 @@ ProcessButtons:
     clc
     adc #PLAYER_SPEED
     sta TilesScroll
-    cmp #MAX_TILE_SCROLL_RIGHT
-    bne @ScrollGlobalyRight
+    ;cmp #MAX_TILE_SCROLL_RIGHT
+    ;bne @ScrollGlobalyRight
 
-    jsr PushCollisionMapLeft
+    ;jsr PushCollisionMapLeft
 
 ;--
 @ScrollGlobalyRight:
@@ -726,12 +780,17 @@ ProcessButtons:
     adc #PLAYER_SPEED
     sta PlayerX
 
-
+;--------
+;Check if UP is pressed
 @CheckUp:
 go_Up:
     lda Buttons
     and #%00001000
     beq @CheckDown
+
+    lda #1
+    sta DirectionY
+
     lda PlayerY
     sec
     sbc #PLAYER_SPEED
@@ -741,6 +800,10 @@ go_Up:
     lda Buttons
     and #%00000100
     beq @exit
+
+    lda #2
+    sta DirectionY
+
     lda PlayerY
     clc
     adc #PLAYER_SPEED
