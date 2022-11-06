@@ -37,7 +37,7 @@ zerosprite:
     .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
     .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
     .byte $00,$41,$49,$00,$30,$30,$00,$41,$4E,$47,$40,$3E,$4B,$00,$30,$30
-    .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
+    .byte $00,$50,$3A,$4B,$46,$4D,$41,$00,$30,$30,$00,$00,$00,$3D,$30,$30
 
 palette:
     .byte $0f,$00,$21,$31, $0f,$27,$21,$31, $0f,$17,$21,$31, $31,$10,$0f,$01    ;background
@@ -112,6 +112,11 @@ OldPlayerY:
 PlayerX:
     .res 1
 PlayerY:
+    .res 1
+
+PlayerFrame:
+    .res 1
+PlayerFlip:
     .res 1
 
 DirectionX:
@@ -398,7 +403,7 @@ WaitSprite0:
     beq WaitSprite0      ; wait until sprite 0 is hit
 
 
-    ldx #$03
+    ldx #$F
 WaitScanline:
     dex
     bne WaitScanline
@@ -670,6 +675,9 @@ ProcessButtons:
 
     lda #1
     sta DirectionX
+    lda #0
+    sta PlayerFrame
+    sta PlayerFlip
 
     lda PlayerX
     clc
@@ -689,10 +697,6 @@ ProcessButtons:
     sec
     sbc #PLAYER_SPEED
     sta TilesScroll
-    ;cmp #MAX_TILE_SCROLL_LEFT
-    ;bne @ScrollGlobalyLeft
-
-    ;jsr PushCollisionMapRight
 ;--
 @ScrollGlobalyLeft:
     lda GlobalScroll
@@ -725,6 +729,11 @@ ProcessButtons:
 
     lda #2
     sta DirectionX
+    lda #0
+    sta PlayerFrame
+    lda #1
+    sta PlayerFlip
+
 
     lda PlayerX
     clc
@@ -747,11 +756,6 @@ ProcessButtons:
     clc
     adc #PLAYER_SPEED
     sta TilesScroll
-    ;cmp #MAX_TILE_SCROLL_RIGHT
-    ;bne @ScrollGlobalyRight
-
-    ;jsr PushCollisionMapLeft
-
 ;--
 @ScrollGlobalyRight:
     lda GlobalScroll
@@ -787,6 +791,9 @@ go_Up:
 
     lda #1
     sta DirectionY
+    lda #1
+    sta PlayerFrame
+
 
     lda PlayerY
     sec
@@ -800,6 +807,9 @@ go_Up:
 
     lda #2
     sta DirectionY
+    lda #2
+    sta PlayerFrame
+
 
     lda PlayerY
     clc
@@ -1225,20 +1235,62 @@ LoadOutsideMap:
 ;-----------------------------------
 UpdateCharacter:
 
+    ;sprite 1
     ldx #$00
     lda PlayerY
     sta DUDE_SPRITE, x
     inx
+    lda PlayerFlip
+    beq @NoFlip1
+    lda PlayerFrame
+    asl ;frame * 2
+    clc
+    adc #1
+    sta DUDE_SPRITE,x
     inx
+    lda DUDE_SPRITE, x
+    ora #%01000000
+    sta DUDE_SPRITE, x
+    jmp @MoveX1
+@NoFlip1:
+    lda PlayerFrame
+    asl ;frame * 2
+    sta DUDE_SPRITE,x
+    inx
+    lda DUDE_SPRITE, x
+    and #%10111111
+    sta DUDE_SPRITE, x
+@MoveX1:
     inx
     lda PlayerX
     sta DUDE_SPRITE, x
     inx
 
+    ;sprite 2
     lda PlayerY
     sta DUDE_SPRITE, x
     inx
+    lda PlayerFlip
+    beq @NoFlip2
+    lda PlayerFrame
+    asl
+    sta DUDE_SPRITE, x
     inx
+    lda DUDE_SPRITE, x
+    ora #%01000000
+    sta DUDE_SPRITE, x
+    jmp @MoveX2
+@NoFlip2:
+    lda PlayerFrame
+    asl
+    clc
+    adc #1
+    sta DUDE_SPRITE, x
+    inx
+    lda DUDE_SPRITE, x
+    and #%10111111
+    sta DUDE_SPRITE, x
+@MoveX2:
     inx
     lda PlayerX
     clc
@@ -1246,23 +1298,69 @@ UpdateCharacter:
     sta DUDE_SPRITE, x
     inx
 
+    ;sprite 3
+    lda PlayerY
+    clc
+    adc #$08
+    sta DUDE_SPRITE, x
+    inx
+    lda PlayerFlip
+    beq @NoFlip3
+    lda PlayerFrame
+    asl
+    clc
+    adc #17
+    sta DUDE_SPRITE, x
+    inx
+    lda DUDE_SPRITE, x
+    ora #%01000000
+    sta DUDE_SPRITE, x
+    jmp @MoveX3
+@NoFlip3:
+    lda PlayerFrame
+    asl
+    clc
+    adc #16
+    sta DUDE_SPRITE, x
+    inx
+    lda DUDE_SPRITE, x
+    and #%10111111
+    sta DUDE_SPRITE, x
+@MoveX3:
+    inx
+    lda PlayerX
+    sta DUDE_SPRITE, x
+    inx
+
+    ;sprite 4
     lda PlayerY
     clc
     adc #$08
     sta DUDE_SPRITE,x
     inx
-    inx
-    inx
-    lda PlayerX
+    lda PlayerFlip
+    beq @NoFlip4
+    lda PlayerFrame
+    asl
+    clc
+    adc #16
     sta DUDE_SPRITE, x
     inx
-
-    lda PlayerY
+    lda DUDE_SPRITE, x
+    ora #%01000000
+    sta DUDE_SPRITE, x
+    jmp @MoveX4
+@NoFlip4:
+    lda PlayerFrame
+    asl
     clc
-    adc #$08
-    sta DUDE_SPRITE,x
+    adc #17
+    sta DUDE_SPRITE, x
     inx
-    inx
+    lda DUDE_SPRITE, x
+    and #%10111111
+    sta DUDE_SPRITE, x
+@MoveX4:
     inx
     lda PlayerX
     clc
