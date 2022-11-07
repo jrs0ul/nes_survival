@@ -87,6 +87,7 @@ sprites:
     CHARACTER_ZERO             = $30
 
     MAX_WARMTH_DELAY           = $40
+    FIRE_ANIMATION_DELAY       = $20
 
 ;===================================================================
 .segment "ZEROPAGE"
@@ -130,6 +131,10 @@ DirectionX:
 DirectionY:
     .res 1
 
+FireFrame:  ;an animation frame of fire in the fireplace
+    .res 1
+FireFrameDelay:
+    .res 1
 
 HP:
     .res 2
@@ -292,6 +297,19 @@ doSomeLogics:
     lda NMIActive
     beq continueForever
 
+    dec FireFrameDelay
+    lda FireFrameDelay
+    bne checkHP
+    lda #FIRE_ANIMATION_DELAY
+    sta FireFrameDelay
+    inc FireFrame
+    lda FireFrame
+    cmp #2
+    bne checkHP
+    lda #0
+    sta FireFrame
+
+checkHP:
     lda HP
     beq checkSecondHPdigit
     jmp checkWarmth
@@ -312,6 +330,8 @@ checkWarmth:
 resetWarmthDelay:
     lda #MAX_WARMTH_DELAY
     sta WarmthDelay
+    lda InHouse
+    bne increaseWarmth
     jsr DecreaseWarmth
     lda Warmth
     beq checkSecondDigit
@@ -322,6 +342,10 @@ checkSecondDigit:
     jmp doneLogics
 decreaseLife:
     jsr DecreaseHP
+    jmp doneLogics
+
+increaseWarmth:
+    jsr IncreaseWarmth
 
 
 doneLogics:
@@ -366,17 +390,20 @@ nmi:
     jsr LoadTheHouseInterior
 checkIfOutsideNeedsToLoad:
     lda MustLoadOutside
-    beq continueNmi
+    beq checkFire
     jsr LoadOutsideMap
 
-   
+checkFire:
+    lda InHouse
+    beq continueNmi
+    jsr UpdateFireplace
+
 continueNmi:
     jsr CheckGameOver
     jsr UpdateCharacter
     jsr UpdateStatusDigits
 
 
-    
     ;This is the PPU clean up section, so rendering the next frame starts properly.
     lda #%10010000   ; enable NMI, sprites from Pattern Table 0, background from Pattern Table 1
     sta $2000
@@ -426,8 +453,33 @@ endOfNmi:
     rti        ; return from interrupt
 
 ;#############################| Subroutines |#############################################
+UpdateFireplace:
+
+    lda $2002
+    lda #$21
+    sta $2006
+    lda #$0E
+    sta $2006
+
+    lda FireFrame
+    asl
+    sta Temp
+    lda #$5C
+    clc
+    adc Temp
+    sta $2007
+    lda #$5C
+    clc
+    adc Temp
+    adc #1
+    sta $2007
 
 
+    rts
+
+
+
+;----------------------------------
 HandleInput:
     lda Buttons
     beq finishInput ; no input
@@ -605,6 +657,8 @@ ResetEntityVariables:
 
     lda #MAX_WARMTH_DELAY
     sta WarmthDelay
+    lda #FIRE_ANIMATION_DELAY
+    sta FireFrameDelay
 
     lda #0
     sta GlobalScroll
@@ -637,6 +691,25 @@ DecreaseWarmth:
 
 @exit:
     rts
+;-------------------------------------
+IncreaseWarmth:
+
+    lda Warmth + 1
+    cmp #9
+    beq @increaseUpperDigit
+
+    inc Warmth + 1
+    jmp @exit
+@increaseUpperDigit:
+    lda Warmth
+    cmp #9
+    beq @exit
+    inc Warmth
+    lda #0
+    sta Warmth + 1
+@exit:
+    rts
+
 ;-------------------------------------
 DecreaseHP:
 
