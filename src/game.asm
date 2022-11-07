@@ -82,6 +82,10 @@ sprites:
 
     SCREEN_ROW_COUNT           = 30
 
+    CHARACTER_ZERO             = $30
+    
+    MAX_WARMTH_DELAY           = $40
+
 ;===================================================================
 .segment "ZEROPAGE"
 
@@ -125,10 +129,18 @@ DirectionY:
     .res 1
 
 
-hp0:
+HP:
+    .res 2
+Warmth:
+    .res 2
+
+WarmthDelay:
     .res 1
-hp1:
+
+NMIActive:
     .res 1
+
+
 GameState:
     .res 1
 PlayerAlive:
@@ -221,21 +233,13 @@ vblankwait2:      ; Second wait for vblank, PPU is ready after this
     bpl vblankwait2
 
 
-loadpalettes:
-    lda $2002    ; read PPU status to reset the high/low latch
-    lda #$3F
-    sta $2006    ; write the high byte of $3F00 address
-    lda #$00
-    sta $2006    ; write the low byte of $3F00 address
-
-    ; Set x to 0 to get ready to load relative addresses from x
-    ldx #$00
-LoadPalettesLoop:
-    lda palette, x        ;load palette byte
-    sta $2007             ;write to PPU
-    inx                   ;set index to next byte
-    cpx #$20
-    bne LoadPalettesLoop  ;if x = $20, 32 bytes copied, all done
+    lda #<palette
+    sta pointer
+    lda #>palette
+    sta pointer + 1
+    lda #32
+    sta Temp
+    jsr LoadPalette
 
     jsr loadSprites
 
@@ -276,10 +280,175 @@ endlessLoop:
 
     dec FrameCount
     bne doInput
-    jmp continueForever
+    jmp doSomeLogics
 
 doInput:
+    jsr HandleInput
 
+doSomeLogics:
+
+    lda NMIActive
+    beq continueForever
+
+    lda HP
+    beq checkSecondHPdigit
+    jmp checkWarmth
+checkSecondHPdigit:
+    lda HP + 1
+    beq killPlayer
+    jmp checkWarmth
+killPlayer:
+    lda #0
+    sta PlayerAlive
+    jmp doneLogics
+
+checkWarmth:
+    dec WarmthDelay
+    lda WarmthDelay
+    beq resetWarmthDelay
+    jmp doneLogics
+resetWarmthDelay:
+    lda #MAX_WARMTH_DELAY
+    sta WarmthDelay
+    jsr DecreaseWarmth
+    lda Warmth
+    beq checkSecondDigit
+    jmp doneLogics
+checkSecondDigit:
+    lda Warmth + 1
+    beq decreaseLife
+    jmp doneLogics
+decreaseLife:
+    jsr DecreaseHP
+
+
+doneLogics:
+    lda #0
+    sta NMIActive
+
+continueForever:
+
+    jsr CheckIfEnteredHouse
+    jsr CheckIfExitedHouse
+
+    jmp endlessLoop
+
+;=========================================================
+
+nmi:
+    ;push registers to stack
+    pha
+    tya
+    pha
+    txa
+    pha
+    ;---
+
+    lda #$00
+    sta $2003        ; set the low byte (00) of the RAM address
+    lda #$02
+    sta $4014        ; set the high byte (02) of the RAM address, start the transfer
+
+    lda #1
+    sta NMIActive
+
+    jsr ReadController
+    jsr CheckStartButton
+
+    lda #GAME_STATE
+    cmp GameState
+    bne endOfNmi
+
+    lda MustLoadHouseInterior
+    beq checkIfOutsideNeedsToLoad
+    jsr LoadTheHouseInterior
+checkIfOutsideNeedsToLoad:
+    lda MustLoadOutside
+    beq continueNmi
+    jsr LoadOutsideMap
+
+   
+continueNmi:
+    jsr CheckGameOver
+    jsr UpdateCharacter
+    jsr UpdateStatusDigits
+
+
+    
+    ;This is the PPU clean up section, so rendering the next frame starts properly.
+    lda #%10010000   ; enable NMI, sprites from Pattern Table 0, background from Pattern Table 1
+    sta $2000
+    lda #%00011110   ; enable sprites, enable background, no clipping on left side
+    sta $2001
+
+
+    lda #$00
+    sta $2006        ; clean up PPU address registers
+    sta $2006
+
+    lda #$00         ; start with no scroll for status bar
+    sta $2005
+    sta $2005
+
+
+WaitNotSprite0:
+    lda $2002
+    and #%01000000
+    bne WaitNotSprite0   ; wait until sprite 0 not hit
+
+WaitSprite0:
+    lda $2002
+    and #%01000000
+    beq WaitSprite0      ; wait until sprite 0 is hit
+
+
+    ldx #$F
+WaitScanline:
+    dex
+    bne WaitScanline
+
+    ;uncoment the call for some scrolling
+    jsr scrollBackground
+
+    lda #%10010000 
+    sta $2000
+
+endOfNmi:
+
+    pla
+    tax
+    pla
+    tay
+    pla
+
+    rti        ; return from interrupt
+
+;#############################| Subroutines |#############################################
+
+; Loads palettes
+; Temp stores palette size
+; pointer points to palette
+LoadPalette:
+    lda $2002    ; read PPU status to reset the high/low latch
+    lda #$3F
+    sta $2006    ; write the high byte of $3F00 address
+    lda #$00
+    sta $2006    ; write the low byte of $3F00 address
+
+    ; Set x to 0 to get ready to load relative addresses from x
+    ldy #0
+@LoadPalettesLoop:
+    lda (pointer), y      ;load palette byte
+    sta $2007             ;write to PPU
+    iny                   ;set index to next byte
+    cpy Temp
+    bne @LoadPalettesLoop  
+
+
+    rts
+
+;----------------------------------------
+HandleInput:
     lda Buttons
     beq finishInput ; no input
 
@@ -331,100 +500,11 @@ checkAnother:
 finishInput:
     lda #INPUT_DELAY
     sta FrameCount
-
-continueForever:
-
-    jsr CheckIfEnteredHouse
-    jsr CheckIfExitedHouse
-
-    jmp endlessLoop
-
-;=========================================================
-
-nmi:
-    ;push registers to stack
-    pha
-    tya
-    pha
-    txa
-    pha
-    ;---
-
-    lda #$00
-    sta $2003        ; set the low byte (00) of the RAM address
-    lda #$02
-    sta $4014        ; set the high byte (02) of the RAM address, start the transfer
-
-    jsr ReadController
-    jsr CheckStartButton
-
-    lda #GAME_STATE
-    cmp GameState
-    bne endOfNmi    ;if the states is not game, update the sound and finish
-
-    lda MustLoadHouseInterior
-    beq checkIfOutsideNeedsToLoad
-    jsr LoadTheHouseInterior
-checkIfOutsideNeedsToLoad:
-    lda MustLoadOutside
-    beq continueNmi
-    jsr LoadOutsideMap
-
-   
-continueNmi:
-    jsr CheckGameOver
-    jsr UpdateCharacter
-    jsr UpdateHpDigits
-
-    ;This is the PPU clean up section, so rendering the next frame starts properly.
-    lda #%10010000   ; enable NMI, sprites from Pattern Table 0, background from Pattern Table 1
-    sta $2000
-    lda #%00011110   ; enable sprites, enable background, no clipping on left side
-    sta $2001
+    rts
 
 
-    lda #$00
-    sta $2006        ; clean up PPU address registers
-    sta $2006
 
-    lda #$00         ; start with no scroll for status bar
-    sta $2005
-    sta $2005
-
-
-WaitNotSprite0:
-    lda $2002
-    and #%01000000
-    bne WaitNotSprite0   ; wait until sprite 0 not hit
-
-WaitSprite0:
-    lda $2002
-    and #%01000000
-    beq WaitSprite0      ; wait until sprite 0 is hit
-
-
-    ldx #$F
-WaitScanline:
-    dex
-    bne WaitScanline
-
-    ;uncoment the call for some scrolling
-    jsr scrollBackground
-
-    lda #%10010000 
-    sta $2000
-
-endOfNmi:
-
-    pla
-    tax
-    pla
-    tay
-    pla
-
-    rti        ; return from interrupt
-
-;#############################| Subroutines |#############################################
+;--------------------------
 ReadController:
     lda #$01
     sta $4016
@@ -440,7 +520,7 @@ ReadController:
 
     rts
 ;--------------------------------
-UpdateHpDigits:
+UpdateStatusDigits:
 
     lda $2002
     lda #$20
@@ -448,13 +528,30 @@ UpdateHpDigits:
     lda #$24
     sta $2006
 
-    lda #$30 ;'0' character
+    lda #CHARACTER_ZERO
     clc 
-    adc hp1
+    adc HP
     sta $2007
-    lda #$30
+    lda #CHARACTER_ZERO
     clc 
-    adc hp0
+    adc HP + 1
+    sta $2007
+
+
+    lda $2002
+    lda #$20
+    sta $2006
+    lda #$38
+    sta $2006
+
+    lda #CHARACTER_ZERO
+    clc
+    adc Warmth
+    sta $2007
+
+    lda #CHARACTER_ZERO
+    clc
+    adc Warmth + 1
     sta $2007
 
     rts
@@ -521,11 +618,19 @@ noGameOver:
 ResetEntityVariables:
 
     lda #9
-    sta hp0
-    sta hp1
+    sta HP
+    sta HP + 1
+    sta Warmth
+    sta Warmth + 1
+
+    lda #MAX_WARMTH_DELAY
+    sta WarmthDelay
 
     lda #0
     sta GlobalScroll
+    sta TilesScroll
+    sta TimesShiftedLeft
+    sta TimesShiftedRight
     sta InHouse
     lda #$50
     sta PlayerX
@@ -534,6 +639,40 @@ ResetEntityVariables:
     lda #$01
     sta PlayerAlive
 
+    rts
+;-------------------------------------
+DecreaseWarmth:
+
+    lda Warmth + 1
+    beq @decreaseUperDigit
+
+    dec Warmth + 1
+    jmp @exit
+@decreaseUperDigit:
+    lda Warmth
+    beq @exit
+    dec Warmth
+    lda #9
+    sta Warmth + 1
+
+@exit:
+    rts
+;-------------------------------------
+DecreaseHP:
+
+    lda HP + 1
+    beq @decreaseUperDigit
+
+    dec HP + 1
+    jmp @exit
+@decreaseUperDigit:
+    lda HP
+    beq @exit
+    dec HP
+    lda #9
+    sta HP + 1
+
+@exit:
     rts
 
 ;-------------------------------------
@@ -582,6 +721,16 @@ CheckStartButton:
 
     jsr LoadNametable
     jsr LoadStatusBar
+
+    lda #<palette
+    sta pointer
+    lda #>palette
+    sta pointer + 1
+    lda #16
+    sta Temp
+    jsr LoadPalette
+
+
     jsr ResetEntityVariables
 
     ldx #0
@@ -1129,8 +1278,8 @@ LoadTheHouseInterior:
     lda #<house
     sta pointer
     lda #>house
-    sta pointer+1
-    lda #$20
+    sta pointer + 1
+    lda #$20    ; $20000
     sta NametableAddress
 
     jsr LoadNametable
@@ -1140,23 +1289,14 @@ LoadTheHouseInterior:
     lda #152
     sta PlayerY
 
+    lda #<house_bg_palette
+    sta pointer
+    lda #>house_bg_palette
+    sta pointer + 1
+    lda #16
+    sta Temp
+    jsr LoadPalette
 
-    ;--
-    lda $2002    ; read PPU status to reset the high/low latch
-    lda #$3F
-    sta $2006    ; write the high byte of $3F00 address
-    lda #$00
-    sta $2006    ; write the low byte of $3F00 address
-
-    ldx #$00
-@LoadPalettesLoop:
-    lda house_bg_palette, x
-    sta $2007
-    inx
-    cpx #$10
-    bne @LoadPalettesLoop  
-    ;--
-    
     lda #0
     sta MustLoadHouseInterior
 
@@ -1213,19 +1353,13 @@ LoadOutsideMap:
     lda #120
     sta PlayerY
 
-    lda $2002    ; read PPU status to reset the high/low latch
-    lda #$3F
-    sta $2006    ; write the high byte of $3F00 address
-    lda #$00
-    sta $2006    ; write the low byte of $3F00 address
-
-    ldx #$00
-@LoadPalettesLoop:
-    lda palette, x
-    sta $2007
-    inx
-    cpx #$10
-    bne @LoadPalettesLoop
+    lda #<palette
+    sta pointer
+    lda #>palette
+    sta pointer + 1
+    lda #16
+    sta Temp
+    jsr LoadPalette
 
     lda #0
     sta MustLoadOutside
