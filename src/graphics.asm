@@ -55,7 +55,7 @@ InsideLoop:
     cpy #0
     bne InsideLoop
 
-    inc pointer+1
+    inc pointer + 1
     inx
     cpx #4
     bne OutsideLoop

@@ -32,8 +32,6 @@
 .include "data/house.asm"
 .include "data/title.asm"
 .include "data/collision_data.asm"
-.include "graphics.asm"
-.include "collision.asm"
 
 zerosprite:
     .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
@@ -49,7 +47,7 @@ house_bg_palette:
     .byte $0f,$16,$27,$37, $0f,$07,$00,$31, $0f,$17,$27,$31, $31,$10,$0f,$01    ;background
 
 sprites:
-    .byte $0A, $0A, $00000011, $08   ; sprite 0 
+    .byte $0A, $FF, $00000011, $08   ; sprite 0 
     .byte $00, $00, %00000011, $00
     .byte $00, $01, %00000011, $00
     .byte $00, $10, %00000011, $00
@@ -121,6 +119,10 @@ PlayerX:
 PlayerY:
     .res 1
 
+WalkAnimationIndex:
+    .res 1
+WalkTimer:
+    .res 1
 PlayerFrame:
     .res 1
 PlayerFlip:
@@ -297,18 +299,8 @@ doSomeLogics:
     lda NMIActive
     beq continueForever
 
-    dec FireFrameDelay
-    lda FireFrameDelay
-    bne checkHP
-    lda #FIRE_ANIMATION_DELAY
-    sta FireFrameDelay
-    inc FireFrame
-    lda FireFrame
-    cmp #2
-    bne checkHP
-    lda #0
-    sta FireFrame
-
+    jsr AnimateFire
+    
 checkHP:
     lda HP
     beq checkSecondHPdigit
@@ -453,6 +445,49 @@ endOfNmi:
     rti        ; return from interrupt
 
 ;#############################| Subroutines |#############################################
+
+.include "graphics.asm"
+.include "collision.asm"
+
+
+AnimateWalk:
+    inc WalkTimer
+    lda WalkTimer
+    cmp #8
+    bne @exit
+    lda #0
+    sta WalkTimer
+
+    lda WalkAnimationIndex
+    clc
+    adc #16
+    cmp #64
+    bcs @resetWalk
+    jmp @saveWalk
+@resetWalk:
+    lda #0
+@saveWalk:
+    sta WalkAnimationIndex
+@exit:
+    rts
+;--------------------------------
+AnimateFire:
+    dec FireFrameDelay
+    lda FireFrameDelay
+    bne @exit
+    lda #FIRE_ANIMATION_DELAY
+    sta FireFrameDelay
+    inc FireFrame
+    lda FireFrame
+    cmp #2
+    bne @exit
+    lda #0
+    sta FireFrame
+@exit:
+    rts
+
+
+;-------------------------------
 UpdateFireplace:
 
     lda $2002
@@ -483,6 +518,8 @@ UpdateFireplace:
 HandleInput:
     lda Buttons
     beq finishInput ; no input
+
+    jsr AnimateWalk
 
     lda PlayerX
     sta OldPlayerX
@@ -1165,7 +1202,7 @@ UpdateCharacter:
     adc #$08
     sta DUDE_SPRITE, x
     inx
-
+;----
     ;sprite 3
     lda PlayerY
     clc
@@ -1178,6 +1215,7 @@ UpdateCharacter:
     asl
     clc
     adc #17
+    adc WalkAnimationIndex
     sta DUDE_SPRITE, x
     inx
     lda DUDE_SPRITE, x
@@ -1189,6 +1227,7 @@ UpdateCharacter:
     asl
     clc
     adc #16
+    adc WalkAnimationIndex
     sta DUDE_SPRITE, x
     inx
     lda DUDE_SPRITE, x
@@ -1212,6 +1251,7 @@ UpdateCharacter:
     asl
     clc
     adc #16
+    adc WalkAnimationIndex
     sta DUDE_SPRITE, x
     inx
     lda DUDE_SPRITE, x
@@ -1223,6 +1263,7 @@ UpdateCharacter:
     asl
     clc
     adc #17
+    adc WalkAnimationIndex
     sta DUDE_SPRITE, x
     inx
     lda DUDE_SPRITE, x
