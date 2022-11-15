@@ -31,6 +31,7 @@
 .include "data/field_bg1.asm"
 .include "data/house.asm"
 .include "data/title.asm"
+.include "data/menu_screen.asm"
 .include "data/collision_data.asm"
 
 zerosprite:
@@ -57,8 +58,10 @@ sprites:
 ; CONSTANTS
     DUDE_SPRITE                = $0204
 
+    ;possible game states
     TITLE_STATE                = 0
     GAME_STATE                 = 1
+    MENU_STATE                 = 2
 
     PLAYER_SPEED               = 2
     INPUT_DELAY                = 64
@@ -79,6 +82,12 @@ sprites:
     HOUSE_DOOR_Y2              = 120
 
     HOUSE_EXIT_Y               = 168
+
+    HOUSE_ENTRY_POINT_X        = 128
+    HOUSE_ENTRY_POINT_Y        = 152
+
+    HOUSE_EXIT_POINT_X         = 72
+    HOUSE_EXIT_POINT_Y         = 120
 
     SCREEN_ROW_COUNT           = 30
 
@@ -156,6 +165,8 @@ PlayerAlive:
     .res 1
 Buttons:
     .res 1
+OldButtons:
+    .res 1
 InHouse:    ;is the player inside his hut?
     .res 1
 
@@ -182,6 +193,8 @@ TimesShiftedRight:
 MustLoadHouseInterior:
     .res 1
 MustLoadOutside:
+    .res 1
+MustLoadMenu:
     .res 1
 
 CarrySet:
@@ -286,6 +299,8 @@ endlessLoop:
     bne continueForever ; don't do logics until the house is not loaded to the PPU
     lda MustLoadOutside
     bne continueForever ; the same is with the map of outside
+    lda MustLoadMenu
+    bne continueForever
 
     dec FrameCount
     bne doInput
@@ -373,10 +388,14 @@ nmi:
     jsr ReadController
     jsr CheckStartButton
 
-    lda #GAME_STATE
-    cmp GameState
+    lda GameState
+    cmp #GAME_STATE
     bne endOfNmi
 
+    lda MustLoadMenu
+    beq CheckHouseLoad
+    jsr LoadMenu
+CheckHouseLoad:
     lda MustLoadHouseInterior
     beq checkIfOutsideNeedsToLoad
     jsr LoadTheHouseInterior
@@ -770,58 +789,27 @@ CheckStartButton:
 
     lda Buttons
     and #%00010000
-    beq dontStart
+    bne @checkOld
+    jmp @exit
+@checkOld:
+    lda OldButtons
+    and #%00010000
+    bne @exit
+
 
     lda GameState
-    cmp #$00
-    bne dontStart
+    cmp #TITLE_STATE
+    bne @someOtherState
+
+    ;On title state------
 
     lda #GAME_STATE
     sta GameState
 
-    ;Load Nametable 1
-
-    lda #$00
-    sta $2000
-    sta $2001
-
-    lda #<background
-    sta pointer
-    lda #>background
-    sta pointer+1
-
-    lda #$20    ;$20000
-    sta NametableAddress
-
-    jsr LoadNametable
-
-    ;Load Nametable 2
-
-    lda #$00
-    sta $2000
-    sta $2001
-
-    lda #<field_bg1
-    sta pointer
-    lda #>field_bg1
-    sta pointer+1
-
-    lda #$24    ;$2400
-    sta NametableAddress
-
-    jsr LoadNametable
-    jsr LoadStatusBar
-
-    lda #<palette
-    sta pointer
-    lda #>palette
-    sta pointer + 1
-    lda #16
-    sta Temp
-    jsr LoadPalette
-
-
     jsr ResetEntityVariables
+    lda #1
+    sta MustLoadOutside
+    
 
     ldx #0
 @copyCollisionMapLoop:
@@ -837,7 +825,37 @@ CheckStartButton:
     lda #255;-1
     sta LeftCollisionColumnIndex
 
-dontStart:
+
+    jmp @exit
+@someOtherState:
+
+    cmp #GAME_STATE
+    beq @enterMenuScreen
+    ;exit menu screen
+
+    lda #GAME_STATE
+    sta GameState
+
+    lda InHouse
+    beq @loadOutside ;InHouse = 0
+    lda #1
+    sta MustLoadHouseInterior
+    jmp @exit
+@loadOutside:
+    lda #1
+    sta MustLoadOutside
+
+    jmp @exit
+@enterMenuScreen:
+
+    lda #1
+    sta MustLoadMenu
+
+
+@exit:
+    lda Buttons
+    sta OldButtons
+
     rts
 
 
@@ -1032,6 +1050,10 @@ CheckIfEnteredHouse:
 
     lda #1
     sta MustLoadHouseInterior
+    lda #HOUSE_ENTRY_POINT_X
+    sta PlayerX
+    lda #HOUSE_ENTRY_POINT_Y
+    sta PlayerY
 
 @nope:
     rts
@@ -1055,10 +1077,7 @@ LoadTheHouseInterior:
 
     jsr LoadNametable
     jsr LoadStatusBar
-    lda #128
-    sta PlayerX
-    lda #152
-    sta PlayerY
+    
 
     lda #<house_bg_palette
     sta pointer
@@ -1075,6 +1094,32 @@ LoadTheHouseInterior:
 
 @nope:
     rts
+;-----------------------------------
+LoadMenu:
+    lda #$00
+    sta $2000
+    sta $2001
+
+    lda #<menu_screen
+    sta pointer
+    lda #>menu_screen
+    sta pointer + 1
+
+    lda #$20    ;$20000
+    sta NametableAddress
+
+    jsr LoadNametable
+
+    lda #0
+    sta MustLoadMenu
+
+    lda #MENU_STATE
+    sta GameState
+
+    rts
+
+
+
 ;-----------------------------------
 CheckIfExitedHouse:
 
@@ -1105,6 +1150,7 @@ CheckIfExitedHouse:
 ;-------------------------------
 LoadOutsideMap:
 
+
     lda #$00
     sta $2000
     sta $2001
@@ -1114,15 +1160,27 @@ LoadOutsideMap:
     lda #>background
     sta pointer+1
 
-    lda #$20
+    lda #$20    ;$20000
+    sta NametableAddress
+
+    jsr LoadNametable
+
+    ;Load Nametable 2
+
+    lda #$00
+    sta $2000
+    sta $2001
+
+    lda #<field_bg1
+    sta pointer
+    lda #>field_bg1
+    sta pointer+1
+
+    lda #$24    ;$2400
     sta NametableAddress
 
     jsr LoadNametable
     jsr LoadStatusBar
-    lda #72
-    sta PlayerX
-    lda #120
-    sta PlayerY
 
     lda #<palette
     sta pointer
@@ -1131,9 +1189,10 @@ LoadOutsideMap:
     lda #16
     sta Temp
     jsr LoadPalette
-
+    
     lda #0
     sta MustLoadOutside
+
 
     rts
 
