@@ -103,6 +103,7 @@ sprites:
 
     INVENTORY_SPRITE_X         = 50
     INVENTORY_SPRITE_MIN_Y     = 44
+    INVENTORY_SPRITE_MAX_Y     = 164
 
 ;===================================================================
 .segment "ZEROPAGE"
@@ -893,6 +894,8 @@ ResetEntityVariables:
 
     lda #INVENTORY_SPRITE_MIN_Y
     sta InventoryPointerPos
+    lda #0
+    sta InventoryItemIndex
 
     lda #MAX_WARMTH_DELAY
     sta WarmthDelay
@@ -1016,18 +1019,7 @@ CheckStartButton:
     beq @enterMenuScreen
     ;exit menu screen
 
-    lda #GAME_STATE
-    sta GameState
-
-    lda InHouse
-    beq @loadOutside ;InHouse = 0
-    lda #1
-    sta MustLoadHouseInterior
-    jmp @exit
-@loadOutside:
-    lda #1
-    sta MustLoadOutside
-
+    jsr ExitMenuState
     jmp @exit
 @enterMenuScreen:
 
@@ -1042,6 +1034,24 @@ CheckStartButton:
     rts
 
 ;-------------------------------------
+ExitMenuState:
+    lda #GAME_STATE
+    sta GameState
+
+    lda InHouse
+    beq @loadOutside ;InHouse = 0
+    lda #1
+    sta MustLoadHouseInterior
+    jmp @exit
+@loadOutside:
+    lda #1
+    sta MustLoadOutside
+@exit:
+
+    rts
+
+
+;-------------------------------------
 MenuInput:
     lda Buttons
     cmp MenuButtons
@@ -1052,25 +1062,40 @@ MenuInput:
     beq @CheckUp
 
     lda InventoryPointerPos
-    cmp #152
+    cmp #INVENTORY_SPRITE_MAX_Y - 12
     bcs @CheckUp
     clc
     adc #12
     sta InventoryPointerPos
+    inc InventoryItemIndex
 
-    jmp @exit
+    jmp @CheckB
 
 @CheckUp:
     lda Buttons
     and #%00001000
-    beq @exit
+    beq @CheckB
 
     lda InventoryPointerPos
     cmp #INVENTORY_SPRITE_MIN_Y + 12
-    bcc @exit
+    bcc @CheckB
     sec
     sbc #12
     sta InventoryPointerPos
+    dec InventoryItemIndex
+
+@CheckB:
+    lda Buttons
+    and #%01000000
+    beq @exit
+    ldx InventoryItemIndex
+
+    lda Inventory, x
+    beq @exit
+    lda #0
+    sta Inventory, x
+    jsr ExitMenuState
+
 @exit:
     lda Buttons
     sta MenuButtons
