@@ -45,11 +45,13 @@ palette:
     .byte $0f,$00,$21,$31, $0f,$27,$21,$31, $0f,$17,$21,$31, $31,$10,$0f,$01    ;background
     .byte $0f,$00,$21,$31, $0f,$27,$21,$31, $0f,$17,$21,$31, $0f,$0f,$37,$16    ;OAM sprites
 
-house_bg_palette:
+house_palette:
     .byte $0f,$16,$27,$37, $0f,$07,$00,$31, $0f,$17,$27,$31, $31,$10,$0f,$01    ;background
+    .byte $0f,$00,$21,$31, $0f,$27,$21,$31, $0f,$17,$21,$31, $0f,$0f,$37,$16    ;OAM sprites
 
-menu_bg_palette:
-    .byte $10,$0F,$10,$10, $0f,$07,$00,$31, $0f,$17,$27,$31, $31,$10,$0f,$01    ;background
+menu_palette:
+    .byte $10,$0F,$00,$10, $0f,$07,$00,$31, $0f,$17,$27,$31, $31,$10,$0f,$01    ;background
+    .byte $10,$07,$17,$27, $10,$06,$16,$37, $10,$17,$21,$31, $10,$0f,$17,$16    ;OAM sprites
 
 sprites:
     .byte $0A, $FF, $00000011, $08   ; sprite 0 
@@ -101,7 +103,7 @@ sprites:
     FIRE_ANIMATION_DELAY       = $20
 
 
-    INVENTORY_SPRITE_X         = 50
+    INVENTORY_SPRITE_X         = 48
     INVENTORY_SPRITE_MIN_Y     = 44
     INVENTORY_SPRITE_MAX_Y     = 164
 
@@ -514,6 +516,9 @@ endforReal:
 .include "graphics.asm"
 .include "collision.asm"
 
+
+
+;-------------------------------------
 UpdateInventorySprites:
 
     ldx #0
@@ -526,22 +531,35 @@ UpdateInventorySprites:
 @itemLoop:
 
     lda Inventory, x
+    asl ;inventory_index * 2
     tay
-    lda inventory_data, y
+    lda inventory_data, y ;grap sprite index
     bne @store_sprite_index
     lda #$FD ;empty sprite index
 @store_sprite_index:
     sta TempZ ; save sprite index
+    iny
+    lda inventory_data, y
+    sta TempPointY ; save palette
+
+    stx TempPointX ; save x index
     lda TempY
     clc
     adc #12
     sta TempY
-    stx TempPointX ; save x index
+
+    ldy #0
+@twoTileLoop: ;item consists of two tiles
+
+    lda TempY
     ldx Temp
     sta FIRST_SPRITE, x ;set Y coordinate
 
     inc Temp
     lda TempZ
+    sty TempPush
+    clc
+    adc TempPush
     ldx Temp
     sta FIRST_SPRITE, x
 
@@ -549,36 +567,23 @@ UpdateInventorySprites:
     ;attributes
     ldx Temp
     lda #0
+    clc
+    adc TempPointY
     sta FIRST_SPRITE, x
     inc Temp
     ;x coordinate
     lda #INVENTORY_SPRITE_X
-    ldx Temp
-    sta FIRST_SPRITE, x
-    inc Temp
-
-    ;Y
-    lda TempY
-    ldx Temp
-    sta FIRST_SPRITE, x
-    inc Temp
-    ;sprite Index
-    ldx Temp
-    lda TempZ
+    cpy #1
+    bne @saveX
     clc
-    adc #1
-    sta FIRST_SPRITE, x
-    inc Temp
-    ;attributes
-    ldx Temp
-    lda #0
-    sta FIRST_SPRITE, x
-    inc Temp
-    ;X
-    lda #INVENTORY_SPRITE_X + 8
+    adc #8
+@saveX:
     ldx Temp
     sta FIRST_SPRITE, x
     inc Temp
+    iny
+    cpy #2
+    bcc @twoTileLoop
 
     ldx TempPointX ;restore x index
 @next:
@@ -589,6 +594,8 @@ UpdateInventorySprites:
 
     ldx Temp
     lda InventoryPointerPos
+    sec
+    sbc #1
     sta FIRST_SPRITE, x
     inc Temp
     lda #$FC
@@ -1323,11 +1330,11 @@ LoadTheHouseInterior:
     jsr LoadStatusBar
     
 
-    lda #<house_bg_palette
+    lda #<house_palette
     sta pointer
-    lda #>house_bg_palette
+    lda #>house_palette
     sta pointer + 1
-    lda #16
+    lda #32
     sta Temp
     jsr LoadPalette
 
@@ -1354,11 +1361,11 @@ LoadMenu:
 
     jsr LoadNametable
 
-    lda #<menu_bg_palette
+    lda #<menu_palette
     sta pointer
-    lda #>menu_bg_palette
+    lda #>menu_palette
     sta pointer + 1
-    lda #16
+    lda #32
     sta Temp
     jsr LoadPalette
 
@@ -1443,7 +1450,7 @@ LoadOutsideMap:
     sta pointer
     lda #>palette
     sta pointer + 1
-    lda #16
+    lda #32
     sta Temp
     jsr LoadPalette
     
