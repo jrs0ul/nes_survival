@@ -33,6 +33,7 @@
 .include "data/title.asm"
 .include "data/menu_screen.asm"
 .include "data/collision_data.asm"
+.include "data/inventory_data.asm"
 
 zerosprite:
     .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
@@ -46,6 +47,9 @@ palette:
 
 house_bg_palette:
     .byte $0f,$16,$27,$37, $0f,$07,$00,$31, $0f,$17,$27,$31, $31,$10,$0f,$01    ;background
+
+menu_bg_palette:
+    .byte $10,$0F,$10,$10, $0f,$07,$00,$31, $0f,$17,$27,$31, $31,$10,$0f,$01    ;background
 
 sprites:
     .byte $0A, $FF, $00000011, $08   ; sprite 0 
@@ -86,8 +90,8 @@ sprites:
     HOUSE_ENTRY_POINT_X        = 128
     HOUSE_ENTRY_POINT_Y        = 152
 
-    HOUSE_EXIT_POINT_X         = 72
-    HOUSE_EXIT_POINT_Y         = 120
+    OUTSIDE_ENTRY_FROM_HOUSE_X = 72
+    OUTSIDE_ENTRY_FROM_HOUSE_Y = 120
 
     SCREEN_ROW_COUNT           = 30
 
@@ -148,9 +152,16 @@ FireFrameDelay:
     .res 1
 
 HP:
-    .res 2
+    .res 3
+Food:
+    .res 3
 Warmth:
-    .res 2
+    .res 3
+
+
+Inventory:
+    .res 10
+
 
 WarmthDelay:
     .res 1
@@ -409,11 +420,15 @@ checkFire:
     beq continueNmi
     jsr UpdateFireplace
 
+    
+
+
 continueNmi:
     jsr CheckGameOver
     jsr UpdateCharacter
     jsr UpdateStatusDigits
 
+cont2:
 
     ;This is the PPU clean up section, so rendering the next frame starts properly.
     lda #%10010000   ; enable NMI, sprites from Pattern Table 0, background from Pattern Table 1
@@ -455,6 +470,13 @@ WaitScanline:
 
 endOfNmi:
 
+    lda GameState
+    cmp #MENU_STATE
+    bne endforReal
+
+    jsr UpdateInventorySprites
+
+endforReal:
     pla
     tax
     pla
@@ -468,7 +490,88 @@ endOfNmi:
 .include "graphics.asm"
 .include "collision.asm"
 
+UpdateInventorySprites:
 
+    ldx #0
+    lda #0
+    sta Temp
+
+    lda #60
+    sta TempY
+
+@itemLoop:
+
+    lda Inventory, x
+    tay
+    lda inventory_data, y
+    bne @store_sprite_index
+    lda #$FD ;empty sprite index
+@store_sprite_index:
+    sta TempZ ; save sprite index
+    lda TempY
+    clc
+    adc #8
+    sta TempY
+    stx TempPointX ; save x index
+    ldx Temp
+    sta DUDE_SPRITE, x ;set Y coordinate
+
+    inc Temp
+    lda TempZ
+    ldx Temp
+    sta DUDE_SPRITE, x
+
+    inc Temp
+    ;attributes
+    ldx Temp
+    lda #0
+    sta DUDE_SPRITE, x
+    inc Temp
+    ;x coordinate
+    lda #100
+    ldx Temp
+    sta DUDE_SPRITE, x
+    inc Temp
+
+    ;Y
+    lda TempY
+    ldx Temp
+    sta DUDE_SPRITE, x
+    inc Temp
+    ;sprite Index
+    ldx Temp
+    lda TempZ
+    clc
+    adc #1
+    sta DUDE_SPRITE, x
+    inc Temp
+    ;attributes
+    ldx Temp
+    lda #0
+    sta DUDE_SPRITE, x
+    inc Temp
+    ;X
+    lda #108
+    ldx Temp
+    sta DUDE_SPRITE, x
+    inc Temp
+
+    ldx TempPointX ;restore x index
+@next:
+    inx
+    cpx #10
+    bcc @itemLoop
+
+
+
+    rts
+
+
+
+
+
+
+;---------------------------------------
 AnimateWalk:
     inc WalkTimer
     lda WalkTimer
@@ -509,6 +612,11 @@ AnimateFire:
 ;-------------------------------
 UpdateFireplace:
 
+    lda GameState
+    cmp #GAME_STATE
+    bne @exit
+
+
     lda $2002
     lda #$21
     sta $2006
@@ -528,7 +636,7 @@ UpdateFireplace:
     adc #1
     sta $2007
 
-
+@exit:
     rts
 
 
@@ -610,6 +718,10 @@ ReadController:
 ;--------------------------------
 UpdateStatusDigits:
 
+    lda GameState
+    cmp #GAME_STATE
+    bne @exit
+
     lda $2002
     lda #$20
     sta $2006
@@ -642,6 +754,7 @@ UpdateStatusDigits:
     adc Warmth + 1
     sta $2007
 
+@exit:
     rts
 
 ;-----------------------------------
@@ -710,6 +823,27 @@ ResetEntityVariables:
     sta HP + 1
     sta Warmth
     sta Warmth + 1
+
+    lda #2
+    sta Inventory
+    lda #1
+    sta Inventory + 1
+    lda #1
+    sta Inventory + 2
+    lda #2
+    sta Inventory + 3
+    lda #0
+    sta Inventory + 4
+    lda #2
+    sta Inventory + 5
+    lda #1
+    sta Inventory + 6
+    lda #0
+    sta Inventory + 7
+    lda #2
+    sta Inventory + 8
+    lda #1
+    sta Inventory + 9
 
     lda #MAX_WARMTH_DELAY
     sta WarmthDelay
@@ -1110,6 +1244,14 @@ LoadMenu:
 
     jsr LoadNametable
 
+    lda #<menu_bg_palette
+    sta pointer
+    lda #>menu_bg_palette
+    sta pointer + 1
+    lda #16
+    sta Temp
+    jsr LoadPalette
+
     lda #0
     sta MustLoadMenu
 
@@ -1141,6 +1283,11 @@ CheckIfExitedHouse:
 
     lda #0
     sta InHouse
+
+    lda #OUTSIDE_ENTRY_FROM_HOUSE_X
+    sta PlayerX
+    lda #OUTSIDE_ENTRY_FROM_HOUSE_Y
+    sta PlayerY
 
     lda #1
     sta MustLoadOutside
