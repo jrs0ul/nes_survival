@@ -60,7 +60,7 @@ sprites:
 
 ;--------------
 ; CONSTANTS
-    DUDE_SPRITE                = $0204
+    FIRST_SPRITE                = $0204
 
     ;possible game states
     TITLE_STATE                = 0
@@ -99,6 +99,10 @@ sprites:
 
     MAX_WARMTH_DELAY           = $40
     FIRE_ANIMATION_DELAY       = $20
+
+
+    INVENTORY_SPRITE_X         = 50
+    INVENTORY_SPRITE_MIN_Y     = 44
 
 ;===================================================================
 .segment "ZEROPAGE"
@@ -160,7 +164,13 @@ Warmth:
 
 
 Inventory:
-    .res 10
+    .res 10 ;10 items
+
+InventoryPointerPos:
+    .res 1
+
+InventoryItemIndex:
+    .res 1
 
 
 WarmthDelay:
@@ -178,6 +188,9 @@ Buttons:
     .res 1
 OldButtons:
     .res 1
+MenuButtons:
+    .res 1
+
 InHouse:    ;is the player inside his hut?
     .res 1
 
@@ -322,6 +335,10 @@ doInput:
 
 doSomeLogics:
 
+    lda GameState
+    cmp #GAME_STATE
+    bne nextIteration
+
     lda NMIActive
     beq continueForever
 
@@ -374,7 +391,7 @@ continueForever:
 
     jsr CheckIfEnteredHouse
     jsr CheckIfExitedHouse
-
+nextIteration:
     jmp endlessLoop
 
 ;=========================================================
@@ -398,6 +415,7 @@ nmi:
 
     jsr ReadController
     jsr CheckStartButton
+
 
     lda GameState
     cmp #GAME_STATE
@@ -425,10 +443,10 @@ checkFire:
 
 continueNmi:
     jsr CheckGameOver
-    jsr UpdateCharacter
+    jsr UpdateSprites
     jsr UpdateStatusDigits
 
-cont2:
+nmicont2:
 
     ;This is the PPU clean up section, so rendering the next frame starts properly.
     lda #%10010000   ; enable NMI, sprites from Pattern Table 0, background from Pattern Table 1
@@ -445,6 +463,10 @@ cont2:
     sta $2005
     sta $2005
 
+    
+    lda GameState
+    cmp #GAME_STATE
+    bne endOfNmi
 
 WaitNotSprite0:
     lda $2002
@@ -465,14 +487,15 @@ WaitScanline:
     ;uncoment the call for some scrolling
     jsr scrollBackground
 
+endOfNmi:
     lda #%10010000 
     sta $2000
 
-endOfNmi:
 
     lda GameState
     cmp #MENU_STATE
     bne endforReal
+    jsr MenuInput
 
     jsr UpdateInventorySprites
 
@@ -496,7 +519,7 @@ UpdateInventorySprites:
     lda #0
     sta Temp
 
-    lda #60
+    lda #32
     sta TempY
 
 @itemLoop:
@@ -510,50 +533,50 @@ UpdateInventorySprites:
     sta TempZ ; save sprite index
     lda TempY
     clc
-    adc #8
+    adc #12
     sta TempY
     stx TempPointX ; save x index
     ldx Temp
-    sta DUDE_SPRITE, x ;set Y coordinate
+    sta FIRST_SPRITE, x ;set Y coordinate
 
     inc Temp
     lda TempZ
     ldx Temp
-    sta DUDE_SPRITE, x
+    sta FIRST_SPRITE, x
 
     inc Temp
     ;attributes
     ldx Temp
     lda #0
-    sta DUDE_SPRITE, x
+    sta FIRST_SPRITE, x
     inc Temp
     ;x coordinate
-    lda #100
+    lda #INVENTORY_SPRITE_X
     ldx Temp
-    sta DUDE_SPRITE, x
+    sta FIRST_SPRITE, x
     inc Temp
 
     ;Y
     lda TempY
     ldx Temp
-    sta DUDE_SPRITE, x
+    sta FIRST_SPRITE, x
     inc Temp
     ;sprite Index
     ldx Temp
     lda TempZ
     clc
     adc #1
-    sta DUDE_SPRITE, x
+    sta FIRST_SPRITE, x
     inc Temp
     ;attributes
     ldx Temp
     lda #0
-    sta DUDE_SPRITE, x
+    sta FIRST_SPRITE, x
     inc Temp
     ;X
-    lda #108
+    lda #INVENTORY_SPRITE_X + 8
     ldx Temp
-    sta DUDE_SPRITE, x
+    sta FIRST_SPRITE, x
     inc Temp
 
     ldx TempPointX ;restore x index
@@ -563,13 +586,25 @@ UpdateInventorySprites:
     bcc @itemLoop
 
 
+    ldx Temp
+    lda InventoryPointerPos
+    sta FIRST_SPRITE, x
+    inc Temp
+    lda #$FC
+    ldx Temp
+    sta FIRST_SPRITE, x
+    inc Temp
+    ldx Temp
+    lda #%00000011
+    sta FIRST_SPRITE, x
+    inc Temp
+    ldx Temp
+    lda #30
+    sta FIRST_SPRITE, x
+
+
 
     rts
-
-
-
-
-
 
 ;---------------------------------------
 AnimateWalk:
@@ -643,9 +678,16 @@ UpdateFireplace:
 
 ;----------------------------------
 HandleInput:
+
+    lda GameState
+    cmp #GAME_STATE
+    bne inputInOtherStates
+
+
     lda Buttons
     beq finishInput ; no input
 
+    
     jsr AnimateWalk
 
     lda PlayerX
@@ -691,6 +733,10 @@ checkAnother:
     cmp #1
     bne finishInput
     jsr PushCollisionMapRight
+
+    jmp finishInput
+
+inputInOtherStates:
 
 
 finishInput:
@@ -845,6 +891,9 @@ ResetEntityVariables:
     lda #1
     sta Inventory + 9
 
+    lda #INVENTORY_SPRITE_MIN_Y
+    sta InventoryPointerPos
+
     lda #MAX_WARMTH_DELAY
     sta WarmthDelay
     lda #FIRE_ANIMATION_DELAY
@@ -992,7 +1041,43 @@ CheckStartButton:
 
     rts
 
+;-------------------------------------
+MenuInput:
+    lda Buttons
+    cmp MenuButtons
+    beq @exit
 
+    lda Buttons
+    and #%00000100
+    beq @CheckUp
+
+    lda InventoryPointerPos
+    cmp #152
+    bcs @CheckUp
+    clc
+    adc #12
+    sta InventoryPointerPos
+
+    jmp @exit
+
+@CheckUp:
+    lda Buttons
+    and #%00001000
+    beq @exit
+
+    lda InventoryPointerPos
+    cmp #INVENTORY_SPRITE_MIN_Y + 12
+    bcc @exit
+    sec
+    sbc #12
+    sta InventoryPointerPos
+@exit:
+    lda Buttons
+    sta MenuButtons
+    lda #0
+    sta Buttons
+
+    rts
 ;--------------------------------------
 
 ProcessButtons:
@@ -1344,12 +1429,12 @@ LoadOutsideMap:
     rts
 
 ;-----------------------------------
-UpdateCharacter:
+UpdateSprites:
 
     ;sprite 1
     ldx #$00
     lda PlayerY
-    sta DUDE_SPRITE, x
+    sta FIRST_SPRITE, x
     inx
     lda PlayerFlip
     beq @NoFlip1
@@ -1357,63 +1442,65 @@ UpdateCharacter:
     asl ;frame * 2
     clc
     adc #1
-    sta DUDE_SPRITE,x
+    sta FIRST_SPRITE,x
     inx
-    lda DUDE_SPRITE, x
-    ora #%01000000
-    sta DUDE_SPRITE, x
+    lda FIRST_SPRITE, x
+    ora #%01000011
+    sta FIRST_SPRITE, x
     jmp @MoveX1
 @NoFlip1:
     lda PlayerFrame
     asl ;frame * 2
-    sta DUDE_SPRITE,x
+    sta FIRST_SPRITE,x
     inx
-    lda DUDE_SPRITE, x
+    lda FIRST_SPRITE, x
+    ora #%00000011
     and #%10111111
-    sta DUDE_SPRITE, x
+    sta FIRST_SPRITE, x
 @MoveX1:
     inx
     lda PlayerX
-    sta DUDE_SPRITE, x
+    sta FIRST_SPRITE, x
     inx
 
     ;sprite 2
     lda PlayerY
-    sta DUDE_SPRITE, x
+    sta FIRST_SPRITE, x
     inx
     lda PlayerFlip
     beq @NoFlip2
     lda PlayerFrame
     asl
-    sta DUDE_SPRITE, x
+    sta FIRST_SPRITE, x
     inx
-    lda DUDE_SPRITE, x
-    ora #%01000000
-    sta DUDE_SPRITE, x
+    lda FIRST_SPRITE, x
+    ora #%01000011
+    sta FIRST_SPRITE, x
     jmp @MoveX2
 @NoFlip2:
     lda PlayerFrame
     asl
     clc
     adc #1
-    sta DUDE_SPRITE, x
+    sta FIRST_SPRITE, x
     inx
-    lda DUDE_SPRITE, x
+    lda FIRST_SPRITE, x
+    ora #%00000011
     and #%10111111
-    sta DUDE_SPRITE, x
+    sta FIRST_SPRITE, x
 @MoveX2:
     inx
     lda PlayerX
     clc
     adc #$08
-    sta DUDE_SPRITE, x
+    sta FIRST_SPRITE, x
     inx
 ;----
     ;sprite 3
     lda PlayerY
     clc
     adc #$08
-    sta DUDE_SPRITE, x
+    sta FIRST_SPRITE, x
     inx
     lda PlayerFlip
     beq @NoFlip3
@@ -1422,11 +1509,11 @@ UpdateCharacter:
     clc
     adc #17
     adc WalkAnimationIndex
-    sta DUDE_SPRITE, x
+    sta FIRST_SPRITE, x
     inx
-    lda DUDE_SPRITE, x
-    ora #%01000000
-    sta DUDE_SPRITE, x
+    lda FIRST_SPRITE, x
+    ora #%01000011
+    sta FIRST_SPRITE, x
     jmp @MoveX3
 @NoFlip3:
     lda PlayerFrame
@@ -1434,22 +1521,23 @@ UpdateCharacter:
     clc
     adc #16
     adc WalkAnimationIndex
-    sta DUDE_SPRITE, x
+    sta FIRST_SPRITE, x
     inx
-    lda DUDE_SPRITE, x
+    lda FIRST_SPRITE, x
+    ora #%00000011
     and #%10111111
-    sta DUDE_SPRITE, x
+    sta FIRST_SPRITE, x
 @MoveX3:
     inx
     lda PlayerX
-    sta DUDE_SPRITE, x
+    sta FIRST_SPRITE, x
     inx
 
     ;sprite 4
     lda PlayerY
     clc
     adc #$08
-    sta DUDE_SPRITE,x
+    sta FIRST_SPRITE,x
     inx
     lda PlayerFlip
     beq @NoFlip4
@@ -1458,11 +1546,11 @@ UpdateCharacter:
     clc
     adc #16
     adc WalkAnimationIndex
-    sta DUDE_SPRITE, x
+    sta FIRST_SPRITE, x
     inx
-    lda DUDE_SPRITE, x
-    ora #%01000000
-    sta DUDE_SPRITE, x
+    lda FIRST_SPRITE, x
+    ora #%01000011
+    sta FIRST_SPRITE, x
     jmp @MoveX4
 @NoFlip4:
     lda PlayerFrame
@@ -1470,17 +1558,32 @@ UpdateCharacter:
     clc
     adc #17
     adc WalkAnimationIndex
-    sta DUDE_SPRITE, x
+    sta FIRST_SPRITE, x
     inx
-    lda DUDE_SPRITE, x
+    lda FIRST_SPRITE, x
+    ora #%00000011
     and #%10111111
-    sta DUDE_SPRITE, x
+    sta FIRST_SPRITE, x
 @MoveX4:
     inx
     lda PlayerX
     clc
     adc #$08
-    sta DUDE_SPRITE, x
+    sta FIRST_SPRITE, x
+;--
+    inx
+    ldy #20
+@hideSpritesLoop:
+    lda #$FE
+    sta FIRST_SPRITE, x
+    inx
+    inx
+    inx
+    inx
+
+    dey
+    bne @hideSpritesLoop
+
 
     rts
 
@@ -1489,9 +1592,9 @@ loadSprites:
     ldx #$00
 spriteLoadLoop:
     lda sprites, x
-    sta DUDE_SPRITE - 4, x
+    sta FIRST_SPRITE - 4, x
     inx
-    cpx #$28
+    cpx #$32
     bne spriteLoadLoop
 
     rts
