@@ -100,7 +100,8 @@ sprites:
     CHARACTER_ZERO             = $30
 
     MAX_WARMTH_DELAY           = $40
-    MAX_FOOD_DELAY             = $50
+    MAX_FOOD_DELAY             = $60
+    MAX_FUEL_DELAY             = $55
 
     FIRE_ANIMATION_DELAY       = $20
 
@@ -190,6 +191,8 @@ WarmthDelay:
     .res 1
 FoodDelay:
     .res 1
+FuelDelay:
+    .res 1
 
 NMIActive:
     .res 1
@@ -255,7 +258,7 @@ TempPointX:
 TempPointY:
     .res 1
 
-;249 bytes
+;250 bytes
 
 ;====================================================================================
 .segment "CODE"
@@ -494,11 +497,14 @@ Logics:
     adc HP + 2
     cmp #0
     beq @killPlayer
-    jmp @checkWarmth
+    jmp @checkFuel
 @killPlayer:
     lda #0
     sta PlayerAlive
     jmp @doneLogics
+
+@checkFuel:
+    jsr DecreaseFuel
 
 @checkWarmth:
     dec WarmthDelay
@@ -551,6 +557,23 @@ Logics:
 @exit:
 
     rts
+;-------------------------------
+DecreaseFuel:
+    dec FuelDelay
+    lda FuelDelay
+    beq @resetFuelDelay
+    jmp @exit
+@resetFuelDelay:
+    lda #MAX_FUEL_DELAY
+    sta FuelDelay
+    lda #<Fuel
+    sta DigitPtr
+    lda #>Fuel
+    sta DigitPtr + 1
+    jsr DecreaseDigits
+@exit:
+    rts
+
 ;-------------------------------
 DecreaseLife:
     lda #<HP
@@ -734,6 +757,12 @@ UpdateFireplace:
     lda #$0E
     sta $2006
 
+    lda Fuel
+    clc
+    adc Fuel + 1
+    adc Fuel + 2
+    cmp #0
+    beq @putFireOut
     lda FireFrame
     asl
     sta Temp
@@ -745,6 +774,11 @@ UpdateFireplace:
     clc
     adc Temp
     adc #1
+    sta $2007
+    jmp @exit
+@putFireOut:
+    lda #0
+    sta $2007
     sta $2007
 
 @exit:
@@ -962,6 +996,7 @@ ResetEntityVariables:
     sta HP
     sta Warmth
     sta Food
+    sta Fuel
 
     lda #0
     sta HP + 1
@@ -970,6 +1005,8 @@ ResetEntityVariables:
     sta Warmth + 2
     sta Food + 1
     sta Food + 2
+    sta Fuel + 1
+    sta Fuel + 2
 
     lda #2
     sta Inventory
@@ -1001,6 +1038,8 @@ ResetEntityVariables:
     sta WarmthDelay
     lda #MAX_FOOD_DELAY
     sta FoodDelay
+    lda #MAX_FUEL_DELAY
+    sta FuelDelay
     lda #FIRE_ANIMATION_DELAY
     sta FireFrameDelay
 
@@ -1531,6 +1570,23 @@ LoadMenu:
     iny
     cpy #3
     bne @warmthLoop
+
+
+    lda $2002
+    lda #$21
+    sta $2006
+    lda #$DB
+    sta $2006
+
+    ldy #0
+@fuelLoop:
+    lda #CHARACTER_ZERO
+    clc 
+    adc Fuel, y
+    sta $2007
+    iny
+    cpy #3
+    bne @fuelLoop
 
 
 
