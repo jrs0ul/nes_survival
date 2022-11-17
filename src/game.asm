@@ -38,8 +38,8 @@
 zerosprite:
     .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
     .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
-    .byte $00,$57,$30,$30,$30,$00,$00,$41,$4E,$47,$40,$3E,$4B,$00,$30,$30
-    .byte $00,$50,$3A,$4B,$46,$4D,$41,$00,$30,$30,$00,$00,$00,$3D,$30,$30
+    .byte $00,$57,$30,$30,$30,$00,$3F,$48,$48,$3D,$00,$30,$30,$30,$00,$50
+    .byte $3A,$4B,$46,$4D,$41,$00,$30,$30,$30,$00,$00,$00,$00,$3D,$30,$30
 
 palette:
     .byte $0f,$00,$21,$31, $0f,$27,$21,$31, $0f,$17,$21,$31, $31,$10,$0f,$01    ;background
@@ -100,17 +100,25 @@ sprites:
     CHARACTER_ZERO             = $30
 
     MAX_WARMTH_DELAY           = $40
+    MAX_FOOD_DELAY             = $50
+
     FIRE_ANIMATION_DELAY       = $20
 
 
     INVENTORY_SPRITE_X         = 48
     INVENTORY_SPRITE_MIN_Y     = 44
     INVENTORY_SPRITE_MAX_Y     = 164
+    INVENTORY_POINTER_X        = 30
+    INVENTORY_STEP_PIXELS      = 12
+
+    INVENTORY_MAX_ITEMS        = 10
 
 ;===================================================================
 .segment "ZEROPAGE"
 
 pointer:
+    .res 2
+DigitPtr:
     .res 2
 ;--------------
 .segment "BSS" ; variables in ram
@@ -164,10 +172,12 @@ Food:
     .res 3
 Warmth:
     .res 3
+Fuel:       ;how much fuel you have at home in the fireplace
+    .res 3
 
 
 Inventory:
-    .res 10 ;10 items
+    .res INVENTORY_MAX_ITEMS 
 
 InventoryPointerPos:
     .res 1
@@ -177,6 +187,8 @@ InventoryItemIndex:
 
 
 WarmthDelay:
+    .res 1
+FoodDelay:
     .res 1
 
 NMIActive:
@@ -242,6 +254,8 @@ TempPointX:
     .res 1
 TempPointY:
     .res 1
+
+;249 bytes
 
 ;====================================================================================
 .segment "CODE"
@@ -323,11 +337,11 @@ vblankwait2:      ; Second wait for vblank, PPU is ready after this
 endlessLoop:
 
     lda MustLoadHouseInterior
-    bne continueForever ; don't do logics until the house is not loaded to the PPU
+    bne nextIteration ; don't do logics until the house is not loaded to the PPU
     lda MustLoadOutside
-    bne continueForever ; the same is with the map of outside
+    bne nextIteration ; the same is with the map of outside
     lda MustLoadMenu
-    bne continueForever
+    bne nextIteration
 
     dec FrameCount
     bne doInput
@@ -338,61 +352,8 @@ doInput:
 
 doSomeLogics:
 
-    lda GameState
-    cmp #GAME_STATE
-    bne nextIteration
+    jsr Logics
 
-    lda NMIActive
-    beq continueForever
-
-    jsr AnimateFire
-    
-    lda HP
-    clc
-    adc HP + 1
-    adc HP + 2
-    cmp #0
-    beq killPlayer
-    jmp checkWarmth
-killPlayer:
-    lda #0
-    sta PlayerAlive
-    jmp doneLogics
-
-checkWarmth:
-    dec WarmthDelay
-    lda WarmthDelay
-    beq resetWarmthDelay
-    jmp doneLogics
-resetWarmthDelay:
-    lda #MAX_WARMTH_DELAY
-    sta WarmthDelay
-    lda InHouse
-    bne increaseWarmth
-    jsr DecreaseWarmth
-    lda Warmth
-    beq checkSecondDigit
-    jmp doneLogics
-checkSecondDigit:
-    lda Warmth + 1
-    beq decreaseLife
-    jmp doneLogics
-decreaseLife:
-    jsr DecreaseHP
-    jmp doneLogics
-
-increaseWarmth:
-    jsr IncreaseWarmth
-
-
-doneLogics:
-    lda #0
-    sta NMIActive
-
-continueForever:
-
-    jsr CheckIfEnteredHouse
-    jsr CheckIfExitedHouse
 nextIteration:
     jmp endlessLoop
 
@@ -515,7 +476,115 @@ endforReal:
 .include "graphics.asm"
 .include "collision.asm"
 
+;-----------------------------------
+Logics:
 
+    lda GameState
+    cmp #GAME_STATE
+    bne @exit
+
+    lda NMIActive
+    beq @continueForever
+
+    jsr AnimateFire
+    
+    lda HP
+    clc
+    adc HP + 1
+    adc HP + 2
+    cmp #0
+    beq @killPlayer
+    jmp @checkWarmth
+@killPlayer:
+    lda #0
+    sta PlayerAlive
+    jmp @doneLogics
+
+@checkWarmth:
+    dec WarmthDelay
+    lda WarmthDelay
+    beq @resetWarmthDelay
+    jmp @checkFood
+
+@resetWarmthDelay:
+    lda #MAX_WARMTH_DELAY
+    sta WarmthDelay
+    lda InHouse
+    bne @increaseWarmth
+    jmp @decreaseWarmth
+@increaseWarmth:
+    jsr IncreaseWarmth
+    jmp @checkFood
+@decreaseWarmth:
+    jsr DecreaseWarmth
+    cmp #0
+    beq @decreaseLifeBecauseCold
+    jmp @checkFood
+@decreaseLifeBecauseCold:
+    jsr DecreaseLife
+
+@checkFood:
+    dec FoodDelay
+    lda FoodDelay
+    beq @resetFoodDelay
+    jmp @doneLogics
+
+@resetFoodDelay:
+    lda #MAX_FOOD_DELAY
+    sta FoodDelay
+    jsr DecreaseFood
+    cmp #0
+    beq @decreaseLifeBecauseHunger
+    jmp @doneLogics
+
+@decreaseLifeBecauseHunger:
+    jsr DecreaseLife
+
+@doneLogics:
+    lda #0
+    sta NMIActive
+
+@continueForever:
+
+    jsr CheckIfEnteredHouse
+    jsr CheckIfExitedHouse
+@exit:
+
+    rts
+;-------------------------------
+DecreaseLife:
+    lda #<HP
+    sta DigitPtr
+    lda #>HP
+    sta DigitPtr + 1
+    jsr DecreaseDigits
+    rts
+;-------------------------------
+DecreaseWarmth:
+    lda #<Warmth
+    sta DigitPtr
+    lda #>Warmth
+    sta DigitPtr + 1
+    jsr DecreaseDigits
+
+    lda Warmth
+    clc
+    adc Warmth + 1
+    adc Warmth + 2
+    rts
+;--------------------------------
+DecreaseFood:
+    lda #<Food
+    sta DigitPtr
+    lda #>Food
+    sta DigitPtr + 1
+    jsr DecreaseDigits
+    lda Food
+    clc
+    adc Food + 1
+    adc Food + 2
+
+    rts
 
 ;-------------------------------------
 UpdateInventorySprites:
@@ -544,7 +613,7 @@ UpdateInventorySprites:
     stx TempPointX ; save x index
     lda TempY
     clc
-    adc #12
+    adc #INVENTORY_STEP_PIXELS
     sta TempY
 
     ldy #0
@@ -587,14 +656,14 @@ UpdateInventorySprites:
     ldx TempPointX ;restore x index
 @next:
     inx
-    cpx #10
+    cpx #INVENTORY_MAX_ITEMS
     bcc @itemLoop
 
 
     ldx Temp
     lda InventoryPointerPos
     sec
-    sbc #1
+    sbc #1                  ;subtract 1 because the gfx in the tile skips first pixel row
     sta FIRST_SPRITE, x
     inc Temp
     lda #$FC
@@ -606,7 +675,7 @@ UpdateInventorySprites:
     sta FIRST_SPRITE, x
     inc Temp
     ldx Temp
-    lda #30
+    lda #INVENTORY_POINTER_X
     sta FIRST_SPRITE, x
 
 
@@ -781,37 +850,49 @@ UpdateStatusDigits:
     lda #$22
     sta $2006
 
+    ldy #0
+@HpLoop:
     lda #CHARACTER_ZERO
     clc 
-    adc HP
+    adc HP, y
     sta $2007
-    lda #CHARACTER_ZERO
-    clc 
-    adc HP + 1
-    sta $2007
-    lda #CHARACTER_ZERO
-    clc 
-    adc HP + 2
-    sta $2007
-
-
-
+    iny
+    cpy #3
+    bcc @HpLoop
 
     lda $2002
     lda #$20
     sta $2006
-    lda #$38
+    lda #$36
     sta $2006
 
+    ldy #0
+@warmthLoop:
     lda #CHARACTER_ZERO
     clc
-    adc Warmth
+    adc Warmth, y
     sta $2007
 
+    iny
+    cpy #3
+    bcc @warmthLoop
+
+    
+    lda $2002
+    lda #$20
+    sta $2006
+    lda #$2B
+    sta $2006
+
+    ldy #0
+@FoodLoop:
     lda #CHARACTER_ZERO
     clc
-    adc Warmth + 1
+    adc Food, y
     sta $2007
+    iny
+    cpy #3
+    bcc @FoodLoop
 
 @exit:
     rts
@@ -879,12 +960,16 @@ ResetEntityVariables:
 
     lda #1
     sta HP
+    sta Warmth
+    sta Food
+
     lda #0
     sta HP + 1
     sta HP + 2
-    ;lda #9
-    sta Warmth
     sta Warmth + 1
+    sta Warmth + 2
+    sta Food + 1
+    sta Food + 2
 
     lda #2
     sta Inventory
@@ -914,6 +999,8 @@ ResetEntityVariables:
 
     lda #MAX_WARMTH_DELAY
     sta WarmthDelay
+    lda #MAX_FOOD_DELAY
+    sta FoodDelay
     lda #FIRE_ANIMATION_DELAY
     sta FireFrameDelay
 
@@ -932,64 +1019,73 @@ ResetEntityVariables:
 
     rts
 ;-------------------------------------
-DecreaseWarmth:
+DecreaseDigits:
 
-    lda Warmth + 1
-    beq @decreaseUperDigit
+    ldy #2
+    lda (DigitPtr), y
+    beq @decreaseSecondDigit
 
-    dec Warmth + 1
+    lda (DigitPtr), y
+    sec
+    sbc #1
+    sta (DigitPtr), y
     jmp @exit
-@decreaseUperDigit:
-    lda Warmth
-    beq @exit
-    dec Warmth
+@decreaseSecondDigit:
+    ldy #1
+    lda (DigitPtr), y
+    beq @decreaseThirdDigit
+
+    lda (DigitPtr), y
+    sec
+    sbc #1
+    sta (DigitPtr), y
     lda #9
-    sta Warmth + 1
+    ldy #2
+    sta (DigitPtr), y
+    jmp @exit
+@decreaseThirdDigit:
+    ldy #0
+    lda (DigitPtr), y
+    beq @exit
+    lda (DigitPtr), y
+    sec
+    sbc #1
+    sta (DigitPtr), y
+    lda #9
+    ldy #2
+    sta (DigitPtr), y
+    ldy #1
+    sta (DigitPtr), y
 
 @exit:
     rts
+
 ;-------------------------------------
 IncreaseWarmth:
 
+    lda Warmth
+    bne @exit
+
+    lda Warmth + 2
+    cmp #9
+    beq @increaseSecondDigit
+
+    inc Warmth + 2
+    jmp @exit
+@increaseSecondDigit:
     lda Warmth + 1
     cmp #9
-    beq @increaseUpperDigit
-
+    beq @increaseThirdDigit
     inc Warmth + 1
+    lda #0
+    sta Warmth + 2
     jmp @exit
-@increaseUpperDigit:
-    lda Warmth
-    cmp #9
-    beq @exit
-    inc Warmth
+@increaseThirdDigit:
+    lda #1
+    sta Warmth
     lda #0
     sta Warmth + 1
-@exit:
-    rts
-
-;-------------------------------------
-DecreaseHP:
-
-    lda HP + 2
-    beq @decreaseSecondDigit
-
-    dec HP + 2
-    jmp @exit
-@decreaseSecondDigit:
-    lda HP + 1
-    beq @decreaseThirdDigit
-    dec HP + 1
-    lda #9
-    sta HP + 2
-    jmp @exit
-@decreaseThirdDigit:
-    lda HP
-    beq @exit
-    dec HP
-    lda #9
-    sta HP + 2
-    sta HP + 1
-
+    sta Warmth + 2
 
 @exit:
     rts
@@ -1393,21 +1489,48 @@ LoadMenu:
     lda #$BB
     sta $2006
 
+    ldy #0
+@hpLoop:
     lda #CHARACTER_ZERO
     clc 
-    adc HP
+    adc HP, y
     sta $2007
+    iny
+    cpy #3
+    bne @hpLoop
 
+
+    lda $2002
+    lda #$20
+    sta $2006
+    lda #$FB
+    sta $2006
+
+    ldy #0
+@foodLoop:
     lda #CHARACTER_ZERO
     clc 
-    adc HP + 1
+    adc Food, y
     sta $2007
+    iny
+    cpy #3
+    bne @foodLoop
 
+    lda $2002
+    lda #$21
+    sta $2006
+    lda #$3B
+    sta $2006
+
+    ldy #0
+@warmthLoop:
     lda #CHARACTER_ZERO
     clc 
-    adc HP + 2
+    adc Warmth, y
     sta $2007
-
+    iny
+    cpy #3
+    bne @warmthLoop
 
 
 
