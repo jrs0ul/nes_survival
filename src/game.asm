@@ -38,7 +38,7 @@
 zerosprite:
     .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
     .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
-    .byte $00,$41,$49,$00,$30,$30,$00,$41,$4E,$47,$40,$3E,$4B,$00,$30,$30
+    .byte $00,$57,$30,$30,$30,$00,$00,$41,$4E,$47,$40,$3E,$4B,$00,$30,$30
     .byte $00,$50,$3A,$4B,$46,$4D,$41,$00,$30,$30,$00,$00,$00,$3D,$30,$30
 
 palette:
@@ -347,12 +347,11 @@ doSomeLogics:
 
     jsr AnimateFire
     
-checkHP:
     lda HP
-    beq checkSecondHPdigit
-    jmp checkWarmth
-checkSecondHPdigit:
-    lda HP + 1
+    clc
+    adc HP + 1
+    adc HP + 2
+    cmp #0
     beq killPlayer
     jmp checkWarmth
 killPlayer:
@@ -779,7 +778,7 @@ UpdateStatusDigits:
     lda $2002
     lda #$20
     sta $2006
-    lda #$24
+    lda #$22
     sta $2006
 
     lda #CHARACTER_ZERO
@@ -790,6 +789,12 @@ UpdateStatusDigits:
     clc 
     adc HP + 1
     sta $2007
+    lda #CHARACTER_ZERO
+    clc 
+    adc HP + 2
+    sta $2007
+
+
 
 
     lda $2002
@@ -872,9 +877,12 @@ noGameOver:
 ;-------------------------------------
 ResetEntityVariables:
 
-    lda #9
+    lda #1
     sta HP
+    lda #0
     sta HP + 1
+    sta HP + 2
+    ;lda #9
     sta Warmth
     sta Warmth + 1
 
@@ -962,17 +970,26 @@ IncreaseWarmth:
 ;-------------------------------------
 DecreaseHP:
 
-    lda HP + 1
-    beq @decreaseUperDigit
+    lda HP + 2
+    beq @decreaseSecondDigit
 
-    dec HP + 1
+    dec HP + 2
     jmp @exit
-@decreaseUperDigit:
+@decreaseSecondDigit:
+    lda HP + 1
+    beq @decreaseThirdDigit
+    dec HP + 1
+    lda #9
+    sta HP + 2
+    jmp @exit
+@decreaseThirdDigit:
     lda HP
     beq @exit
     dec HP
     lda #9
+    sta HP + 2
     sta HP + 1
+
 
 @exit:
     rts
@@ -1368,6 +1385,32 @@ LoadMenu:
     lda #32
     sta Temp
     jsr LoadPalette
+
+
+    lda $2002
+    lda #$20
+    sta $2006
+    lda #$BB
+    sta $2006
+
+    lda #CHARACTER_ZERO
+    clc 
+    adc HP
+    sta $2007
+
+    lda #CHARACTER_ZERO
+    clc 
+    adc HP + 1
+    sta $2007
+
+    lda #CHARACTER_ZERO
+    clc 
+    adc HP + 2
+    sta $2007
+
+
+
+
 
     lda #0
     sta MustLoadMenu
