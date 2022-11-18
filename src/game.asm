@@ -261,7 +261,16 @@ TempPointX:
 TempPointY:
     .res 1
 
-;250 bytes
+Items:   ;items that lies in the map
+    .res 16 ; max 4 items * 4 bytes(x, y, item index, ??)
+ItemCount:
+    .res 1
+
+Npcs:   ;animals and stuff
+    .res 16 ; max 4 npcs * 4 bytes (x, y, starting tile, height in tiles)
+NpcsCount:
+    .res 1
+;284 bytes
 
 ;====================================================================================
 .segment "CODE"
@@ -1028,6 +1037,22 @@ ResetEntityVariables:
     sta Food + 2
     sta Fuel + 1
     sta Fuel + 2
+
+    lda #2
+    sta ItemCount
+    lda #50
+    sta Items
+    lda #180
+    sta Items + 1
+    lda #ITEM_TYPE_FUEL
+    sta Items + 2
+    sta Items + 3 ;dummy
+    lda #55
+    sta Items + 4
+    lda #32
+    sta Items + 5
+    lda #ITEM_TYPE_FOOD
+    sta Items + 6
 
     lda #2
     sta Inventory
@@ -1931,8 +1956,85 @@ UpdateSprites:
     adc #$08
     sta FIRST_SPRITE, x
 ;--
+;items update
     inx
-    ldy #20
+    ldy ItemCount
+    dey
+@itemLoop:
+
+    sty Temp
+    tya
+    asl
+    asl
+    tay
+    iny
+    lda Items, y
+    sta FIRST_SPRITE, x
+    inx
+    ;index
+    iny
+    lda Items, y
+    asl
+    asl; a * 4
+    sty TempY; store item index
+    tay
+
+    lda inventory_data, y ;tile index
+    sta TempZ
+    sta FIRST_SPRITE, x
+    iny
+    lda inventory_data, y
+    sta TempPointX; store palette index
+    ldy TempY ;restore item index
+
+    inx
+    ;attributes
+    sta FIRST_SPRITE, x
+    inx
+    dey
+    dey
+    lda Items, y
+    sec
+    sbc GlobalScroll
+    sta FIRST_SPRITE, x
+    ;x
+    inx
+    iny
+    lda Items, y
+    sta FIRST_SPRITE, x
+    ;y
+    inx
+    ;idx
+    lda TempZ
+    clc
+    adc #1
+    sta FIRST_SPRITE, x
+    inx
+    ;att
+    lda TempPointX
+    sta FIRST_SPRITE, x
+    inx
+    ;x
+    dey
+    lda Items, y
+    clc
+    adc #8
+    sec
+    sbc GlobalScroll
+    sta FIRST_SPRITE, x
+    inx
+
+
+    ldy Temp
+    dey
+    bpl @itemLoop
+;---
+
+
+    lda #20
+    sec
+    sbc ItemCount
+    tay
 @hideSpritesLoop:
     lda #$FE
     sta FIRST_SPRITE, x
