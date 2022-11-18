@@ -519,6 +519,13 @@ Logics:
     bne @increaseWarmth
     jmp @decreaseWarmth
 @increaseWarmth:
+    lda Fuel
+    clc
+    adc Fuel + 1
+    adc Fuel + 2
+    cmp #0
+    beq @decreaseWarmth
+
     jsr IncreaseWarmth
     jmp @checkFood
 @decreaseWarmth:
@@ -530,21 +537,7 @@ Logics:
     jsr DecreaseLife
 
 @checkFood:
-    dec FoodDelay
-    lda FoodDelay
-    beq @resetFoodDelay
-    jmp @doneLogics
-
-@resetFoodDelay:
-    lda #MAX_FOOD_DELAY
-    sta FoodDelay
-    jsr DecreaseFood
-    cmp #0
-    beq @decreaseLifeBecauseHunger
-    jmp @doneLogics
-
-@decreaseLifeBecauseHunger:
-    jsr DecreaseLife
+    jsr FoodLogics
 
 @doneLogics:
     lda #0
@@ -557,6 +550,35 @@ Logics:
 @exit:
 
     rts
+;-------------------------------
+FoodLogics:
+    dec FoodDelay
+    lda FoodDelay
+    beq @resetFoodDelay
+    jmp @exit
+
+@resetFoodDelay:
+    lda #MAX_FOOD_DELAY
+    sta FoodDelay
+    lda #<Food
+    sta DigitPtr
+    lda #>Food
+    sta DigitPtr + 1
+    jsr DecreaseDigits
+    lda Food
+    clc
+    adc Food + 1
+    adc Food + 2
+    cmp #0
+    beq @decreaseLifeBecauseHunger
+    jmp @exit
+
+@decreaseLifeBecauseHunger:
+    jsr DecreaseLife
+
+@exit:
+    rts
+
 ;-------------------------------
 DecreaseFuel:
     dec FuelDelay
@@ -583,6 +605,15 @@ DecreaseLife:
     jsr DecreaseDigits
     rts
 ;-------------------------------
+IncreaseWarmth:
+    lda #<Warmth
+    sta DigitPtr
+    lda #>Warmth
+    sta DigitPtr + 1
+    jsr IncreaseDigits
+    rts
+
+;-------------------------------
 DecreaseWarmth:
     lda #<Warmth
     sta DigitPtr
@@ -595,20 +626,6 @@ DecreaseWarmth:
     adc Warmth + 1
     adc Warmth + 2
     rts
-;--------------------------------
-DecreaseFood:
-    lda #<Food
-    sta DigitPtr
-    lda #>Food
-    sta DigitPtr + 1
-    jsr DecreaseDigits
-    lda Food
-    clc
-    adc Food + 1
-    adc Food + 2
-
-    rts
-
 ;-------------------------------------
 UpdateInventorySprites:
 
@@ -1100,31 +1117,45 @@ DecreaseDigits:
     rts
 
 ;-------------------------------------
-IncreaseWarmth:
+;Increase stat number from 000 to 100
+IncreaseDigits:
 
-    lda Warmth
-    bne @exit
+    ldy #0
+    lda (DigitPtr), y
+    bne @exit           ;the highest digit is not zero anymore, let's stop
 
-    lda Warmth + 2
+    ldy #2
+    lda (DigitPtr), y
     cmp #9
     beq @increaseSecondDigit
 
-    inc Warmth + 2
+    lda (DigitPtr), y
+    clc
+    adc #1
+    sta (DigitPtr), y
     jmp @exit
 @increaseSecondDigit:
-    lda Warmth + 1
+    ldy #1
+    lda (DigitPtr), y
     cmp #9
     beq @increaseThirdDigit
-    inc Warmth + 1
+    lda (DigitPtr), y
+    clc
+    adc #1
+    sta (DigitPtr), y
     lda #0
-    sta Warmth + 2
+    ldy #2
+    sta (DigitPtr), y
     jmp @exit
 @increaseThirdDigit:
     lda #1
-    sta Warmth
+    ldy #0
+    sta (DigitPtr), y
     lda #0
-    sta Warmth + 1
-    sta Warmth + 2
+    ldy #1
+    sta (DigitPtr), y
+    ldy #2
+    sta (DigitPtr), y
 
 @exit:
     rts
