@@ -112,6 +112,9 @@ sprites:
     INVENTORY_POINTER_X        = 30
     INVENTORY_STEP_PIXELS      = 12
 
+    ITEM_TYPE_FOOD             = 1
+    ITEM_TYPE_FUEL             = 2
+
     INVENTORY_MAX_ITEMS        = 10
 
 ;===================================================================
@@ -639,9 +642,10 @@ UpdateInventorySprites:
 @itemLoop:
 
     lda Inventory, x
-    asl ;inventory_index * 2
+    asl
+    asl ;inventory_index * 4
     tay
-    lda inventory_data, y ;grap sprite index
+    lda inventory_data, y ;grab sprite index
     bne @store_sprite_index
     lda #$FD ;empty sprite index
 @store_sprite_index:
@@ -1275,16 +1279,7 @@ MenuInput:
     dec InventoryItemIndex
 
 @CheckB:
-    lda Buttons
-    and #%01000000
-    beq @exit
-    ldx InventoryItemIndex
-
-    lda Inventory, x
-    beq @exit
-    lda #0
-    sta Inventory, x
-    jsr ExitMenuState
+    jsr Button_B_Pressed
 
 @exit:
     lda Buttons
@@ -1293,6 +1288,86 @@ MenuInput:
     sta Buttons
 
     rts
+;--------------------------------------
+Button_B_Pressed:
+    lda Buttons
+    and #%01000000
+    beq @exit
+    ldx InventoryItemIndex
+
+    lda Inventory, x
+    beq @exit
+    asl
+    asl
+    tay
+    iny
+    iny
+    iny
+    lda inventory_data, y ; power
+    sta Temp ; save power for later
+    dey
+    lda inventory_data, y ; type
+
+    cmp #ITEM_TYPE_FUEL
+    beq @addFuel
+
+@checkFood:
+    cmp #ITEM_TYPE_FOOD
+    beq @addFood
+
+    jmp @clearItem
+
+@addFuel:
+    lda InHouse
+    beq @exit
+    lda #MAX_FUEL_DELAY
+    sta FuelDelay
+
+    lda Fuel + 1
+    clc
+    adc Temp
+    cmp #10
+    bcs @clampFuel
+    jmp @saveFuel
+@clampFuel:
+    lda #0
+    sta Fuel + 1
+    sta Fuel + 2
+    lda #1
+    sta Fuel
+    jmp @clearItem
+@saveFuel:
+    sta Fuel + 1
+    jmp @clearItem
+;--------
+@addFood:
+    lda #MAX_FOOD_DELAY
+    sta FoodDelay
+
+    lda Food + 1
+    clc
+    adc Temp
+    cmp #10
+    bcs @clampFood
+    jmp @saveFood
+@clampFood:
+    lda #0
+    sta Food + 1
+    sta Food + 2
+    lda #1
+    sta Food
+    jmp @clearItem
+@saveFood:
+    sta Food + 1
+
+@clearItem:
+    lda #0
+    sta Inventory, x
+    jsr ExitMenuState
+
+@exit:
+    rts
+
 ;--------------------------------------
 
 ProcessButtons:
