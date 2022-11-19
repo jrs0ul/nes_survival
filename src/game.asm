@@ -260,6 +260,8 @@ TempPointX:
     .res 1
 TempPointY:
     .res 1
+TempIndex:
+    .res 1
 
 Items:   ;items that lies in the map
     .res 16 ; max 4 items * 4 bytes(x, y, item index, ??)
@@ -268,9 +270,9 @@ ItemCount:
 
 Npcs:   ;animals and stuff
     .res 16 ; max 4 npcs * 4 bytes (x, y, starting tile, height in tiles)
-NpcsCount:
+NpcCount:
     .res 1
-;284 bytes
+;285 bytes
 
 ;====================================================================================
 .segment "CODE"
@@ -1053,6 +1055,26 @@ ResetEntityVariables:
     sta Items + 5
     lda #ITEM_TYPE_FOOD
     sta Items + 6
+
+    lda #1
+    sta NpcCount
+    lda #100
+    sta Npcs
+    lda #180
+    sta Npcs + 1
+    lda #10
+    sta Npcs + 2
+    lda #3
+    sta Npcs + 3
+   ; lda #100
+   ; sta Npcs + 4
+   ; lda #32
+   ; sta Npcs + 5
+   ; lda #40
+   ; sta Npcs + 6
+   ; lda #2
+   ; sta Npcs + 7
+
 
     lda #2
     sta Inventory
@@ -2029,25 +2051,127 @@ UpdateSprites:
     dey
     bpl @itemLoop
 ;---
-
-
-    lda #20
-    sec
-    sbc ItemCount
-    tay
-@hideSpritesLoop:
-    lda #$FE
-    sta FIRST_SPRITE, x
-    inx
-    inx
-    inx
-    inx
-
+;Npcs
+    ldy NpcCount
     dey
-    bne @hideSpritesLoop
+@npcLoop:
+
+    sty Temp ; save npc index
+    tya
+    asl
+    asl
+    tay
+    lda Npcs, y ; x
+    sec
+    sbc GlobalScroll
+    sta TempPointX ; save x
+    iny
+    lda Npcs, y; y
+    sta TempPointY ; save y
+    iny
+    lda Npcs, y    ; first tile
+    sta TempZ      ;save tile
+    iny
+    lda Npcs, y ; row count
+    tay
+    lda #0
+    sta TempPush ; additionl Y
+    sta TempIndex ;additional sprite index
+@rowloop:
+    jsr UpdateNpcRow
+    dey
+    bne @rowloop
+
+    ldy Temp; restore the index
+    dey
+    bpl @npcLoop
+
+;---------
+   ; lda ItemCount
+   ; asl ;count * 2
+   ; sta Temp
+   ; lda NpcCount
+   ; asl
+   ; asl
+   ; sta TempY
+
+   ; lda #20
+
+   ; sec
+   ; sbc Temp
+   ; sbc TempY
+   ; tay
+;@hideSpritesLoop:
+;    lda #$FE
+;    sta FIRST_SPRITE, x
+;    inx
+;    inx
+;    inx
+;    inx
+;
+;    dey
+;    bne @hideSpritesLoop
 
 
     rts
+;---------------------------------
+UpdateNpcRow:
+     ;Y
+    lda TempPointY
+    clc
+    adc TempPush
+    sta FIRST_SPRITE, x
+    inx
+    ;index
+    lda TempZ
+    clc
+    adc TempIndex
+    sta FIRST_SPRITE, x
+    inx
+    ;attr
+    lda #0
+    sta FIRST_SPRITE, x
+    inx
+    ;X
+    lda TempPointX
+    sta FIRST_SPRITE, x
+    inx
+    ;Y
+    lda TempPointY
+    clc
+    adc TempPush
+    sta FIRST_SPRITE, x
+    inx
+    ;index
+    lda TempZ
+    clc
+    adc #1
+    adc TempIndex
+    sta FIRST_SPRITE, x
+    inx
+    ;attr
+    lda #0
+    sta FIRST_SPRITE, x
+    inx
+    ;X
+    lda TempPointX
+    clc
+    adc #8
+    sta FIRST_SPRITE, x
+    inx
+    
+    lda TempPush
+    clc
+    adc #8
+    sta TempPush
+    lda TempIndex
+    clc
+    adc #16
+    sta TempIndex
+
+
+    rts
+
 
 ;----------------------------------
 loadSprites:
