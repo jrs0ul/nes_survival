@@ -42,12 +42,12 @@ zerosprite:
     .byte $3A,$4B,$46,$4D,$41,$00,$30,$30,$30,$00,$00,$00,$00,$3D,$30,$30
 
 palette:
-    .byte $0f,$00,$21,$31, $0f,$27,$21,$31, $0f,$17,$21,$31, $31,$10,$0f,$01    ;background
-    .byte $0f,$00,$21,$31, $0f,$27,$21,$31, $0f,$17,$21,$31, $0f,$0f,$37,$16    ;OAM sprites
+    .byte $0C,$00,$21,$31, $0C,$27,$21,$31, $0C,$17,$21,$31, $0C,$10,$0f,$01    ;background
+    .byte $0C,$0f,$17,$20, $0C,$06,$16,$39, $0C,$17,$21,$31, $0C,$0f,$37,$16    ;OAM sprites
 
 house_palette:
-    .byte $0f,$16,$27,$37, $0f,$07,$00,$31, $0f,$17,$27,$31, $31,$10,$0f,$01    ;background
-    .byte $0f,$00,$21,$31, $0f,$27,$21,$31, $0f,$17,$21,$31, $0f,$0f,$37,$16    ;OAM sprites
+    .byte $0C,$16,$27,$37, $0C,$07,$00,$31, $0C,$17,$27,$31, $0C,$10,$0f,$01    ;background
+    .byte $0C,$00,$21,$31, $0C,$27,$21,$31, $0C,$17,$21,$31, $0C,$0f,$37,$16    ;OAM sprites
 
 menu_palette:
     .byte $10,$0F,$00,$10, $0f,$07,$00,$31, $0f,$17,$27,$31, $31,$10,$0f,$01    ;background
@@ -263,6 +263,26 @@ TempPointY:
 TempIndex:
     .res 1
 
+;inventory temps
+TempTileIndex:
+    .res 1
+TempTileIndexOffset:
+    .res 1
+TempTileYPos:
+    .res 1
+TempPaletteIndex:
+    .res 1
+TempInventoryIndex:
+    .res 1
+TempSpriteIdx:
+    .res 1
+;----
+TempItemIndex:
+    .res 1
+TempSpriteCount: ; count of active sprites
+    .res 1
+;--
+
 Items:   ;items that lies in the map
     .res 16 ; max 4 items * 4 bytes(x, y, item index, ??)
 ItemCount:
@@ -272,7 +292,7 @@ Npcs:   ;animals and stuff
     .res 16 ; max 4 npcs * 4 bytes (x, y, starting tile, height in tiles)
 NpcCount:
     .res 1
-;285 bytes
+;293 bytes
 
 ;====================================================================================
 .segment "CODE"
@@ -366,6 +386,23 @@ endlessLoop:
 
 doInput:
     jsr HandleInput
+    lda GameState
+    cmp #GAME_STATE
+    beq update_game_sprites
+    cmp #MENU_STATE
+    beq update_menu_sprites
+    cmp #TITLE_STATE
+    beq hide_sprites
+    jmp doSomeLogics
+
+update_game_sprites:
+    jsr UpdateSprites
+    jmp doSomeLogics
+update_menu_sprites:
+    jsr UpdateInventorySprites
+    jmp doSomeLogics
+hide_sprites:
+    jsr HideSprites
 
 doSomeLogics:
 
@@ -423,7 +460,6 @@ checkFire:
 
 continueNmi:
     jsr CheckGameOver
-    jsr UpdateSprites
     jsr UpdateStatusDigits
 
 nmicont2:
@@ -477,7 +513,6 @@ endOfNmi:
     bne endforReal
     jsr MenuInput
 
-    jsr UpdateInventorySprites
 
 endforReal:
     pla
@@ -502,6 +537,8 @@ Logics:
 
     lda NMIActive
     beq @continueForever
+
+
 
     jsr AnimateFire
     
@@ -645,10 +682,12 @@ UpdateInventorySprites:
 
     ldx #0
     lda #0
-    sta Temp
+    sta TempSpriteIdx
+    sta TempSpriteCount
 
     lda #32
-    sta TempY
+    sta TempTileYPos
+
 
 @itemLoop:
 
@@ -660,40 +699,40 @@ UpdateInventorySprites:
     bne @store_sprite_index
     lda #$FD ;empty sprite index
 @store_sprite_index:
-    sta TempZ ; save sprite index
+    sta TempTileIndex ; save sprite index
     iny
     lda inventory_data, y
-    sta TempPointY ; save palette
+    sta TempPaletteIndex ; save palette
 
-    stx TempPointX ; save x index
-    lda TempY
+    stx TempInventoryIndex ; save x index
+    lda TempTileYPos
     clc
     adc #INVENTORY_STEP_PIXELS
-    sta TempY
+    sta TempTileYPos
 
     ldy #0
 @twoTileLoop: ;item consists of two tiles
 
-    lda TempY
-    ldx Temp
+    lda TempTileYPos
+    ldx TempSpriteIdx
     sta FIRST_SPRITE, x ;set Y coordinate
 
-    inc Temp
-    lda TempZ
-    sty TempPush
+    inc TempSpriteIdx
+    lda TempTileIndex
+    sty TempTileIndexOffset
     clc
-    adc TempPush
-    ldx Temp
+    adc TempTileIndexOffset
+    ldx TempSpriteIdx
     sta FIRST_SPRITE, x
 
-    inc Temp
+    inc TempSpriteIdx
     ;attributes
-    ldx Temp
+    ldx TempSpriteIdx
     lda #0
     clc
-    adc TempPointY
+    adc TempPaletteIndex
     sta FIRST_SPRITE, x
-    inc Temp
+    inc TempSpriteIdx
     ;x coordinate
     lda #INVENTORY_SPRITE_X
     cpy #1
@@ -701,37 +740,61 @@ UpdateInventorySprites:
     clc
     adc #8
 @saveX:
-    ldx Temp
+    ldx TempSpriteIdx
     sta FIRST_SPRITE, x
-    inc Temp
+    inc TempSpriteIdx
+    inc TempSpriteCount
     iny
     cpy #2
     bcc @twoTileLoop
 
-    ldx TempPointX ;restore x index
+    ldx TempInventoryIndex ;restore x index
 @next:
     inx
     cpx #INVENTORY_MAX_ITEMS
     bcc @itemLoop
 
 
-    ldx Temp
+    ldx TempSpriteIdx
     lda InventoryPointerPos
     sec
     sbc #1                  ;subtract 1 because the gfx in the tile skips first pixel row
     sta FIRST_SPRITE, x
-    inc Temp
+    inc TempSpriteIdx
     lda #$FC
-    ldx Temp
+    ldx TempSpriteIdx
     sta FIRST_SPRITE, x
-    inc Temp
-    ldx Temp
+    inc TempSpriteIdx
+    ldx TempSpriteIdx
     lda #%00000011
     sta FIRST_SPRITE, x
-    inc Temp
-    ldx Temp
+    inc TempSpriteIdx
+    ldx TempSpriteIdx
     lda #INVENTORY_POINTER_X
     sta FIRST_SPRITE, x
+    inc TempSpriteCount
+
+
+    inx
+    lda #63
+
+    cmp TempSpriteCount
+    bcc @done
+    sec
+    sbc TempSpriteCount
+
+    tay
+@hideSpritesLoop:
+    lda #$FE
+    sta FIRST_SPRITE, x
+    inx
+    inx
+    inx
+    inx
+
+    dey
+    bne @hideSpritesLoop
+@done:
 
 
 
@@ -989,9 +1052,25 @@ InitializeStatusBarLoop:     ; copy status bar to first nametable
 ;--------------------------------------------
 
 HideSprites:
-    lda #$F0
-    sta PlayerX
-    sta PlayerY
+
+    ldx #0
+
+    ldy #64
+@hideSpritesLoop:
+    lda #$FE
+    sta FIRST_SPRITE, x
+    inx
+    ;index
+    inx
+    ;attr
+    inx
+    ;x
+    inx
+
+    dey
+    bne @hideSpritesLoop
+
+
     rts
 ;--------------------------------------------
 CheckGameOver:
@@ -1002,7 +1081,6 @@ CheckGameOver:
 gameOver:
     lda #TITLE_STATE
     sta GameState
-    jsr HideSprites
     lda #$00
     sta $2000
     sta $2001
@@ -1056,24 +1134,40 @@ ResetEntityVariables:
     lda #ITEM_TYPE_FOOD
     sta Items + 6
 
-    lda #1
+    lda #4
     sta NpcCount
     lda #100
     sta Npcs
     lda #180
     sta Npcs + 1
-    lda #10
+    lda #14
     sta Npcs + 2
     lda #3
     sta Npcs + 3
-   ; lda #100
-   ; sta Npcs + 4
-   ; lda #32
-   ; sta Npcs + 5
-   ; lda #40
-   ; sta Npcs + 6
-   ; lda #2
-   ; sta Npcs + 7
+    lda #100
+    sta Npcs + 4
+    lda #32
+    sta Npcs + 5
+    lda #08
+    sta Npcs + 6
+    lda #2
+    sta Npcs + 7
+    lda #132
+    sta Npcs + 8
+    lda #180
+    sta Npcs + 9
+    lda #10
+    sta Npcs + 10
+    lda #3
+    sta Npcs + 11
+    lda #170
+    sta Npcs + 12
+    lda #180
+    sta Npcs + 13
+    lda #10
+    sta Npcs + 14 
+    lda #3
+    sta Npcs + 15
 
 
     lda #2
@@ -1596,6 +1690,12 @@ CheckIfEnteredHouse:
     cmp #HOUSE_DOOR_Y2
     bcs @nope
 
+
+    lda #0
+    sta ItemCount
+    lda #0
+    sta NpcCount
+
     ldx #0
 @copyCollisionMapLoop:
     lda hut_collision, x
@@ -1775,6 +1875,10 @@ CheckIfExitedHouse:
 
     lda #0
     sta InHouse
+    lda #2
+    sta ItemCount
+    lda #4
+    sta NpcCount
 
     lda #OUTSIDE_ENTRY_FROM_HOUSE_X
     sta PlayerX
@@ -1977,6 +2081,10 @@ UpdateSprites:
     clc
     adc #$08
     sta FIRST_SPRITE, x
+
+    lda #4
+    sta TempSpriteCount
+
 ;--
 ;items update
     inx
@@ -1984,7 +2092,7 @@ UpdateSprites:
     dey
 @itemLoop:
 
-    sty Temp
+    sty TempItemIndex
     tya
     asl
     asl
@@ -2024,6 +2132,7 @@ UpdateSprites:
     iny
     lda Items, y
     sta FIRST_SPRITE, x
+    inc TempSpriteCount
     ;y
     inx
     ;idx
@@ -2045,18 +2154,20 @@ UpdateSprites:
     sbc GlobalScroll
     sta FIRST_SPRITE, x
     inx
+    inc TempSpriteCount
 
 
-    ldy Temp
+    ldy TempItemIndex
     dey
     bpl @itemLoop
 ;---
 ;Npcs
     ldy NpcCount
+    beq @hidesprites
     dey
 @npcLoop:
 
-    sty Temp ; save npc index
+    sty TempItemIndex ; save npc index
     tya
     asl
     asl
@@ -2082,36 +2193,30 @@ UpdateSprites:
     dey
     bne @rowloop
 
-    ldy Temp; restore the index
+    ldy TempItemIndex; restore the index
     dey
     bpl @npcLoop
-
 ;---------
-   ; lda ItemCount
-   ; asl ;count * 2
-   ; sta Temp
-   ; lda NpcCount
-   ; asl
-   ; asl
-   ; sta TempY
+@hidesprites:
+    lda #64
 
-   ; lda #20
+    cmp TempSpriteCount
+    bcc @done
+    sec
+    sbc TempSpriteCount
 
-   ; sec
-   ; sbc Temp
-   ; sbc TempY
-   ; tay
-;@hideSpritesLoop:
-;    lda #$FE
-;    sta FIRST_SPRITE, x
-;    inx
-;    inx
-;    inx
-;    inx
-;
-;    dey
-;    bne @hideSpritesLoop
+    tay
+@hideSpritesLoop:
+    lda #$FE
+    sta FIRST_SPRITE, x
+    inx
+    inx
+    inx
+    inx
 
+    dey
+    bne @hideSpritesLoop
+@done:
 
     rts
 ;---------------------------------
@@ -2135,6 +2240,7 @@ UpdateNpcRow:
     ;X
     lda TempPointX
     sta FIRST_SPRITE, x
+    inc TempSpriteCount
     inx
     ;Y
     lda TempPointY
@@ -2159,6 +2265,8 @@ UpdateNpcRow:
     adc #8
     sta FIRST_SPRITE, x
     inx
+
+    inc TempSpriteCount
     
     lda TempPush
     clc
