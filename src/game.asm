@@ -597,12 +597,7 @@ ItemCollisionCheck:
     cmp TempPointY
     bcs @nextItem
 
-    tya
-    asl
-    asl
-    tax
-    lda #0
-    sta Items, x
+    jsr AddAndDeactivateItems
 
 @nextItem:
     iny
@@ -613,6 +608,32 @@ ItemCollisionCheck:
     rts
 
 
+;-----------------------------------
+AddAndDeactivateItems:
+    sty TempY
+
+    ldy #INVENTORY_MAX_ITEMS - 1
+@inventoryLoop:
+    lda Inventory, y
+    beq @addItem
+    dey
+    bpl @inventoryLoop
+    jmp @exit ; no place in the inventory?
+
+@addItem:
+    inx
+    lda Items, x
+    sta Inventory, y
+    ldy TempY
+
+    tya
+    asl
+    asl
+    tax
+    lda #0
+    sta Items, x
+@exit:
+    rts
 ;-----------------------------------
 Logics:
 
@@ -1202,7 +1223,7 @@ ResetEntityVariables:
     sta Fuel + 1
     sta Fuel + 2
 
-    lda #2
+    lda #3
     sta ItemCount
     lda #1
     sta Items
@@ -1220,6 +1241,14 @@ ResetEntityVariables:
     sta Items + 6
     lda #ITEM_TYPE_FOOD
     sta Items + 7
+    lda #1
+    sta Items + 8
+    lda #10
+    sta Items + 9
+    lda #100
+    sta Items + 10
+    lda #1
+    sta Items + 11
 
     lda #4
     sta NpcCount
