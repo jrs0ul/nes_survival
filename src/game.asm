@@ -71,6 +71,7 @@ sprites:
 
     PLAYER_SPEED               = 2
     INPUT_DELAY                = 64
+    ITEM_DELAY                 = 64
 
     COLLISION_MAP_SIZE         = 120 ; 4 columns * 30 rows
     COLLISION_MAP_COLUMN_COUNT = 4
@@ -247,6 +248,9 @@ CarrySet:
 
 FrameCount:
     .res 1
+ItemUpdateDelay:
+    .res 1
+
 
 Temp:
     .res 1
@@ -366,6 +370,8 @@ vblankwait2:      ; Second wait for vblank, PPU is ready after this
 
     lda #INPUT_DELAY
     sta FrameCount
+    lda #ITEM_DELAY
+    sta ItemUpdateDelay
     lda #0
     sta MustLoadHouseInterior
 
@@ -381,8 +387,8 @@ endlessLoop:
     bne nextIteration
 
     dec FrameCount
-    bne doInput
-    jmp doSomeLogics
+    lda FrameCount
+    bne checkItems
 
 doInput:
     jsr HandleInput
@@ -393,6 +399,15 @@ doInput:
     beq update_menu_sprites
     cmp #TITLE_STATE
     beq hide_sprites
+
+checkItems:
+    dec ItemUpdateDelay
+    lda ItemUpdateDelay
+    beq doItemCheck
+    jmp doSomeLogics
+
+doItemCheck:
+    jsr ItemCollisionCheck
     jmp doSomeLogics
 
 update_game_sprites:
@@ -527,6 +542,70 @@ endforReal:
 
 .include "graphics.asm"
 .include "collision.asm"
+
+
+ItemCollisionCheck:
+    lda #ITEM_DELAY
+    sta ItemUpdateDelay
+
+    ldy #0
+@itemLoop:
+    tya
+    asl
+    asl ;y * 4
+    tax
+    lda Items, x ;x
+    sta TempPointX
+    lda PlayerX
+    clc
+    adc #8
+    cmp TempPointX
+    bcs @checkX2
+    jmp @nextItem
+@checkX2:
+    lda Items,x
+    clc
+    adc #16
+    sta TempPointX
+    lda PlayerX
+    clc
+    adc #8
+    cmp TempPointX
+    bcs @nextItem
+
+    inx
+    lda Items, x ;y
+    sta TempPointY
+    lda PlayerY
+    clc
+    adc #16
+    cmp TempPointY
+    bcs @checkY2
+    jmp @nextItem
+@checkY2:
+
+    lda Items, x
+    clc
+    adc #16
+    sta TempPointY
+    lda PlayerY
+    clc
+    adc #16
+    cmp TempPointY
+    bcs @nextItem
+
+    inx
+    lda #10
+    sta Items, x
+
+@nextItem:
+    iny
+    cpy ItemCount
+    bcc @itemLoop
+
+
+    rts
+
 
 ;-----------------------------------
 Logics:
@@ -938,7 +1017,6 @@ checkAnother:
     cmp #1
     bne finishInput
     jsr PushCollisionMapRight
-
     jmp finishInput
 
 inputInOtherStates:
