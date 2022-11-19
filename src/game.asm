@@ -288,7 +288,7 @@ TempSpriteCount: ; count of active sprites
 ;--
 
 Items:   ;items that lies in the map
-    .res 16 ; max 4 items * 4 bytes(x, y, item index, ??)
+    .res 16 ; max 4 items * 4 bytes(active, x, y, item index)
 ItemCount:
     .res 1
 
@@ -554,6 +554,9 @@ ItemCollisionCheck:
     asl
     asl ;y * 4
     tax
+    lda Items, x ; active?
+    beq @nextItem
+    inx
     lda Items, x ;x
     sta TempPointX
     lda PlayerX
@@ -594,8 +597,11 @@ ItemCollisionCheck:
     cmp TempPointY
     bcs @nextItem
 
-    inx
-    lda #10
+    tya
+    asl
+    asl
+    tax
+    lda #0
     sta Items, x
 
 @nextItem:
@@ -1198,19 +1204,22 @@ ResetEntityVariables:
 
     lda #2
     sta ItemCount
-    lda #50
+    lda #1
     sta Items
-    lda #180
+    lda #50
     sta Items + 1
-    lda #ITEM_TYPE_FUEL
+    lda #180
     sta Items + 2
-    sta Items + 3 ;dummy
-    lda #55
+    lda #ITEM_TYPE_FUEL
+    sta Items + 3
+    lda #1
     sta Items + 4
-    lda #32
+    lda #55
     sta Items + 5
-    lda #ITEM_TYPE_FOOD
+    lda #32
     sta Items + 6
+    lda #ITEM_TYPE_FOOD
+    sta Items + 7
 
     lda #4
     sta NpcCount
@@ -2173,10 +2182,13 @@ UpdateSprites:
     sty TempItemIndex
     tya
     asl
-    asl
+    asl ; y * 4
     tay
+    lda Items, y ; is active
+    beq @nextItem
     iny
-    lda Items, y
+    iny
+    lda Items, y ; y
     sta FIRST_SPRITE, x
     inx
     ;index
@@ -2234,7 +2246,7 @@ UpdateSprites:
     inx
     inc TempSpriteCount
 
-
+@nextItem:
     ldy TempItemIndex
     dey
     bpl @itemLoop
