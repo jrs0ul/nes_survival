@@ -34,6 +34,7 @@
 .include "data/menu_screen.asm"
 .include "data/collision_data.asm"
 .include "data/inventory_data.asm"
+.include "data/item_list.asm" ;items in maps
 
 zerosprite:
     .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
@@ -1224,33 +1225,7 @@ ResetEntityVariables:
     sta Fuel + 1
     sta Fuel + 2
 
-    lda #3
-    sta ItemCount
-    lda #1
-    sta Items
-    lda #50
-    sta Items + 1
-    lda #180
-    sta Items + 2
-    lda #ITEM_TYPE_FUEL
-    sta Items + 3
-    lda #1
-    sta Items + 4
-    lda #55
-    sta Items + 5
-    lda #32
-    sta Items + 6
-    lda #ITEM_TYPE_FOOD
-    sta Items + 7
-    lda #1
-    sta Items + 8
-    lda #10
-    sta Items + 9
-    lda #100
-    sta Items + 10
-    lda #1
-    sta Items + 11
-
+    
     lda #4
     sta NpcCount
     lda #100
@@ -1287,26 +1262,6 @@ ResetEntityVariables:
     sta Npcs + 15
 
 
-    lda #2
-    sta Inventory
-    lda #1
-    sta Inventory + 1
-    lda #1
-    sta Inventory + 2
-    lda #2
-    sta Inventory + 3
-    lda #0
-    sta Inventory + 4
-    lda #2
-    sta Inventory + 5
-    lda #1
-    sta Inventory + 6
-    lda #0
-    sta Inventory + 7
-    lda #2
-    sta Inventory + 8
-    lda #1
-    sta Inventory + 9
 
     lda #INVENTORY_SPRITE_MIN_Y
     sta InventoryPointerPos
@@ -1447,8 +1402,14 @@ CheckStartButton:
     jsr ResetEntityVariables
     lda #1
     sta MustLoadOutside
-    
 
+    lda #<Outside1_items
+    sta pointer
+    lda #>Outside1_items
+    sta pointer + 1
+    jsr LoadItems
+       
+@collision:
     ldx #0
 @copyCollisionMapLoop:
     lda bg_collision, x
@@ -1484,7 +1445,41 @@ CheckStartButton:
     sta OldButtons
 
     rts
+;-------------------------------------
+;pointer points to the items data
+LoadItems:
+    ldy #0
+    lda (pointer), y
+    sta ItemCount
+    ldx ItemCount
+    beq @exit
+    iny
+@itemLoop:
+    lda (pointer), y
+    dey
+    sta Items, y
+    iny
+    iny
+    lda (pointer), y
+    dey
+    sta Items, y
+    iny
+    iny
+    lda (pointer), y
+    dey
+    sta Items, y
+    iny
+    iny
+    lda (pointer), y
+    dey
+    sta Items, y
+    iny
+    iny
+    dex
+    bne @itemLoop
+@exit:
 
+    rts
 ;-------------------------------------
 ExitMenuState:
     lda #GAME_STATE
@@ -1824,8 +1819,12 @@ CheckIfEnteredHouse:
     bcs @nope
 
 
-    lda #0
-    sta ItemCount
+    lda #<House_items
+    sta pointer
+    lda #>House_items
+    sta pointer + 1
+    jsr LoadItems
+
     lda #0
     sta NpcCount
 
@@ -1875,6 +1874,7 @@ LoadTheHouseInterior:
     lda #32
     sta Temp
     jsr LoadPalette
+
 
     lda #0
     sta MustLoadHouseInterior
@@ -2005,11 +2005,15 @@ CheckIfExitedHouse:
     cpx #COLLISION_MAP_SIZE
     bne @copyCollisionMapLoop
 
-
     lda #0
     sta InHouse
-    lda #2
-    sta ItemCount
+    
+    lda #<Outside1_items
+    sta pointer
+    lda #>Outside1_items
+    sta pointer + 1
+    jsr LoadItems
+
     lda #4
     sta NpcCount
 
