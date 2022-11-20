@@ -35,6 +35,7 @@
 .include "data/collision_data.asm"
 .include "data/inventory_data.asm"
 .include "data/item_list.asm" ;items in maps
+.include "data/npc_list.asm"  ;npcs in maps
 
 zerosprite:
     .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
@@ -1225,43 +1226,6 @@ ResetEntityVariables:
     sta Fuel + 1
     sta Fuel + 2
 
-    
-    lda #4
-    sta NpcCount
-    lda #100
-    sta Npcs
-    lda #180
-    sta Npcs + 1
-    lda #14
-    sta Npcs + 2
-    lda #3
-    sta Npcs + 3
-    lda #100
-    sta Npcs + 4
-    lda #32
-    sta Npcs + 5
-    lda #08
-    sta Npcs + 6
-    lda #2
-    sta Npcs + 7
-    lda #132
-    sta Npcs + 8
-    lda #180
-    sta Npcs + 9
-    lda #10
-    sta Npcs + 10
-    lda #3
-    sta Npcs + 11
-    lda #170
-    sta Npcs + 12
-    lda #180
-    sta Npcs + 13
-    lda #10
-    sta Npcs + 14 
-    lda #3
-    sta Npcs + 15
-
-
 
     lda #INVENTORY_SPRITE_MIN_Y
     sta InventoryPointerPos
@@ -1408,6 +1372,12 @@ CheckStartButton:
     lda #>Outside1_items
     sta pointer + 1
     jsr LoadItems
+
+    lda #<Outside1_npcs
+    sta pointer
+    lda #>Outside1_npcs
+    sta pointer + 1
+    jsr LoadNpcs
        
 @collision:
     ldx #0
@@ -1445,6 +1415,43 @@ CheckStartButton:
     sta OldButtons
 
     rts
+;-------------------------------------
+
+;pointer points to the NPCs data
+LoadNpcs:
+    ldy #0
+    lda (pointer), y
+    sta NpcCount
+    ldx NpcCount
+    beq @exit
+    iny
+@npcLoop:
+    lda (pointer), y
+    dey
+    sta Npcs, y
+    iny
+    iny
+    lda (pointer), y
+    dey
+    sta Npcs, y
+    iny
+    iny
+    lda (pointer), y
+    dey
+    sta Npcs, y
+    iny
+    iny
+    lda (pointer), y
+    dey
+    sta Npcs, y
+    iny
+    iny
+    dex
+    bne @npcLoop
+@exit:
+
+    rts
+
 ;-------------------------------------
 ;pointer points to the items data
 LoadItems:
@@ -1571,6 +1578,8 @@ Button_B_Pressed:
     jmp @clearItem
 
 @addFuel:
+    lda InHouse
+    beq @exit ; can't use a stick outside the hut
     jsr UseFuel
     jmp @clearItem
 ;--------
@@ -1585,8 +1594,6 @@ Button_B_Pressed:
     rts
 ;--------------------------------------
 UseFuel:
-    lda InHouse
-    beq @exit
     lda #MAX_FUEL_DELAY
     sta FuelDelay
 
@@ -1825,8 +1832,11 @@ CheckIfEnteredHouse:
     sta pointer + 1
     jsr LoadItems
 
-    lda #0
-    sta NpcCount
+    lda #<House_npcs
+    sta pointer
+    lda #>House_npcs
+    sta pointer + 1
+    jsr LoadNpcs
 
     ldx #0
 @copyCollisionMapLoop:
@@ -2014,8 +2024,12 @@ CheckIfExitedHouse:
     sta pointer + 1
     jsr LoadItems
 
-    lda #4
-    sta NpcCount
+    lda #<Outside1_npcs
+    sta pointer
+    lda #>Outside1_npcs
+    sta pointer + 1
+    jsr LoadNpcs
+
 
     lda #OUTSIDE_ENTRY_FROM_HOUSE_X
     sta PlayerX
