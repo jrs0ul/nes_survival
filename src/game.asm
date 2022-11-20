@@ -633,6 +633,7 @@ AddAndDeactivateItems:
     lda #0
     sta Items, x
 @exit:
+    ldy TempY
     rts
 ;-----------------------------------
 Logics:
@@ -1575,10 +1576,27 @@ Button_B_Pressed:
     jmp @clearItem
 
 @addFuel:
+    jsr UseFuel
+    jmp @clearItem
+;--------
+@addFood:
+    jsr UseFood
+@clearItem:
+    lda #0
+    sta Inventory, x
+    jsr ExitMenuState
+
+@exit:
+    rts
+;--------------------------------------
+UseFuel:
     lda InHouse
     beq @exit
     lda #MAX_FUEL_DELAY
     sta FuelDelay
+
+    lda Fuel
+    bne @clampFuel
 
     lda Fuel + 1
     clc
@@ -1592,14 +1610,18 @@ Button_B_Pressed:
     sta Fuel + 2
     lda #1
     sta Fuel
-    jmp @clearItem
+    jmp @exit
 @saveFuel:
     sta Fuel + 1
-    jmp @clearItem
-;--------
-@addFood:
+@exit:
+    rts
+;--------------------------------------
+UseFood:
     lda #MAX_FOOD_DELAY
     sta FoodDelay
+
+    lda Food    ; highest digit
+    bne @clampFood
 
     lda Food + 1
     clc
@@ -1613,18 +1635,13 @@ Button_B_Pressed:
     sta Food + 2
     lda #1
     sta Food
-    jmp @clearItem
+    jmp @exit
 @saveFood:
     sta Food + 1
 
-@clearItem:
-    lda #0
-    sta Inventory, x
-    jsr ExitMenuState
-
 @exit:
-    rts
 
+    rts
 ;--------------------------------------
 
 ProcessButtons:
@@ -2216,6 +2233,9 @@ UpdateSprites:
     lda Items, y ; is active
     beq @nextItem
     iny
+    lda Items, y
+    cmp GlobalScroll
+    bcc @nextItem ;don't let the item reappear after you scrolled forward
     iny
     lda Items, y ; y
     sta FIRST_SPRITE, x
@@ -2292,6 +2312,8 @@ UpdateSprites:
     asl
     tay
     lda Npcs, y ; x
+    cmp GlobalScroll
+    bcc @nextNpc
     sec
     sbc GlobalScroll
     sta TempPointX ; save x
@@ -2312,6 +2334,7 @@ UpdateSprites:
     dey
     bne @rowloop
 
+@nextNpc:
     ldy TempItemIndex; restore the index
     dey
     bpl @npcLoop
