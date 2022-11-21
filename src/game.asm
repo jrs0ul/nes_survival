@@ -560,6 +560,8 @@ ItemCollisionCheck:
     beq @nextItem
     inx
     lda Items, x ;x
+    sec
+    sbc GlobalScroll
     sta TempPointX
     lda PlayerX
     clc
@@ -571,6 +573,8 @@ ItemCollisionCheck:
     lda Items,x
     clc
     adc #16
+    sec
+    sbc GlobalScroll
     sta TempPointX
     lda PlayerX
     clc
