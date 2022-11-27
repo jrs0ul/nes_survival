@@ -27,8 +27,9 @@
 ;==========================================================
 .segment "RODATA" ; data in rom
 
-.include "data/field_bg.asm"
-.include "data/field_bg1.asm"
+
+.include "data/map_list.asm"
+
 .include "data/house.asm"
 .include "data/title.asm"
 .include "data/menu_screen.asm"
@@ -135,6 +136,10 @@ OldGlobalScroll:
     .res 1
 GlobalScroll:
     .res 1
+
+CurrentMapSegmentIndex:
+    .res 1
+
 TilesScroll:
     .res 1
 OldTileScroll:
@@ -1230,6 +1235,8 @@ ResetEntityVariables:
     sta Fuel + 1
     sta Fuel + 2
 
+    sta CurrentMapSegmentIndex
+
 
     lda #INVENTORY_SPRITE_MIN_Y
     sta InventoryPointerPos
@@ -2053,10 +2060,11 @@ LoadOutsideMap:
     sta $2000
     sta $2001
 
-    lda #<background
+    ldy CurrentMapSegmentIndex
+    lda map_list_low, y
     sta pointer
-    lda #>background
-    sta pointer+1
+    lda map_list_high, y
+    sta pointer + 1
 
     lda #$20    ;$20000
     sta NametableAddress
@@ -2069,10 +2077,13 @@ LoadOutsideMap:
     sta $2000
     sta $2001
 
-    lda #<field_bg1
+    ldy CurrentMapSegmentIndex
+    iny ; map index + 1
+
+    lda map_list_low, y
     sta pointer
-    lda #>field_bg1
-    sta pointer+1
+    lda map_list_high, y
+    sta pointer + 1
 
     lda #$24    ;$2400
     sta NametableAddress
