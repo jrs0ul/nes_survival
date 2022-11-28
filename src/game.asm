@@ -137,7 +137,13 @@ OldGlobalScroll:
 GlobalScroll:
     .res 1
 
-CurrentMapSegmentIndex:
+CurrentMapSegmentIndex: ;starting screen
+    .res 1
+
+ScreenCount:
+    .res 1
+
+NMICTRL: ;nmi control settingss
     .res 1
 
 TilesScroll:
@@ -366,6 +372,7 @@ vblankwait2:      ; Second wait for vblank, PPU is ready after this
     jsr LoadNametable
 
     lda #%10010000   ; enable NMI, sprites from Pattern Table 0
+    sta NMICTRL
     sta $2000
     
     lda #%00011110   ; enable sprites
@@ -526,8 +533,9 @@ WaitScanline:
     jsr scrollBackground
 
 endOfNmi:
-    lda #%10010000 
+    lda NMICTRL
     sta $2000
+
 
 
     lda GameState
@@ -1237,6 +1245,9 @@ ResetEntityVariables:
 
     sta CurrentMapSegmentIndex
 
+    lda #3 ; three screens in the outdoors map
+    sta ScreenCount
+
 
     lda #INVENTORY_SPRITE_MIN_Y
     sta InventoryPointerPos
@@ -1717,64 +1728,7 @@ ProcessButtons:
 ;-----
 ;Check if RIGHT is pressed
 @CheckRight:
-    lda Buttons
-    and #%00000001
-    beq @CheckUp
-
-    lda #2
-    sta DirectionX
-    lda #0
-    sta PlayerFrame
-    lda #1
-    sta PlayerFlip
-
-
-    lda PlayerX
-    clc
-    adc #8
-    cmp #128
-    bcc @moveRight  ;not gonna scroll until playerx >= 128
-    lda GlobalScroll
-    cmp #255        ;hacky constant, it means the map stopped scrolling
-    beq @moveRight
-
-    lda InHouse
-    cmp #1
-    beq @moveRight ; no scrolling
-
-    lda GlobalScroll
-    cmp #255
-    bcs @ScrollGlobalyRight
-;--
-    lda TilesScroll
-    clc
-    adc #PLAYER_SPEED
-    sta TilesScroll
-;--
-@ScrollGlobalyRight:
-    lda GlobalScroll
-    cmp #254
-    beq @clamp
-    clc
-    adc #PLAYER_SPEED
-    cmp #255
-    bcs @clamp
-    jmp @save
-@clamp:
-    lda #255
-@save:
-    sta GlobalScroll
-
-    jmp @CheckUp
-
-@moveRight:
-    lda PlayerX
-    cmp #238 ;254 - 16
-    beq @CheckUp
-    clc
-    adc #PLAYER_SPEED
-    sta PlayerX
-
+    jsr CheckRight
 ;--------
 ;Check if UP is pressed
 @CheckUp:
@@ -1812,6 +1766,93 @@ go_Up:
 @exit:
     lda #0
     sta Buttons
+    rts
+;----------------------------------
+;Right on dpad is pressed
+CheckRight:
+    lda Buttons
+    and #%00000001
+    beq @exit
+
+    lda #2
+    sta DirectionX
+    lda #0
+    sta PlayerFrame
+    lda #1
+    sta PlayerFlip
+
+
+    lda PlayerX
+    clc
+    adc #8
+    cmp #128
+    bcc @moveRight  ;not gonna scroll until playerx >= 128
+    lda GlobalScroll
+    cmp #255        ;hacky constant, it means the map stopped scrolling
+    beq @moveRight
+
+    lda CurrentMapSegmentIndex ; CurrentMapSegment + 1 == ScreenCount -> do not scroll
+    clc
+    adc #1
+    cmp ScreenCount
+    beq @moveRight
+
+    lda GlobalScroll
+    cmp #255
+    bcs @ScrollGlobalyRight
+;--
+    lda TilesScroll
+    clc
+    adc #PLAYER_SPEED
+    sta TilesScroll
+;--
+@ScrollGlobalyRight:
+    lda GlobalScroll
+    cmp #254
+    beq @clamp
+    clc
+    adc #PLAYER_SPEED
+    cmp #255
+    bcs @clamp
+    jmp @save
+@clamp:
+    lda CurrentMapSegmentIndex
+    clc 
+    adc #1
+    cmp ScreenCount
+    bcs @continue_clamping
+    inc CurrentMapSegmentIndex
+
+    jsr FlipStartingNametable
+
+    lda #1
+    jmp @save
+@continue_clamping:
+    lda #255
+@save:
+    sta GlobalScroll
+
+    jmp @exit
+
+@moveRight:
+    lda PlayerX
+    cmp #238 ;254 - 16
+    beq @exit
+    clc
+    adc #PLAYER_SPEED
+    sta PlayerX
+@exit:
+
+    rts
+;----------------------------------
+FlipStartingNametable:
+    lda NMICTRL
+    clc
+    adc #1
+    and #1
+    adc NMICTRL
+    sta NMICTRL
+
     rts
 ;----------------------------------
 CheckIfEnteredHouse:
@@ -1899,6 +1940,8 @@ LoadTheHouseInterior:
 
     lda #0
     sta MustLoadHouseInterior
+    lda #1
+    sta ScreenCount
 
 
 
@@ -2101,6 +2144,9 @@ LoadOutsideMap:
     
     lda #0
     sta MustLoadOutside
+
+    lda #3
+    sta ScreenCount
 
 
     rts
