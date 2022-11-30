@@ -1,14 +1,5 @@
 
 ;---------------------------------
-scrollBackground:
-
-    lda GlobalScroll
-    sta $2005        ; write the horizontal scroll count register
-
-    lda #0           ; no vertical scrolling
-    sta $2005
-    rts
-;---------------------------------
 ; Loads palettes
 ; Temp stores palette size
 ; pointer points to palette

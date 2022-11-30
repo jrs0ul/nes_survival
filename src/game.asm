@@ -538,18 +538,20 @@ WaitSprite0:
     and #%01000000
     beq WaitSprite0      ; wait until sprite 0 is hit
 
-
     ldx #$F
 WaitScanline:
     dex
     bne WaitScanline
 
-    jsr scrollBackground
+    lda GlobalScroll
+    sta $2005        ; write the horizontal scroll count register
+
+    lda #0           ; no vertical scrolling
+    sta $2005
 
 endOfNmi:
     lda PPUCTRL
     sta $2000
-
 
 
     lda GameState
@@ -664,12 +666,15 @@ UpdateAttributeColumn:
     lda map_list_low, y
     clc
     adc #$C0
-    ;adc AttribColumnIdx
     sta pointer
     lda map_list_high, y
-    ;clc
     adc #$3
     sta pointer + 1
+
+    lda pointer
+    clc
+    adc AttribColumnIdx
+    sta pointer
 
 
     ldx #8
@@ -678,7 +683,7 @@ UpdateAttributeColumn:
     ldy #0
     lda $2002
 @attribLoop:
-    lda #$27
+    lda #$27 ;TODO:change depending on the nametable
     sta $2006
     lda tmpAttribAddress
     clc
