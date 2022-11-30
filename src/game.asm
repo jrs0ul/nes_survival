@@ -128,6 +128,8 @@ pointer:
     .res 2
 DigitPtr:
     .res 2
+pointer2:
+    .res 2
 ;--------------
 .segment "BSS" ; variables in ram
 
@@ -143,7 +145,12 @@ CurrentMapSegmentIndex: ;starting screen
 ScreenCount:
     .res 1
 
-NMICTRL: ;nmi control settingss
+BgColumnIdxToUpload:
+    .res 1
+BgColumnIdxUploaded: ;last uploaded column from ROM to PPU
+    .res 1
+
+PPUCTRL: ;PPU control settings
     .res 1
 
 TilesScroll:
@@ -265,6 +272,7 @@ ItemUpdateDelay:
     .res 1
 
 
+
 Temp:
     .res 1
 TempY:
@@ -372,12 +380,15 @@ vblankwait2:      ; Second wait for vblank, PPU is ready after this
     jsr LoadNametable
 
     lda #%10010000   ; enable NMI, sprites from Pattern Table 0
-    sta NMICTRL
+    sta PPUCTRL
     sta $2000
     
     lda #%00011110   ; enable sprites
     sta $2001
 
+    lda #255
+    sta BgColumnIdxToUpload
+    sta BgColumnIdxUploaded
 
     lda #TITLE_STATE
     sta GameState
@@ -489,12 +500,13 @@ checkFire:
 
 continueNmi:
     jsr CheckGameOver
+    jsr UploadBgColumns
     jsr UpdateStatusDigits
 
 nmicont2:
 
     ;This is the PPU clean up section, so rendering the next frame starts properly.
-    lda #%10010000   ; enable NMI, sprites from Pattern Table 0, background from Pattern Table 1
+    lda PPUCTRL
     sta $2000
     lda #%00011110   ; enable sprites, enable background, no clipping on left side
     sta $2001
@@ -533,7 +545,7 @@ WaitScanline:
     jsr scrollBackground
 
 endOfNmi:
-    lda NMICTRL
+    lda PPUCTRL
     sta $2000
 
 
@@ -559,6 +571,101 @@ endforReal:
 .include "collision.asm"
 
 
+;--------------------------------------------
+;Check and upload background columns from rom map to the PPU
+UploadBgColumns:
+
+    lda BgColumnIdxUploaded
+    cmp BgColumnIdxToUpload
+    beq @exit
+
+    ;upload the tiles
+
+    ;let's calculate from which map to upload
+    lda CurrentMapSegmentIndex
+    clc
+    adc #2
+    cmp ScreenCount
+    bcs @exit
+
+    tay
+
+    lda map_list_low, y
+    sta pointer
+    lda map_list_high, y
+    sta pointer + 1
+
+    ;lda BgColumnIdxToUpload
+    ;asl
+    ;asl
+    ;asl
+    ;asl
+    ;tay
+
+
+    ;ldy #0
+    ldx #0
+
+
+    lda #$24
+    sta pointer2
+    lda #$00
+    sta pointer2 + 1
+
+@loop:
+    lda $2002
+    lda pointer2
+    sta $2006
+    lda pointer2 + 1
+    sta $2006
+
+    lda #0;(pointer), y
+    sta $2007
+
+    ;iny
+    ;inc pointer + 1
+    
+    lda #0;(pointer), y
+    sta $2007
+
+    ;tya
+    ;clc 
+    ;adc #31
+    ;tay
+    ;lda pointer + 1
+    ;clc
+    ;adc #31
+    ;sta pointer + 1
+    lda pointer2 + 1
+    clc
+    adc #$20
+    sta pointer2 + 1
+    inx
+    lda pointer2
+    cmp #$27
+    bne @usual_check
+    cpx #7
+    beq @done
+    jmp @loop
+@usual_check:
+    cpx #8
+    bcc @loop
+
+    lda pointer2
+    cmp #$27
+    bcs @done
+    ldx #0
+    stx pointer2 + 1
+    inc pointer2
+    jmp @loop
+
+@done:
+    lda BgColumnIdxToUpload
+    sta BgColumnIdxUploaded
+@exit:
+    rts
+
+;--------------------------------------------
 ItemCollisionCheck:
     lda #ITEM_DELAY
     sta ItemUpdateDelay
@@ -1070,6 +1177,14 @@ inputInOtherStates:
 
 
 finishInput:
+
+    lda GlobalScroll
+    lsr
+    lsr
+    lsr
+    lsr
+    sta BgColumnIdxToUpload
+
     lda #INPUT_DELAY
     sta FrameCount
     rts
@@ -1845,13 +1960,14 @@ CheckRight:
 
     rts
 ;----------------------------------
+;invert the least significant bit
 FlipStartingNametable:
-    lda NMICTRL
+    lda PPUCTRL
     clc
     adc #1
     and #1
-    adc NMICTRL
-    sta NMICTRL
+    adc PPUCTRL
+    sta PPUCTRL
 
     rts
 ;----------------------------------
