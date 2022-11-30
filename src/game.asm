@@ -130,6 +130,8 @@ DigitPtr:
     .res 2
 pointer2:
     .res 2
+tmpAttribAddress:
+    .res 1
 ;--------------
 .segment "BSS" ; variables in ram
 
@@ -317,6 +319,11 @@ Npcs:   ;animals and stuff
     .res 16 ; max 4 npcs * 4 bytes (x, y, starting tile, height in tiles)
 NpcCount:
     .res 1
+
+AttribColumnIdx:
+    .res 1
+SourceMapIdx:
+    .res 1
 ;293 bytes
 
 ;====================================================================================
@@ -491,11 +498,7 @@ checkIfOutsideNeedsToLoad:
     jsr LoadOutsideMap
 
 checkFire:
-    lda InHouse
-    beq continueNmi
     jsr UpdateFireplace
-
-    
 
 
 continueNmi:
@@ -587,6 +590,7 @@ UploadBgColumns:
     cmp ScreenCount
     bcs @exit
 
+    sta SourceMapIdx
     tay
 
     lda map_list_low, y
@@ -604,7 +608,7 @@ UploadBgColumns:
 
 
     lda PPUCTRL
-    eor #%00000100
+    eor #%00000100 ; add 32 to next ppu address mode
     sta $2000
     lda $2002
     lda pointer2
@@ -612,7 +616,7 @@ UploadBgColumns:
     lda pointer2 + 1
     sta $2006
 
-    ldx #30
+    ldx #SCREEN_ROW_COUNT
     ldy #0
 @loop:
     lda (pointer), y
@@ -635,11 +639,70 @@ UploadBgColumns:
     lda PPUCTRL
     sta $2000
 
+;update attributes
+
+
+   jsr UpdateAttributeColumn
+
 @done:
     lda BgColumnIdxToUpload
     sta BgColumnIdxUploaded
 @exit:
     rts
+;--------------------------------------------
+UpdateAttributeColumn:
+
+    lda SourceMapIdx
+    tay
+
+    lda BgColumnIdxToUpload
+    lsr
+    lsr
+    sta AttribColumnIdx ; column / 4
+
+
+    lda map_list_low, y
+    clc
+    adc #$C0
+    ;adc AttribColumnIdx
+    sta pointer
+    lda map_list_high, y
+    ;clc
+    adc #$3
+    sta pointer + 1
+
+
+    ldx #8
+    lda #$C0
+    sta tmpAttribAddress
+    ldy #0
+    lda $2002
+@attribLoop:
+    lda #$27
+    sta $2006
+    lda tmpAttribAddress
+    clc
+    adc AttribColumnIdx
+    sta $2006
+
+    lda (pointer), y
+    sta $2007
+
+    lda tmpAttribAddress
+    clc
+    adc #8
+    sta tmpAttribAddress
+
+    tya
+    clc
+    adc #8
+    tay
+
+    dex
+    bne @attribLoop
+
+    rts
+
 
 ;--------------------------------------------
 ItemCollisionCheck:
@@ -1050,6 +1113,8 @@ AnimateFire:
 ;-------------------------------
 UpdateFireplace:
 
+    lda InHouse
+    beq @exit
     lda GameState
     cmp #GAME_STATE
     bne @exit
