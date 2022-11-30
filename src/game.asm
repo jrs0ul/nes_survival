@@ -597,9 +597,6 @@ UploadBgColumns:
     sta pointer + 1
 
 
-
-
-
     lda #$24
     sta pointer2
     lda BgColumnIdxToUpload
@@ -623,28 +620,13 @@ UploadBgColumns:
 
     tya
     clc
-    adc #$20
+    adc #32
     tay
-    
-    cpy #$E0
-    bcs @res
-    jmp @cont
-@res:
+
+    cpy #0
+    bne @cont
+
     inc pointer + 1
-    
-
-    ;lda pointer2 + 1
-    ;cmp #$E0 ;$100 - $20 
-    ;bcs @resetPointer2
-
-    ;clc
-    ;adc #$20
-    ;sta pointer2 + 1
-    ;jmp @cont
-;@resetPointer2:
-;    lda BgColumnIdxToUpload
-;    sta pointer2 + 1
-;    inc pointer2
 
 @cont:
     dex
