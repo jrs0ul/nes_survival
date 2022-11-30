@@ -541,7 +541,6 @@ WaitScanline:
     dex
     bne WaitScanline
 
-    ;uncoment the call for some scrolling
     jsr scrollBackground
 
 endOfNmi:
@@ -591,73 +590,68 @@ UploadBgColumns:
     tay
 
     lda map_list_low, y
+    clc
+    adc BgColumnIdxToUpload
     sta pointer
     lda map_list_high, y
     sta pointer + 1
 
-    ;lda BgColumnIdxToUpload
-    ;asl
-    ;asl
-    ;asl
-    ;asl
-    ;tay
 
 
-    ;ldy #0
-    ldx #0
 
 
     lda #$24
     sta pointer2
-    lda #$00
+    lda BgColumnIdxToUpload
     sta pointer2 + 1
 
-@loop:
+
+    lda PPUCTRL
+    eor #%00000100
+    sta $2000
     lda $2002
     lda pointer2
     sta $2006
     lda pointer2 + 1
     sta $2006
 
-    lda #0;(pointer), y
+    ldx #30
+    ldy #0
+@loop:
+    lda (pointer), y
     sta $2007
 
-    ;iny
-    ;inc pointer + 1
-    
-    lda #0;(pointer), y
-    sta $2007
-
-    ;tya
-    ;clc 
-    ;adc #31
-    ;tay
-    ;lda pointer + 1
-    ;clc
-    ;adc #31
-    ;sta pointer + 1
-    lda pointer2 + 1
+    tya
     clc
     adc #$20
-    sta pointer2 + 1
-    inx
-    lda pointer2
-    cmp #$27
-    bne @usual_check
-    cpx #7
-    beq @done
-    jmp @loop
-@usual_check:
-    cpx #8
-    bcc @loop
+    tay
+    
+    cpy #$E0
+    bcs @res
+    jmp @cont
+@res:
+    inc pointer + 1
+    
 
-    lda pointer2
-    cmp #$27
-    bcs @done
-    ldx #0
-    stx pointer2 + 1
-    inc pointer2
-    jmp @loop
+    ;lda pointer2 + 1
+    ;cmp #$E0 ;$100 - $20 
+    ;bcs @resetPointer2
+
+    ;clc
+    ;adc #$20
+    ;sta pointer2 + 1
+    ;jmp @cont
+;@resetPointer2:
+;    lda BgColumnIdxToUpload
+;    sta pointer2 + 1
+;    inc pointer2
+
+@cont:
+    dex
+    bne @loop
+
+    lda PPUCTRL
+    sta $2000
 
 @done:
     lda BgColumnIdxToUpload
@@ -1179,7 +1173,6 @@ inputInOtherStates:
 finishInput:
 
     lda GlobalScroll
-    lsr
     lsr
     lsr
     lsr
