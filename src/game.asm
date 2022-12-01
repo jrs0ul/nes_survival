@@ -147,9 +147,17 @@ CurrentMapSegmentIndex: ;starting screen
 ScreenCount:
     .res 1
 
-BgColumnIdxToUpload:
+BgColumnIdxToUpload: ; index of a column to be uploaded
     .res 1
-BgColumnIdxUploaded: ;last uploaded column from ROM to PPU
+BgColumnIdxUploaded: ; last uploaded column from ROM to PPU
+    .res 1
+
+DestScreenAddr: ; higher byte of destination screen to upload columns
+    .res 1
+
+FirstNametableAddr: ; will store adresses in ram they will be filpped
+    .res 1
+SecondNametableAddr:
     .res 1
 
 PPUCTRL: ;PPU control settings
@@ -407,6 +415,11 @@ vblankwait2:      ; Second wait for vblank, PPU is ready after this
     lda #0
     sta MustLoadHouseInterior
 
+    lda #$20
+    sta FirstNametableAddr
+    lda #$24
+    sta SecondNametableAddr
+
 ;---------------------------------
 
 endlessLoop:
@@ -504,7 +517,7 @@ checkFire:
 continueNmi:
     jsr CheckGameOver
     jsr UploadBgColumns
-    jsr UpdateStatusDigits
+    ;jsr UpdateStatusDigits
 
 nmicont2:
 
@@ -586,13 +599,28 @@ UploadBgColumns:
     ;upload the tiles
 
     ;let's calculate from which map to upload
-    lda CurrentMapSegmentIndex
-    clc
-    adc #2
-    cmp ScreenCount
-    bcs @exit
+;    lda DestScreenAddr
+;    
+;    cmp #$24
+;    beq @plus_one
 
-    sta SourceMapIdx
+;@plus_two:
+;    lda CurrentMapSegmentIndex
+;    clc
+;    adc #2
+;    cmp ScreenCount
+;    bcs @exit
+;    jmp @store_map_idx
+
+;@plus_one:
+;    lda CurrentMapSegmentIndex
+;    clc
+;    adc #1
+;    cmp ScreenCount
+;    bcs @exit
+;@store_map_idx:
+;    sta SourceMapIdx
+    lda SourceMapIdx
     tay
 
     lda map_list_low, y
@@ -603,7 +631,7 @@ UploadBgColumns:
     sta pointer + 1
 
 
-    lda #$24
+    lda DestScreenAddr
     sta pointer2
     lda BgColumnIdxToUpload
     sta pointer2 + 1
@@ -1228,7 +1256,32 @@ finishInput:
     lsr
     lsr
     lsr
+    cmp #16
+    bcc WriteToB
+;Write to A
+    sec
+    sbc #16
     sta BgColumnIdxToUpload
+    lda CurrentMapSegmentIndex
+    clc
+    adc #2
+    sta SourceMapIdx
+    ldx FirstNametableAddr
+    jmp storeIdx
+WriteToB:
+    clc
+    adc #16
+    sta BgColumnIdxToUpload
+    lda CurrentMapSegmentIndex
+    clc
+    adc #1
+    sta SourceMapIdx
+    ldx SecondNametableAddr
+
+storeIdx:
+    stx DestScreenAddr
+
+
 
     lda #INPUT_DELAY
     sta FrameCount
@@ -1405,7 +1458,7 @@ ResetEntityVariables:
 
     sta CurrentMapSegmentIndex
 
-    lda #3 ; three screens in the outdoors map
+    lda #4 ; three screens in the outdoors map
     sta ScreenCount
 
 
@@ -1976,12 +2029,12 @@ CheckRight:
     bcs @clamp
     jmp @save
 @clamp:
+    inc CurrentMapSegmentIndex
     lda CurrentMapSegmentIndex
     clc 
     adc #1
     cmp ScreenCount
     bcs @continue_clamping
-    inc CurrentMapSegmentIndex
 
     jsr FlipStartingNametable
 
@@ -2007,6 +2060,11 @@ CheckRight:
 ;----------------------------------
 ;invert the least significant bit
 FlipStartingNametable:
+    lda FirstNametableAddr
+    ldx SecondNametableAddr
+    stx FirstNametableAddr
+    sta SecondNametableAddr
+
     lda PPUCTRL
     clc
     adc #1
@@ -2306,7 +2364,7 @@ LoadOutsideMap:
     lda #0
     sta MustLoadOutside
 
-    lda #3
+    lda #4
     sta ScreenCount
 
 
