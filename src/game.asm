@@ -130,6 +130,8 @@ DigitPtr:
     .res 2
 pointer2:
     .res 2
+collisionMapPtr:
+    .res 2
 tmpAttribAddress:
     .res 1
 ;--------------
@@ -159,6 +161,12 @@ FirstNametableAddr: ; will store adresses in ram they will be filpped
     .res 1
 SecondNametableAddr:
     .res 1
+
+LeftCollisionMapIdx:
+    .res 1
+RightCollisonMapIdx:
+    .res 1
+
 
 PPUCTRL: ;PPU control settings
     .res 1
@@ -419,6 +427,11 @@ vblankwait2:      ; Second wait for vblank, PPU is ready after this
     sta FirstNametableAddr
     lda #$24
     sta SecondNametableAddr
+
+    lda #1
+    sta RightCollisonMapIdx
+    lda #0
+    sta LeftCollisionMapIdx
 
 ;---------------------------------
 
@@ -822,10 +835,8 @@ Logics:
     lda NMIActive
     beq @continueForever
 
-
-
     jsr AnimateFire
-    
+
     lda HP
     clc
     adc HP + 1
@@ -1866,57 +1877,7 @@ ProcessButtons:
     sta DirectionY
 
 ;Check if LEFT is pressed
-    lda Buttons
-    and #%00000010
-    beq @CheckRight
-
-    lda #1
-    sta DirectionX
-    lda #0
-    sta PlayerFrame
-    sta PlayerFlip
-
-    lda PlayerX
-    clc
-    adc #8
-    cmp #128
-    bcs @moveLeft
-
-
-    lda InHouse
-    cmp #1
-    beq @moveLeft ; no scrolling inside the house :)
-
-    lda GlobalScroll
-    beq @moveLeft   ;hack
-;--
-    lda TilesScroll
-    sec
-    sbc #PLAYER_SPEED
-    sta TilesScroll
-;--
-@ScrollGlobalyLeft:
-    lda GlobalScroll
-    cmp #1
-    beq @clampLeft
-
-    sec
-    sbc #PLAYER_SPEED
-    jmp @saveLeft
-@clampLeft:
-    lda #0
-@saveLeft:
-    sta GlobalScroll
-
-    jmp @CheckUp
-
-@moveLeft:
-    lda PlayerX
-    beq @CheckUp ; already x=0
-    sec
-    sbc #PLAYER_SPEED
-    sta PlayerX
-    jmp @CheckUp
+    jsr CheckLeft
 ;-----
 ;Check if RIGHT is pressed
 @CheckRight:
@@ -1958,6 +1919,71 @@ go_Up:
 @exit:
     lda #0
     sta Buttons
+    rts
+;----------------------------------
+CheckLeft:
+    lda Buttons
+    and #%00000010
+    beq @exit
+
+    lda #1
+    sta DirectionX
+    lda #0
+    sta PlayerFrame
+    sta PlayerFlip
+
+    lda PlayerX
+    clc
+    adc #8
+    cmp #128
+    bcs @moveLeft
+
+    lda CurrentMapSegmentIndex ; CurrentMapSegment == -1 -> do not scroll
+    cmp #255
+    beq @moveLeft
+;-
+
+    lda GlobalScroll
+    beq @moveLeft   ;hack
+;--
+    lda TilesScroll
+    sec
+    sbc #PLAYER_SPEED
+    sta TilesScroll
+;--
+@ScrollGlobalyLeft:
+    lda GlobalScroll
+    cmp #1
+    beq @clamp
+
+    sec
+    sbc #PLAYER_SPEED
+    jmp @save
+@clamp:
+    dec CurrentMapSegmentIndex
+    lda CurrentMapSegmentIndex
+    beq @continue_clamping
+
+    jsr FlipStartingNametable
+
+    lda #254
+    jmp @save
+@continue_clamping:
+    lda #0
+@save:
+    sta GlobalScroll
+
+    jmp @exit
+
+@moveLeft:
+    lda PlayerX
+    beq @exit ; already x=0
+    sec
+    sbc #PLAYER_SPEED
+    sta PlayerX
+
+@exit:
+
     rts
 ;----------------------------------
 ;Right on dpad is pressed

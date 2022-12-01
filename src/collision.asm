@@ -6,6 +6,7 @@ LoadRightCollisionColumn:
     cmp #COLLISION_MAP_COLUMN_COUNT
     bcs @exit
 
+
     ldx #0
 @loadColumn:
     txa
