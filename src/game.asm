@@ -598,30 +598,9 @@ UploadBgColumns:
 
     ;upload the tiles
 
-    ;let's calculate from which map to upload
-;    lda DestScreenAddr
-;    
-;    cmp #$24
-;    beq @plus_one
-
-;@plus_two:
-;    lda CurrentMapSegmentIndex
-;    clc
-;    adc #2
-;    cmp ScreenCount
-;    bcs @exit
-;    jmp @store_map_idx
-
-;@plus_one:
-;    lda CurrentMapSegmentIndex
-;    clc
-;    adc #1
-;    cmp ScreenCount
-;    bcs @exit
-;@store_map_idx:
-;    sta SourceMapIdx
-    lda SourceMapIdx
-    tay
+    ldy SourceMapIdx
+    cpy ScreenCount
+    bcs @exit
 
     lda map_list_low, y
     clc
@@ -654,7 +633,7 @@ UploadBgColumns:
 
     tya
     clc
-    adc #32
+    adc #32 ;increment the data index for the next value in column
     tay
 
     cpy #0
@@ -670,8 +649,6 @@ UploadBgColumns:
     sta $2000
 
 ;update attributes
-
-
    jsr UpdateAttributeColumn
 
 @done:
@@ -711,7 +688,9 @@ UpdateAttributeColumn:
     ldy #0
     lda $2002
 @attribLoop:
-    lda #$27 ;TODO:change depending on the nametable
+    lda DestScreenAddr
+    clc
+    adc #3
     sta $2006
     lda tmpAttribAddress
     clc
@@ -2066,10 +2045,8 @@ FlipStartingNametable:
     sta SecondNametableAddr
 
     lda PPUCTRL
-    clc
-    adc #1
-    and #1
-    adc PPUCTRL
+    eor #1
+
     sta PPUCTRL
 
     rts
