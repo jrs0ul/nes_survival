@@ -33,7 +33,6 @@
 .include "data/house.asm"
 .include "data/title.asm"
 .include "data/menu_screen.asm"
-.include "data/collision_data.asm"
 .include "data/inventory_data.asm"
 .include "data/item_list.asm" ;items in maps
 .include "data/npc_list.asm"  ;npcs in maps
@@ -615,6 +614,7 @@ UploadBgColumns:
     cpy ScreenCount
     bcs @exit
 
+    ;calculate source address
     lda map_list_low, y
     clc
     adc BgColumnIdxToUpload
@@ -622,10 +622,12 @@ UploadBgColumns:
     lda map_list_high, y
     sta pointer + 1
 
-
+    ;calculate source address
     lda DestScreenAddr
     sta pointer2
-    lda BgColumnIdxToUpload
+    lda #64 ; skip two rows
+    clc
+    adc BgColumnIdxToUpload
     sta pointer2 + 1
 
 
@@ -638,8 +640,8 @@ UploadBgColumns:
     lda pointer2 + 1
     sta $2006
 
-    ldx #SCREEN_ROW_COUNT
-    ldy #0
+    ldx #SCREEN_ROW_COUNT - 2
+    ldy #64  ;  skip two rows
 @loop:
     lda (pointer), y
     sta $2007
@@ -1271,13 +1273,9 @@ WriteToB:
 storeIdx:
     stx DestScreenAddr
 
-
-
     lda #INPUT_DELAY
     sta FrameCount
     rts
-
-
 
 ;--------------------------
 ReadController:
@@ -2736,3 +2734,4 @@ spriteLoadLoop:
 
     rts
 
+.include "data/collision_data.asm"

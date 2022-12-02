@@ -2,6 +2,12 @@
 ;Loads collision data where CurrentCollisionColumnIndex is the column index
 LoadRightCollisionColumn:
 
+    ldy RightCollisonMapIdx
+    lda collision_list_low, y
+    sta collisionMapPtr
+    lda collision_list_high, y
+    sta collisionMapPtr + 1
+
     lda RightCollisionColumnIndex
     cmp #COLLISION_MAP_COLUMN_COUNT
     bcs @exit
@@ -16,7 +22,7 @@ LoadRightCollisionColumn:
     adc RightCollisionColumnIndex
     tay ; x * 4 move to y
 
-    lda bg_collision1, y
+    lda (collisionMapPtr), y
     sta ScrollCollisionColumnRight, x
     inx
     cpx #SCREEN_ROW_COUNT
@@ -27,6 +33,12 @@ LoadRightCollisionColumn:
 ;--------------------------------------
 ;copy-paste hack
 LoadLeftCollisionColumn:
+
+    ldy LeftCollisionMapIdx
+    lda collision_list_low, y
+    sta collisionMapPtr
+    lda collision_list_high, y
+    sta collisionMapPtr + 1
 
     lda LeftCollisionColumnIndex
     cmp #COLLISION_MAP_COLUMN_COUNT
@@ -41,7 +53,7 @@ LoadLeftCollisionColumn:
     adc LeftCollisionColumnIndex
     tay ; x * 4 move to y
 
-    lda bg_collision, y
+    lda (collisionMapPtr), y
     sta ScrollCollisionColumnLeft, x
     inx
     cpx #SCREEN_ROW_COUNT
@@ -210,8 +222,24 @@ PushCollisionMapLeft:
 
 @update_columns:
     inc RightCollisionColumnIndex
+    lda RightCollisionColumnIndex
+    cmp #4
+    bcc @loadRightColumn
+    lda #0
+    sta RightCollisionColumnIndex
+    inc RightCollisonMapIdx
+
+@loadRightColumn:
     jsr LoadRightCollisionColumn
+
     inc LeftCollisionColumnIndex
+    lda LeftCollisionColumnIndex
+    cmp #4
+    bcc @LoadLeftColumn
+    lda #0
+    sta LeftCollisionColumnIndex
+    inc LeftCollisionMapIdx
+@LoadLeftColumn:
     jsr LoadLeftCollisionColumn
 
     lda #0
