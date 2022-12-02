@@ -1254,9 +1254,21 @@ finishInput:
     sec
     sbc #16
     sta BgColumnIdxToUpload
+
+;---
+    lda DirectionX
+    cmp #1
+    beq LeftDir
+    lda #2
+    jmp SaveDir
+LeftDir:
+    lda #0
+SaveDir:
+    sta Temp
+;---
     lda CurrentMapSegmentIndex
     clc
-    adc #2
+    adc Temp;#2
     sta SourceMapIdx
     ldx FirstNametableAddr
     jmp storeIdx
@@ -1264,9 +1276,21 @@ WriteToB:
     clc
     adc #16
     sta BgColumnIdxToUpload
+;---
+    lda DirectionX
+    cmp #1
+    beq LeftDir1
+    lda #1
+    jmp SaveDir1
+LeftDir1:
+    lda #255 ; -1 ?
+SaveDir1:
+    sta Temp
+
+;---
     lda CurrentMapSegmentIndex
     clc
-    adc #1
+    adc Temp;#1
     sta SourceMapIdx
     ldx SecondNametableAddr
 
@@ -1873,6 +1897,8 @@ ProcessButtons:
     lda #0
     sta DirectionX
     sta DirectionY
+    lda #255 ; if direction is changed let's reload column
+    sta BgColumnIdxUploaded
 
 ;Check if LEFT is pressed
     jsr CheckLeft
@@ -1960,6 +1986,7 @@ CheckLeft:
 @clamp:
     dec CurrentMapSegmentIndex
     lda CurrentMapSegmentIndex
+    cmp #255
     beq @continue_clamping
 
     jsr FlipStartingNametable
