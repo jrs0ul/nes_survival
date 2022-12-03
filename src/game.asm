@@ -209,10 +209,19 @@ FireFrameDelay:
 
 HP:
     .res 3
+HpUpdated:
+    .res 1
+
 Food:
     .res 3
+FoodUpdated:
+    .res 1
+
 Warmth:
     .res 3
+WarmthUpdated:
+    .res 1
+
 Fuel:       ;how much fuel you have at home in the fireplace
     .res 3
 
@@ -528,7 +537,7 @@ checkFire:
 continueNmi:
     jsr CheckGameOver
     jsr UploadBgColumns
-    ;jsr UpdateStatusDigits
+    jsr UpdateStatusDigits
 
 nmicont2:
 
@@ -912,6 +921,8 @@ FoodLogics:
     lda #>Food
     sta DigitPtr + 1
     jsr DecreaseDigits
+    lda #1
+    sta FoodUpdated
     lda Food
     clc
     adc Food + 1
@@ -950,6 +961,8 @@ DecreaseLife:
     lda #>HP
     sta DigitPtr + 1
     jsr DecreaseDigits
+    lda #1
+    sta HpUpdated
     rts
 ;-------------------------------
 IncreaseWarmth:
@@ -958,6 +971,8 @@ IncreaseWarmth:
     lda #>Warmth
     sta DigitPtr + 1
     jsr IncreaseDigits
+    lda #1
+    sta WarmthUpdated
     rts
 
 ;-------------------------------
@@ -972,6 +987,8 @@ DecreaseWarmth:
     clc
     adc Warmth + 1
     adc Warmth + 2
+    lda #1
+    sta WarmthUpdated
     rts
 ;-------------------------------------
 UpdateInventorySprites:
@@ -1322,6 +1339,10 @@ UpdateStatusDigits:
     cmp #GAME_STATE
     bne @exit
 
+
+    lda HpUpdated
+    beq @warmth
+
     lda $2002
     lda #$20
     sta $2006
@@ -1329,6 +1350,7 @@ UpdateStatusDigits:
     sta $2006
 
     ldy #0
+    sty HpUpdated
 @HpLoop:
     lda #CHARACTER_ZERO
     clc 
@@ -1338,13 +1360,19 @@ UpdateStatusDigits:
     cpy #3
     bcc @HpLoop
 
+@warmth:
     lda $2002
     lda #$20
     sta $2006
     lda #$36
     sta $2006
 
+
+    lda WarmthUpdated
+    beq @food
+
     ldy #0
+    sty WarmthUpdated
 @warmthLoop:
     lda #CHARACTER_ZERO
     clc
@@ -1355,7 +1383,10 @@ UpdateStatusDigits:
     cpy #3
     bcc @warmthLoop
 
-    
+@food:
+    lda FoodUpdated
+    beq @exit
+
     lda $2002
     lda #$20
     sta $2006
@@ -1363,6 +1394,7 @@ UpdateStatusDigits:
     sta $2006
 
     ldy #0
+    sta FoodUpdated
 @FoodLoop:
     lda #CHARACTER_ZERO
     clc
@@ -1396,6 +1428,10 @@ InitializeStatusBarLoop:     ; copy status bar to first nametable
     sta $2006
     sta $2005
     sta $2005
+    lda #1
+    sta HpUpdated
+    sta FoodUpdated
+    sta WarmthUpdated
     rts
 
 ;--------------------------------------------
@@ -1459,6 +1495,9 @@ ResetEntityVariables:
     sta Warmth
     sta Food
     sta Fuel
+    sta HpUpdated
+    sta WarmthUpdated
+    sta FoodUpdated
 
     lda #0
     sta HP + 1
