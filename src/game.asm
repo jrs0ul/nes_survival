@@ -623,21 +623,21 @@ UploadBgColumns:
     sta pointer + 1
 
     ;calculate source address
-    lda DestScreenAddr
-    sta pointer2
     lda #64 ; skip two rows
     clc
     adc BgColumnIdxToUpload
+    sta pointer2
+    lda DestScreenAddr
     sta pointer2 + 1
-
+    
 
     lda PPUCTRL
     eor #%00000100 ; add 32 to next ppu address mode
     sta $2000
     lda $2002
-    lda pointer2
-    sta $2006
     lda pointer2 + 1
+    sta $2006
+    lda pointer2
     sta $2006
 
     ldx #SCREEN_ROW_COUNT - 2
@@ -1963,13 +1963,15 @@ CheckLeft:
     bcs @moveLeft
 
     lda CurrentMapSegmentIndex ; CurrentMapSegment == -1 -> do not scroll
-    cmp #255
-    beq @moveLeft
+    cmp #1
+    bcc @checkScroll
+    jmp @skipScroll
 ;-
-
+@checkScroll:
     lda GlobalScroll
     beq @moveLeft   ;hack
 ;--
+@skipScroll:
     lda TilesScroll
     sec
     sbc #PLAYER_SPEED
@@ -1977,8 +1979,8 @@ CheckLeft:
 ;--
 @ScrollGlobalyLeft:
     lda GlobalScroll
-    cmp #1
-    beq @clamp
+    cmp #2
+    bcc @clamp
 
     sec
     sbc #PLAYER_SPEED
@@ -2060,11 +2062,11 @@ CheckRight:
     jmp @save
 @clamp:
     inc CurrentMapSegmentIndex
-    lda CurrentMapSegmentIndex
-    clc 
-    adc #1
-    cmp ScreenCount
-    bcs @continue_clamping
+    ;lda CurrentMapSegmentIndex
+    ;clc 
+    ;adc #1
+    ;cmp ScreenCount
+    ;bcs @continue_clamping
 
     jsr FlipStartingNametable
 
