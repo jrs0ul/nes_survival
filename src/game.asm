@@ -1988,8 +1988,8 @@ CheckLeft:
 @clamp:
     dec CurrentMapSegmentIndex
     lda CurrentMapSegmentIndex
-    cmp #255
-    beq @continue_clamping
+    ;cmp #255
+    ;beq @continue_clamping
 
     jsr FlipStartingNametable
 
@@ -2057,16 +2057,11 @@ CheckRight:
     beq @clamp
     clc
     adc #PLAYER_SPEED
-    cmp #255
-    bcs @clamp
+   ; cmp #255
+   ; bcs @clamp
     jmp @save
 @clamp:
     inc CurrentMapSegmentIndex
-    ;lda CurrentMapSegmentIndex
-    ;clc 
-    ;adc #1
-    ;cmp ScreenCount
-    ;bcs @continue_clamping
 
     jsr FlipStartingNametable
 
