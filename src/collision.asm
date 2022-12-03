@@ -146,8 +146,23 @@ PushCollisionMapRight:
 
 @update_columns: ;update left and right side columns
     dec LeftCollisionColumnIndex
+    lda LeftCollisionColumnIndex
+    cmp #255
+    bne @loadLeftColumn
+    lda #COLLISION_MAP_COLUMN_COUNT - 1
+    sta LeftCollisionColumnIndex
+    dec LeftCollisionMapIdx
+@loadLeftColumn:
     jsr LoadLeftCollisionColumn
+
     dec RightCollisionColumnIndex
+    lda RightCollisionColumnIndex
+    cmp #255
+    bne @loadRightColumn
+    lda #COLLISION_MAP_COLUMN_COUNT - 1
+    sta RightCollisionColumnIndex
+    dec RightCollisonMapIdx
+@loadRightColumn:
     jsr LoadRightCollisionColumn
 
     lda #0
@@ -223,7 +238,7 @@ PushCollisionMapLeft:
 @update_columns:
     inc RightCollisionColumnIndex
     lda RightCollisionColumnIndex
-    cmp #4
+    cmp #COLLISION_MAP_COLUMN_COUNT
     bcc @loadRightColumn
     lda #0
     sta RightCollisionColumnIndex
@@ -234,7 +249,7 @@ PushCollisionMapLeft:
 
     inc LeftCollisionColumnIndex
     lda LeftCollisionColumnIndex
-    cmp #4
+    cmp #COLLISION_MAP_COLUMN_COUNT
     bcc @LoadLeftColumn
     lda #0
     sta LeftCollisionColumnIndex
