@@ -1988,15 +1988,13 @@ CheckLeft:
 @clamp:
     dec CurrentMapSegmentIndex
     lda CurrentMapSegmentIndex
-    ;cmp #255
-    ;beq @continue_clamping
 
     jsr FlipStartingNametable
 
-    lda #254
+    lda GlobalScroll
+    sec
+    sbc #PLAYER_SPEED
     jmp @save
-@continue_clamping:
-    lda #0
 @save:
     sta GlobalScroll
 
@@ -2032,9 +2030,6 @@ CheckRight:
     adc #8
     cmp #128
     bcc @moveRight  ;not gonna scroll until playerx >= 128
-    lda GlobalScroll
-    cmp #255        ;hacky constant, it means the map stopped scrolling
-    beq @moveRight
 
     lda CurrentMapSegmentIndex ; CurrentMapSegment + 1 == ScreenCount -> do not scroll
     clc
@@ -2054,21 +2049,19 @@ CheckRight:
 @ScrollGlobalyRight:
     lda GlobalScroll
     cmp #254
-    beq @clamp
+    bcs @clamp
     clc
     adc #PLAYER_SPEED
-   ; cmp #255
-   ; bcs @clamp
     jmp @save
 @clamp:
     inc CurrentMapSegmentIndex
 
     jsr FlipStartingNametable
 
-    lda #1
-    jmp @save
-@continue_clamping:
-    lda #255
+    lda GlobalScroll
+    ;lda #1
+    clc
+    adc #PLAYER_SPEED
 @save:
     sta GlobalScroll
 
