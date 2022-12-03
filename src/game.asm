@@ -28,7 +28,6 @@
 .segment "RODATA" ; data in rom
 
 
-.include "data/map_list.asm"
 
 .include "data/house.asm"
 .include "data/title.asm"
@@ -1443,6 +1442,9 @@ gameOver:
     sta pointer
     lda #>title
     sta pointer+1
+    lda PPUCTRL
+    and #%11111110
+    sta PPUCTRL
     lda #$20
     sta NametableAddress
     jsr LoadNametable
@@ -1500,6 +1502,21 @@ ResetEntityVariables:
     sta PlayerY
     lda #$01
     sta PlayerAlive
+    lda #255
+    sta BgColumnIdxToUpload
+    sta BgColumnIdxToUpload
+
+    lda #$20
+    sta FirstNametableAddr
+    lda #$24
+    sta SecondNametableAddr
+
+    lda #1
+    sta RightCollisonMapIdx
+    lda #0
+    sta LeftCollisionMapIdx
+
+
 
     rts
 ;-------------------------------------
@@ -1962,7 +1979,7 @@ CheckLeft:
     cmp #128
     bcs @moveLeft
 
-    lda CurrentMapSegmentIndex ; CurrentMapSegment == -1 -> do not scroll
+    lda CurrentMapSegmentIndex ; CurrentMapSegment < 1 -> do not scroll
     cmp #1
     bcc @checkScroll
     jmp @skipScroll
@@ -2059,7 +2076,6 @@ CheckRight:
     jsr FlipStartingNametable
 
     lda GlobalScroll
-    ;lda #1
     clc
     adc #PLAYER_SPEED
 @save:
@@ -2195,7 +2211,7 @@ LoadMenu:
     lda #>menu_screen
     sta pointer + 1
 
-    lda #$20    ;$20000
+    lda FirstNametableAddr
     sta NametableAddress
 
     jsr LoadNametable
@@ -2210,7 +2226,7 @@ LoadMenu:
 
 
     lda $2002
-    lda #$20
+    lda FirstNametableAddr
     sta $2006
     lda #$BB
     sta $2006
@@ -2227,7 +2243,7 @@ LoadMenu:
 
 
     lda $2002
-    lda #$20
+    lda FirstNametableAddr
     sta $2006
     lda #$FB
     sta $2006
@@ -2243,7 +2259,9 @@ LoadMenu:
     bne @foodLoop
 
     lda $2002
-    lda #$21
+    lda FirstNametableAddr
+    clc
+    adc #1
     sta $2006
     lda #$3B
     sta $2006
@@ -2260,7 +2278,9 @@ LoadMenu:
 
 
     lda $2002
-    lda #$21
+    lda FirstNametableAddr
+    clc
+    adc #1
     sta $2006
     lda #$DB
     sta $2006
@@ -2274,8 +2294,6 @@ LoadMenu:
     iny
     cpy #3
     bne @fuelLoop
-
-
 
 
     lda #0
@@ -2346,7 +2364,7 @@ LoadOutsideMap:
     lda map_list_high, y
     sta pointer + 1
 
-    lda #$20    ;$20000
+    lda FirstNametableAddr
     sta NametableAddress
 
     jsr LoadNametable
@@ -2359,16 +2377,21 @@ LoadOutsideMap:
 
     ldy CurrentMapSegmentIndex
     iny ; map index + 1
+    cpy ScreenCount
+    bcs @loadRest
+
 
     lda map_list_low, y
     sta pointer
     lda map_list_high, y
     sta pointer + 1
 
-    lda #$24    ;$2400
+    lda SecondNametableAddr
     sta NametableAddress
 
     jsr LoadNametable
+
+@loadRest:
     jsr LoadStatusBar
 
     lda #<palette
@@ -2751,4 +2774,5 @@ spriteLoadLoop:
 
     rts
 
+.include "data/map_list.asm"
 .include "data/collision_data.asm"
