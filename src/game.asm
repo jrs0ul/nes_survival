@@ -43,7 +43,7 @@ zerosprite:
     .byte $3A,$4B,$46,$4D,$41,$00,$30,$30,$30,$00,$00,$00,$00,$3D,$30,$30
 
 palette:
-    .byte $0C,$00,$21,$31, $0C,$27,$21,$31, $0C,$17,$21,$31, $0C,$10,$0f,$01    ;background
+    .byte $0C,$00,$21,$31, $0C,$1B,$21,$31, $0C,$18,$21,$31, $0C,$10,$0f,$01    ;background
     .byte $0C,$0f,$17,$20, $0C,$06,$16,$39, $0C,$17,$21,$31, $0C,$0f,$37,$16    ;OAM sprites
 
 house_palette:
@@ -151,6 +151,10 @@ BgColumnIdxToUpload: ; index of a column to be uploaded
     .res 1
 BgColumnIdxUploaded: ; last uploaded column from ROM to PPU
     .res 1
+
+AttribColumnIdxToUpdate:
+    .res 1
+
 
 DestScreenAddr: ; higher byte of destination screen to upload columns
     .res 1
@@ -281,13 +285,15 @@ TimesShiftedRight:
     .res 1
 
 
+MustLoadSomething:
+    .res 1
 MustLoadHouseInterior:
     .res 1
 MustLoadOutside:
     .res 1
 MustLoadMenu:
     .res 1
-
+;--
 CarrySet:
     .res 1
 
@@ -343,7 +349,7 @@ Npcs:   ;animals and stuff
 NpcCount:
     .res 1
 
-AttribColumnIdx:
+AttribHighAddress:
     .res 1
 SourceMapIdx:
     .res 1
@@ -429,6 +435,7 @@ vblankwait2:      ; Second wait for vblank, PPU is ready after this
     sta ItemUpdateDelay
     lda #0
     sta MustLoadHouseInterior
+    sta MustLoadSomething
 
     lda #$20
     sta FirstNametableAddr
@@ -444,12 +451,8 @@ vblankwait2:      ; Second wait for vblank, PPU is ready after this
 
 endlessLoop:
 
-    lda MustLoadHouseInterior
-    bne nextIteration ; don't do logics until the house is not loaded to the PPU
-    lda MustLoadOutside
-    bne nextIteration ; the same is with the map of outside
-    lda MustLoadMenu
-    bne nextIteration
+    lda MustLoadSomething
+    bne nextIteration ; don't do logics until *something* is not loaded to the PPU
 
     dec FrameCount
     lda FrameCount
@@ -501,16 +504,28 @@ nmi:
     txa
     pha
     ;---
-
+    ;copy sprite data
     lda #$00
     sta $2003        ; set the low byte (00) of the RAM address
     lda #$02
     sta $4014        ; set the high byte (02) of the RAM address, start the transfer
-
+    ;---
     lda #1
     sta NMIActive
 
-    jsr ReadController
+    ;read controller
+    lda #$01
+    sta $4016
+    lda #$00
+    sta $4016
+    ldx #$08
+ReadControllerLoop:
+    lda $4016
+    lsr
+    rol Buttons
+    dex
+    bne ReadControllerLoop
+    ;-----
     jsr CheckStartButton
 
 
@@ -518,24 +533,23 @@ nmi:
     cmp #GAME_STATE
     bne endOfNmi
 
-    lda MustLoadMenu
-    beq CheckHouseLoad
+    lda MustLoadSomething
+    beq DoneLoadingMaps
+
     jsr LoadMenu
-CheckHouseLoad:
-    lda MustLoadHouseInterior
-    beq checkIfOutsideNeedsToLoad
     jsr LoadTheHouseInterior
-checkIfOutsideNeedsToLoad:
     lda MustLoadOutside
-    beq checkFire
+    beq DoneLoadingMaps
     jsr LoadOutsideMap
 
-checkFire:
+DoneLoadingMaps:
     jsr UpdateFireplace
 
-
 continueNmi:
-    jsr CheckGameOver
+    lda PlayerAlive
+    bne BGColumnUploading
+    jsr GameOver
+BGColumnUploading:
     jsr UploadBgColumns
     jsr UpdateStatusDigits
 
@@ -547,7 +561,6 @@ nmicont2:
     lda #%00011110   ; enable sprites, enable background, no clipping on left side
     sta $2001
 
-
     lda #$00
     sta $2006        ; clean up PPU address registers
     sta $2006
@@ -556,7 +569,6 @@ nmicont2:
     sta $2005
     sta $2005
 
-    
     lda GameState
     cmp #GAME_STATE
     bne endOfNmi
@@ -682,14 +694,7 @@ UploadBgColumns:
 ;--------------------------------------------
 UpdateAttributeColumn:
 
-    lda SourceMapIdx
-    tay
-
-    lda BgColumnIdxToUpload
-    lsr
-    lsr
-    sta AttribColumnIdx ; column / 4
-
+    ldy SourceMapIdx
 
     lda map_list_low, y
     clc
@@ -701,35 +706,34 @@ UpdateAttributeColumn:
 
     lda pointer
     clc
-    adc AttribColumnIdx
+    adc AttribColumnIdxToUpdate
     sta pointer
 
-
-    ldx #8
+    ldx #7 ; TODO: return back to 8
     lda #$C0
+    clc
+    adc AttribColumnIdxToUpdate
     sta tmpAttribAddress
-    ldy #0
-    lda $2002
-@attribLoop:
     lda DestScreenAddr
     clc
     adc #3
+    sta AttribHighAddress
+    ldy #0
+    lda $2002
+@attribLoop:
+    lda AttribHighAddress
     sta $2006
     lda tmpAttribAddress
-    clc
-    adc AttribColumnIdx
     sta $2006
 
-    lda (pointer), y
-    sta $2007
-
-    lda tmpAttribAddress
     clc
     adc #8
     sta tmpAttribAddress
 
+    lda (pointer), y
+    sta $2007
+
     tya
-    clc
     adc #8
     tay
 
@@ -1180,9 +1184,6 @@ UpdateFireplace:
     clc
     adc Temp
     sta $2007
-    lda #$5C
-    clc
-    adc Temp
     adc #1
     sta $2007
     jmp @exit
@@ -1284,7 +1285,7 @@ SaveDir:
 ;---
     lda CurrentMapSegmentIndex
     clc
-    adc Temp;#2
+    adc Temp
     sta SourceMapIdx
     ldx FirstNametableAddr
     jmp storeIdx
@@ -1306,32 +1307,22 @@ SaveDir1:
 ;---
     lda CurrentMapSegmentIndex
     clc
-    adc Temp;#1
+    adc Temp
     sta SourceMapIdx
     ldx SecondNametableAddr
 
 storeIdx:
     stx DestScreenAddr
 
+    lda BgColumnIdxToUpload
+    lsr
+    lsr
+    sta AttribColumnIdxToUpdate ; attribute id, bg_column / 4
+
     lda #INPUT_DELAY
     sta FrameCount
     rts
 
-;--------------------------
-ReadController:
-    lda #$01
-    sta $4016
-    lda #$00
-    sta $4016
-    ldx #$08
-@ReadControllerLoop:
-    lda $4016
-    lsr
-    rol Buttons
-    dex
-    bne @ReadControllerLoop
-
-    rts
 ;--------------------------------
 UpdateStatusDigits:
 
@@ -1458,12 +1449,7 @@ HideSprites:
 
     rts
 ;--------------------------------------------
-CheckGameOver:
-    lda PlayerAlive
-    cmp #$01
-    bne gameOver
-    jmp noGameOver
-gameOver:
+GameOver:
     lda #TITLE_STATE
     sta GameState
     lda #$00
@@ -1485,7 +1471,6 @@ gameOver:
     sta NametableAddress
     jsr LoadNametable
 
-noGameOver:
     rts
 ;-------------------------------------
 ResetEntityVariables:
@@ -1511,7 +1496,7 @@ ResetEntityVariables:
 
     sta CurrentMapSegmentIndex
 
-    lda #4 ; three screens in the outdoors map
+    lda #5 ; three screens in the outdoors map
     sta ScreenCount
 
 
@@ -1669,6 +1654,7 @@ CheckStartButton:
     jsr ResetEntityVariables
     lda #1
     sta MustLoadOutside
+    sta MustLoadSomething
 
     lda #<Outside1_items
     sta pointer
@@ -1711,6 +1697,7 @@ CheckStartButton:
 
     lda #1
     sta MustLoadMenu
+    sta MustLoadSomething
 
 
 @exit:
@@ -1799,10 +1786,12 @@ ExitMenuState:
     beq @loadOutside ;InHouse = 0
     lda #1
     sta MustLoadHouseInterior
+    sta MustLoadSomething
     jmp @exit
 @loadOutside:
     lda #1
     sta MustLoadOutside
+    sta MustLoadSomething
 @exit:
 
     rts
@@ -2192,6 +2181,7 @@ CheckIfEnteredHouse:
 
     lda #1
     sta MustLoadHouseInterior
+    sta MustLoadSomething
     lda #HOUSE_ENTRY_POINT_X
     sta PlayerX
     lda #HOUSE_ENTRY_POINT_Y
@@ -2202,6 +2192,9 @@ CheckIfEnteredHouse:
 ;---------------------------
 
 LoadTheHouseInterior:
+
+    lda MustLoadHouseInterior
+    beq @nope
 
     lda #$00
     sta $2000
@@ -2232,6 +2225,7 @@ LoadTheHouseInterior:
 
     lda #0
     sta MustLoadHouseInterior
+    sta MustLoadSomething
     lda #1
     sta ScreenCount
 
@@ -2241,6 +2235,10 @@ LoadTheHouseInterior:
     rts
 ;-----------------------------------
 LoadMenu:
+
+    lda MustLoadMenu
+    beq @exit
+
     lda #$00
     sta $2000
     sta $2001
@@ -2264,6 +2262,19 @@ LoadMenu:
     jsr LoadPalette
 
 
+    jsr UpdateMenuStats
+
+    lda #0
+    sta MustLoadMenu
+    sta MustLoadSomething
+
+    lda #MENU_STATE
+    sta GameState
+@exit:
+
+    rts
+;----------------------------------
+UpdateMenuStats:
     lda $2002
     lda FirstNametableAddr
     sta $2006
@@ -2334,15 +2345,7 @@ LoadMenu:
     cpy #3
     bne @fuelLoop
 
-
-    lda #0
-    sta MustLoadMenu
-
-    lda #MENU_STATE
-    sta GameState
-
     rts
-
 
 
 ;-----------------------------------
@@ -2386,6 +2389,7 @@ CheckIfExitedHouse:
 
     lda #1
     sta MustLoadOutside
+    sta MustLoadSomething
 
 @nope:
     rts
@@ -2443,8 +2447,9 @@ LoadOutsideMap:
     
     lda #0
     sta MustLoadOutside
+    sta MustLoadSomething
 
-    lda #4
+    lda #5
     sta ScreenCount
 
 
