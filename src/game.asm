@@ -72,7 +72,7 @@ sprites:
 
     PLAYER_SPEED               = 2
     INPUT_DELAY                = 64
-    ITEM_DELAY                 = 64
+    ITEM_DELAY                 = 66
 
     COLLISION_MAP_SIZE         = 120 ; 4 columns * 30 rows
     COLLISION_MAP_COLUMN_COUNT = 4
@@ -132,8 +132,6 @@ collisionMapPtr:
     .res 2
 tmpAttribAddress:
     .res 1
-readyForMapColumnUpdate:
-    .res 1
 ;--------------
 .segment "BSS" ; variables in ram
 
@@ -176,6 +174,8 @@ PPUCTRL: ;PPU control settings
 TilesScroll:
     .res 1
 OldTileScroll:
+    .res 1
+ScrollDirection:
     .res 1
 
 
@@ -292,6 +292,8 @@ MustLoadHouseInterior:
 MustLoadOutside:
     .res 1
 MustLoadMenu:
+    .res 1
+MustLoadTitle:
     .res 1
 ;--
 CarrySet:
@@ -490,6 +492,7 @@ doSomeLogics:
 
     jsr Logics
 
+
 nextIteration:
     jmp endlessLoop
 
@@ -527,14 +530,10 @@ ReadControllerLoop:
     ;-----
     jsr CheckStartButton
 
-
-    lda GameState
-    cmp #GAME_STATE
-    bne endOfNmi
-
     lda MustLoadSomething
     beq DoneLoadingMaps
 
+    jsr LoadTitle
     jsr LoadMenu
     jsr LoadTheHouseInterior
     lda MustLoadOutside
@@ -542,13 +541,11 @@ ReadControllerLoop:
     jsr LoadOutsideMap
 
 DoneLoadingMaps:
-    jsr UpdateFireplace
 
-continueNmi:
-    lda PlayerAlive
-    bne BGColumnUploading
-    jsr GameOver
-BGColumnUploading:
+    lda GameState
+    cmp #GAME_STATE
+    bne nmicont2
+    jsr UpdateFireplace
     jsr UploadBgColumns
     jsr UpdateStatusDigits
 
@@ -623,9 +620,6 @@ endforReal:
 ;Check and upload background columns from rom map to the PPU
 UploadBgColumns:
 
-    lda readyForMapColumnUpdate
-    beq @exit
-    ;upload the tiles
 
     ldy SourceMapIdx
     cpy ScreenCount
@@ -681,8 +675,9 @@ UploadBgColumns:
     sta $2000
 
 ;update attributes
-   jsr UpdateAttributeColumn
+    jsr UpdateAttributeColumn
 
+    jmp @exit
 @exit:
     rts
 ;--------------------------------------------
@@ -843,6 +838,13 @@ Logics:
     lda NMIActive
     beq @continueForever
 
+
+    lda PlayerAlive
+    bne @cont
+    lda #1
+    sta MustLoadSomething
+    sta MustLoadTitle
+@cont:
     jsr AnimateFire
 
     lda HP
@@ -861,10 +863,27 @@ Logics:
     jsr DecreaseFuel
 
 @checkWarmth:
+    jsr WarmthLogics
+@checkFood:
+    jsr FoodLogics
+
+@doneLogics:
+    lda #0
+    sta NMIActive
+
+@continueForever:
+
+    jsr CheckIfEnteredHouse
+    jsr CheckIfExitedHouse
+@exit:
+
+    rts
+;-------------------------------
+WarmthLogics:
     dec WarmthDelay
     lda WarmthDelay
     beq @resetWarmthDelay
-    jmp @checkFood
+    jmp @exit
 
 @resetWarmthDelay:
     lda #MAX_WARMTH_DELAY
@@ -881,26 +900,19 @@ Logics:
     beq @decreaseWarmth
 
     jsr IncreaseWarmth
-    jmp @checkFood
+    jmp @exit
 @decreaseWarmth:
     jsr DecreaseWarmth
+    lda Warmth
+    clc
+    adc Warmth + 1
+    adc Warmth + 2
     cmp #0
     beq @decreaseLifeBecauseCold
-    jmp @checkFood
+    jmp @exit
 @decreaseLifeBecauseCold:
     jsr DecreaseLife
 
-@checkFood:
-    jsr FoodLogics
-
-@doneLogics:
-    lda #0
-    sta NMIActive
-
-@continueForever:
-
-    jsr CheckIfEnteredHouse
-    jsr CheckIfExitedHouse
 @exit:
 
     rts
@@ -981,10 +993,6 @@ DecreaseWarmth:
     sta DigitPtr + 1
     jsr DecreaseDigits
 
-    lda Warmth
-    clc
-    adc Warmth + 1
-    adc Warmth + 2
     lda #1
     sta WarmthUpdated
     rts
@@ -1154,10 +1162,6 @@ UpdateFireplace:
 
     lda InHouse
     beq @exit
-    lda GameState
-    cmp #GAME_STATE
-    bne @exit
-
 
     lda $2002
     lda #$21
@@ -1255,13 +1259,18 @@ inputInOtherStates:
 
 finishInput:
 
-    lda #0
-    sta readyForMapColumnUpdate
+    jsr CalcMapColumnToUpdate
+
+    lda #INPUT_DELAY
+    sta FrameCount
+    rts
+;--------------------------------
+CalcMapColumnToUpdate:
 
     lda GlobalScroll
     lsr
     lsr
-    lsr
+    lsr             ;GlobalScroll / 8
     cmp #16
     bcc WriteToB
 ;Write to A
@@ -1270,7 +1279,7 @@ finishInput:
     sta BgColumnIdxToUpload
 
 ;---
-    lda DirectionX
+    lda ScrollDirection
     cmp #1
     beq LeftDir
     lda #2
@@ -1291,7 +1300,7 @@ WriteToB:
     adc #16
     sta BgColumnIdxToUpload
 ;---
-    lda DirectionX
+    lda ScrollDirection
     cmp #1
     beq LeftDir1
     lda #1
@@ -1315,13 +1324,8 @@ storeIdx:
     lsr
     lsr
     sta AttribColumnIdxToUpdate ; attribute id, bg_column / 4
-    lda #1
-    sta readyForMapColumnUpdate
 
-    lda #INPUT_DELAY
-    sta FrameCount
     rts
-
 ;--------------------------------
 UpdateStatusDigits:
 
@@ -1448,16 +1452,16 @@ HideSprites:
 
     rts
 ;--------------------------------------------
-GameOver:
+LoadTitle:
+
+    lda MustLoadTitle
+    beq @exit
+
     lda #TITLE_STATE
     sta GameState
     lda #$00
     sta $2000
     sta $2001
-    sta $2006
-    sta $2006
-    sta $2005
-    sta $2005
 
     lda #<title
     sta pointer
@@ -1469,7 +1473,10 @@ GameOver:
     lda #$20
     sta NametableAddress
     jsr LoadNametable
-
+    lda #0
+    sta MustLoadTitle
+    sta MustLoadSomething
+@exit:
     rts
 ;-------------------------------------
 ResetEntityVariables:
@@ -1486,8 +1493,10 @@ ResetEntityVariables:
     lda #0
     sta HP + 1
     sta HP + 2
+    ;sta Warmth
     sta Warmth + 1
     sta Warmth + 2
+    ;sta Food
     sta Food + 1
     sta Food + 2
     sta Fuel + 1
@@ -1495,7 +1504,7 @@ ResetEntityVariables:
 
     sta CurrentMapSegmentIndex
 
-    lda #5 ; three screens in the outdoors map
+    lda #5 ;  screens in the outdoors map
     sta ScreenCount
 
 
@@ -1994,6 +2003,7 @@ CheckLeft:
 
     lda #1
     sta DirectionX
+    sta ScrollDirection
     lda #0
     sta PlayerFrame
     sta PlayerFlip
@@ -2061,6 +2071,7 @@ CheckRight:
 
     lda #2
     sta DirectionX
+    sta ScrollDirection
     lda #0
     sta PlayerFrame
     lda #1
