@@ -132,6 +132,8 @@ collisionMapPtr:
     .res 2
 tmpAttribAddress:
     .res 1
+readyForMapColumnUpdate:
+    .res 1
 ;--------------
 .segment "BSS" ; variables in ram
 
@@ -148,8 +150,6 @@ ScreenCount:
     .res 1
 
 BgColumnIdxToUpload: ; index of a column to be uploaded
-    .res 1
-BgColumnIdxUploaded: ; last uploaded column from ROM to PPU
     .res 1
 
 AttribColumnIdxToUpdate:
@@ -424,7 +424,6 @@ vblankwait2:      ; Second wait for vblank, PPU is ready after this
 
     lda #255
     sta BgColumnIdxToUpload
-    sta BgColumnIdxUploaded
 
     lda #TITLE_STATE
     sta GameState
@@ -624,10 +623,8 @@ endforReal:
 ;Check and upload background columns from rom map to the PPU
 UploadBgColumns:
 
-    lda BgColumnIdxUploaded
-    cmp BgColumnIdxToUpload
+    lda readyForMapColumnUpdate
     beq @exit
-
     ;upload the tiles
 
     ldy SourceMapIdx
@@ -686,9 +683,6 @@ UploadBgColumns:
 ;update attributes
    jsr UpdateAttributeColumn
 
-@done:
-    lda BgColumnIdxToUpload
-    sta BgColumnIdxUploaded
 @exit:
     rts
 ;--------------------------------------------
@@ -1261,6 +1255,9 @@ inputInOtherStates:
 
 finishInput:
 
+    lda #0
+    sta readyForMapColumnUpdate
+
     lda GlobalScroll
     lsr
     lsr
@@ -1318,6 +1315,8 @@ storeIdx:
     lsr
     lsr
     sta AttribColumnIdxToUpdate ; attribute id, bg_column / 4
+    lda #1
+    sta readyForMapColumnUpdate
 
     lda #INPUT_DELAY
     sta FrameCount
@@ -1942,8 +1941,6 @@ ProcessButtons:
     lda #0
     sta DirectionX
     sta DirectionY
-    lda #255 ; if direction is changed let's reload column
-    sta BgColumnIdxUploaded
 
 ;Check if LEFT is pressed
     jsr CheckLeft
