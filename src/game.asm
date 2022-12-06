@@ -29,12 +29,14 @@
 
 
 
+.include "data/map_list.asm"
 .include "data/house.asm"
 .include "data/title.asm"
 .include "data/menu_screen.asm"
 .include "data/inventory_data.asm"
 .include "data/item_list.asm" ;items in maps
 .include "data/npc_list.asm"  ;npcs in maps
+.include "data/collision_data.asm"
 
 zerosprite:
     .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
@@ -143,6 +145,10 @@ GlobalScroll:
 
 CurrentMapSegmentIndex: ;starting screen
     .res 1
+MustIncrementScreenIndex:
+    .res 1
+MustDecrementScreenIndex:
+    .res 1
 
 ScreenCount:
     .res 1
@@ -176,6 +182,8 @@ TilesScroll:
 OldTileScroll:
     .res 1
 ScrollDirection:
+    .res 1
+OldScrollDirection:
     .res 1
 
 
@@ -1200,11 +1208,11 @@ HandleInput:
 
     lda GameState
     cmp #GAME_STATE
-    bne inputInOtherStates
+    bne @finishInput
 
 
     lda Buttons
-    beq finishInput ; no input
+    beq @finishInput ; no input
 
     
     jsr AnimateWalk
@@ -1217,11 +1225,13 @@ HandleInput:
     sta OldGlobalScroll
     lda TilesScroll
     sta OldTileScroll
-
+    lda ScrollDirection
+    sta OldScrollDirection
+    
     jsr ProcessButtons
 
     jsr CanPlayerGo
-    beq contInput; all good, no obstacles
+    beq @contInput; all good, no obstacles
 
     ;obstacle ahead, restore previous position
     lda OldPlayerX
@@ -1232,37 +1242,66 @@ HandleInput:
     sta GlobalScroll
     lda OldTileScroll
     sta TilesScroll
+    lda OldScrollDirection
+    sta ScrollDirection
+    lda #0
+    sta MustIncrementScreenIndex
+    sta MustDecrementScreenIndex
+    
+    jmp @finishInput
 
-    jmp finishInput
-
-contInput:
-    lda TilesScroll
-    cmp #MAX_TILE_SCROLL_RIGHT
-    bne checkAnother
-    lda DirectionX
-    cmp #2
-    bne checkAnother
-    jsr PushCollisionMapLeft
-    jmp finishInput
-checkAnother:
-    lda TilesScroll
-    cmp #MAX_TILE_SCROLL_LEFT
-    bne finishInput
-    lda DirectionX
-    cmp #1
-    bne finishInput
-    jsr PushCollisionMapRight
-    jmp finishInput
-
-inputInOtherStates:
+@contInput:
+    jsr SwitchScreenIdxIfNeeded
+    jsr PushCollisionMapIfNeeded
 
 
-finishInput:
+@finishInput:
 
     jsr CalcMapColumnToUpdate
 
     lda #INPUT_DELAY
     sta FrameCount
+    rts
+;--------------------------------
+SwitchScreenIdxIfNeeded:
+    lda MustIncrementScreenIndex
+    beq @checkDecrement
+    inc CurrentMapSegmentIndex
+    jsr FlipStartingNametable
+    lda #0
+    sta MustIncrementScreenIndex
+
+@checkDecrement:
+    lda MustDecrementScreenIndex
+    beq @exit
+    
+    dec CurrentMapSegmentIndex
+    jsr FlipStartingNametable
+    lda #0
+    sta MustDecrementScreenIndex
+
+@exit:
+    rts
+;--------------------------------
+PushCollisionMapIfNeeded:
+    lda TilesScroll
+    cmp #MAX_TILE_SCROLL_RIGHT
+    bne @checkAnother
+    lda DirectionX
+    cmp #2
+    bne @checkAnother
+    jsr PushCollisionMapLeft
+    jmp @finishInput
+@checkAnother:
+    lda TilesScroll
+    cmp #MAX_TILE_SCROLL_LEFT
+    bne @finishInput
+    lda DirectionX
+    cmp #1
+    bne @finishInput
+    jsr PushCollisionMapRight
+@finishInput:
+
     rts
 ;--------------------------------
 CalcMapColumnToUpdate:
@@ -2038,10 +2077,11 @@ CheckLeft:
     sbc #PLAYER_SPEED
     jmp @save
 @clamp:
-    dec CurrentMapSegmentIndex
-    lda CurrentMapSegmentIndex
+    ;dec CurrentMapSegmentIndex
 
-    jsr FlipStartingNametable
+    ;jsr FlipStartingNametable
+    lda #1
+    sta MustDecrementScreenIndex
 
     lda GlobalScroll
     sec
@@ -2107,9 +2147,11 @@ CheckRight:
     adc #PLAYER_SPEED
     jmp @save
 @clamp:
-    inc CurrentMapSegmentIndex
+    ;inc CurrentMapSegmentIndex
 
-    jsr FlipStartingNametable
+    ;jsr FlipStartingNametable
+    lda #1
+    sta MustIncrementScreenIndex
 
     lda GlobalScroll
     clc
@@ -2826,5 +2868,3 @@ spriteLoadLoop:
 
     rts
 
-.include "data/map_list.asm"
-.include "data/collision_data.asm"
