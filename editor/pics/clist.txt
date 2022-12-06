@@ -1,0 +1,8 @@
+pics/chars.tga
+16 16 1
+pics/tileset.tga
+32 32 0
+pics/buttons.tga
+32 32 0
+pics/pointer.tga
+16 16 0
