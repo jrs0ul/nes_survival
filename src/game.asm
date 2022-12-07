@@ -2313,51 +2313,13 @@ LoadOutsideMap:
 
     jsr LoadNametable
 
-    ;TODO: load changed segment depending on GlobalScroll
-
-    ;SourceMapIdx -------
-    ;                   |
-    ;DestScreenAddr <----
-
-    ;if BgColumnIdxToUpload < 16  -> 0..BgColumnIdxToUpload
-    ;if BgColumnIdxToUpload >= 16 -> 16..BgColumnIdxToUpload
     lda BgColumnIdxToUpload
     cmp #16
     bcc @lowerRange
     jsr ReloadUpperColumnRange
     jmp @loadRest
 @lowerRange:;***********
-    ;0.. BgColumnIdxToUpload
-
-    lda DestScreenAddr
-    sta Temp
-    lda #0
-    sta TempY
-    ldy #30
-@lowerRangeRowLoop:
-    lda $2002
-    lda Temp
-    sta $2006
-    lda TempY
-    sta $2006
-
-    ldx BgColumnIdxToUpload
-@lowerRangeLoop:
-    lda #0
-    sta $2007
-    dex
-    bpl @lowerRangeLoop
-    lda TempY
-    clc
-    adc #32
-    sta TempY
-    cmp #0
-    bne @nextrow
-    inc Temp
-@nextrow:
-    dey
-    bne @lowerRangeRowLoop
-
+    jsr ReloadLowerColumnRange
 ;*******
 
 @loadRest:
@@ -2378,6 +2340,58 @@ LoadOutsideMap:
     lda #5
     sta ScreenCount
 
+
+    rts
+;-----------------------------------
+ReloadLowerColumnRange:
+    ;0.. BgColumnIdxToUpload
+
+    ldy SourceMapIdx
+    lda map_list_low, y
+    sta pointer
+    lda map_list_high, y
+    sta pointer + 1
+
+
+    lda DestScreenAddr
+    sta Temp
+    lda #0
+    sta TempY
+    ldx #30
+@lowerRangeRowLoop:
+    lda $2002
+    lda Temp
+    sta $2006
+    lda TempY
+    sta $2006
+
+    ldy #0;BgColumnIdxToUpload
+@lowerRangeLoop:
+
+    lda (pointer), y
+    sta $2007
+    iny
+    cpy BgColumnIdxToUpload
+    bcc @lowerRangeLoop
+
+    lda pointer
+    clc
+    adc #32
+    sta pointer
+    cmp #0
+    bne @incrementDest
+    inc pointer + 1
+@incrementDest:
+    lda TempY
+    clc
+    adc #32
+    sta TempY
+    cmp #0
+    bne @nextrow
+    inc Temp
+@nextrow:
+    dex
+    bne @lowerRangeRowLoop
 
     rts
 ;-----------------------------------
