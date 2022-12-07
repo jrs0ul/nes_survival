@@ -432,9 +432,6 @@ vblankwait2:      ; Second wait for vblank, PPU is ready after this
     lda #%00011110   ; enable sprites
     sta $2001
 
-    lda #255
-    sta BgColumnIdxToUpload
-
     lda #TITLE_STATE
     sta GameState
 
@@ -622,6 +619,8 @@ endforReal:
 
 .include "graphics.asm"
 .include "collision.asm"
+.include "items.asm"
+.include "npcs.asm"
 
 
 ;--------------------------------------------
@@ -739,103 +738,6 @@ UpdateAttributeColumn:
 
     rts
 
-
-;--------------------------------------------
-ItemCollisionCheck:
-    lda #ITEM_DELAY
-    sta ItemUpdateDelay
-
-    ldy #0
-@itemLoop:
-    tya
-    asl
-    asl ;y * 4
-    tax
-    lda Items, x ; active?
-    beq @nextItem
-    inx
-    lda Items, x ;x
-    sec
-    sbc GlobalScroll
-    sta TempPointX
-    lda PlayerX
-    clc
-    adc #8
-    cmp TempPointX
-    bcs @checkX2
-    jmp @nextItem
-@checkX2:
-    lda Items,x
-    clc
-    adc #16
-    sec
-    sbc GlobalScroll
-    sta TempPointX
-    lda PlayerX
-    clc
-    adc #8
-    cmp TempPointX
-    bcs @nextItem
-
-    inx
-    lda Items, x ;y
-    sta TempPointY
-    lda PlayerY
-    clc
-    adc #16
-    cmp TempPointY
-    bcs @checkY2
-    jmp @nextItem
-@checkY2:
-
-    lda Items, x
-    clc
-    adc #16
-    sta TempPointY
-    lda PlayerY
-    clc
-    adc #16
-    cmp TempPointY
-    bcs @nextItem
-
-    jsr AddAndDeactivateItems
-
-@nextItem:
-    iny
-    cpy ItemCount
-    bcc @itemLoop
-
-
-    rts
-
-
-;-----------------------------------
-AddAndDeactivateItems:
-    sty TempY
-
-    ldy #INVENTORY_MAX_ITEMS - 1
-@inventoryLoop:
-    lda Inventory, y
-    beq @addItem
-    dey
-    bpl @inventoryLoop
-    jmp @exit ; no place in the inventory?
-
-@addItem:
-    inx
-    lda Items, x
-    sta Inventory, y
-    ldy TempY
-
-    tya
-    asl
-    asl
-    tax
-    lda #0
-    sta Items, x
-@exit:
-    ldy TempY
-    rts
 ;-----------------------------------
 Logics:
 
@@ -1573,8 +1475,8 @@ ResetEntityVariables:
     sta PlayerY
     lda #$01
     sta PlayerAlive
-    lda #255
-    sta BgColumnIdxToUpload
+    
+    lda #0
     sta BgColumnIdxToUpload
 
     lda #$20
@@ -1754,77 +1656,6 @@ CheckStartButton:
     rts
 ;-------------------------------------
 
-;pointer points to the NPCs data
-LoadNpcs:
-    ldy #0
-    lda (pointer), y
-    sta NpcCount
-    ldx NpcCount
-    beq @exit
-    iny
-@npcLoop:
-    lda (pointer), y
-    dey
-    sta Npcs, y
-    iny
-    iny
-    lda (pointer), y
-    dey
-    sta Npcs, y
-    iny
-    iny
-    lda (pointer), y
-    dey
-    sta Npcs, y
-    iny
-    iny
-    lda (pointer), y
-    dey
-    sta Npcs, y
-    iny
-    iny
-    dex
-    bne @npcLoop
-@exit:
-
-    rts
-
-;-------------------------------------
-;pointer points to the items data
-LoadItems:
-    ldy #0
-    lda (pointer), y
-    sta ItemCount
-    ldx ItemCount
-    beq @exit
-    iny
-@itemLoop:
-    lda (pointer), y
-    dey
-    sta Items, y
-    iny
-    iny
-    lda (pointer), y
-    dey
-    sta Items, y
-    iny
-    iny
-    lda (pointer), y
-    dey
-    sta Items, y
-    iny
-    iny
-    lda (pointer), y
-    dey
-    sta Items, y
-    iny
-    iny
-    dex
-    bne @itemLoop
-@exit:
-
-    rts
-;-------------------------------------
 ExitMenuState:
     lda #GAME_STATE
     sta GameState
@@ -1842,8 +1673,6 @@ ExitMenuState:
 @exit:
 
     rts
-
-
 ;-------------------------------------
 MenuInput:
     lda Buttons
@@ -2484,6 +2313,55 @@ LoadOutsideMap:
 
     jsr LoadNametable
 
+    ;TODO: load changed segment depending on GlobalScroll
+
+    ;SourceMapIdx -------
+    ;                   |
+    ;DestScreenAddr <----
+
+    ;if BgColumnIdxToUpload < 16  -> 0..BgColumnIdxToUpload
+    ;if BgColumnIdxToUpload >= 16 -> 16..BgColumnIdxToUpload
+    lda BgColumnIdxToUpload
+    cmp #16
+    bcc @lowerRange
+    ;Upper Range 16 .. BgColumnIdxToUpload
+
+
+    jmp @loadRest
+@lowerRange:
+    ;0.. BgColumnIdxToUpload
+
+    lda DestScreenAddr
+    sta Temp
+    lda #0
+    sta TempY
+    ldy #30
+@lowerRangeRowLoop:
+    lda $2002
+    lda Temp
+    sta $2006
+    lda TempY
+    sta $2006
+
+    ldx BgColumnIdxToUpload
+@lowerRangeLoop:
+    lda #0
+    sta $2007
+    dex
+    bpl @lowerRangeLoop
+    lda TempY
+    clc
+    adc #32
+    sta TempY
+    cmp #0
+    bne @nextrow
+    inc Temp
+@nextrow:
+    dey
+    bne @lowerRangeRowLoop
+
+;*******
+
 @loadRest:
     jsr LoadStatusBar
 
@@ -2651,127 +2529,9 @@ UpdateSprites:
     lda #4
     sta TempSpriteCount
 
-;--
-;items update
-    inx
-    ldy ItemCount
-    dey
-@itemLoop:
+    jsr UpdateItemSpritesInWorld
+    jsr UpdateNpcSpritesInWorld
 
-    sty TempItemIndex
-    tya
-    asl
-    asl ; y * 4
-    tay
-    lda Items, y ; is active
-    beq @nextItem
-    iny
-    lda Items, y
-    cmp GlobalScroll
-    bcc @nextItem ;don't let the item reappear after you scrolled forward
-    iny
-    lda Items, y ; y
-    sta FIRST_SPRITE, x
-    inx
-    ;index
-    iny
-    lda Items, y
-    asl
-    asl; a * 4
-    sty TempY; store item index
-    tay
-
-    lda inventory_data, y ;tile index
-    sta TempZ
-    sta FIRST_SPRITE, x
-    iny
-    lda inventory_data, y
-    sta TempPointX; store palette index
-    ldy TempY ;restore item index
-
-    inx
-    ;attributes
-    sta FIRST_SPRITE, x
-    inx
-    dey
-    dey
-    lda Items, y
-    sec
-    sbc GlobalScroll
-    sta FIRST_SPRITE, x
-    ;x
-    inx
-    iny
-    lda Items, y
-    sta FIRST_SPRITE, x
-    inc TempSpriteCount
-    ;y
-    inx
-    ;idx
-    lda TempZ
-    clc
-    adc #1
-    sta FIRST_SPRITE, x
-    inx
-    ;att
-    lda TempPointX
-    sta FIRST_SPRITE, x
-    inx
-    ;x
-    dey
-    lda Items, y
-    clc
-    adc #8
-    sec
-    sbc GlobalScroll
-    sta FIRST_SPRITE, x
-    inx
-    inc TempSpriteCount
-
-@nextItem:
-    ldy TempItemIndex
-    dey
-    bpl @itemLoop
-;---
-;Npcs
-    ldy NpcCount
-    beq @hidesprites
-    dey
-@npcLoop:
-
-    sty TempItemIndex ; save npc index
-    tya
-    asl
-    asl
-    tay
-    lda Npcs, y ; x
-    cmp GlobalScroll
-    bcc @nextNpc
-    sec
-    sbc GlobalScroll
-    sta TempPointX ; save x
-    iny
-    lda Npcs, y; y
-    sta TempPointY ; save y
-    iny
-    lda Npcs, y    ; first tile
-    sta TempZ      ;save tile
-    iny
-    lda Npcs, y ; row count
-    tay
-    lda #0
-    sta TempPush ; additionl Y
-    sta TempIndex ;additional sprite index
-@rowloop:
-    jsr UpdateNpcRow
-    dey
-    bne @rowloop
-
-@nextNpc:
-    ldy TempItemIndex; restore the index
-    dey
-    bpl @npcLoop
-;---------
 @hidesprites:
     lda #64
 
@@ -2794,67 +2554,6 @@ UpdateSprites:
 @done:
 
     rts
-;---------------------------------
-UpdateNpcRow:
-     ;Y
-    lda TempPointY
-    clc
-    adc TempPush
-    sta FIRST_SPRITE, x
-    inx
-    ;index
-    lda TempZ
-    clc
-    adc TempIndex
-    sta FIRST_SPRITE, x
-    inx
-    ;attr
-    lda #0
-    sta FIRST_SPRITE, x
-    inx
-    ;X
-    lda TempPointX
-    sta FIRST_SPRITE, x
-    inc TempSpriteCount
-    inx
-    ;Y
-    lda TempPointY
-    clc
-    adc TempPush
-    sta FIRST_SPRITE, x
-    inx
-    ;index
-    lda TempZ
-    clc
-    adc #1
-    adc TempIndex
-    sta FIRST_SPRITE, x
-    inx
-    ;attr
-    lda #0
-    sta FIRST_SPRITE, x
-    inx
-    ;X
-    lda TempPointX
-    clc
-    adc #8
-    sta FIRST_SPRITE, x
-    inx
-
-    inc TempSpriteCount
-    
-    lda TempPush
-    clc
-    adc #8
-    sta TempPush
-    lda TempIndex
-    clc
-    adc #16
-    sta TempIndex
-
-
-    rts
-
 
 ;----------------------------------
 loadSprites:
