@@ -2324,11 +2324,9 @@ LoadOutsideMap:
     lda BgColumnIdxToUpload
     cmp #16
     bcc @lowerRange
-    ;Upper Range 16 .. BgColumnIdxToUpload
-
-
+    jsr ReloadUpperColumnRange
     jmp @loadRest
-@lowerRange:
+@lowerRange:;***********
     ;0.. BgColumnIdxToUpload
 
     lda DestScreenAddr
@@ -2382,7 +2380,62 @@ LoadOutsideMap:
 
 
     rts
+;-----------------------------------
+ReloadUpperColumnRange:
+    ;Upper Range 16 .. BgColumnIdxToUpload
 
+    lda DestScreenAddr
+    sta Temp ;upper address
+    lda #0
+    sta TempY ;lower address
+
+    ldy #30 ; rows
+
+    lda BgColumnIdxToUpload
+    sec
+    sbc #16
+    sta TempZ
+
+    ;lda BgColumnIdxToUpload
+
+
+
+@UpperRangeRowLoop:
+
+    lda TempY
+    clc
+    adc #16
+    sta TempY
+    cmp #0
+    bne @continue
+    inc Temp
+@continue:
+    lda $2002
+    lda Temp
+    sta $2006
+    lda TempY
+    sta $2006
+
+    ldx TempZ
+@UpperRangeLoop:
+    lda #0
+    sta $2007
+    dex
+    bpl @UpperRangeLoop
+
+    lda TempY
+    clc
+    adc #16
+    sta TempY
+    cmp #0
+    bne @nextrow
+    inc Temp
+@nextrow:
+    dey
+    bne @UpperRangeRowLoop
+
+
+    rts
 ;-----------------------------------
 UpdateSprites:
 
