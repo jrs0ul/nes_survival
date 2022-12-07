@@ -2316,7 +2316,14 @@ LoadOutsideMap:
     lda BgColumnIdxToUpload
     cmp #16
     bcc @lowerRange
-    jsr ReloadUpperColumnRange
+
+    lda ScrollDirection
+    cmp #1
+    bne @movedRight
+    jsr ReloadUpperColumnRange_movingLeft
+    jmp @loadRest
+@movedRight:
+    jsr ReloadUpperColumnRange_movingRight
     jmp @loadRest
 @lowerRange:;***********
     jsr ReloadLowerColumnRange
@@ -2395,26 +2402,111 @@ ReloadLowerColumnRange:
 
     rts
 ;-----------------------------------
-ReloadUpperColumnRange:
+ReloadUpperColumnRange_movingLeft:
     ;Upper Range 16 .. BgColumnIdxToUpload
+
+    ldy SourceMapIdx
+    lda map_list_low, y
+    sta pointer
+    lda map_list_high, y
+    sta pointer + 1
+
 
     lda DestScreenAddr
     sta Temp ;upper address
     lda #0
     sta TempY ;lower address
 
-    ldy #30 ; rows
+    ldx #30 ; rows
+
+    lda #32
+    sec
+    sbc BgColumnIdxToUpload
+    sta TempZ
+
+@UpperRangeRowLoop:
+
+    lda pointer
+    clc
+    adc BgColumnIdxToUpload
+    sta pointer
+    cmp #0
+
+    lda TempY
+    clc
+    adc BgColumnIdxToUpload
+    sta TempY
+    cmp #0
+    bne @continue
+    inc Temp
+@continue:
+    lda $2002
+    lda Temp
+    sta $2006
+    lda TempY
+    sta $2006
+
+    ldy #0;
+@UpperRangeLoop:
+    lda (pointer), y
+    sta $2007
+    iny
+    cpy TempZ
+    bcc @UpperRangeLoop
+
+    lda pointer
+    clc
+    adc TempZ
+    sta pointer
+    cmp #0
+    bne @incrementDest
+    inc pointer + 1
+
+@incrementDest:
+    lda TempY
+    clc
+    adc TempZ
+    sta TempY
+    cmp #0
+    bne @nextrow
+    inc Temp
+@nextrow:
+    dex
+    bne @UpperRangeRowLoop
+
+
+    rts
+
+;-----------------------------------
+ReloadUpperColumnRange_movingRight:
+    ;Upper Range 16 .. BgColumnIdxToUpload
+
+    ldy SourceMapIdx
+    lda map_list_low, y
+    sta pointer
+    lda map_list_high, y
+    sta pointer + 1
+
+
+    lda DestScreenAddr
+    sta Temp ;upper address
+    lda #0
+    sta TempY ;lower address
+
+    ldx #30 ; rows
 
     lda BgColumnIdxToUpload
     sec
     sbc #16
     sta TempZ
 
-    ;lda BgColumnIdxToUpload
-
-
-
 @UpperRangeRowLoop:
+
+    lda pointer
+    clc
+    adc #16
+    sta pointer
+    cmp #0
 
     lda TempY
     clc
@@ -2430,13 +2522,23 @@ ReloadUpperColumnRange:
     lda TempY
     sta $2006
 
-    ldx TempZ
+    ldy #0;
 @UpperRangeLoop:
-    lda #0
+    lda (pointer), y
     sta $2007
-    dex
-    bpl @UpperRangeLoop
+    iny
+    cpy TempZ
+    bcc @UpperRangeLoop
 
+    lda pointer
+    clc
+    adc #16
+    sta pointer
+    cmp #0
+    bne @incrementDest
+    inc pointer + 1
+
+@incrementDest:
     lda TempY
     clc
     adc #16
@@ -2445,7 +2547,7 @@ ReloadUpperColumnRange:
     bne @nextrow
     inc Temp
 @nextrow:
-    dey
+    dex
     bne @UpperRangeRowLoop
 
 
