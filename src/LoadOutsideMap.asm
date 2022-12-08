@@ -185,14 +185,8 @@ ReloadLowerColumnRange_movingLeft:
 
     ldx #30
 @lowerRangeRowLoop:
-    jsr MovingLeft_RowIncrement
-    lda $2002
-    lda Temp
-    sta $2006
-    lda TempY
-    sta $2006
+    jsr MovingLeft_PreRowLoop
 
-    ldy #0
 @lowerRangeLoop:
 
     lda (pointer), y
@@ -253,15 +247,8 @@ ReloadUpperColumnRange_movingLeft:
     sta TempZ
 
 @UpperRangeRowLoop:
-    jsr MovingLeft_RowIncrement
+    jsr MovingLeft_PreRowLoop
 
-    lda $2002
-    lda Temp
-    sta $2006
-    lda TempY
-    sta $2006
-
-    ldy #0;
 @UpperRangeLoop:
     lda (pointer), y
     sta $2007
@@ -293,7 +280,8 @@ ReloadUpperColumnRange_movingLeft:
     rts
 
 ;-----------------------------------
-MovingLeft_RowIncrement:
+MovingLeft_PreRowLoop:
+
     lda BgColumnIdxToUpload
     beq @continue ; zero
     lda pointer
@@ -309,7 +297,16 @@ MovingLeft_RowIncrement:
     cmp #0
     bne @continue
     inc Temp
+
 @continue:
+    lda $2002
+    lda Temp
+    sta $2006
+    lda TempY
+    sta $2006
+
+    ldy #0
+
     rts
 
 ;-----------------------------------

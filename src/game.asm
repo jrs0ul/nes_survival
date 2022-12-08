@@ -659,7 +659,7 @@ UploadBgColumns:
     lda pointer2
     sta $2006
 
-    ldx #SCREEN_ROW_COUNT - 2
+    ldx #SCREEN_ROW_COUNT - 3 ; skip two rows that are invisible anyway and the one that's covered
     ldy #64  ;  skip two rows
 @loop:
     lda (pointer), y
@@ -672,20 +672,18 @@ UploadBgColumns:
 
     cpy #0
     bne @cont
-
     inc pointer + 1
 
 @cont:
     dex
     bne @loop
 
-    lda PPUCTRL
+    lda PPUCTRL ; restore normal ppu addressing
     sta $2000
 
 ;update attributes
     jsr UpdateAttributeColumn
 
-    jmp @exit
 @exit:
     rts
 ;--------------------------------------------
