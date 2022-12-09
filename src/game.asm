@@ -1474,9 +1474,11 @@ ResetEntityVariables:
     sta PlayerY
     lda #$01
     sta PlayerAlive
-    
-    lda #0
+
+    lda #31
     sta BgColumnIdxToUpload
+    lda #24
+    sta DestScreenAddr
 
     lda #$20
     sta FirstNametableAddr
