@@ -50,8 +50,20 @@ bool PicsContainer::load(const char *list){
         Image naujas;
 
         unsigned short imageBits = 0;
-        if (!naujas.loadTga(PicInfo[i].name,imageBits))
-            printf("%s not found or corrupted by M$\n",PicInfo[i].name);
+        if (PicInfo[i].type == 0)
+        {
+            if (!naujas.loadTga(PicInfo[i].name,imageBits))
+                printf("%s not found or corrupted by M$ :(\n",PicInfo[i].name);
+        }
+        else
+        {
+            if (!naujas.loadChr(PicInfo[i].name))
+            {
+                printf("%s not loaded\n", PicInfo[i].name);
+            }
+
+            imageBits = 24;
+        }
         PicInfo[i].width = naujas.width;
         PicInfo[i].height = naujas.height;
 
@@ -450,7 +462,6 @@ bool PicsContainer::loadFile(const char* file, unsigned long index,
 
         unsigned short imageBits=0;
 
-
         if (!naujas.loadTga(file, imageBits)){
             printf("%s not found or corrupted by M$\n", file);
             return false;
@@ -653,9 +664,9 @@ bool PicsContainer::initContainer(const char *list){
         PicData data;
         data.name[0] = 0;
         result = fscanf(failas,"%s\n",data.name);
-        result = fscanf(failas,"%d %d %d\n",
+        result = fscanf(failas,"%d %d %d %d\n",
                         &data.theight, &data.twidth,
-                        &data.filter);
+                        &data.filter, &data.type);
         PicInfo.add(data);
     }
 

@@ -302,6 +302,8 @@ static void RenderScreen ( void ){
     DrawPanel();
     pics.draw ( 3, Cross.x(),Cross.z() );
 
+    pics.draw(4, 0, 0);
+
 
     pics.drawBatch(0, 0, 666);
 

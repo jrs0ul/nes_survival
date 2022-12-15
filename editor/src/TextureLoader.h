@@ -43,6 +43,7 @@ struct PicData{
     int width;
     int height;
     int filter;
+    int type; //tga or CHR
     //additional data for faster rendering
     float htilew;
     float htileh;
