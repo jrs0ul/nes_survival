@@ -55,7 +55,7 @@
 #include "TextureLoader.h"
 #include "Map.h"
 #include "Utils.h"
-#include "mygtas.h"
+#include "Button.h"
 #include "CIniFile.h"
 
 
@@ -69,6 +69,16 @@
 int SCREENW = 640;
 int SCREENH = 480;
 
+const unsigned PANEL_HEIGHT = 100;
+const unsigned MAX_BUTTON = 100;
+const unsigned TILE_STEP = 32;
+
+const unsigned BUTTON_TILES_DEC = 25;
+const unsigned BUTTON_TILES_INC = 26;
+const unsigned BUTTON_FIRST_TILE = 27;
+const unsigned BUTTON_SAVE = 18;
+
+
 Uint32 tick = 0;
 
 
@@ -81,7 +91,7 @@ bool _QuitApp = false;
 Map map;
 
 
-Mygtas mygtai[30];
+Mygtas mygtai[MAX_BUTTON];
 
 Vector3D Cross;
 
@@ -98,7 +108,7 @@ int mx,my;
 
 unsigned char currenttile=0;
 int currentchar = 0;
-unsigned char firsttile=0;
+unsigned char firsttile = 0;
 
 int charsIDs[]={1,4,7,8};
 
@@ -233,7 +243,7 @@ void DrawPanel(){
         mygtai[13].draw ( pics,5,4 );*/
 
     if ( SELECT_LEV1 )
-        mygtai[6].draw ( pics,2,0,1.0f,0,0 );
+        mygtai[6].draw ( pics, 2, 0, 1.0f, 0,0 );
     else
         mygtai[6].draw ( pics,2, 0 );
 
@@ -248,21 +258,22 @@ void DrawPanel(){
         mygtai[8].draw ( pics,5,2 );*/
 
     if ( SELECT_COL )
-        mygtai[12].draw ( pics,2, 3,1.0f,0,0 );
+        mygtai[12].draw ( pics, 2, 3, 1.0f, 0, 0 );
     else
-        mygtai[12].draw ( pics,2, 3 );
+        mygtai[12].draw ( pics, 2, 3 );
 
    /* if ( SELECT_ENT )
         mygtai[14].draw ( pics,5,8,1.0f,0,0 );
     else
         mygtai[14].draw ( pics,5,8 );*/
 
-    mygtai[3].draw ( pics,1,firsttile );
-    mygtai[4].draw ( pics,1,firsttile+1 );
-    mygtai[5].draw ( pics,1,firsttile+2 );
+    for (unsigned i = BUTTON_FIRST_TILE; i < BUTTON_FIRST_TILE + TILE_STEP; ++i)
+    {
+        mygtai[i].draw ( pics, 1, firsttile + (i - BUTTON_FIRST_TILE));
+    }
 
-    mygtai[9].draw ( pics,2,6 );
-    mygtai[10].draw ( pics,2,7 );
+    mygtai[BUTTON_TILES_DEC].draw ( pics,2,6 );
+    mygtai[BUTTON_TILES_INC].draw ( pics,2,7 );
 
 
     /*mygtai[15].draw ( pics,5,6 );
@@ -270,7 +281,7 @@ void DrawPanel(){
     mygtai[17].draw ( pics,5,7 );*/
 
 
-    mygtai[18].draw ( pics,2,9 );
+    mygtai[BUTTON_SAVE].draw ( pics, 2, 9 );
 
 }
 
@@ -302,7 +313,6 @@ static void RenderScreen ( void ){
     DrawPanel();
     pics.draw ( 3, Cross.x(),Cross.z() );
 
-    pics.draw(4, 0, 0);
 
 
     pics.drawBatch(0, 0, 666);
@@ -327,7 +337,6 @@ static void RenderScreen ( void ){
 //--------------------------------------------------------
 static void SetupOpengl ( int width, int height )
 {
-
 
     glEnable ( GL_TEXTURE_2D );
 
@@ -359,13 +368,7 @@ static void SetupOpengl ( int width, int height )
     }
 
 
-
-
-
 }
-
-
-
 
 
 //----------------------------------------------------------------
@@ -417,19 +420,21 @@ void CheckKeys()
             && ( my<SCREENH ) && ( my>0 ) )
     {
         Cross.set ( mx,0,my );
-        if ( Cross.z() >100 )
+        if ( Cross.z() > PANEL_HEIGHT )
         {
             tilex= ( (int)(Cross.x()-map.getMapPos().x()) +16 ) /32;
             tiley= ( (int)(Cross.z()-map.getMapPos().z()) +16 ) /32;
         }
     }
 
-    if ( Cross.z() >100 )
+    if ( Cross.z() > PANEL_HEIGHT )
     {
         if ( ( bm & SDL_BUTTON ( 1 ) ) )
         {
             if ( SELECT_LEV1 )
-                map.setTile ( tilex,tiley,currenttile+1 );
+            {
+                map.setTile(tilex, tiley, currenttile);
+            }
             if ( SELECT_COL )
                 map.setCollision ( tilex,tiley,true );
 
@@ -439,7 +444,7 @@ void CheckKeys()
         if ( ( bm & SDL_BUTTON ( 3 ) ) )
         {
             if ( SELECT_LEV1 )
-                map.setTile ( tilex,tiley,0 );
+                map.setTile ( tilex, tiley, 0 );
             if ( SELECT_COL )
                 map.setCollision ( tilex,tiley,false );
         }
@@ -455,29 +460,47 @@ void CheckKeys()
                 SHOW_LEV1 = !SHOW_LEV1;
             if ( ( mygtai[11].pointerOntop ( (int)Cross.x(), (int)Cross.z() ) ) )
                 SHOW_COL = !SHOW_COL;
-           
-            if ( ( mygtai[3].pointerOntop ( (int)Cross.x(), (int)Cross.z() ) ) )
-                currenttile = firsttile;
-            if ( ( mygtai[4].pointerOntop ( (int)Cross.x(), (int)Cross.z() ) ) )
-                currenttile = firsttile+1;
-            if ( ( mygtai[5].pointerOntop ( (int)Cross.x(), (int)Cross.z() ) ) )
-                currenttile = firsttile+2;
+
+            for (unsigned i = BUTTON_FIRST_TILE; i < BUTTON_FIRST_TILE + TILE_STEP; ++i)
+            {
+                if ( ( mygtai[i].pointerOntop ( (int)Cross.x(), (int)Cross.z() ) ) )
+                {
+                    currenttile = firsttile + (i - BUTTON_FIRST_TILE);
+                }
+            }
 
             if ( ( mygtai[6].pointerOntop ( (int)Cross.x(), (int)Cross.z() ) ) )
+            {
                 SELECT_LEV1 = !SELECT_LEV1;
+            }
+
 
    
             if ( ( mygtai[12].pointerOntop ( (int)Cross.x(), (int)Cross.z() ) ) )
                 SELECT_COL = !SELECT_COL;
 
       
-            if ( ( mygtai[9].pointerOntop ( (int)Cross.x(), (int)Cross.z() ) ) )
-                if ( firsttile>0 )
-                    firsttile--;
+            if ( ( mygtai[BUTTON_TILES_DEC].pointerOntop ( (int)Cross.x(), (int)Cross.z() ) ) )
+            {
+                if (firsttile < TILE_STEP)
+                {
+                    firsttile = 0;
+                }
+                else
+                {
+                    //if ( firsttile - TILE_STEP >= 0 )
+                        firsttile -= TILE_STEP;
+                }
+            }
 
-            if ( ( mygtai[10].pointerOntop ( (int)Cross.x(), (int)Cross.z() ) ) )
-                if ( firsttile+3<pics.getInfo ( 2 )->htileh*pics.getInfo ( 2 )->htilew )
-                    firsttile++;
+            if ( ( mygtai[BUTTON_TILES_INC].pointerOntop ( (int)Cross.x(), (int)Cross.z() ) ) )
+            {
+                if ( firsttile + TILE_STEP <= 255 )
+                {
+                    firsttile += TILE_STEP;
+                }
+            }
+
             if ( ( mygtai[15].pointerOntop ( (int)Cross.x(), (int)Cross.z() ) ) )
                 if ( currentchar>0 )
                     currentchar--;
@@ -486,7 +509,7 @@ void CheckKeys()
                     currentchar++;
       
            
-            if ( ( mygtai[18].pointerOntop ( (int)Cross.x(),(int)Cross.z() ) ) )
+            if ( ( mygtai[BUTTON_SAVE].pointerOntop ( (int)Cross.x(),(int)Cross.z() ) ) )
             {
                 map.save (MapTilesOut, MapCollisionOut);
             }
@@ -546,17 +569,12 @@ int main ( int argc, char* argv[] )
     mygtai[14].init ( 154,55,32,32 );
 
 
-    mygtai[9].init ( 204,55,32,32 );
-    mygtai[3].init ( 250,55,32,32 );
-    mygtai[4].init ( 296,55,32,32 );
-    mygtai[5].init ( 332,55,32,32 );
-    mygtai[10].init ( 378,55,32,32 );
-
+   
     mygtai[15].init ( 204,20,32,32 );
     mygtai[16].init ( 250,20,32,32 );
     mygtai[17].init ( 296,20,32,32 );
 
-    mygtai[18].init ( 580,20,32,32 );
+    mygtai[BUTTON_SAVE].init ( SCREENW - 42, 20, 32, 32 );
 
 
     mygtai[19].init ( 460,20,32,32 );
@@ -565,6 +583,22 @@ int main ( int argc, char* argv[] )
     mygtai[22].init ( 460,55,32,32 );
     mygtai[23].init ( 496,55,32,32 );
     mygtai[24].init ( 532,55,32,32 );
+
+    mygtai[BUTTON_TILES_DEC].init ( 204,55,32,32 );
+
+    unsigned tileRow = 0;
+    for (unsigned i = BUTTON_FIRST_TILE; i < BUTTON_FIRST_TILE + TILE_STEP; ++i)
+    {
+        mygtai[i].init(250 + (i - BUTTON_FIRST_TILE - (16 * tileRow)) * 34, 10 + tileRow * 34, 32, 32);
+        
+        if (((i - BUTTON_FIRST_TILE) + 1) % 16 == 0 && (i - BUTTON_FIRST_TILE) > 0)
+        {
+            ++tileRow;
+        }
+    }
+    
+    mygtai[BUTTON_TILES_INC].init ( 250 + 16 * 34,55,32,32 );
+
 
 
     const SDL_VideoInfo* info = NULL;

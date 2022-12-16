@@ -184,7 +184,7 @@ void Map::draw(PicsContainer &pics, int layer, int screenw, int screenh, COLOR c
                     pics.draw(1,
                               a*32+mappos.x(),
                               i*32+mappos.z(), 
-                              tiles[i][a], true, 1.0f,1.0f, 0.0, c, c);
+                              tiles[i][a], true, 4.0f, 4.0f, 0.0, c, c);
                 }
             }
         } 

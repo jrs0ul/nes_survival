@@ -1,10 +1,9 @@
 pics/chars.tga
 16 16 1 0
-pics/tileset.tga
-32 32 0 0
+../src/tile.chr
+8 8 0 1
 pics/buttons.tga
 32 32 0 0
 pics/pointer.tga
 16 16 0 0
-../src/tile.chr
-128 128 0 1
+

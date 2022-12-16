@@ -290,7 +290,7 @@ bool Image::loadChr(const char* name)
     for (unsigned i = 255; i >= 0; --i)
     {
         y = floor(i / 16.f) * 8 + 7;
-        x = (i - (floor(i / 16.f) * 16)) * 8 + 7;
+        x = (i - (floor(i / 16.f) * 16)) * 8 + 8;
 
 
         for (unsigned j = 0; j < TILE_WIDTH; ++j)
@@ -333,14 +333,13 @@ bool Image::loadChr(const char* name)
                 secondPart = secondPart << shift;
                 secondPart = secondPart >> shr;
 
-                printf("x %u y %u, i %u\n", x, y, i);
                 data[(y * 128 + (128 - x)) * 3]     = 85 * (firstPart + secondPart);
                 data[(y * 128 + (128 - x)) * 3 + 1] = 85 * firstPart;
                 data[(y * 128 + (128 - x)) * 3 + 2] = 85 * (firstPart + secondPart);
                 ++shift;
                 --x;
             }
-            x = (i - (floor(i / 16.f) * 16)) * 8 + 7;
+            x = (i - (floor(i / 16.f) * 16)) * 8 + 8;
             --y;
         }
        
