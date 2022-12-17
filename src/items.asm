@@ -140,9 +140,6 @@ UpdateItemSpritesInWorld:
 
     inx ;next sprite byte
     
-    lda CurrentMapSegmentIndex
-    bne @exit
-
     ldy ItemCount
     dey ;let's start from ItemCount - 1
 @itemLoop:
@@ -159,6 +156,18 @@ UpdateItemSpritesInWorld:
 
 ;----------------------------------------
 UpdateSpritesForSingleItem:
+
+    lda CurrentMapSegmentIndex
+    cmp #2 ;item screen - 1
+    bcc @exit
+    cmp #4 ;item screen + 1
+    bcs @exit
+    
+    lda #0
+    sec
+    sbc GlobalScroll
+    sta Temp
+
     sty TempItemIndex
     tya
     asl
@@ -167,9 +176,38 @@ UpdateSpritesForSingleItem:
     lda Items, y ; is item active
     beq @exit
     iny
+
     lda Items, y ; x coord
+    sta TempX
+;---
+    lda CurrentMapSegmentIndex
+    cmp #3 ;item screen
+    beq @ItemMatchesScreen
+    lda GlobalScroll
+    beq @exit
+    lda TempX
+    clc
+    adc Temp
+    bcs @exit ; x > 255
+    sta Temp; save new x
+    jmp @continueWithSprite
+@ItemMatchesScreen:
+    lda TempX
     cmp GlobalScroll
-    bcc @exit ;don't let the item reappear after you scrolled forward
+    bcc @exit
+    sec
+    sbc GlobalScroll
+    sta Temp
+@continueWithSprite:
+
+    jsr FinishFirstItemPart
+    ;------------------------------------
+    jsr SecondItemSpritePart
+@exit:
+    rts
+;-----------------------
+
+FinishFirstItemPart:
     iny
     lda Items, y ; y coord
     sta FIRST_SPRITE, x
@@ -193,11 +231,12 @@ UpdateSpritesForSingleItem:
     inx
     sta FIRST_SPRITE, x; ;write attributes
     inx
+    
     dey
     dey
-    lda Items, y
-    sec
-    sbc GlobalScroll
+    ;--
+
+    lda Temp
     sta FIRST_SPRITE, x
     ;x
     inx
@@ -205,6 +244,17 @@ UpdateSpritesForSingleItem:
     lda Items, y
     sta FIRST_SPRITE, x
     inc TempSpriteCount
+
+    rts
+
+;----------------------
+SecondItemSpritePart:
+    lda Temp
+    clc
+    adc #8
+    bcs @exit ; x > 255
+    sta Temp
+
     ;y
     inx
     ;idx
@@ -218,12 +268,8 @@ UpdateSpritesForSingleItem:
     sta FIRST_SPRITE, x
     inx
     ;x
-    dey
-    lda Items, y
-    clc
-    adc #8
-    sec
-    sbc GlobalScroll
+    lda Temp
+
     sta FIRST_SPRITE, x
     inx
     inc TempSpriteCount

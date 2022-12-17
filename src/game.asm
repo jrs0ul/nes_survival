@@ -316,6 +316,8 @@ ItemUpdateDelay:
 
 Temp:
     .res 1
+TempX:
+    .res 1
 TempY:
     .res 1
 TempZ:
