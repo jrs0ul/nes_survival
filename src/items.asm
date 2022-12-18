@@ -39,18 +39,45 @@ ItemCollisionCheck:
     lda #ITEM_DELAY
     sta ItemUpdateDelay
 
-    lda CurrentMapSegmentIndex
-    bne @exit
-
     ldy #0
 @itemLoop:
     tya
     asl
     asl ;y * 4
     tax
-    lda Items, x ; active?
-    beq @nextItem
+    lda Items, x ; index + active?
+    lsr
+    bcc @nextItem ; inactive
     inx
+    inx
+    inx
+    lda Items, x ;screen index
+    jsr CalcItemMapScreenIndexes
+    dex
+    dex
+
+    lda ItemMapScreenIndex
+    beq @skipPrev; the item is in the 0 screen
+
+    lda CurrentMapSegmentIndex
+    cmp PrevItemMapScreenIndex
+    bcc @nextItem
+@skipPrev:
+    lda CurrentMapSegmentIndex
+    cmp NextItemMapScreenIndex
+    bcs @nextItem
+
+    jsr CheckItemsXY
+
+@nextItem:
+    iny
+    cpy ItemCount
+    bcc @itemLoop
+
+@exit:
+    rts
+;----------------------------------
+CheckItemsXY:
     lda Items, x ;x
     sec
     sbc GlobalScroll
@@ -60,7 +87,7 @@ ItemCollisionCheck:
     adc #8
     cmp TempPointX
     bcs @checkX2
-    jmp @nextItem
+    jmp @exit
 @checkX2:
     lda Items,x
     clc
@@ -72,7 +99,7 @@ ItemCollisionCheck:
     clc
     adc #8
     cmp TempPointX
-    bcs @nextItem
+    bcs @exit
 
     inx
     lda Items, x ;y
@@ -82,7 +109,7 @@ ItemCollisionCheck:
     adc #16
     cmp TempPointY
     bcs @checkY2
-    jmp @nextItem
+    jmp @exit
 @checkY2:
 
     lda Items, x
@@ -93,18 +120,23 @@ ItemCollisionCheck:
     clc
     adc #16
     cmp TempPointY
-    bcs @nextItem
+    bcs @exit
 
     jsr AddAndDeactivateItems
-
-@nextItem:
-    iny
-    cpy ItemCount
-    bcc @itemLoop
-
 @exit:
     rts
 
+;-----------------------------------
+CalcItemMapScreenIndexes:
+    sta ItemMapScreenIndex
+    clc
+    adc #1
+    sta NextItemMapScreenIndex
+    sec
+    sbc #2
+    sta PrevItemMapScreenIndex
+
+    rts
 ;-----------------------------------
 AddAndDeactivateItems:
     sty TempY
@@ -118,16 +150,20 @@ AddAndDeactivateItems:
     jmp @exit ; no place in the inventory?
 
 @addItem:
-    inx
-    lda Items, x
-    sta Inventory, y
-    ldy TempY
-
+    sty Temp  ; store empty inventory slot
+    ldy TempY ; item index
     tya
     asl
     asl
     tax
-    lda #0
+    ;put to inventory
+    lda Items, x
+    lsr
+    ldy Temp
+    sta Inventory, y
+    ;deactivate
+    lda Items, x
+    and #%11111110
     sta Items, x
 @exit:
     ldy TempY
@@ -167,30 +203,37 @@ UpdateSpritesForSingleItem:
     bcc @exit ;lowest bit was zero, item's not active
     sta TempZ ; store item DB index
 
+    iny
+    iny
+    iny
+    lda Items, y; Item map screen index
+    jsr CalcItemMapScreenIndexes
+    dey
+    dey
+    dey
+
+
+    lda ItemMapScreenIndex
+    beq @skipPrev; the item is in the 0 screen
 
     lda CurrentMapSegmentIndex
-    cmp #2 ;item screen - 1
+    cmp PrevItemMapScreenIndex
     bcc @exit
-    cmp #4 ;item screen + 1
+@skipPrev:
+    lda CurrentMapSegmentIndex
+    cmp NextItemMapScreenIndex
     bcs @exit
-    
-    lda #0
-    sec
-    sbc GlobalScroll
-    sta Temp
 
     iny
     lda Items, y ; x coord
     sta TempX
 ;---
     lda CurrentMapSegmentIndex
-    cmp #3 ;item screen
+    cmp ItemMapScreenIndex
     beq @ItemMatchesScreen
-    lda GlobalScroll
-    beq @exit
     lda TempX
-    clc
-    adc Temp
+    sec
+    sbc GlobalScroll
     bcs @exit ; x > 255
     sta Temp; save new x
     jmp @continueWithSprite
