@@ -312,6 +312,9 @@ FrameCount:
 ItemUpdateDelay:
     .res 1
 
+ItemMapScreenIndex:
+    .res 1
+
 
 
 Temp:
@@ -352,7 +355,7 @@ TempSpriteCount: ; count of active sprites
 ;--
 
 Items:   ;items that lies in the map
-    .res 16 ; max 4 items * 4 bytes(active, x, y, item index)
+    .res 16 ; max 4 items * 4 bytes(item index(7 bits) + active(1 bit), x, y, screen_index)
 ItemCount:
     .res 1
 

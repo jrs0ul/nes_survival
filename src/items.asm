@@ -157,6 +157,17 @@ UpdateItemSpritesInWorld:
 ;----------------------------------------
 UpdateSpritesForSingleItem:
 
+    sty TempItemIndex
+    tya
+    asl
+    asl ; y * 4
+    tay
+    lda Items, y ; item index + is active ?
+    lsr
+    bcc @exit ;lowest bit was zero, item's not active
+    sta TempZ ; store item DB index
+
+
     lda CurrentMapSegmentIndex
     cmp #2 ;item screen - 1
     bcc @exit
@@ -168,15 +179,7 @@ UpdateSpritesForSingleItem:
     sbc GlobalScroll
     sta Temp
 
-    sty TempItemIndex
-    tya
-    asl
-    asl ; y * 4
-    tay
-    lda Items, y ; is item active
-    beq @exit
     iny
-
     lda Items, y ; x coord
     sta TempX
 ;---
@@ -214,7 +217,7 @@ FinishFirstItemPart:
     inx; next byte
 
     iny
-    lda Items, y ; item index
+    lda TempZ ; item index
     asl
     asl; a * 4
     sty TempY; store item index

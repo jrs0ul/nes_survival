@@ -3,6 +3,6 @@ House_items:
 
 Outside1_items:
     .byte 3
-    .byte 1, 50, 180, 1
-    .byte 1, 55, 32, 2
-    .byte 1, 220, 100, 1
+    .byte %00000011, 50, 180, 1
+    .byte %00000101, 55, 32, 1
+    .byte %00000101, 220, 100, 2
