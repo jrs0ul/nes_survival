@@ -34,6 +34,7 @@
 .include "data/title.asm"
 .include "data/menu_screen.asm"
 .include "data/inventory_data.asm"
+.include "data/npc_data.asm"
 .include "data/item_list.asm" ;items in maps
 .include "data/npc_list.asm"  ;npcs in maps
 .include "data/collision_data.asm"
@@ -364,7 +365,7 @@ ItemCount:
     .res 1
 
 Npcs:   ;animals and stuff
-    .res 16 ; max 4 npcs * 4 bytes (x, y, starting tile, height in tiles)
+    .res 16 ; max 4 npcs * 4 bytes (npc type(7 bits) + alive(1 bit), x, y, screen_index) //starting tile, height in tiles
 NpcCount:
     .res 1
 

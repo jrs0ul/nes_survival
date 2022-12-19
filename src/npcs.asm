@@ -48,6 +48,29 @@ UpdateNpcSpritesInWorld:
     asl
     asl
     tay
+    lda Npcs, y ; index + alive
+
+    lsr
+    bcc @nextNpc
+
+    sty Temp; store Npcs index
+    asl
+    tay
+    lda npc_data, y ; first tile index
+    sta TempZ ;save tile
+    iny
+    lda npc_data, y ; tile rows for the npc
+    ldy Temp; restore Npcs index
+    sta Temp; store tile rows
+
+    iny
+    iny
+    iny
+    lda Npcs, y ; screen index where npc resides
+    sta ItemMapScreenIndex
+    dey
+    dey
+
     lda Npcs, y ; x
     cmp GlobalScroll
     bcc @nextNpc
@@ -57,11 +80,8 @@ UpdateNpcSpritesInWorld:
     iny
     lda Npcs, y; y
     sta TempPointY ; save y
-    iny
-    lda Npcs, y    ; first tile
-    sta TempZ      ;save tile
-    iny
-    lda Npcs, y ; row count
+
+    lda Temp ; row count
     tay
     lda #0
     sta TempPush ; additionl Y
