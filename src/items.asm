@@ -34,7 +34,7 @@ LoadItems:
 @exit:
 
     rts
-;--------------------------------------------
+;======================================================
 ItemCollisionCheck:
     lda #ITEM_DELAY
     sta ItemUpdateDelay
@@ -78,9 +78,18 @@ ItemCollisionCheck:
     rts
 ;----------------------------------
 CheckItemsXY:
-    lda Items, x ;x
+
+    lda Items, x
+    sta TempX
+
+    lda CurrentMapSegmentIndex
+    cmp ItemMapScreenIndex
+    beq @ItemMatchesScreen
+
+    lda TempX
     sec
     sbc GlobalScroll
+    bcs @exit ; x > 255 ?
     sta TempPointX
     lda PlayerX
     clc
@@ -88,10 +97,26 @@ CheckItemsXY:
     cmp TempPointX
     bcs @checkX2
     jmp @exit
+
 @checkX2:
-    lda Items,x
+    lda TempX
     clc
     adc #16
+    sec
+    sbc GlobalScroll
+    bcs @exit ; x > 255 ?
+    sta TempPointX
+    lda PlayerX
+    clc
+    adc #8
+    cmp TempPointX
+    bcs @exit
+    jmp @checkY
+
+@ItemMatchesScreen:
+    lda TempX
+    cmp GlobalScroll
+    bcc @exit
     sec
     sbc GlobalScroll
     sta TempPointX
@@ -99,7 +124,30 @@ CheckItemsXY:
     clc
     adc #8
     cmp TempPointX
+    bcs @CheckX2Match
+    jmp @exit
+@CheckX2Match:
+
+    lda TempX
+    clc
+    adc #16
+    cmp GlobalScroll
+    bcc @exit
+    sec
+    sbc GlobalScroll
+
+    sta TempPointX
+    lda PlayerX
+    clc
+    adc #8
+    cmp TempPointX
     bcs @exit
+@checkY:
+    jsr CheckYPoints
+@exit:
+    rts
+;-----------------------------------
+CheckYPoints:
 
     inx
     lda Items, x ;y
@@ -110,6 +158,7 @@ CheckItemsXY:
     cmp TempPointY
     bcs @checkY2
     jmp @exit
+
 @checkY2:
 
     lda Items, x
@@ -124,7 +173,9 @@ CheckItemsXY:
 
     jsr AddAndDeactivateItems
 @exit:
+
     rts
+
 
 ;-----------------------------------
 CalcItemMapScreenIndexes:
@@ -169,7 +220,7 @@ AddAndDeactivateItems:
     ldy TempY
     rts
 
-;-----------------------------------------
+;===================================================
 
 UpdateItemSpritesInWorld:
 ;X register stores sprite data byte index (sprites are made of 4 bytes)
