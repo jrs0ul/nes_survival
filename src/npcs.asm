@@ -36,14 +36,22 @@ LoadNpcs:
 ;-------------------------------------
 UpdateNpcSpritesInWorld:
 
-    lda CurrentMapSegmentIndex
-    bne @exit
     ldy NpcCount
     beq @exit
     dey
 @npcLoop:
-
     sty TempItemIndex ; save npc index
+    jsr UpdateSingleNpcSprites
+
+@nextNpc:
+    ldy TempItemIndex; restore the index
+    dey
+    bpl @npcLoop
+@exit:
+    rts
+
+;------------------------------------
+UpdateSingleNpcSprites:
     tya
     asl
     asl
@@ -67,16 +75,38 @@ UpdateNpcSpritesInWorld:
     iny
     iny
     lda Npcs, y ; screen index where npc resides
-    sta ItemMapScreenIndex
+    jsr CalcItemMapScreenIndexes
     dey
     dey
 
+    lda ItemMapScreenIndex
+    beq @skipPrevScreen
+    lda CurrentMapSegmentIndex
+    cmp PrevItemMapScreenIndex
+    bcc @nextNpc
+@skipPrevScreen:
+    lda CurrentMapSegmentIndex
+    cmp NextItemMapScreenIndex
+    bcs @nextNpc
+
+    lda CurrentMapSegmentIndex
+    cmp ItemMapScreenIndex
+    beq @NpcMatchesScreen
+
+    lda Npcs, y ; x
+    sec
+    sbc GlobalScroll
+    bcs @nextNpc
+    sta TempPointX ; save x
+    jmp @calcY
+@NpcMatchesScreen:
     lda Npcs, y ; x
     cmp GlobalScroll
     bcc @nextNpc
     sec
     sbc GlobalScroll
-    sta TempPointX ; save x
+    sta TempPointX
+@calcY:
     iny
     lda Npcs, y; y
     sta TempPointY ; save y
@@ -90,15 +120,9 @@ UpdateNpcSpritesInWorld:
     jsr UpdateNpcRow
     dey
     bne @rowloop
-
 @nextNpc:
-    ldy TempItemIndex; restore the index
-    dey
-    bpl @npcLoop
-@exit:
     rts
-
-;------------------------------------
+;-------------------------------------
 UpdateNpcRow:
      ;Y
     lda TempPointY

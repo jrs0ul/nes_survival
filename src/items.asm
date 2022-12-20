@@ -223,10 +223,7 @@ AddAndDeactivateItems:
 ;===================================================
 
 UpdateItemSpritesInWorld:
-;X register stores sprite data byte index (sprites are made of 4 bytes)
 
-    inx ;next sprite byte
-    
     ldy ItemCount
     dey ;let's start from ItemCount - 1
 @itemLoop:
@@ -243,6 +240,7 @@ UpdateItemSpritesInWorld:
 
 ;----------------------------------------
 UpdateSpritesForSingleItem:
+;X register stores sprite data byte index (sprites are made of 4 bytes)
 
     sty TempItemIndex
     tya

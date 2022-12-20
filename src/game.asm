@@ -2423,6 +2423,7 @@ UpdateSprites:
     lda #4
     sta TempSpriteCount
 
+    inx; next sprite byte
     jsr UpdateItemSpritesInWorld
     jsr UpdateNpcSpritesInWorld
 
