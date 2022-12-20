@@ -360,6 +360,8 @@ TempItemIndex:
     .res 1
 TempSpriteCount: ; count of active sprites
     .res 1
+TempNpcCnt:
+    .res 1
 ;--
 
 Items:   ;items that lies in the map
@@ -368,7 +370,15 @@ ItemCount:
     .res 1
 
 Npcs:   ;animals and stuff
-    .res 16 ; max 4 npcs * 4 bytes (npc type(7 bits) + alive(1 bit), x, y, screen_index) //starting tile, height in tiles
+    .res 32 ; max 4 npcs * 8 bytes:
+            ;   (npc type(7 bits) + alive(1 bit),
+            ;   x,
+            ;   y,
+            ;   screen_index
+            ;   direction
+            ;   frame
+            ;   hp
+            ;   timer
 NpcCount:
     .res 1
 
@@ -2438,8 +2448,8 @@ UpdateSprites:
     sta TempSpriteCount
 
     inx; next sprite byte
-    jsr UpdateItemSpritesInWorld
     jsr UpdateNpcSpritesInWorld
+    jsr UpdateItemSpritesInWorld
 
 @hidesprites:
     lda #64

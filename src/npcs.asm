@@ -3,31 +3,37 @@ LoadNpcs:
     ldy #0
     lda (pointer), y
     sta NpcCount
-    ldx NpcCount
-    beq @exit
+    sta TempNpcCnt
+    beq @exit ; no npcs
     iny
+    ldx #0
 @npcLoop:
+
     lda (pointer), y
-    dey
-    sta Npcs, y
-    iny
-    iny
-    lda (pointer), y
-    dey
-    sta Npcs, y
-    iny
+    sta Npcs, x
+    inx
     iny
     lda (pointer), y
-    dey
-    sta Npcs, y
+    sta Npcs, x
     iny
-    iny
+    inx
     lda (pointer), y
-    dey
-    sta Npcs, y
+    sta Npcs, x
     iny
+    inx
+    lda (pointer), y
+    sta Npcs, x
     iny
-    dex
+    inx
+    lda #1
+    sta Npcs, x ; dir
+    inx
+    inx
+    inx
+    inx
+
+    dec TempNpcCnt
+    lda TempNpcCnt
     bne @npcLoop
 @exit:
 
@@ -55,6 +61,7 @@ UpdateSingleNpcSprites:
     tya
     asl
     asl
+    asl ; a * 8
     tay
     lda Npcs, y ; index + alive
 
@@ -202,6 +209,7 @@ doNpcAI:
     tya
     asl
     asl
+    asl ; a * 8
     tax
     lda Npcs, x ;type + active
     lsr
@@ -212,8 +220,6 @@ doNpcAI:
     inx
     lda Npcs, x; screen
     jsr CalcItemMapScreenIndexes
-    dex
-    dex
 
     lda ItemMapScreenIndex
     beq @skipPrev
@@ -225,23 +231,8 @@ doNpcAI:
     cmp NextItemMapScreenIndex
     bcs @nextNpc
 
+    jsr SingleNpcAI
 
-    lda Npcs, x ;load x
-    clc
-    adc #1
-    bcs @goToNextScreen
-    sta Npcs, x ;save x
-    jmp @nextNpc
-@goToNextScreen:
-    sta Npcs, x ;save x
-    inx
-    inx
-    lda Npcs, x; screen idx
-    clc
-    adc #1
-    cmp ScreenCount
-    bcs @nextNpc
-    sta Npcs, x
 @nextNpc:
     dey
     bpl @npcLoop
@@ -249,4 +240,77 @@ doNpcAI:
 
     lda #NPC_AI_DELAY
     sta NpcAIUpdateDelay
+    rts
+;-----------------------------------
+SingleNpcAI:
+
+    inx
+    lda Npcs, x ; load dir
+    dex
+    dex
+    dex
+
+    cmp #1 ; right?
+    bne @goLeft
+
+    lda Npcs, x ;load x
+    clc
+    adc #1
+    bcs @goToNextScreen
+    sta Npcs, x ;save x
+    jmp @nextNpc
+
+@goToNextScreen:
+    sta Temp
+    inx
+    inx
+    lda Npcs, x; screen idx
+    clc
+    adc #1
+    cmp ScreenCount
+    bcs @changeDir
+    sta Npcs, x
+    dex
+    dex
+    lda Temp
+    sta Npcs, x; save changed x
+    jmp @nextNpc
+@goLeft:
+    lda Npcs, x
+    sta Temp
+    sec
+    sbc #1
+    cmp Temp
+    bcs @goToPrevScreen
+    sta Npcs, x
+    jmp @nextNpc
+@goToPrevScreen:
+    sta Temp
+    inx
+    inx
+    lda Npcs, x
+    beq @changeDir
+    sec
+    sbc #1
+    sta Npcs, x
+    dex
+    dex
+    lda Temp
+    sta Npcs, x; save changed x
+    jmp @nextNpc
+
+@changeDir:
+    inx
+    lda Npcs, x
+    clc
+    adc #1
+    sta Npcs, x
+    cmp #3
+    bcs @backToOne
+    jmp @nextNpc
+@backToOne:
+    lda #1
+    sta Npcs, x
+@nextNpc:
+
     rts
