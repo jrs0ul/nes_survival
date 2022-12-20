@@ -194,4 +194,25 @@ UpdateNpcRow:
 
 
 ;----------------------------------
+doNpcAI:
 
+    ldy NpcCount
+@npcLoop:
+    
+    tya
+    asl
+    asl
+    tax
+    inx
+    lda Npcs, x
+    clc
+    adc #1
+    sta Npcs, x
+
+    dey
+    bpl @npcLoop
+
+
+    lda #NPC_AI_DELAY
+    sta NpcAIUpdateDelay
+    rts

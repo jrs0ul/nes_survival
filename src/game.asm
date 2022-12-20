@@ -76,6 +76,7 @@ sprites:
     PLAYER_SPEED               = 2
     INPUT_DELAY                = 64
     ITEM_DELAY                 = 66
+    NPC_AI_DELAY               = 128
 
     COLLISION_MAP_SIZE         = 120 ; 4 columns * 30 rows
     COLLISION_MAP_COLUMN_COUNT = 4
@@ -308,9 +309,11 @@ MustLoadTitle:
 CarrySet:
     .res 1
 
-FrameCount:
+InputUpdateDelay:
     .res 1
 ItemUpdateDelay:
+    .res 1
+NpcAIUpdateDelay:
     .res 1
 
 PrevItemMapScreenIndex:
@@ -446,9 +449,11 @@ vblankwait2:      ; Second wait for vblank, PPU is ready after this
     sta GameState
 
     lda #INPUT_DELAY
-    sta FrameCount
+    sta InputUpdateDelay
     lda #ITEM_DELAY
     sta ItemUpdateDelay
+    lda #NPC_AI_DELAY
+    sta NpcAIUpdateDelay
     lda #0
     sta MustLoadHouseInterior
     sta MustLoadSomething
@@ -470,8 +475,8 @@ endlessLoop:
     lda MustLoadSomething
     bne nextIteration ; don't do logics until *something* is not loaded to the PPU
 
-    dec FrameCount
-    lda FrameCount
+    dec InputUpdateDelay
+    lda InputUpdateDelay
     bne checkItems
 
 doInput:
@@ -488,10 +493,19 @@ checkItems:
     dec ItemUpdateDelay
     lda ItemUpdateDelay
     beq doItemCheck
-    jmp doSomeLogics
+    jmp npcAI
 
 doItemCheck:
     jsr ItemCollisionCheck
+    jmp npcAI
+
+npcAI:
+    dec NpcAIUpdateDelay
+    lda NpcAIUpdateDelay
+    beq runAI
+    jmp doSomeLogics
+runAI:
+    jsr doNpcAI
     jmp doSomeLogics
 
 update_game_sprites:
@@ -1171,7 +1185,7 @@ HandleInput:
     jsr CalcMapColumnToUpdate
 
     lda #INPUT_DELAY
-    sta FrameCount
+    sta InputUpdateDelay
     rts
 ;--------------------------------
 SwitchScreenIdxIfNeeded:
