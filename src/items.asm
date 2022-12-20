@@ -335,9 +335,6 @@ FinishFirstItemPart:
     sta FIRST_SPRITE, x
     ;x
     inx
-    iny
-    lda Items, y
-    sta FIRST_SPRITE, x
     inc TempSpriteCount
 
     rts
@@ -349,6 +346,11 @@ SecondItemSpritePart:
     adc #8
     bcs @exit ; x > 255
     sta Temp
+
+    iny
+    lda Items, y
+    sta FIRST_SPRITE, x
+
 
     ;y
     inx
@@ -364,7 +366,6 @@ SecondItemSpritePart:
     inx
     ;x
     lda Temp
-
     sta FIRST_SPRITE, x
     inx
     inc TempSpriteCount

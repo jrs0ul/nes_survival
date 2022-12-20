@@ -144,7 +144,15 @@ UpdateNpcRow:
     lda TempPointX
     sta FIRST_SPRITE, x
     inc TempSpriteCount
+
     inx
+
+    lda TempPointX ; check if the second sprite is still in screen
+    clc
+    adc #8
+    bcs @exit
+
+
     ;Y
     lda TempPointY
     clc
@@ -170,7 +178,8 @@ UpdateNpcRow:
     inx
 
     inc TempSpriteCount
-    
+
+@exit:
     lda TempPush
     clc
     adc #8
