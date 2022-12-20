@@ -59,7 +59,7 @@ UpdateSingleNpcSprites:
     lda Npcs, y ; index + alive
 
     lsr
-    bcc @nextNpc
+    bcc @nextNpc ;npc not active
 
     sty Temp; store Npcs index
     asl
@@ -203,12 +203,46 @@ doNpcAI:
     asl
     asl
     tax
+    lda Npcs, x ;type + active
+    lsr
+    bcc @nextNpc ; not active
+
     inx
-    lda Npcs, x
+    inx
+    inx
+    lda Npcs, x; screen
+    jsr CalcItemMapScreenIndexes
+    dex
+    dex
+
+    lda ItemMapScreenIndex
+    beq @skipPrev
+    lda CurrentMapSegmentIndex
+    cmp PrevItemMapScreenIndex
+    bcc @nextNpc
+@skipPrev:
+    lda CurrentMapSegmentIndex
+    cmp NextItemMapScreenIndex
+    bcs @nextNpc
+
+
+    lda Npcs, x ;load x
     clc
     adc #1
+    bcs @goToNextScreen
+    sta Npcs, x ;save x
+    jmp @nextNpc
+@goToNextScreen:
+    sta Npcs, x ;save x
+    inx
+    inx
+    lda Npcs, x; screen idx
+    clc
+    adc #1
+    cmp ScreenCount
+    bcs @nextNpc
     sta Npcs, x
-
+@nextNpc:
     dey
     bpl @npcLoop
 
