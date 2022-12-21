@@ -38,6 +38,109 @@ LoadNpcs:
 @exit:
 
     rts
+;-------------------------------------
+;Player's knifer collides with all the npcs
+PlayerHitsNpcs:
+
+    lda AttackTimer
+    beq @exit
+
+    ldy NpcCount
+    beq @exit ; no npcs
+    dey
+@npcLoop:
+    sty TempItemIndex
+    jsr CheckSingleNpcAgainstPlayerHit
+   
+@nextNpc:
+    ldy TempItemIndex
+    dey
+    bpl @npcLoop
+
+@exit:
+    lda NPC_COLLISION_DELAY
+    sta NpcCollisionDelay
+    rts
+;-------------------------------------
+CheckSingleNpcAgainstPlayerHit:
+    tya
+    asl
+    asl
+    asl ; y * 8
+    tay
+
+    lda Npcs, y ; index + alive
+    lsr
+    bcc @exit ; dead already
+
+    sty Temp
+    asl
+    tay
+    iny
+    lda npc_data, y ; tile rows
+    ldy Temp
+    sta Temp ; save row count
+
+    iny
+    iny
+    iny
+    lda Npcs, y ; screen index where npc resides
+    jsr CalcItemMapScreenIndexes
+    dey
+    dey
+
+    lda ItemMapScreenIndex
+    beq @skipPrevScreen
+    lda CurrentMapSegmentIndex
+    cmp PrevItemMapScreenIndex
+    bcc @exit
+@skipPrevScreen:
+    lda CurrentMapSegmentIndex
+    cmp NextItemMapScreenIndex
+    bcs @exit
+
+    lda CurrentMapSegmentIndex
+    cmp ItemMapScreenIndex
+    beq @NpcMatchesScreen
+    
+    ;X1
+    lda Npcs, y ; x
+    sec 
+    sbc GlobalScroll
+    bcs @exit
+    sta TempPointX
+    jmp @calcY
+@NpcMatchesScreen:
+    lda Npcs, y ; x
+    cmp GlobalScroll
+    bcc @exit
+    sec
+    sbc GlobalScroll
+    sta TempPointX
+
+@calcY: ; Y1
+    iny
+    lda Npcs, y ; y
+    sta TempPointY
+;-------
+    lda TempPointX
+    cmp PlayerX
+    bcs @exit
+    lda TempPointX
+    clc
+    adc #16 ; two tiles
+    cmp PlayerX
+    bcc @exit
+
+    dey
+    dey
+    lda Npcs, y
+    and #%11111110;
+    sta Npcs, y
+
+@exit:
+
+    rts
 
 ;-------------------------------------
 UpdateNpcSpritesInWorld:

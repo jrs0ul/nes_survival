@@ -83,9 +83,13 @@ sprites:
     BUTTON_B_MASK               = %01000000
 
     PLAYER_SPEED               = 2
+
+    PLAYER_ATTACK_DELAY        = 16
+
     INPUT_DELAY                = 64
     ITEM_DELAY                 = 66
     NPC_AI_DELAY               = 128
+    NPC_COLLISION_DELAY        = 250
 
     COLLISION_MAP_SIZE         = 120 ; 4 columns * 30 rows
     COLLISION_MAP_COLUMN_COUNT = 4
@@ -326,6 +330,8 @@ ItemUpdateDelay:
     .res 1
 NpcAIUpdateDelay:
     .res 1
+NpcCollisionDelay:
+    .res 1
 
 PrevItemMapScreenIndex:
     .res 1
@@ -475,6 +481,8 @@ vblankwait2:      ; Second wait for vblank, PPU is ready after this
     sta ItemUpdateDelay
     lda #NPC_AI_DELAY
     sta NpcAIUpdateDelay
+    lda #NPC_COLLISION_DELAY
+    sta NpcCollisionDelay
     lda #0
     sta MustLoadHouseInterior
     sta MustLoadSomething
@@ -518,15 +526,22 @@ checkItems:
 
 doItemCheck:
     jsr ItemCollisionCheck
-    jmp npcAI
 
 npcAI:
     dec NpcAIUpdateDelay
     lda NpcAIUpdateDelay
     beq runAI
-    jmp doSomeLogics
+    jmp npcCollision
 runAI:
     jsr doNpcAI
+
+npcCollision:
+    dec NpcCollisionDelay
+    lda NpcCollisionDelay
+    beq doNpcCollision
+    jmp doSomeLogics
+doNpcCollision:
+    jsr PlayerHitsNpcs
     jmp doSomeLogics
 
 update_game_sprites:
@@ -1936,10 +1951,13 @@ CheckB:
     and #BUTTON_B_MASK
     beq @exit
 
+    lda AttackTimer
+    bne @exit
+
     lda #64
     sta WalkAnimationIndex
 
-    lda #32
+    lda #PLAYER_ATTACK_DELAY
     sta AttackTimer
 
 
