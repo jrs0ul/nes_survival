@@ -73,6 +73,15 @@ sprites:
     GAME_STATE                 = 1
     MENU_STATE                 = 2
 
+    BUTTON_RIGHT_MASK           = %00000001
+    BUTTON_LEFT_MASK            = %00000010
+    BUTTON_DOWN_MASK            = %00000100
+    BUTTON_UP_MASK              = %00001000
+
+    BUTTON_START_MASK           = %00010000
+
+    BUTTON_B_MASK               = %01000000
+
     PLAYER_SPEED               = 2
     INPUT_DELAY                = 64
     ITEM_DELAY                 = 66
@@ -205,6 +214,8 @@ PlayerY:
 WalkAnimationIndex:
     .res 1
 WalkTimer:
+    .res 1
+AttackTimer:
     .res 1
 PlayerFrame:
     .res 1
@@ -811,6 +822,18 @@ Logics:
     jsr FoodLogics
 
 @doneLogics:
+    
+    lda AttackTimer
+    beq @noAttack
+    dec AttackTimer
+    lda AttackTimer
+    beq @hideAttackAnim
+    jmp @noAttack
+@hideAttackAnim:
+    lda #16
+    sta WalkAnimationIndex
+@noAttack:
+
     lda #0
     sta NMIActive
 
@@ -1149,8 +1172,15 @@ HandleInput:
     lda Buttons
     beq @finishInput ; no input
 
-    
+    lda AttackTimer
+    bne @finishInput
+
+    lda Buttons
+    and #%00001111
+    beq @continueInput
     jsr AnimateWalk
+
+@continueInput:
 
     lda PlayerX
     sta OldPlayerX
@@ -1617,12 +1647,12 @@ IncreaseDigits:
 CheckStartButton:
 
     lda Buttons
-    and #%00010000
+    and #BUTTON_START_MASK
     bne @checkOld
     jmp @exit
 @checkOld:
     lda OldButtons
-    and #%00010000
+    and #BUTTON_START_MASK
     bne @exit
 
 
@@ -1715,7 +1745,7 @@ MenuInput:
     beq @exit
 
     lda Buttons
-    and #%00000100
+    and #BUTTON_DOWN_MASK
     beq @CheckUp
 
     lda InventoryPointerPos
@@ -1730,7 +1760,7 @@ MenuInput:
 
 @CheckUp:
     lda Buttons
-    and #%00001000
+    and #BUTTON_UP_MASK
     beq @CheckB
 
     lda InventoryPointerPos
@@ -1754,7 +1784,7 @@ MenuInput:
 ;--------------------------------------
 Button_B_Pressed:
     lda Buttons
-    and #%01000000
+    and #BUTTON_B_MASK
     beq @exit
     ldx InventoryItemIndex
 
@@ -1854,6 +1884,8 @@ ProcessButtons:
     sta DirectionX
     sta DirectionY
 
+    jsr CheckB
+
 ;Check if LEFT is pressed
     jsr CheckLeft
 ;-----
@@ -1865,7 +1897,7 @@ ProcessButtons:
 @CheckUp:
 go_Up:
     lda Buttons
-    and #%00001000
+    and #BUTTON_UP_MASK
     beq @CheckDown
 
     lda #1
@@ -1881,7 +1913,7 @@ go_Up:
 
 @CheckDown:
     lda Buttons
-    and #%00000100
+    and #BUTTON_DOWN_MASK
     beq @exit
 
     lda #2
@@ -1899,9 +1931,24 @@ go_Up:
     sta Buttons
     rts
 ;----------------------------------
+CheckB:
+    lda Buttons
+    and #BUTTON_B_MASK
+    beq @exit
+
+    lda #64
+    sta WalkAnimationIndex
+
+    lda #32
+    sta AttackTimer
+
+
+@exit:
+    rts
+;----------------------------------
 CheckLeft:
     lda Buttons
-    and #%00000010
+    and #BUTTON_LEFT_MASK
     beq @exit
 
     lda #1
@@ -1967,7 +2014,7 @@ CheckLeft:
 ;Right on dpad is pressed
 CheckRight:
     lda Buttons
-    and #%00000001
+    and #BUTTON_RIGHT_MASK
     beq @exit
 
     lda #2
@@ -2447,6 +2494,12 @@ UpdateSprites:
     lda #4
     sta TempSpriteCount
 
+;-----knife
+    lda AttackTimer
+    beq @noKnife
+    jsr SetKnifeSprite
+@noKnife:
+;---
     inx; next sprite byte
     jsr UpdateNpcSpritesInWorld
     jsr UpdateItemSpritesInWorld
@@ -2472,6 +2525,120 @@ UpdateSprites:
     bne @hideSpritesLoop
 @done:
 
+    rts
+;----------------------------------
+SetKnifeSprite:
+    inx
+
+    lda PlayerFlip
+    beq @noFlip
+
+    lda PlayerFrame
+    beq @horizontalDirX
+    cmp #2
+    beq @goDown
+    lda PlayerY
+    jmp @storeY
+@goDown:
+    lda PlayerY
+    clc 
+    adc #16
+    jmp @storeY
+@horizontalDirX:
+    lda PlayerY
+    clc
+    adc #8
+@storeY:
+    sta FIRST_SPRITE,x
+    inx
+    lda #240
+    clc
+    adc PlayerFrame
+    sta FIRST_SPRITE,x
+    inx
+    lda #%01000000
+    sta FIRST_SPRITE,x
+    inx
+
+    lda PlayerFrame
+    beq @horizontalDir
+    cmp #2
+    bne @upFlip
+
+    lda PlayerX
+    clc
+    adc #8
+
+    jmp @storeX
+@upFlip:
+
+    lda PlayerX
+
+    jmp @storeX
+
+@horizontalDir:
+
+    lda PlayerX
+    clc
+    adc #16
+
+@storeX:
+    sta FIRST_SPRITE,x
+    inc TempSpriteCount
+    jmp @exit
+
+@noFlip:;--------------------------
+
+    lda PlayerFrame
+    beq @HorizontalDirYNoFlip
+    cmp #2
+    beq @goDownNoFlip
+    lda PlayerY
+    jmp @StoreYNoFlip
+    
+@goDownNoFlip:
+    lda PlayerY
+    clc
+    adc #16
+    jmp @StoreYNoFlip
+
+@HorizontalDirYNoFlip:
+    lda PlayerY
+    clc
+    adc #8
+@StoreYNoFlip:
+    sta FIRST_SPRITE,x
+    inx
+    lda #240
+    clc
+    adc PlayerFrame
+    sta FIRST_SPRITE,x
+    inx
+    lda #%00000000
+    sta FIRST_SPRITE,x
+    inx
+
+    lda PlayerFrame
+    beq @HorizontalDirNoFlip
+    cmp #2
+    bne @up
+    lda PlayerX
+    jmp @storeXNoFlip
+@up:
+    lda PlayerX
+    clc 
+    adc #8
+    jmp @storeXNoFlip
+@HorizontalDirNoFlip:
+    lda PlayerX
+    sec
+    sbc #8
+
+@storeXNoFlip:
+    sta FIRST_SPRITE,x
+    inc TempSpriteCount
+
+@exit:
     rts
 
 ;----------------------------------
