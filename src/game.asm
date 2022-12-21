@@ -231,6 +231,11 @@ DirectionX:
 DirectionY:
     .res 1
 
+KnifeX:
+    .res 1
+KnifeY:
+    .res 1
+
 FireFrame:  ;an animation frame of fire in the fireplace
     .res 1
 FireFrameDelay:
@@ -382,7 +387,7 @@ TempNpcCnt:
 ;--
 
 Items:   ;items that lies in the map
-    .res 24 ; max 6 items * 4 bytes(item index(7 bits) + active(1 bit), x, y, screen_index)
+    .res 44 ; max 6 items * 4 bytes(item index(7 bits) + active(1 bit), x, y, screen_index)
 ItemCount:
     .res 1
 
@@ -2546,114 +2551,129 @@ UpdateSprites:
     rts
 ;----------------------------------
 SetKnifeSprite:
-    inx
+    
+
 
     lda PlayerFlip
-    beq @noFlip
+    beq @nF
 
-    lda PlayerFrame
-    beq @horizontalDirX
-    cmp #2
-    beq @goDown
-    lda PlayerY
-    jmp @storeY
-@goDown:
-    lda PlayerY
-    clc 
-    adc #16
-    jmp @storeY
-@horizontalDirX:
-    lda PlayerY
-    clc
-    adc #8
-@storeY:
-    sta FIRST_SPRITE,x
-    inx
-    lda #240
-    clc
-    adc PlayerFrame
-    sta FIRST_SPRITE,x
-    inx
     lda #%01000000
-    sta FIRST_SPRITE,x
-    inx
+    sta Temp
+
 
     lda PlayerFrame
-    beq @horizontalDir
+    beq @horizF
     cmp #2
-    bne @upFlip
+    beq @gDown
+
+    lda PlayerY
+    ;sta KnifeY
+    sta TempPointY
+
+    lda PlayerX
+    ;sta KnifeX
+    sta TempPointX
+
+    jmp @updateKnife
+@gDown:
+    lda PlayerY
+    clc
+    adc #16
+    ;sta KnifeY
+    sta TempPointY
 
     lda PlayerX
     clc
     adc #8
+    ;sta KnifeX
+    sta TempPointX
 
-    jmp @storeX
-@upFlip:
 
-    lda PlayerX
-
-    jmp @storeX
-
-@horizontalDir:
-
-    lda PlayerX
-    clc
-    adc #16
-
-@storeX:
-    sta FIRST_SPRITE,x
-    inc TempSpriteCount
-    jmp @exit
-
-@noFlip:;--------------------------
-
-    lda PlayerFrame
-    beq @HorizontalDirYNoFlip
-    cmp #2
-    beq @goDownNoFlip
-    lda PlayerY
-    jmp @StoreYNoFlip
-    
-@goDownNoFlip:
-    lda PlayerY
-    clc
-    adc #16
-    jmp @StoreYNoFlip
-
-@HorizontalDirYNoFlip:
+    jmp @updateKnife
+@horizF:
     lda PlayerY
     clc
     adc #8
-@StoreYNoFlip:
-    sta FIRST_SPRITE,x
-    inx
-    lda #240
+    ;sta KnifeY
+    sta TempPointY
+
+    lda PlayerX
     clc
-    adc PlayerFrame
-    sta FIRST_SPRITE,x
-    inx
+    adc #16
+    ;sta KnifeX
+    sta TempPointX
+
+    jmp @updateKnife
+@nF:
+
     lda #%00000000
-    sta FIRST_SPRITE,x
-    inx
+    sta Temp
 
     lda PlayerFrame
-    beq @HorizontalDirNoFlip
+    beq @horizNF
     cmp #2
-    bne @up
+    beq @gDownNF
+
+
+    lda PlayerY
+    ;sta KnifeY
+    sta TempPointY
+
     lda PlayerX
-    jmp @storeXNoFlip
-@up:
-    lda PlayerX
-    clc 
+    clc
     adc #8
-    jmp @storeXNoFlip
-@HorizontalDirNoFlip:
+    ;sta KnifeX
+    sta TempPointX
+
+    jmp @updateKnife
+@gDownNF:
+    lda PlayerY
+    clc
+    adc #16
+    ;sta KnifeY
+    sta TempPointY
+
+    lda PlayerX
+    ;sta KnifeX
+    sta TempPointX
+
+
+    jmp @updateKnife
+@horizNF:
+    lda PlayerY
+    clc
+    adc #8
+    ;sta KnifeY
+    sta TempPointY
+
     lda PlayerX
     sec
     sbc #8
+    ;sta KnifeX
+    sta TempPointX
+@updateKnife:
+;----------------------
 
-@storeXNoFlip:
+    inx
+    lda TempPointY;KnifeY
     sta FIRST_SPRITE,x
+    clc
+    adc #4
+    sta KnifeY
+    inx
+    lda #240
+    clc
+    adc PlayerFrame
+    sta FIRST_SPRITE,x
+    inx
+    lda Temp
+    sta FIRST_SPRITE,x
+    inx
+    lda TempPointX;KnifeX
+    sta FIRST_SPRITE,x
+    clc
+    adc #4
+    sta KnifeX
     inc TempSpriteCount
 
 @exit:

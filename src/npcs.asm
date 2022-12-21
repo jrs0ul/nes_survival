@@ -123,25 +123,44 @@ CheckSingleNpcAgainstPlayerHit:
     lda Npcs, y ; y
     sta TempPointY
 ;-------
+    jsr CheckNpcsCollision
+@exit:
+
+    rts
+
+;-------------------------------------
+CheckNpcsCollision:
     lda TempPointX
-    cmp PlayerX
+    cmp KnifeX
     bcs @exit
     lda TempPointX
     clc
     adc #16 ; two tiles
-    cmp PlayerX
+    cmp KnifeX
     bcc @exit
+
+    lda TempPointY
+    cmp KnifeY
+    bcs @exit
+
+    lda TempPointY
+    ldx Temp
+@addRowsLoop:
+    clc
+    adc #8
+    dex
+    bne @addRowsLoop
+    cmp KnifeY
+    bcc @exit
+    ;---
 
     dey
     dey
     lda Npcs, y
     and #%11111110;
     sta Npcs, y
-
 @exit:
-
     rts
-
 ;-------------------------------------
 UpdateNpcSpritesInWorld:
 
