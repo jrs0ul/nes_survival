@@ -356,6 +356,7 @@ UpdateNpcRow:
 doNpcAI:
 
     ldy NpcCount
+    dey; npcCount - 1, first index
 @npcLoop:
     
     tya
@@ -405,10 +406,29 @@ SingleNpcAI:
     cmp #1 ; right?
     bne @goLeft
 
+@goRight:
+
     lda Npcs, x ;load x
     clc
     adc #1
     bcs @goToNextScreen
+
+    sta TempX ; save modified x
+    clc
+    adc #14
+    sta TempPointX
+    stx TempIndex
+    inx
+    lda Npcs, x ;y
+    sta TempPointY
+    jsr TestPointAgainstCollisionMap
+    ldx TempIndex
+    inx
+    inx ;increment to screen idx
+    cmp #0
+    beq @changeDir
+    ldx TempIndex
+    lda TempX
     sta Npcs, x ;save x
     jmp @nextNpc
 
@@ -427,6 +447,7 @@ SingleNpcAI:
     lda Temp
     sta Npcs, x; save changed x
     jmp @nextNpc
+;----
 @goLeft:
     lda Npcs, x
     sta Temp
@@ -434,13 +455,28 @@ SingleNpcAI:
     sbc #1
     cmp Temp
     bcs @goToPrevScreen
+
+    stx TempIndex ; save x reg
+    sta TempX
+    sta TempPointX
+    inx
+    lda Npcs, x ; y
+    sta TempPointY
+    jsr TestPointAgainstCollisionMap
+    ldx TempIndex
+    inx
+    inx
+    cmp #0 ; collides?
+    beq @changeDir
+    ldx TempIndex
+    lda TempX
     sta Npcs, x
     jmp @nextNpc
 @goToPrevScreen:
     sta Temp
     inx
     inx
-    lda Npcs, x
+    lda Npcs, x ; scr
     beq @changeDir
     sec
     sbc #1
@@ -450,10 +486,10 @@ SingleNpcAI:
     lda Temp
     sta Npcs, x; save changed x
     jmp @nextNpc
-
+;-------------
 @changeDir:
     inx
-    lda Npcs, x
+    lda Npcs, x ; dir
     clc
     adc #1
     sta Npcs, x

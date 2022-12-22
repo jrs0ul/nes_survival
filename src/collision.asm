@@ -313,7 +313,7 @@ TestPointAgainstCollisionMap:
     lsr
     tax
 
-    lda x_collision_pattern, x
+    lda x_collision_pattern, x ;which bit is wich x cell
     sta Temp        ;save the pattern
 
     txa
@@ -330,9 +330,8 @@ TestPointAgainstCollisionMap:
     lsr
     lsr
     lsr
-    tay
 
-    sty TempY
+    sta TempY
 
     txa
     clc
