@@ -123,13 +123,13 @@ CheckSingleNpcAgainstPlayerHit:
     lda Npcs, y ; y
     sta TempPointY
 ;-------
-    jsr CheckNpcsCollision
+    jsr KnifeNpcsCollision
 @exit:
 
     rts
 
 ;-------------------------------------
-CheckNpcsCollision:
+KnifeNpcsCollision:
     lda TempPointX
     cmp KnifeX
     bcs @exit
@@ -159,6 +159,36 @@ CheckNpcsCollision:
     lda Npcs, y
     and #%11111110;
     sta Npcs, y
+
+    ;drop item
+    inc ItemCount
+    lda ItemCount
+
+    sec
+    sbc #1
+    asl
+    asl
+    tay
+    lda #%00000101
+    sta Items, y
+    iny
+    lda TempPointX
+    clc
+    adc #8
+    clc
+    adc GlobalScroll
+    sta Items, y
+    iny
+    lda TempPointY
+    clc
+    adc #8
+    sta Items, y
+    iny
+    lda ItemMapScreenIndex
+    sta Items, y
+
+
+
 @exit:
     rts
 ;-------------------------------------

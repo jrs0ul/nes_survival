@@ -387,7 +387,11 @@ TempNpcCnt:
 ;--
 
 Items:   ;items that lies in the map
-    .res 44 ; max 6 items * 4 bytes(item index(7 bits) + active(1 bit), x, y, screen_index)
+    .res 44 ; max 11 items * 4 bytes
+            ;(item index(7 bits) + active(1 bit),
+            ; x,
+            ; y,
+            ; screen_index)
 ItemCount:
     .res 1
 
