@@ -413,20 +413,9 @@ SingleNpcAI:
     adc #1
     bcs @goToNextScreen
 
-    sta TempX ; save modified x
-    clc
-    adc #14
-    sta TempPointX
-    stx TempIndex
-    inx
-    lda Npcs, x ;y
-    sta TempPointY
-    jsr TestPointAgainstCollisionMap
-    ldx TempIndex
-    inx
-    inx ;increment to screen idx
-    cmp #0
-    beq @changeDir
+    jsr TestCollisionGoingRight
+    cmp #1
+    beq @changeDir ; collides
     ldx TempIndex
     lda TempX
     sta Npcs, x ;save x
@@ -456,18 +445,9 @@ SingleNpcAI:
     cmp Temp
     bcs @goToPrevScreen
 
-    stx TempIndex ; save x reg
-    sta TempX
-    sta TempPointX
-    inx
-    lda Npcs, x ; y
-    sta TempPointY
-    jsr TestPointAgainstCollisionMap
-    ldx TempIndex
-    inx
-    inx
-    cmp #0 ; collides?
-    beq @changeDir
+    jsr TestCollisionGoingLeft
+    cmp #1 
+    beq @changeDir ;collides
     ldx TempIndex
     lda TempX
     sta Npcs, x
@@ -488,17 +468,66 @@ SingleNpcAI:
     jmp @nextNpc
 ;-------------
 @changeDir:
+    jsr ChangeNpcDirection
+@nextNpc:
+
+    rts
+
+;---------------------
+ChangeNpcDirection:
+    ;x at the npc screen index
     inx
-    lda Npcs, x ; dir
+    lda Npcs, x ; direction
     clc
     adc #1
     sta Npcs, x
     cmp #3
     bcs @backToOne
-    jmp @nextNpc
+    jmp @exit
 @backToOne:
     lda #1
     sta Npcs, x
-@nextNpc:
+@exit:
 
     rts
+;----------------------
+TestCollisionGoingRight:
+    sta TempX ; save modified x
+    clc
+    adc #14
+    sec
+    sbc GlobalScroll
+    sta TempPointX
+
+    stx TempIndex
+    inx
+    lda Npcs, x ;y
+    clc
+    adc #9
+    sta TempPointY
+    jsr TestPointAgainstCollisionMap
+    ldx TempIndex
+    inx
+    inx ;increment to screen idx
+    ;collision result is in A
+
+    rts
+;----------------------------------
+TestCollisionGoingLeft:
+    stx TempIndex ; save x reg
+    sta TempX
+    sec
+    sbc GlobalScroll
+    sta TempPointX
+    inx
+    lda Npcs, x ; y
+    clc
+    adc #9
+    sta TempPointY
+    jsr TestPointAgainstCollisionMap
+    ldx TempIndex
+    inx
+    inx
+    ;collision result is in A
+    rts
+
