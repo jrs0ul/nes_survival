@@ -377,6 +377,8 @@ TempInventoryIndex:
     .res 1
 TempSpriteIdx:
     .res 1
+TempDir:
+    .res 1
 ;----
 TempItemIndex:
     .res 1

@@ -235,6 +235,10 @@ UpdateSingleNpcSprites:
     iny
     lda Npcs, y ; screen index where npc resides
     jsr CalcItemMapScreenIndexes
+    iny
+    lda Npcs, y ; direction
+    sta TempDir
+    dey
     dey
     dey
 
@@ -290,13 +294,30 @@ UpdateNpcRow:
     sta FIRST_SPRITE, x
     inx
     ;index
+    lda TempDir
+    cmp #1
+    beq @spriteIndexFlip1
     lda TempZ
     clc
     adc TempIndex
+    jmp @storeSpriteIndex1
+@spriteIndexFlip1:
+    lda TempZ
+    clc
+    adc TempIndex
+    adc #1
+@storeSpriteIndex1:
     sta FIRST_SPRITE, x
     inx
     ;attr
+    lda TempDir
+    cmp #1
+    beq @flip1
     lda #0
+    jmp @saveattr1
+@flip1:
+    lda #%01000000
+@saveattr1:
     sta FIRST_SPRITE, x
     inx
     ;X
@@ -319,14 +340,30 @@ UpdateNpcRow:
     sta FIRST_SPRITE, x
     inx
     ;index
+    lda TempDir
+    cmp #1
+    beq @flipSpriteIndex2
     lda TempZ
     clc
     adc #1
     adc TempIndex
+    jmp @storeSpriteIndex2
+@flipSpriteIndex2:
+    lda TempZ
+    clc
+    adc TempIndex
+@storeSpriteIndex2:
     sta FIRST_SPRITE, x
     inx
     ;attr
+    lda TempDir
+    cmp #1
+    beq @flip2
     lda #0
+    jmp @saveattr2
+@flip2:
+    lda #%01000000
+@saveattr2:
     sta FIRST_SPRITE, x
     inx
     ;X
