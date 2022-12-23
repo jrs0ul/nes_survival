@@ -372,6 +372,8 @@ doNpcAI:
     inx
     inx
     lda Npcs, x; screen
+    dex
+    dex
     jsr CalcItemMapScreenIndexes
 
     lda ItemMapScreenIndex
@@ -384,6 +386,25 @@ doNpcAI:
     cmp NextItemMapScreenIndex
     bcs @nextNpc
 
+;final filter (could be removed)
+    lda CurrentMapSegmentIndex
+    cmp ItemMapScreenIndex
+    beq @NpcMatchesScreen
+
+    lda Npcs, x ; x
+    sec
+    sbc GlobalScroll
+    bcs @nextNpc
+    jmp @doAI
+@NpcMatchesScreen:
+    lda Npcs, x ; x
+    cmp GlobalScroll
+    bcc @nextNpc
+;---------------------
+
+@doAI:
+    inx
+    inx
     jsr SingleNpcAI
 
 @nextNpc:
