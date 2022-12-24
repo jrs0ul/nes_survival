@@ -379,6 +379,11 @@ TempSpriteIdx:
     .res 1
 TempDir:
     .res 1
+TempFrame:
+    .res 1
+
+SpritesUpdated:
+    .res 1
 ;----
 TempItemIndex:
     .res 1
@@ -583,11 +588,14 @@ nmi:
     pha
     ;---
     ;copy sprite data
+    lda SpritesUpdated
+    beq startNMI
     lda #$00
     sta $2003        ; set the low byte (00) of the RAM address
     lda #$02
     sta $4014        ; set the high byte (02) of the RAM address, start the transfer
     ;---
+startNMI:
     lda #1
     sta NMIActive
 
@@ -816,7 +824,7 @@ Logics:
     bne @exit
 
     lda NMIActive
-    beq @continueForever
+    beq @exit
 
 
     lda PlayerAlive
@@ -860,13 +868,12 @@ Logics:
     sta WalkAnimationIndex
 @noAttack:
 
+    jsr CheckIfEnteredHouse
+    jsr CheckIfExitedHouse
+
     lda #0
     sta NMIActive
 
-@continueForever:
-
-    jsr CheckIfEnteredHouse
-    jsr CheckIfExitedHouse
 @exit:
 
     rts
@@ -2379,6 +2386,13 @@ CheckIfExitedHouse:
     rts
 ;-----------------------------------
 UpdateSprites:
+    
+    lda #0
+    sta SpritesUpdated
+
+    lda PlayerFrame
+    asl  ; frame * 2
+    sta TempFrame
 
     ;sprite 1
     ldx #$00
@@ -2387,8 +2401,8 @@ UpdateSprites:
     inx
     lda PlayerFlip
     beq @NoFlip1
-    lda PlayerFrame
-    asl ;frame * 2
+
+    lda TempFrame
     clc
     adc #1
     sta FIRST_SPRITE,x
@@ -2398,12 +2412,11 @@ UpdateSprites:
     sta FIRST_SPRITE, x
     jmp @MoveX1
 @NoFlip1:
-    lda PlayerFrame
-    asl ;frame * 2
+
+    lda TempFrame
     sta FIRST_SPRITE,x
     inx
     lda FIRST_SPRITE, x
-    ora #%00000011
     and #%10111111
     sta FIRST_SPRITE, x
 @MoveX1:
@@ -2411,15 +2424,14 @@ UpdateSprites:
     lda PlayerX
     sta FIRST_SPRITE, x
     inx
-
+;---
     ;sprite 2
     lda PlayerY
     sta FIRST_SPRITE, x
     inx
     lda PlayerFlip
     beq @NoFlip2
-    lda PlayerFrame
-    asl
+    lda TempFrame
     sta FIRST_SPRITE, x
     inx
     lda FIRST_SPRITE, x
@@ -2427,14 +2439,12 @@ UpdateSprites:
     sta FIRST_SPRITE, x
     jmp @MoveX2
 @NoFlip2:
-    lda PlayerFrame
-    asl
+    lda TempFrame
     clc
     adc #1
     sta FIRST_SPRITE, x
     inx
     lda FIRST_SPRITE, x
-    ora #%00000011
     and #%10111111
     sta FIRST_SPRITE, x
 @MoveX2:
@@ -2453,8 +2463,7 @@ UpdateSprites:
     inx
     lda PlayerFlip
     beq @NoFlip3
-    lda PlayerFrame
-    asl
+    lda TempFrame
     clc
     adc #17
     adc WalkAnimationIndex
@@ -2465,15 +2474,13 @@ UpdateSprites:
     sta FIRST_SPRITE, x
     jmp @MoveX3
 @NoFlip3:
-    lda PlayerFrame
-    asl
+    lda TempFrame
     clc
     adc #16
     adc WalkAnimationIndex
     sta FIRST_SPRITE, x
     inx
     lda FIRST_SPRITE, x
-    ora #%00000011
     and #%10111111
     sta FIRST_SPRITE, x
 @MoveX3:
@@ -2490,8 +2497,7 @@ UpdateSprites:
     inx
     lda PlayerFlip
     beq @NoFlip4
-    lda PlayerFrame
-    asl
+    lda TempFrame
     clc
     adc #16
     adc WalkAnimationIndex
@@ -2502,15 +2508,13 @@ UpdateSprites:
     sta FIRST_SPRITE, x
     jmp @MoveX4
 @NoFlip4:
-    lda PlayerFrame
-    asl
+    lda TempFrame
     clc
     adc #17
     adc WalkAnimationIndex
     sta FIRST_SPRITE, x
     inx
     lda FIRST_SPRITE, x
-    ora #%00000011
     and #%10111111
     sta FIRST_SPRITE, x
 @MoveX4:
@@ -2554,11 +2558,12 @@ UpdateSprites:
     bne @hideSpritesLoop
 @done:
 
+    lda #1
+    sta SpritesUpdated
+
     rts
 ;----------------------------------
 SetKnifeSprite:
-    
-
 
     lda PlayerFlip
     beq @nF
@@ -2573,11 +2578,9 @@ SetKnifeSprite:
     beq @gDown
 
     lda PlayerY
-    ;sta KnifeY
     sta TempPointY
 
     lda PlayerX
-    ;sta KnifeX
     sta TempPointX
 
     jmp @updateKnife
@@ -2585,13 +2588,11 @@ SetKnifeSprite:
     lda PlayerY
     clc
     adc #16
-    ;sta KnifeY
     sta TempPointY
 
     lda PlayerX
     clc
     adc #8
-    ;sta KnifeX
     sta TempPointX
 
 
@@ -2600,13 +2601,11 @@ SetKnifeSprite:
     lda PlayerY
     clc
     adc #8
-    ;sta KnifeY
     sta TempPointY
 
     lda PlayerX
     clc
     adc #16
-    ;sta KnifeX
     sta TempPointX
 
     jmp @updateKnife
@@ -2622,13 +2621,11 @@ SetKnifeSprite:
 
 
     lda PlayerY
-    ;sta KnifeY
     sta TempPointY
 
     lda PlayerX
     clc
     adc #8
-    ;sta KnifeX
     sta TempPointX
 
     jmp @updateKnife
@@ -2636,11 +2633,9 @@ SetKnifeSprite:
     lda PlayerY
     clc
     adc #16
-    ;sta KnifeY
     sta TempPointY
 
     lda PlayerX
-    ;sta KnifeX
     sta TempPointX
 
 
@@ -2649,13 +2644,11 @@ SetKnifeSprite:
     lda PlayerY
     clc
     adc #8
-    ;sta KnifeY
     sta TempPointY
 
     lda PlayerX
     sec
     sbc #8
-    ;sta KnifeX
     sta TempPointX
 @updateKnife:
 ;----------------------
@@ -2694,6 +2687,9 @@ spriteLoadLoop:
     inx
     cpx #$32
     bne spriteLoadLoop
+
+    lda #1
+    sta SpritesUpdated
 
     rts
 
