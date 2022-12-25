@@ -149,6 +149,15 @@ collisionMapPtr:
     .res 2
 tmpAttribAddress:
     .res 1
+
+InputUpdateDelay:
+    .res 1
+ItemUpdateDelay:
+    .res 1
+NpcAIUpdateDelay:
+    .res 1
+NpcCollisionDelay:
+    .res 1
 ;--------------
 .segment "BSS" ; variables in ram
 
@@ -329,14 +338,7 @@ MustLoadTitle:
 CarrySet:
     .res 1
 
-InputUpdateDelay:
-    .res 1
-ItemUpdateDelay:
-    .res 1
-NpcAIUpdateDelay:
-    .res 1
-NpcCollisionDelay:
-    .res 1
+
 
 PrevItemMapScreenIndex:
     .res 1
@@ -419,7 +421,6 @@ AttribHighAddress:
     .res 1
 SourceMapIdx:
     .res 1
-;293 bytes
 
 ;====================================================================================
 .segment "CODE"
@@ -521,10 +522,8 @@ endlessLoop:
     bne nextIteration ; don't do logics until *something* is not loaded to the PPU
 
     dec InputUpdateDelay
-    lda InputUpdateDelay
     bne checkItems
 
-doInput:
     jsr HandleInput
     lda GameState
     cmp #GAME_STATE
@@ -536,27 +535,20 @@ doInput:
 
 checkItems:
     dec ItemUpdateDelay
-    lda ItemUpdateDelay
-    beq doItemCheck
-    jmp npcAI
+    bne npcAI
 
-doItemCheck:
     jsr ItemCollisionCheck
 
 npcAI:
     dec NpcAIUpdateDelay
-    lda NpcAIUpdateDelay
-    beq runAI
-    jmp npcCollision
-runAI:
+    bne npcCollision
+
     jsr doNpcAI
 
 npcCollision:
     dec NpcCollisionDelay
-    lda NpcCollisionDelay
-    beq doNpcCollision
-    jmp doSomeLogics
-doNpcCollision:
+    bne doSomeLogics
+
     jsr PlayerHitsNpcs
     jmp doSomeLogics
 
@@ -587,9 +579,10 @@ nmi:
     txa
     pha
     ;---
+
     ;copy sprite data
-    lda SpritesUpdated
-    beq startNMI
+    ;lda SpritesUpdated
+    ;beq startNMI
     lda #$00
     sta $2003        ; set the low byte (00) of the RAM address
     lda #$02
@@ -2408,7 +2401,7 @@ UpdateSprites:
     sta FIRST_SPRITE,x
     inx
     lda FIRST_SPRITE, x
-    ora #%01000011
+    lda #%01000011
     sta FIRST_SPRITE, x
     jmp @MoveX1
 @NoFlip1:
@@ -2417,7 +2410,7 @@ UpdateSprites:
     sta FIRST_SPRITE,x
     inx
     lda FIRST_SPRITE, x
-    and #%10111111
+    lda #%00000011
     sta FIRST_SPRITE, x
 @MoveX1:
     inx
@@ -2435,7 +2428,7 @@ UpdateSprites:
     sta FIRST_SPRITE, x
     inx
     lda FIRST_SPRITE, x
-    ora #%01000011
+    lda #%01000011
     sta FIRST_SPRITE, x
     jmp @MoveX2
 @NoFlip2:
@@ -2445,7 +2438,7 @@ UpdateSprites:
     sta FIRST_SPRITE, x
     inx
     lda FIRST_SPRITE, x
-    and #%10111111
+    lda #%00000011
     sta FIRST_SPRITE, x
 @MoveX2:
     inx
@@ -2470,7 +2463,7 @@ UpdateSprites:
     sta FIRST_SPRITE, x
     inx
     lda FIRST_SPRITE, x
-    ora #%01000011
+    lda #%01000011
     sta FIRST_SPRITE, x
     jmp @MoveX3
 @NoFlip3:
@@ -2481,7 +2474,7 @@ UpdateSprites:
     sta FIRST_SPRITE, x
     inx
     lda FIRST_SPRITE, x
-    and #%10111111
+    lda #%00000011
     sta FIRST_SPRITE, x
 @MoveX3:
     inx
@@ -2504,7 +2497,7 @@ UpdateSprites:
     sta FIRST_SPRITE, x
     inx
     lda FIRST_SPRITE, x
-    ora #%01000011
+    lda #%01000011
     sta FIRST_SPRITE, x
     jmp @MoveX4
 @NoFlip4:
@@ -2515,7 +2508,7 @@ UpdateSprites:
     sta FIRST_SPRITE, x
     inx
     lda FIRST_SPRITE, x
-    and #%10111111
+    lda #%00000011
     sta FIRST_SPRITE, x
 @MoveX4:
     inx
