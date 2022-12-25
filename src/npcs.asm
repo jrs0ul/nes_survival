@@ -238,6 +238,20 @@ UpdateSingleNpcSprites:
     iny
     lda Npcs, y ; direction
     sta TempDir
+    iny
+    lda Npcs, y ; frame
+    lsr
+    lsr
+    lsr
+    lsr
+    lsr
+    asl
+    asl
+    asl
+    asl
+    asl
+    sta TempFrame
+    dey
     dey
     dey
     dey
@@ -270,6 +284,15 @@ UpdateSingleNpcSprites:
     sbc GlobalScroll
     sta TempPointX
 @calcY:
+    jsr CalcNpcY
+@rowloop:
+    jsr UpdateNpcRow
+    dey
+    bne @rowloop
+@nextNpc:
+    rts
+;------------------------------------
+CalcNpcY:
     iny
     lda Npcs, y; y
     sta TempPointY ; save y
@@ -279,11 +302,6 @@ UpdateSingleNpcSprites:
     lda #0
     sta TempPush ; additionl Y
     sta TempIndex ;additional sprite index
-@rowloop:
-    jsr UpdateNpcRow
-    dey
-    bne @rowloop
-@nextNpc:
     rts
 ;-------------------------------------
 UpdateNpcRow:
@@ -300,12 +318,18 @@ UpdateNpcRow:
     lda TempZ
     clc
     adc TempIndex
+    cpy #3 ; don't animate first row if there are 3 in total
+    beq @storeSpriteIndex1
+    adc TempFrame
     jmp @storeSpriteIndex1
 @spriteIndexFlip1:
     lda TempZ
     clc
     adc TempIndex
     adc #1
+    cpy #3
+    beq @storeSpriteIndex1
+    adc TempFrame
 @storeSpriteIndex1:
     sta FIRST_SPRITE, x
     inx
@@ -347,11 +371,17 @@ UpdateNpcRow:
     clc
     adc #1
     adc TempIndex
+    cpy #3
+    beq @storeSpriteIndex2
+    adc TempFrame
     jmp @storeSpriteIndex2
 @flipSpriteIndex2:
     lda TempZ
     clc
     adc TempIndex
+    cpy #3
+    beq @storeSpriteIndex2
+    adc TempFrame
 @storeSpriteIndex2:
     sta FIRST_SPRITE, x
     inx
@@ -457,10 +487,22 @@ SingleNpcAI:
 
     inx
     lda Npcs, x ; load dir
+    sta TempDir
+    inx
+    lda Npcs, x ; frame
+    clc
+    adc #2
+    cmp #128
+    bcc @storeFrame
+    lda #0
+@storeFrame:
+    sta Npcs, x
+    dex
     dex
     dex
     dex
 
+    lda TempDir
     cmp #1 ; right?
     bne @goLeft
 
