@@ -522,19 +522,9 @@ SingleNpcAI:
     jmp @nextNpc
 
 @goToNextScreen:
-    sta Temp
-    inx
-    inx
-    lda Npcs, x; screen idx
-    clc
-    adc #1
-    cmp ScreenCount
-    bcs @changeDir
-    sta Npcs, x
-    dex
-    dex
-    lda Temp
-    sta Npcs, x; save changed x
+    jsr GoToNextSceen
+    cmp #1 ; 1 - change direction
+    beq @changeDir
     jmp @nextNpc
 ;----
 @notRight:
@@ -568,12 +558,20 @@ SingleNpcAI:
     jsr TestCollisionGoingUp
     cmp #1
     beq @changeDir
-    lda TempZ
+    lda TempZ;stored Y
     dex
     sta Npcs, x ; y
 
     jmp @nextNpc
 @goDown:
+    cmp #4
+    bne @nextNpc
+    jsr TestCollisionGoingDown
+    cmp #1
+    beq @changeDir
+    lda TempZ
+    dex
+    sta Npcs, x; y
     jmp @nextNpc
 ;-------------
 @changeDir:
@@ -602,6 +600,28 @@ GoToPreviousScreen:
 @exit:
     rts
 ;---------------------
+GoToNextSceen:
+    sta Temp
+    inx
+    inx
+    lda Npcs, x; screen idx
+    clc
+    adc #1
+    cmp ScreenCount
+    bcs @changeDir
+    sta Npcs, x
+    dex
+    dex
+    lda Temp
+    sta Npcs, x; save changed x
+    lda #0
+    jmp @exit
+@changeDir:
+    lda #1
+@exit:
+
+    rts
+;---------------------
 ChangeNpcDirection:
     ;x at the npc screen index
     inx
@@ -609,7 +629,7 @@ ChangeNpcDirection:
     clc
     adc #1
     sta Npcs, x
-    cmp #4
+    cmp #5
     bcs @backToOne
     jmp @exit
 @backToOne:
@@ -679,4 +699,25 @@ TestCollisionGoingUp:
     ldx TempIndex
     inx
     rts
+;--------------------------------------
+TestCollisionGoingDown:
+    inx
+    stx TempIndex
+    lda Npcs, x ; y
+    clc
+    adc #1
+    sta TempZ
 
+    clc
+    adc #9
+    sta TempPointY
+    dex
+    lda Npcs, x ; x
+    sec
+    sbc GlobalScroll
+    sta TempPointX
+    jsr TestPointAgainstCollisionMap
+    ldx TempIndex
+    inx
+
+    rts
