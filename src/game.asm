@@ -32,6 +32,7 @@
 .include "data/map_list.asm"
 .include "data/house.asm"
 .include "data/title.asm"
+.include "data/game_over.asm"
 .include "data/menu_screen.asm"
 .include "data/inventory_data.asm"
 .include "data/npc_data.asm"
