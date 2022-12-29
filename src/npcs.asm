@@ -445,6 +445,9 @@ doNpcAI:
     inx
     lda npc_data, x; y offset for collision
     sta TempYOffset
+    inx
+    lda npc_data, x; npc type
+    sta TempNpcType
     ldx TempIndex
 
     inx
@@ -509,11 +512,28 @@ SingleNpcAI:
     lda #0
 @storeFrame:
     sta Npcs, x
-    dex
-    dex
+    inx
+    lda Npcs, x; timer tics
+    clc
+    adc #1
+    cmp #16 ; two cell wide
+    bcc @saveTimer
+    lda #1
+    sta MustRedir
+    lda #0
+@saveTimer:
+    sta Npcs, x; tics
+    dex ; frame
+    dex ; direction
+    dex ; screen
+
+    lda MustRedir
+    bne @changeDir
+
     dex
     dex
 
+    
     lda TempDir
     cmp #1 ; right?
     bne @notRight
@@ -528,9 +548,7 @@ SingleNpcAI:
     jsr TestCollisionGoingRight
     cmp #1
     beq @changeDir ; collides
-    ldx TempIndex
-    lda TempX
-    sta Npcs, x ;save x
+    jsr SaveX
     jmp @nextNpc
 
 @goToNextScreen:
@@ -553,9 +571,7 @@ SingleNpcAI:
     jsr TestCollisionGoingLeft
     cmp #1 
     beq @changeDir ;collides
-    ldx TempIndex
-    lda TempX
-    sta Npcs, x
+    jsr SaveX
     jmp @nextNpc
 @goToPrevScreen:
     jsr GoToPreviousScreen
@@ -589,6 +605,13 @@ SingleNpcAI:
 @changeDir:
     jsr ChangeNpcDirection
 @nextNpc:
+
+    rts
+;---------------------
+SaveX:
+    ldx TempIndex
+    lda TempX
+    sta Npcs, x ;save x
 
     rts
 ;---------------------
@@ -635,12 +658,42 @@ GoToNextSceen:
     rts
 ;---------------------
 ChangeNpcDirection:
+    lda #0
+    sta MustRedir
     ;x at the npc screen index
     inx
+    lda TempNpcType
+    bne @predator
+    ;just random movement
     jsr UpdateRandomNumber
     and #3
     clc
-    adc #1
+    adc #1 ;(1,2,3,4)
+    jmp @storeDirection
+@predator:
+    dex
+    lda Npcs, x; y
+    sta TempPointY
+    dex
+    lda Npcs, x; x
+    sta TempPointX
+    inx
+    inx
+    lda PlayerX
+    clc
+    adc GlobalScroll
+    sta Temp
+    lda TempPointX
+    sec
+    sbc GlobalScroll
+    cmp Temp
+    bcc @goLeft
+
+    lda #2
+    jmp @storeDirection
+@goLeft:
+    lda #1
+@storeDirection:
     sta Npcs, x
 @exit:
 

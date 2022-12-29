@@ -391,6 +391,8 @@ TempNpcIndex:
     .res 1
 TempYOffset:
     .res 1
+TempNpcType: ;temp value of an npc, if it's a predator or not
+    .res 1
 
 SpritesUpdated:
     .res 1
@@ -402,6 +404,9 @@ TempSpriteCount: ; count of active sprites
 TempNpcCnt:
     .res 1
 ;--
+
+MustRedir: ; the current npc must change direction
+    .res 1
 
 Items:   ;items that lies in the map
     .res 44 ; max 11 items * 4 bytes
@@ -420,8 +425,8 @@ Npcs:   ;animals and stuff
             ;   screen_index
             ;   direction
             ;   frame
-            ;   hp
             ;   timer
+            ;   hp
 NpcCount:
     .res 1
 
