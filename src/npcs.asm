@@ -637,15 +637,10 @@ GoToNextSceen:
 ChangeNpcDirection:
     ;x at the npc screen index
     inx
-    lda Npcs, x ; direction
+    jsr UpdateRandomNumber
+    and #3
     clc
     adc #1
-    sta Npcs, x
-    cmp #5
-    bcs @backToOne
-    jmp @exit
-@backToOne:
-    lda #1
     sta Npcs, x
 @exit:
 

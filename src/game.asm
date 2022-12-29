@@ -241,6 +241,9 @@ DirectionX:
 DirectionY:
     .res 1
 
+RandomNumber:
+    .res 1
+
 KnifeX:
     .res 1
 KnifeY:
@@ -410,7 +413,7 @@ ItemCount:
     .res 1
 
 Npcs:   ;animals and stuff
-    .res 32 ; max 4 npcs * 8 bytes:
+    .res 64 ; max 8 npcs * 8 bytes:
             ;   (npc type(7 bits) + alive(1 bit),
             ;   x,
             ;   y,
@@ -518,6 +521,9 @@ vblankwait2:      ; Second wait for vblank, PPU is ready after this
     sta RightCollisonMapIdx
     lda #0
     sta LeftCollisionMapIdx
+
+    lda #128
+    sta RandomNumber
 
 ;---------------------------------
 
@@ -699,6 +705,7 @@ endforReal:
 .include "items.asm"
 .include "npcs.asm"
 .include "LoadOutsideMap.asm"
+.include "random.asm"
 
 
 ;--------------------------------------------
@@ -823,6 +830,8 @@ Logics:
 
     lda NMIActive
     beq @exit
+
+    jsr UpdateRandomNumber
 
 
     lda PlayerAlive
