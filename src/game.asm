@@ -384,6 +384,10 @@ TempDir:
     .res 1
 TempFrame:
     .res 1
+TempNpcIndex:
+    .res 1
+TempYOffset:
+    .res 1
 
 SpritesUpdated:
     .res 1

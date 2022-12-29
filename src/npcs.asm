@@ -75,6 +75,7 @@ CheckSingleNpcAgainstPlayerHit:
 
     sty Temp
     asl
+    asl
     tay
     iny
     lda npc_data, y ; tile rows
@@ -221,6 +222,7 @@ UpdateSingleNpcSprites:
     bcc @nextNpc ;npc not active
 
     sty Temp; store Npcs index
+    asl
     asl
     tay
     lda npc_data, y ; first tile index
@@ -434,6 +436,16 @@ doNpcAI:
     lda Npcs, x ;type + active
     lsr
     bcc @nextNpc ; not active
+    sta TempNpcIndex
+    stx TempIndex
+    asl
+    asl
+    tax
+    inx
+    inx
+    lda npc_data, x; y offset for collision
+    sta TempYOffset
+    ldx TempIndex
 
     inx
     inx
@@ -651,7 +663,7 @@ TestCollisionGoingRight:
     inx
     lda Npcs, x ;y
     clc
-    adc #9
+    adc TempYOffset
     sta TempPointY
     jsr TestPointAgainstCollisionMap
     ldx TempIndex
@@ -670,7 +682,7 @@ TestCollisionGoingLeft:
     inx
     lda Npcs, x ; y
     clc
-    adc #9
+    adc TempYOffset
     sta TempPointY
     jsr TestPointAgainstCollisionMap
     ldx TempIndex
@@ -688,14 +700,25 @@ TestCollisionGoingUp:
     sta TempZ
 
     clc
-    adc #9
+    adc TempYOffset
     sta TempPointY
     dex
     lda Npcs, x ; x
     sec
     sbc GlobalScroll
+    clc
+    adc #2
     sta TempPointX
     jsr TestPointAgainstCollisionMap
+    cmp #1
+    beq @exit
+    
+    lda TempPointX
+    clc
+    adc #12
+    sta TempPointX
+    jsr TestPointAgainstCollisionMap
+@exit:
     ldx TempIndex
     inx
     rts
@@ -709,7 +732,7 @@ TestCollisionGoingDown:
     sta TempZ
 
     clc
-    adc #9
+    adc TempYOffset
     sta TempPointY
     dex
     lda Npcs, x ; x
@@ -717,6 +740,16 @@ TestCollisionGoingDown:
     sbc GlobalScroll
     sta TempPointX
     jsr TestPointAgainstCollisionMap
+    cmp #1
+    beq @exit
+
+    lda TempPointX
+    clc
+    adc #12
+    sta TempPointX
+    jsr TestPointAgainstCollisionMap
+
+@exit:
     ldx TempIndex
     inx
 
