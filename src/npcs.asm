@@ -516,7 +516,7 @@ SingleNpcAI:
     lda Npcs, x; timer tics
     clc
     adc #1
-    cmp #16 ; two cell wide
+    cmp #NPC_STEPS_BEFORE_REDIRECT
     bcc @saveTimer
     lda #1
     sta MustRedir
@@ -681,27 +681,31 @@ ChangeNpcDirection:
     inx ;screen
     inx ;direction
 
-    lda CurrentMapSegmentIndex
-    cmp ItemMapScreenIndex
-    beq @compareX
-
-    lda TempPointX
-    sbc GlobalScroll
-    cmp PlayerX
-    bcs @goLeft
-    lda # 1
-    
-    jmp @storeDirection
-@compareX:
+    lda PlayerX
+    clc
+    adc #8
+    sta Temp
 
     lda TempPointX
     sec
     sbc GlobalScroll
     cmp PlayerX
+    bcc @goRight1
+    cmp Temp
+    bcc @compareY
     bcs @goLeft
+@goRight1:
+    lda # 1
+    jmp @storeDirection
 
-    lda #1
-
+@compareY:
+    lda TempPointY
+    cmp PlayerY
+    bcs @goUp
+    lda #4
+    jmp @storeDirection
+@goUp:
+    lda #3
     jmp @storeDirection
 @goLeft:
     lda #2

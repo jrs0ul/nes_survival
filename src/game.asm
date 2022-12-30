@@ -137,6 +137,8 @@ sprites:
 
     INVENTORY_MAX_ITEMS        = 10
 
+    NPC_STEPS_BEFORE_REDIRECT  = 8
+
 ;===================================================================
 .segment "ZEROPAGE"
 
