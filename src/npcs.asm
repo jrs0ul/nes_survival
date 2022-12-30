@@ -661,9 +661,9 @@ ChangeNpcDirection:
     lda #0
     sta MustRedir
     ;x at the npc screen index
-    inx
     lda TempNpcType
     bne @predator
+    inx ; increase to direction
     ;just random movement
     jsr UpdateRandomNumber
     and #3
@@ -677,22 +677,34 @@ ChangeNpcDirection:
     dex
     lda Npcs, x; x
     sta TempPointX
-    inx
-    inx
-    lda PlayerX
-    clc
-    adc GlobalScroll
-    sta Temp
+    inx ;y
+    inx ;screen
+    inx ;direction
+
+    lda CurrentMapSegmentIndex
+    cmp ItemMapScreenIndex
+    beq @compareX
+
+    lda TempPointX
+    sbc GlobalScroll
+    cmp PlayerX
+    bcs @goLeft
+    lda # 1
+    
+    jmp @storeDirection
+@compareX:
+
     lda TempPointX
     sec
     sbc GlobalScroll
-    cmp Temp
-    bcc @goLeft
+    cmp PlayerX
+    bcs @goLeft
 
-    lda #2
+    lda #1
+
     jmp @storeDirection
 @goLeft:
-    lda #1
+    lda #2
 @storeDirection:
     sta Npcs, x
 @exit:
