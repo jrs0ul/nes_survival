@@ -317,6 +317,25 @@ UpdateNpcRow:
     lda TempDir
     cmp #1
     beq @spriteIndexFlip1
+    cmp #3
+    bcc @contFirstSprite
+;--
+    lda TempDir
+    sec
+    sbc #2
+    asl
+    sta TempFrameOffset
+
+    lda TempZ
+    clc
+    adc TempIndex
+    adc TempFrameOffset
+    cpy #3 ; don't animate first row if there are 3 in total
+    beq @storeSpriteIndex1
+    adc TempFrame
+    jmp @storeSpriteIndex1
+;--
+@contFirstSprite:
     lda TempZ
     clc
     adc TempIndex
@@ -369,6 +388,23 @@ UpdateNpcRow:
     lda TempDir
     cmp #1
     beq @flipSpriteIndex2
+    cmp #3
+    bcc @contSprite2
+
+    ;--
+
+    lda TempZ
+    clc
+    adc #1
+    adc TempIndex
+    adc TempFrameOffset
+    cpy #3
+    beq @storeSpriteIndex2
+    adc TempFrame
+    jmp @storeSpriteIndex2
+    ;--
+
+@contSprite2:
     lda TempZ
     clc
     adc #1
@@ -523,6 +559,7 @@ SingleNpcAI:
     lda #0
 @saveTimer:
     sta Npcs, x; tics
+    sta TempNpcTimer
     dex ; frame
     dex ; direction
     dex ; screen
@@ -661,8 +698,11 @@ ChangeNpcDirection:
     lda #0
     sta MustRedir
     ;x at the npc screen index
+    lda TempNpcTimer
+    bne @randomDir
     lda TempNpcType
     bne @predator
+@randomDir:
     inx ; increase to direction
     ;just random movement
     jsr UpdateRandomNumber
@@ -683,7 +723,7 @@ ChangeNpcDirection:
 
     lda PlayerX
     clc
-    adc #8
+    adc #16
     sta Temp
 
     lda TempPointX

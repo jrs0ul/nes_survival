@@ -137,7 +137,7 @@ sprites:
 
     INVENTORY_MAX_ITEMS        = 10
 
-    NPC_STEPS_BEFORE_REDIRECT  = 8
+    NPC_STEPS_BEFORE_REDIRECT  = 16
 
 ;===================================================================
 .segment "ZEROPAGE"
@@ -395,6 +395,11 @@ TempYOffset:
     .res 1
 TempNpcType: ;temp value of an npc, if it's a predator or not
     .res 1
+TempNpcTimer:
+    .res 1
+TempFrameOffset:
+    .res 1
+
 
 SpritesUpdated:
     .res 1
