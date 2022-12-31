@@ -84,6 +84,9 @@ sprites:
     BUTTON_B_MASK               = %01000000
 
     PLAYER_SPEED               = 2
+    NPC_SPEED                  = 1
+
+    MAX_V_SCROLL               = 255
 
     PLAYER_ATTACK_DELAY        = 16
 
@@ -2036,7 +2039,7 @@ CheckLeft:
 ;--
 @ScrollGlobalyLeft:
     lda GlobalScroll
-    cmp #2
+    cmp #PLAYER_SPEED
     bcc @clamp
 
     sec
@@ -2104,7 +2107,7 @@ CheckRight:
 ;--
 @ScrollGlobalyRight:
     lda GlobalScroll
-    cmp #254
+    cmp #MAX_V_SCROLL - PLAYER_SPEED + 1
     bcs @clamp
     clc
     adc #PLAYER_SPEED

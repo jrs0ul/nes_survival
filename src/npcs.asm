@@ -579,7 +579,7 @@ SingleNpcAI:
 
     lda Npcs, x ;load x
     clc
-    adc #1
+    adc #NPC_SPEED
     bcs @goToNextScreen
 
     jsr TestCollisionGoingRight
@@ -601,7 +601,7 @@ SingleNpcAI:
     lda Npcs, x
     sta Temp
     sec
-    sbc #1
+    sbc #NPC_SPEED
     cmp Temp
     bcs @goToPrevScreen
 
@@ -821,7 +821,7 @@ TestCollisionGoingUp:
     stx TempIndex
     lda Npcs, x ; y
     sec
-    sbc #1
+    sbc #NPC_SPEED
     sta TempZ
 
     clc
@@ -853,7 +853,7 @@ TestCollisionGoingDown:
     stx TempIndex
     lda Npcs, x ; y
     clc
-    adc #1
+    adc #NPC_SPEED
     sta TempZ
 
     clc
