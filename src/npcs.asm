@@ -713,9 +713,13 @@ ChangeNpcDirection:
 @predator:
     dex
     lda Npcs, x; y
+    clc
+    adc #16
     sta TempPointY
     dex
     lda Npcs, x; x
+    clc
+    adc #8
     sta TempPointX
     inx ;y
     inx ;screen
@@ -739,14 +743,31 @@ ChangeNpcDirection:
     jmp @storeDirection
 
 @compareY:
+    
+    lda PlayerY
+    clc
+    adc #16
+    sta Temp
+
     lda TempPointY
+    ;clc
+    ;adc #16
     cmp PlayerY
+    bcc @goDown
+    cmp Temp
     bcs @goUp
+    bcc @attackPlayer
+@goDown:
     lda #4
     jmp @storeDirection
 @goUp:
     lda #3
     jmp @storeDirection
+@attackPlayer:
+    lda #0
+    sta Npcs, x
+    jsr DecreaseLife
+    jmp @exit
 @goLeft:
     lda #2
 @storeDirection:
