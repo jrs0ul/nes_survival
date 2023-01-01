@@ -568,7 +568,7 @@ SingleNpcAI:
     dex ; screen
 
     jsr OnCollisionWithPlayer
-    ;beq @nextNpc
+    beq @nextNpc
 
     lda MustRedir
     bne @changeDir
@@ -576,9 +576,48 @@ SingleNpcAI:
     dex
     dex
 
-    
     lda TempDir
     and #%00000011
+    cmp #0
+    beq @YMovement
+    
+    jsr HorizontalMovement
+    lda MustRedir
+    bne @changeDir
+;---------------------------------------------------
+@YMovement:
+    lda TempDir
+    lsr
+    lsr
+    cmp #1
+    bne @goDown
+@goUp:
+    jsr TestCollisionGoingUp
+    cmp #1
+    beq @changeDir
+    lda TempZ;stored Y
+    dex
+    sta Npcs, x ; y
+
+    jmp @nextNpc
+@goDown:
+    cmp #2
+    bne @nextNpc
+    jsr TestCollisionGoingDown
+    cmp #1
+    beq @changeDir
+    lda TempZ
+    dex
+    sta Npcs, x; y
+    jmp @nextNpc
+;-------------
+@changeDir:
+    jsr ChangeNpcDirection
+@nextNpc:
+
+    rts
+;--------------------------
+HorizontalMovement:
     cmp #1 ; right?
     bne @notRight
 
@@ -621,39 +660,14 @@ SingleNpcAI:
     jsr GoToPreviousScreen
     cmp #1; ;if 1, change direction
     beq @changeDir
-
-;---------------------------------------------------
-@YMovement:
-    lda TempDir
-    lsr
-    lsr
-    cmp #1
-    bne @goDown
-@goUp:
-    jsr TestCollisionGoingUp
-    cmp #1
-    beq @changeDir
-    lda TempZ;stored Y
-    dex
-    sta Npcs, x ; y
-
-    jmp @nextNpc
-@goDown:
-    cmp #2
-    bne @nextNpc
-    jsr TestCollisionGoingDown
-    cmp #1
-    beq @changeDir
-    lda TempZ
-    dex
-    sta Npcs, x; y
-    jmp @nextNpc
-;-------------
+    jmp @YMovement
 @changeDir:
-    jsr ChangeNpcDirection
-@nextNpc:
-
+    lda #1
+    sta MustRedir
+    
+@YMovement:
     rts
+
 ;--------------------------
 SaveX:
     ldx TempIndex
@@ -952,6 +966,8 @@ OnCollisionWithPlayer:
 
     jsr DecreaseLife
 
+    lda #0
 
 @exit:
+    lda #1
     rts
