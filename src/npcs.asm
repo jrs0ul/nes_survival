@@ -320,11 +320,13 @@ UpdateNpcRow:
     cmp #3
     bcc @contFirstSprite
 ;--
-    lda TempDir
-    sec
-    sbc #2
-    asl
+    ;lda TempDir
+    ;sec
+    ;sbc #2
+    ;asl
+    lda #0;remove this
     sta TempFrameOffset
+
 
     lda TempZ
     clc
@@ -572,6 +574,7 @@ SingleNpcAI:
 
     
     lda TempDir
+    and #%00000011
     cmp #1 ; right?
     bne @notRight
 
@@ -586,17 +589,17 @@ SingleNpcAI:
     cmp #1
     beq @changeDir ; collides
     jsr SaveX
-    jmp @nextNpc
+    jmp @YMovement
 
 @goToNextScreen:
     jsr GoToNextSceen
     cmp #1 ; 1 - change direction
     beq @changeDir
-    jmp @nextNpc
+    jmp @YMovement
 ;----
 @notRight:
     cmp #2
-    bne @notLeft
+    bne @YMovement
 @goLeft:
     lda Npcs, x
     sta Temp
@@ -609,15 +612,18 @@ SingleNpcAI:
     cmp #1 
     beq @changeDir ;collides
     jsr SaveX
-    jmp @nextNpc
+    jmp @YMovement
 @goToPrevScreen:
     jsr GoToPreviousScreen
     cmp #1; ;if 1, change direction
     beq @changeDir
-    jmp @nextNpc
-;----------------
-@notLeft:
-    cmp #3
+
+;---------------------------------------------------
+@YMovement:
+    lda TempDir
+    lsr
+    lsr
+    cmp #1
     bne @goDown
 @goUp:
     jsr TestCollisionGoingUp
@@ -629,7 +635,7 @@ SingleNpcAI:
 
     jmp @nextNpc
 @goDown:
-    cmp #4
+    cmp #2
     bne @nextNpc
     jsr TestCollisionGoingDown
     cmp #1
@@ -708,7 +714,12 @@ ChangeNpcDirection:
     jsr UpdateRandomNumber
     and #3
     clc
-    adc #1 ;(1,2,3,4)
+    adc #1;
+    stx TempX
+    tax
+    lda npc_direction_list, x
+    ldx TempX
+    sta TempDir
     jmp @storeDirection
 @predator:
     dex
@@ -730,6 +741,9 @@ ChangeNpcDirection:
     adc #16
     sta Temp
 
+    lda #0
+    sta TempDir
+
     lda TempPointX
     sec
     sbc GlobalScroll
@@ -740,37 +754,42 @@ ChangeNpcDirection:
     bcs @goLeft
 @goRight1:
     lda # 1
-    jmp @storeDirection
+    sta TempDir
+    jmp @compareY
+@goLeft:
+    lda #2
+    sta TempDir
 
 @compareY:
-    
     lda PlayerY
     clc
     adc #16
     sta Temp
 
     lda TempPointY
-    ;clc
-    ;adc #16
     cmp PlayerY
     bcc @goDown
     cmp Temp
     bcs @goUp
-    bcc @attackPlayer
+    bcc @storeDirection
+   ; bcc @attackPlayer
 @goDown:
-    lda #4
+    lda TempDir
+    ora #%00001000
+    sta TempDir
     jmp @storeDirection
 @goUp:
-    lda #3
+    lda TempDir
+    ora #%00000100
+    sta TempDir
     jmp @storeDirection
-@attackPlayer:
-    lda #0
-    sta Npcs, x
-    jsr DecreaseLife
-    jmp @exit
-@goLeft:
-    lda #2
+;@attackPlayer:
+;    lda #0
+;    sta Npcs, x
+;    jsr DecreaseLife
+;    jmp @exit
 @storeDirection:
+    lda TempDir
     sta Npcs, x
 @exit:
 

@@ -65,6 +65,13 @@ sprites:
     .byte $00, $10, %00000011, $00
     .byte $00, $11, %00000011, $00
 
+npc_direction_list:
+    .byte 0
+    .byte %00000100 ; Up
+    .byte %00000001 ; R
+    .byte %00001000
+    .byte %00000010
+
 ;--------------
 ; CONSTANTS
     FIRST_SPRITE                = $0204
@@ -433,7 +440,7 @@ Npcs:   ;animals and stuff
             ;   x,
             ;   y,
             ;   screen_index
-            ;   direction
+            ;   direction(0000(unused bits) 00(Vertical) 00(horizonatal))
             ;   frame
             ;   timer
             ;   hp
