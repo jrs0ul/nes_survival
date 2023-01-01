@@ -99,7 +99,7 @@ npc_direction_list:
 
     INPUT_DELAY                = 64
     ITEM_DELAY                 = 66
-    NPC_AI_DELAY               = 128
+    NPC_AI_DELAY               = 120
     NPC_COLLISION_DELAY        = 250
 
     COLLISION_MAP_SIZE         = 120 ; 4 columns * 30 rows
@@ -406,6 +406,8 @@ TempYOffset:
 TempNpcType: ;temp value of an npc, if it's a predator or not
     .res 1
 TempNpcTimer:
+    .res 1
+TempNpcRows:
     .res 1
 TempFrameOffset:
     .res 1

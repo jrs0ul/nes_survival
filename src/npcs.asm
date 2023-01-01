@@ -320,11 +320,10 @@ UpdateNpcRow:
     cmp #3
     bcc @contFirstSprite
 ;--
-    ;lda TempDir
-    ;sec
-    ;sbc #2
-    ;asl
-    lda #0;remove this
+    lda TempDir
+    lsr
+    lsr
+    asl ;extract Y dir and multiply by 2
     sta TempFrameOffset
 
 
@@ -480,6 +479,8 @@ doNpcAI:
     asl
     tax
     inx
+    lda npc_data, x; rows
+    sta TempNpcRows
     inx
     lda npc_data, x; y offset for collision
     sta TempYOffset
@@ -566,6 +567,9 @@ SingleNpcAI:
     dex ; direction
     dex ; screen
 
+    jsr OnCollisionWithPlayer
+    ;beq @nextNpc
+
     lda MustRedir
     bne @changeDir
 
@@ -650,7 +654,7 @@ SingleNpcAI:
 @nextNpc:
 
     rts
-;---------------------
+;--------------------------
 SaveX:
     ldx TempIndex
     lda TempX
@@ -772,7 +776,6 @@ ChangeNpcDirection:
     cmp Temp
     bcs @goUp
     bcc @storeDirection
-   ; bcc @attackPlayer
 @goDown:
     lda TempDir
     ora #%00001000
@@ -783,11 +786,7 @@ ChangeNpcDirection:
     ora #%00000100
     sta TempDir
     jmp @storeDirection
-;@attackPlayer:
-;    lda #0
-;    sta Npcs, x
-;    jsr DecreaseLife
-;    jmp @exit
+
 @storeDirection:
     lda TempDir
     sta Npcs, x
@@ -897,4 +896,62 @@ TestCollisionGoingDown:
     ldx TempIndex
     inx
 
+    rts
+;-----------------------------------------------------
+OnCollisionWithPlayer:
+    lda TempNpcType
+    beq @exit
+
+    dex
+    lda Npcs, x; y
+    sta TempPointY
+    dex
+    lda Npcs, x; x
+    sec
+    sbc GlobalScroll
+    sta TempPointX
+    inx
+    inx ; back to screen idx
+
+    lda PlayerX
+    clc
+    adc #8
+    sta TempX
+
+    lda PlayerY
+    clc
+    adc #8
+    sta TempY
+
+    lda TempPointX
+    cmp TempX
+    bcs @exit
+    lda TempPointX
+    clc
+    adc #16 ; two tiles
+    cmp PlayerX
+    bcc @exit
+
+    lda TempPointY
+    cmp TempY
+    bcs @exit
+
+    lda TempPointY
+    stx Temp
+    ldx TempNpcRows
+
+@addRowsLoop:
+    clc
+    adc #8
+    dex
+    bne @addRowsLoop
+    ldx Temp
+    cmp TempY
+    bcc @exit
+    ;---
+
+    jsr DecreaseLife
+
+
+@exit:
     rts
