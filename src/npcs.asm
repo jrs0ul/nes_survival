@@ -79,8 +79,12 @@ CheckSingleNpcAgainstPlayerHit:
     tay
     iny
     lda npc_data, y ; tile rows
+    sta TempNpcRows ; save row count
+    iny
+    iny
+    lda npc_data, y ; npc type
+    sta TempNpcType
     ldy Temp
-    sta Temp ; save row count
 
     iny
     iny
@@ -150,7 +154,7 @@ KnifeNpcsCollision:
     bcs @exit
 
     lda TempPointY
-    ldx Temp
+    ldx TempNpcRows
 @addRowsLoop:
     clc
     adc #8
@@ -165,6 +169,9 @@ KnifeNpcsCollision:
     lda Npcs, y
     and #%11111110;
     sta Npcs, y
+
+    lda TempNpcType
+    bne @exit ; predators don't drop anything
 
     ;drop item
     inc ItemCount

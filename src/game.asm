@@ -99,7 +99,7 @@ npc_direction_list:
 
     INPUT_DELAY                = 64
     ITEM_DELAY                 = 66
-    NPC_AI_DELAY               = 120
+    NPC_AI_DELAY               = 128
     NPC_COLLISION_DELAY        = 250
 
     COLLISION_MAP_SIZE         = 120 ; 4 columns * 30 rows
