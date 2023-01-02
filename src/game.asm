@@ -44,7 +44,7 @@ zerosprite:
     .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
     .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
     .byte $00,$57,$30,$30,$30,$00,$3F,$48,$48,$3D,$00,$30,$30,$30,$00,$50
-    .byte $3A,$4B,$46,$4D,$41,$00,$30,$30,$30,$00,$00,$00,$00,$3D,$30,$30
+    .byte $3A,$4B,$46,$4D,$41,$00,$30,$30,$30,$00,$00,$00,$3D,$30,$30,$30
 
 palette:
     .byte $0C,$00,$21,$31, $0C,$1B,$21,$31, $0C,$18,$21,$31, $0C,$10,$0f,$01    ;background
@@ -283,6 +283,15 @@ WarmthUpdated:
 
 Fuel:       ;how much fuel you have at home in the fireplace
     .res 3
+
+Days:
+    .res 3
+DaysUpdated:
+    .res 1
+Minutes:
+    .res 1
+Hours:
+    .res 1
 
 
 Inventory:
@@ -885,11 +894,12 @@ Logics:
 
 @checkFuel:
     jsr DecreaseFuel
-
 @checkWarmth:
     jsr WarmthLogics
 @checkFood:
     jsr FoodLogics
+
+    jsr RunTime
 
 @doneLogics:
     
@@ -912,6 +922,25 @@ Logics:
 
 @exit:
 
+    rts
+;-------------------------------
+RunTime:
+
+    inc Minutes
+    lda Minutes
+    cmp #120
+    bcc @exit
+    lda #0
+    sta Minutes
+    inc Hours
+    lda Hours
+    cmp #240
+    bcc @exit
+    lda #0
+    sta Hours
+    jsr IncreaseDays
+
+@exit:
     rts
 ;-------------------------------
 WarmthLogics:
@@ -1019,7 +1048,16 @@ IncreaseWarmth:
     lda #1
     sta WarmthUpdated
     rts
-
+;-------------------------------
+IncreaseDays:
+    lda #<Days
+    sta DigitPtr
+    lda #>Days
+    sta DigitPtr + 1
+    jsr IncreaseDigits
+    lda #1
+    sta DaysUpdated
+    rts
 ;-------------------------------
 DecreaseWarmth:
     lda #<Warmth
@@ -1452,7 +1490,7 @@ UpdateStatusDigits:
 
 @food:
     lda FoodUpdated
-    beq @exit
+    beq @days
 
     lda $2002
     lda #$20
@@ -1461,7 +1499,7 @@ UpdateStatusDigits:
     sta $2006
 
     ldy #0
-    sta FoodUpdated
+    sty FoodUpdated
 @FoodLoop:
     lda #CHARACTER_ZERO
     clc
@@ -1471,9 +1509,36 @@ UpdateStatusDigits:
     cpy #3
     bcc @FoodLoop
 
+@days:
+    lda DaysUpdated
+    beq @exit
+
+    jsr UpdateDays
+
 @exit:
     rts
+;----------------------------------
+UpdateDays:
 
+    lda $2002
+    lda #$20
+    sta $2006
+    lda #$3D
+    sta $2006
+
+    ldy #0
+    sty DaysUpdated
+@DaysLoop:
+    lda #CHARACTER_ZERO
+    clc
+    adc Days, y
+    sta $2007
+    iny
+    cpy #3
+    bcc @DaysLoop
+
+
+    rts
 ;-----------------------------------
 LoadStatusBar:
     ldy #$00
@@ -1499,6 +1564,7 @@ InitializeStatusBarLoop:     ; copy status bar to first nametable
     sta HpUpdated
     sta FoodUpdated
     sta WarmthUpdated
+    sta DaysUpdated
     rts
 
 ;--------------------------------------------
@@ -1562,6 +1628,7 @@ ResetEntityVariables:
     sta HpUpdated
     sta WarmthUpdated
     sta FoodUpdated
+    sta DaysUpdated
 
     lda #0
     sta HP + 1
@@ -1574,6 +1641,12 @@ ResetEntityVariables:
     sta Food + 2
     sta Fuel + 1
     sta Fuel + 2
+
+    sta Hours
+    sta Minutes
+    sta Days
+    sta Days + 1
+    sta Days + 2
 
     sta CurrentMapSegmentIndex
 
@@ -2371,6 +2444,26 @@ UpdateMenuStats:
     iny
     cpy #3
     bne @fuelLoop
+
+
+    lda $2002
+    lda FirstNametableAddr
+    clc
+    adc #3
+    sta $2006
+    lda #$3B
+    sta $2006
+
+    ldy #0
+@daysLoop:
+    lda #CHARACTER_ZERO
+    clc 
+    adc Days, y
+    sta $2007
+    iny
+    cpy #3
+    bne @daysLoop
+
 
     rts
 
