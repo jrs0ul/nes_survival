@@ -131,8 +131,6 @@ CheckItemsXY:
     lda TempX
     clc
     adc #16
-    cmp GlobalScroll
-    bcc @exit
     sec
     sbc GlobalScroll
 

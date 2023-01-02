@@ -100,6 +100,9 @@ CheckSingleNpcAgainstPlayerHit:
     cmp NextItemMapScreenIndex
     bcs @exit
 
+    lda Npcs, y
+    sta DropedItemX ; store this for item droping
+
     lda CurrentMapSegmentIndex
     cmp ItemMapScreenIndex
     beq @NpcMatchesScreen
@@ -131,6 +134,8 @@ CheckSingleNpcAgainstPlayerHit:
 
 ;-------------------------------------
 KnifeNpcsCollision:
+    lda #0
+    sta TempItemScreen
     lda TempPointX
     cmp KnifeX
     bcs @exit
@@ -173,11 +178,15 @@ KnifeNpcsCollision:
     lda #%00000101
     sta Items, y
     iny
-    lda TempPointX
+    lda DropedItemX
     clc
     adc #8
-    clc
-    adc GlobalScroll
+    bcs @IncrementScreenIndex
+    jmp @continueSpawningItem
+@IncrementScreenIndex:
+    lda #1
+    sta TempItemScreen
+@continueSpawningItem:
     sta Items, y
     iny
     lda TempPointY
@@ -186,6 +195,8 @@ KnifeNpcsCollision:
     sta Items, y
     iny
     lda ItemMapScreenIndex
+    clc
+    adc TempItemScreen
     sta Items, y
 
 

@@ -412,6 +412,9 @@ TempNpcRows:
 TempFrameOffset:
     .res 1
 
+DropedItemX: ;x coordinate of item droped by npc
+    .res 1
+
 
 SpritesUpdated:
     .res 1
@@ -422,13 +425,15 @@ TempSpriteCount: ; count of active sprites
     .res 1
 TempNpcCnt:
     .res 1
+TempItemScreen:
+    .res 1
 ;--
 
 MustRedir: ; the current npc must change direction
     .res 1
 
 Items:   ;items that lies in the map
-    .res 44 ; max 11 items * 4 bytes
+    .res 80 ; max 20 items * 4 bytes
             ;(item index(7 bits) + active(1 bit),
             ; x,
             ; y,

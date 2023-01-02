@@ -2,7 +2,8 @@ House_npcs:
     .byte 0
 
 Outside1_npcs:
-    .byte 5
+    .byte 6
+    .byte %00000011, 100, 80, 4
     .byte %00000011, 155, 28, 2
     .byte %00000011, 155, 190, 2
     .byte %00000011, 155, 180, 3
