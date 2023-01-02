@@ -1648,6 +1648,13 @@ ResetEntityVariables:
     sta Days + 1
     sta Days + 2
 
+    ldx #INVENTORY_MAX_ITEMS
+    dex
+@clearInventoryLoop:
+    sta Inventory, x
+    dex
+    bne @clearInventoryLoop
+
     sta CurrentMapSegmentIndex
 
     lda #5 ;  screens in the outdoors map
