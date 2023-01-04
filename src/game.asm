@@ -77,9 +77,10 @@ npc_direction_list:
     FIRST_SPRITE                = $0204
 
     ;possible game states
-    TITLE_STATE                = 0
-    GAME_STATE                 = 1
-    MENU_STATE                 = 2
+    STATE_TITLE                = 0
+    STATE_GAME                 = 1
+    STATE_MENU                 = 2
+    STATE_GAME_OVER            = 3
 
     BUTTON_RIGHT_MASK           = %00000001
     BUTTON_LEFT_MASK            = %00000010
@@ -359,6 +360,8 @@ MustLoadMenu:
     .res 1
 MustLoadTitle:
     .res 1
+MustLoadGameOver:
+    .res 1
 ;--
 CarrySet:
     .res 1
@@ -535,7 +538,7 @@ vblankwait2:      ; Second wait for vblank, PPU is ready after this
     lda #%00011110   ; enable sprites
     sta $2001
 
-    lda #TITLE_STATE
+    lda #STATE_TITLE
     sta GameState
 
     lda #INPUT_DELAY
@@ -575,12 +578,11 @@ endlessLoop:
 
     jsr HandleInput
     lda GameState
-    cmp #GAME_STATE
+    cmp #STATE_GAME
     beq update_game_sprites
-    cmp #MENU_STATE
+    cmp #STATE_MENU
     beq update_menu_sprites
-    cmp #TITLE_STATE
-    beq hide_sprites
+    jmp hide_sprites
 
 checkItems:
     dec ItemUpdateDelay
@@ -660,6 +662,7 @@ ReadControllerLoop:
     beq DoneLoadingMaps
 
     jsr LoadTitle
+    jsr LoadGameOver
     jsr LoadMenu
     jsr LoadTheHouseInterior
     lda MustLoadOutside
@@ -669,7 +672,7 @@ ReadControllerLoop:
 DoneLoadingMaps:
 
     lda GameState
-    cmp #GAME_STATE
+    cmp #STATE_GAME
     bne nmicont2
     jsr UpdateFireplace
     jsr UploadBgColumns
@@ -692,7 +695,7 @@ nmicont2:
     sta $2005
 
     lda GameState
-    cmp #GAME_STATE
+    cmp #STATE_GAME
     bne endOfNmi
 
 WaitNotSprite0:
@@ -722,7 +725,7 @@ endOfNmi:
 
 
     lda GameState
-    cmp #MENU_STATE
+    cmp #STATE_MENU
     bne endforReal
     jsr MenuInput
 
@@ -863,7 +866,7 @@ UpdateAttributeColumn:
 Logics:
 
     lda GameState
-    cmp #GAME_STATE
+    cmp #STATE_GAME
     bne @exit
 
     lda NMIActive
@@ -876,7 +879,7 @@ Logics:
     bne @cont
     lda #1
     sta MustLoadSomething
-    sta MustLoadTitle
+    sta MustLoadGameOver
 @cont:
     jsr AnimateFire
 
@@ -1272,7 +1275,7 @@ UpdateFireplace:
 HandleInput:
 
     lda GameState
-    cmp #GAME_STATE
+    cmp #STATE_GAME
     bne @finishInput
 
 
@@ -1441,7 +1444,7 @@ storeIdx:
 UpdateStatusDigits:
 
     lda GameState
-    cmp #GAME_STATE
+    cmp #STATE_GAME
     bne @exit
 
 
@@ -1596,7 +1599,7 @@ LoadTitle:
     lda MustLoadTitle
     beq @exit
 
-    lda #TITLE_STATE
+    lda #STATE_TITLE
     sta GameState
     lda #$00
     sta $2000
@@ -1615,6 +1618,56 @@ LoadTitle:
     lda #0
     sta MustLoadTitle
     sta MustLoadSomething
+@exit:
+    rts
+;-------------------------------------
+LoadGameOver:
+    lda MustLoadGameOver
+    beq @exit
+
+    lda #STATE_GAME_OVER
+    sta GameState
+    lda #$00
+    sta $2000
+    sta $2001
+
+    lda #<game_over
+    sta pointer
+    lda #>game_over
+    sta pointer+1
+    lda PPUCTRL
+    and #%11111110
+    sta PPUCTRL
+    lda #$20
+    sta NametableAddress
+    jsr LoadNametable
+
+
+    lda $2002
+    lda FirstNametableAddr
+    clc
+    adc #1
+    sta $2006
+    lda #$D1
+    sta $2006
+
+    ldy #0
+@daysLoop:
+    lda #CHARACTER_ZERO
+    clc 
+    adc Days, y
+    sta $2007
+    iny
+    cpy #3
+    bne @daysLoop
+
+
+
+    lda #0
+    sta MustLoadGameOver
+    sta MustLoadSomething
+
+
 @exit:
     rts
 ;-------------------------------------
@@ -1806,12 +1859,12 @@ CheckStartButton:
 
 
     lda GameState
-    cmp #TITLE_STATE
+    cmp #STATE_TITLE
     bne @someOtherState
 
     ;On title state------
 
-    lda #GAME_STATE
+    lda #STATE_GAME
     sta GameState
 
     jsr ResetEntityVariables
@@ -1850,7 +1903,14 @@ CheckStartButton:
     jmp @exit
 @someOtherState:
 
-    cmp #GAME_STATE
+    cmp #STATE_GAME_OVER
+    bne @CheckOnGame
+    lda #1
+    sta MustLoadSomething
+    sta MustLoadTitle
+    jmp @exit
+@CheckOnGame:
+    cmp #STATE_GAME
     beq @enterMenuScreen
     ;exit menu screen
 
@@ -1871,7 +1931,7 @@ CheckStartButton:
 ;-------------------------------------
 
 ExitMenuState:
-    lda #GAME_STATE
+    lda #STATE_GAME
     sta GameState
 
     lda InHouse
@@ -2375,7 +2435,7 @@ LoadMenu:
     sta MustLoadMenu
     sta MustLoadSomething
 
-    lda #MENU_STATE
+    lda #STATE_MENU
     sta GameState
 @exit:
 
