@@ -28,7 +28,7 @@
 .segment "RODATA" ; data in rom
 
 
-
+.include "data/music.asm"
 .include "data/map_list.asm"
 .include "data/house.asm"
 .include "data/title.asm"
@@ -504,6 +504,13 @@ clrmem:
     sta $0200, x
     inx
     bne clrmem
+
+    ldx #<music_data_untitled
+    ldy #>music_data_untitled
+    lda #1
+    jsr famistudio_init
+    lda #0
+    jsr famistudio_music_play
    
 vblankwait2:      ; Second wait for vblank, PPU is ready after this
     bit $2002
@@ -569,6 +576,7 @@ vblankwait2:      ; Second wait for vblank, PPU is ready after this
 ;---------------------------------
 
 endlessLoop:
+
 
     lda MustLoadSomething
     bne nextIteration ; don't do logics until *something* is not loaded to the PPU
@@ -740,7 +748,7 @@ endforReal:
     rti        ; return from interrupt
 
 ;#############################| Subroutines |#############################################
-
+.include "famistudio_ca65.asm"
 .include "graphics.asm"
 .include "collision.asm"
 .include "items.asm"
@@ -865,15 +873,19 @@ UpdateAttributeColumn:
 ;-----------------------------------
 Logics:
 
-    lda GameState
-    cmp #STATE_GAME
-    bne @exit
 
     lda NMIActive
     beq @exit
 
-    jsr UpdateRandomNumber
 
+    jsr famistudio_update
+
+
+    lda GameState
+    cmp #STATE_GAME
+    bne @exit
+    
+    jsr UpdateRandomNumber
 
     lda PlayerAlive
     bne @cont
