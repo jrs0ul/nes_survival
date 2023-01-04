@@ -626,6 +626,13 @@ doSomeLogics:
 
 
 nextIteration:
+    
+    lda NMIActive
+    beq ne
+    jsr famistudio_update
+    lda #0
+    sta NMIActive
+ne:
     jmp endlessLoop
 
 ;=========================================================
@@ -873,18 +880,13 @@ UpdateAttributeColumn:
 ;-----------------------------------
 Logics:
 
+    lda GameState
+    cmp #STATE_GAME
+    bne @exit
 
     lda NMIActive
     beq @exit
 
-
-    jsr famistudio_update
-
-
-    lda GameState
-    cmp #STATE_GAME
-    bne @exit
-    
     jsr UpdateRandomNumber
 
     lda PlayerAlive
@@ -932,8 +934,8 @@ Logics:
     jsr CheckIfEnteredHouse
     jsr CheckIfExitedHouse
 
-    lda #0
-    sta NMIActive
+    ;lda #0
+    ;sta NMIActive
 
 @exit:
 
