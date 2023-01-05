@@ -99,7 +99,7 @@ npc_direction_list:
 
     PLAYER_ATTACK_DELAY        = 16
 
-    INPUT_DELAY                = 64
+    INPUT_DELAY                = 130
     ITEM_DELAY                 = 66
     NPC_AI_DELAY               = 128
     NPC_COLLISION_DELAY        = 250
@@ -253,6 +253,9 @@ PlayerFlip:
 DirectionX:
     .res 1
 DirectionY:
+    .res 1
+
+InputProcessed:
     .res 1
 
 RandomNumber:
@@ -675,8 +678,9 @@ ReadControllerLoop:
     rol Buttons
     dex
     bne ReadControllerLoop
-    ;-----
-    jsr CheckStartButton
+
+    lda #0
+    sta InputProcessed
 
     lda MustLoadSomething
     beq DoneLoadingMaps
@@ -743,14 +747,6 @@ endOfNmi:
     lda PPUCTRL
     sta $2000
 
-
-    lda GameState
-    cmp #STATE_MENU
-    bne endforReal
-    jsr MenuInput
-
-
-endforReal:
     pla
     tax
     pla
@@ -849,7 +845,7 @@ UpdateAttributeColumn:
     adc AttribColumnIdxToUpdate
     sta pointer
 
-    ldx #7 ; TODO: return back to 8
+    ldx #8 ; 
     lda #$C0
     clc
     adc AttribColumnIdxToUpdate
@@ -939,8 +935,6 @@ Logics:
     jsr CheckIfEnteredHouse
     jsr CheckIfExitedHouse
 
-    ;lda #0
-    ;sta NMIActive
 
 @exit:
 
@@ -1293,15 +1287,25 @@ UpdateFireplace:
 ;----------------------------------
 HandleInput:
 
+    
+    jsr CheckStartButton
+    
     lda GameState
+    cmp #STATE_MENU
+    bne @checkIfGame
+    jsr MenuInput
+@checkIfGame:
     cmp #STATE_GAME
     bne @finishInput
-
 
     lda Buttons
     beq @finishInput ; no input
 
+   
     lda AttackTimer
+    bne @finishInput
+
+    lda InputProcessed
     bne @finishInput
 
     lda Buttons
@@ -1341,6 +1345,7 @@ HandleInput:
     lda #0
     sta MustIncrementScreenIndex
     sta MustDecrementScreenIndex
+
     
     jmp @finishInput
 
@@ -1350,6 +1355,8 @@ HandleInput:
 
 
 @finishInput:
+    lda Buttons
+    sta OldButtons
 
     jsr CalcMapColumnToUpdate
 
@@ -1941,11 +1948,7 @@ CheckStartButton:
     sta MustLoadMenu
     sta MustLoadSomething
 
-
 @exit:
-    lda Buttons
-    sta OldButtons
-
     rts
 ;-------------------------------------
 
@@ -2005,8 +2008,6 @@ MenuInput:
 @exit:
     lda Buttons
     sta MenuButtons
-    lda #0
-    sta Buttons
 
     rts
 ;--------------------------------------
@@ -2155,14 +2156,19 @@ go_Up:
     adc #PLAYER_SPEED
     sta PlayerY
 @exit:
-    lda #0
-    sta Buttons
+    lda #1
+    sta InputProcessed
     rts
 ;----------------------------------
 CheckB:
     lda Buttons
     and #BUTTON_B_MASK
-    beq @exit
+    bne @checkOldB
+    jmp @exit
+@checkOldB:
+    lda OldButtons
+    and #BUTTON_B_MASK
+    bne @exit
 
     lda AttackTimer
     bne @exit
@@ -2179,6 +2185,7 @@ CheckB:
 
 
 @exit:
+
     rts
 ;----------------------------------
 CheckLeft:
