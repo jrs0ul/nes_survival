@@ -188,6 +188,7 @@ CalcItemMapScreenIndexes:
     rts
 ;-----------------------------------
 AddAndDeactivateItems:
+
     sty TempY
 
     ldy #INVENTORY_MAX_ITEMS - 1
@@ -200,6 +201,12 @@ AddAndDeactivateItems:
 
 @addItem:
     sty Temp  ; store empty inventory slot
+
+    lda #0
+    ldx #FAMISTUDIO_SFX_CH1
+    jsr famistudio_sfx_play
+
+
     ldy TempY ; item index
     tya
     asl

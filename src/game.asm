@@ -28,9 +28,10 @@
 .segment "RODATA" ; data in rom
 
 
-.include "data/music.asm"
 .include "data/map_list.asm"
 .include "data/house.asm"
+.include "data/music.asm"
+.include "data/sfx.s"
 .include "data/title.asm"
 .include "data/game_over.asm"
 .include "data/menu_screen.asm"
@@ -504,6 +505,10 @@ clrmem:
     sta $0200, x
     inx
     bne clrmem
+
+    ldx #<sounds
+    ldy #>sounds
+    jsr famistudio_sfx_init
 
     ldx #<music_data_untitled
     ldy #>music_data_untitled
@@ -2167,6 +2172,10 @@ CheckB:
 
     lda #PLAYER_ATTACK_DELAY
     sta AttackTimer
+
+    lda #1
+    ldx #FAMISTUDIO_SFX_CH0
+    jsr famistudio_sfx_play
 
 
 @exit:
