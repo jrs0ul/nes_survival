@@ -73,6 +73,16 @@ npc_direction_list:
     .byte %00001000
     .byte %00000010
 
+palette_fade:
+    .byte $00
+    .byte $10
+    .byte $20
+    .byte $30
+    .byte $40
+    .byte $30
+    .byte $20
+    .byte $10
+
 ;--------------
 ; CONSTANTS
     FIRST_SPRITE                = $0204
@@ -172,6 +182,12 @@ ItemUpdateDelay:
 NpcAIUpdateDelay:
     .res 1
 NpcCollisionDelay:
+    .res 1
+PaletteUpdateSize:
+    .res 1
+RamPalette:
+    .res 32
+PaletteFadeIdx:
     .res 1
 ;--------------
 .segment "BSS" ; variables in ram
@@ -354,6 +370,9 @@ TimesShiftedRight:
     .res 1
 
 
+MustUpdatePalette: ;flag that signals the palette update
+    .res 1
+
 MustLoadSomething:
     .res 1
 MustLoadHouseInterior:
@@ -525,14 +544,20 @@ vblankwait2:      ; Second wait for vblank, PPU is ready after this
     bpl vblankwait2
 
 
-    lda #<palette
-    sta pointer
-    lda #>palette
-    sta pointer + 1
-    lda #32
-    sta Temp
-    jsr LoadPalette
+    ldy #0
+paletteCopy:
+    lda palette, y
+    sta RamPalette, y
+    iny
+    cpy #32
+    bne paletteCopy
 
+    lda #32
+    sta PaletteUpdateSize
+    lda #1
+    sta MustUpdatePalette
+
+    
     jsr loadSprites
 
 ;---
@@ -695,6 +720,15 @@ ReadControllerLoop:
 
 DoneLoadingMaps:
 
+    lda MustUpdatePalette
+    beq doneUpdatingPalette
+
+    jsr UpdatePalette
+    lda #0
+    sta MustUpdatePalette
+
+
+doneUpdatingPalette:
     lda GameState
     cmp #STATE_GAME
     bne nmicont2
@@ -946,10 +980,22 @@ RunTime:
     lda Minutes
     cmp #120
     bcc @exit
+
+    
     lda #0
     sta Minutes
     inc Hours
     lda Hours
+    ;cmp #150
+    ;bcc @exit
+    cmp #195
+    bcs @checkLimit
+
+    jsr DarkenBackground
+    jmp @exit
+
+
+@checkLimit:
     cmp #240
     bcc @exit
     lda #0
@@ -958,6 +1004,39 @@ RunTime:
 
 @exit:
     rts
+;-------------------------------
+DarkenBackground:
+    lda InHouse
+    bne @exit
+    ldy #$01 ;keeps the outline for the background objects
+    ldx PaletteFadeIdx
+    inc PaletteFadeIdx
+    lda PaletteFadeIdx
+    cmp #8
+    bcc @paletteLoop
+    
+    lda #0
+    sta PaletteFadeIdx
+
+@paletteLoop:
+    lda palette, y ;palette from ROM
+    sec
+    sbc palette_fade, x
+    bcs @saveColor
+    lda #$0F
+@saveColor:
+    sta RamPalette, y
+    iny
+    cpy #12 ;skip the last palette that's used for UI
+    bne @paletteLoop
+
+    lda #16
+    sta PaletteUpdateSize
+    lda #1
+    sta MustUpdatePalette
+@exit:
+    rts
+
 ;-------------------------------
 WarmthLogics:
     dec WarmthDelay
@@ -1006,13 +1085,14 @@ FoodLogics:
 @resetFoodDelay:
     lda #MAX_FOOD_DELAY
     sta FoodDelay
-    lda #<Food
-    sta DigitPtr
-    lda #>Food
-    sta DigitPtr + 1
-    jsr DecreaseDigits
-    lda #1
-    sta FoodUpdated
+;TODO: uncomment
+;    lda #<Food
+;    sta DigitPtr
+;    lda #>Food
+;    sta DigitPtr + 1
+;    jsr DecreaseDigits
+;    lda #1
+;    sta FoodUpdated
     lda Food
     clc
     adc Food + 1
@@ -1076,14 +1156,15 @@ IncreaseDays:
     rts
 ;-------------------------------
 DecreaseWarmth:
-    lda #<Warmth
-    sta DigitPtr
-    lda #>Warmth
-    sta DigitPtr + 1
-    jsr DecreaseDigits
+;TODO:uncomment
+    ;lda #<Warmth
+    ;sta DigitPtr
+    ;lda #>Warmth
+    ;sta DigitPtr + 1
+    ;jsr DecreaseDigits
 
-    lda #1
-    sta WarmthUpdated
+    ;lda #1
+    ;sta WarmthUpdated
     rts
 ;-------------------------------------
 UpdateInventorySprites:

@@ -79,14 +79,20 @@ LoadOutsideMap:
 @loadRest:
     jsr LoadStatusBar
 
-    lda #<palette
-    sta pointer
-    lda #>palette
-    sta pointer + 1
+    ;copy outside map palette to ram
+    ldy #0
+@paletteCopy:
+    lda palette, y
+    sta RamPalette, y
+    iny
+    cpy #32
+    bne @paletteCopy
+
     lda #32
-    sta Temp
-    jsr LoadPalette
-    
+    sta PaletteUpdateSize
+    lda #1
+    sta MustUpdatePalette
+
     lda #0
     sta MustLoadOutside
     sta MustLoadSomething
