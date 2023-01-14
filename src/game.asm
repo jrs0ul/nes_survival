@@ -73,15 +73,25 @@ npc_direction_list:
     .byte %00001000
     .byte %00000010
 
-palette_fade:
-    .byte $00
-    .byte $10
-    .byte $20
-    .byte $30
-    .byte $40
-    .byte $30
-    .byte $20
-    .byte $10
+palette_fade_for_periods: ; each period is 1h 30 mins
+    .byte $40 ;00:00 period start
+    .byte $40 ;01:30
+    .byte $40 ;03:00
+    .byte $40 ;04:30
+    .byte $30 ;06:00
+    .byte $20 ;07:30
+    .byte $10 ;09:00
+    .byte $00 ;10:30
+    .byte $00 ;12:00
+    .byte $00 ;13:30
+    .byte $10 ;15:00
+    .byte $20 ;16:30
+    .byte $30 ;18:00
+    .byte $40 ;19:30
+    .byte $40 ;21:00
+    .byte $40 ;22:30
+
+
 
 ;--------------
 ; CONSTANTS
@@ -187,11 +197,11 @@ PaletteUpdateSize:
     .res 1
 RamPalette:
     .res 32
-PaletteFadeIdx:
-    .res 1
 ;--------------
 .segment "BSS" ; variables in ram
 
+CurrentPaletteDecrementValue: ;a helper value to prevent doing too much of palette changing
+    .res 1
 
 OldGlobalScroll:
     .res 1
@@ -552,10 +562,12 @@ paletteCopy:
     cpy #32
     bne paletteCopy
 
+    lda #255
+    sta CurrentPaletteDecrementValue
+    jsr AdaptBackgroundPalette
     lda #32
     sta PaletteUpdateSize
-    lda #1
-    sta MustUpdatePalette
+    
 
     
     jsr loadSprites
@@ -978,7 +990,7 @@ RunTime:
 
     inc Minutes
     lda Minutes
-    cmp #120
+    cmp #60
     bcc @exit
 
     
@@ -986,42 +998,38 @@ RunTime:
     sta Minutes
     inc Hours
     lda Hours
-    ;cmp #150
-    ;bcc @exit
-    cmp #195
-    bcs @checkLimit
-
-    jsr DarkenBackground
-    jmp @exit
-
-
-@checkLimit:
     cmp #240
-    bcc @exit
+    bcc @adaptPalette
     lda #0
     sta Hours
     jsr IncreaseDays
 
+@adaptPalette:
+    jsr AdaptBackgroundPalette
+
 @exit:
     rts
 ;-------------------------------
-DarkenBackground:
+AdaptBackgroundPalette:
     lda InHouse
     bne @exit
-    ldy #$01 ;keeps the outline for the background objects
-    ldx PaletteFadeIdx
-    inc PaletteFadeIdx
-    lda PaletteFadeIdx
-    cmp #8
-    bcc @paletteLoop
-    
-    lda #0
-    sta PaletteFadeIdx
 
+    ldy #$01 ;keeps the outline for the background objects
+    lda Hours
+    lsr
+    lsr
+    lsr
+    lsr
+    tax
+    lda palette_fade_for_periods, x
+    cmp CurrentPaletteDecrementValue
+    beq @exit
+    sta CurrentPaletteDecrementValue
+   
 @paletteLoop:
     lda palette, y ;palette from ROM
     sec
-    sbc palette_fade, x
+    sbc palette_fade_for_periods, x
     bcs @saveColor
     lda #$0F
 @saveColor:
@@ -1085,14 +1093,13 @@ FoodLogics:
 @resetFoodDelay:
     lda #MAX_FOOD_DELAY
     sta FoodDelay
-;TODO: uncomment
-;    lda #<Food
-;    sta DigitPtr
-;    lda #>Food
-;    sta DigitPtr + 1
-;    jsr DecreaseDigits
-;    lda #1
-;    sta FoodUpdated
+    lda #<Food
+    sta DigitPtr
+    lda #>Food
+    sta DigitPtr + 1
+    jsr DecreaseDigits
+    lda #1
+    sta FoodUpdated
     lda Food
     clc
     adc Food + 1
@@ -1156,15 +1163,14 @@ IncreaseDays:
     rts
 ;-------------------------------
 DecreaseWarmth:
-;TODO:uncomment
-    ;lda #<Warmth
-    ;sta DigitPtr
-    ;lda #>Warmth
-    ;sta DigitPtr + 1
-    ;jsr DecreaseDigits
+    lda #<Warmth
+    sta DigitPtr
+    lda #>Warmth
+    sta DigitPtr + 1
+    jsr DecreaseDigits
 
-    ;lda #1
-    ;sta WarmthUpdated
+    lda #1
+    sta WarmthUpdated
     rts
 ;-------------------------------------
 UpdateInventorySprites:
@@ -1802,7 +1808,9 @@ ResetEntityVariables:
     sta Fuel + 1
     sta Fuel + 2
 
+    lda #120
     sta Hours
+    lda #0
     sta Minutes
     sta Days
     sta Days + 1
@@ -1863,6 +1871,9 @@ ResetEntityVariables:
     lda #0
     sta LeftCollisionMapIdx
 
+    lda #255
+    sta CurrentPaletteDecrementValue
+
 
 
     rts
@@ -1870,8 +1881,8 @@ ResetEntityVariables:
 DecreaseDigits:
 
     ldy #2
-    lda (DigitPtr), y
-    beq @decreaseSecondDigit
+    lda (DigitPtr), y 
+    beq @decreaseSecondDigit ; the last digit was 0
 
     lda (DigitPtr), y
     sec
