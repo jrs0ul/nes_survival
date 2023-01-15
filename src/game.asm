@@ -1996,11 +1996,7 @@ CheckStartButton:
     sta pointer + 1
     jsr LoadItems
 
-    lda #<Outside1_npcs
-    sta pointer
-    lda #>Outside1_npcs
-    sta pointer + 1
-    jsr LoadNpcs
+    jsr GenerateNpcs
        
 @collision:
     ldx #0
@@ -2684,11 +2680,7 @@ CheckIfExitedHouse:
     sta pointer + 1
     jsr LoadItems
 
-    lda #<Outside1_npcs
-    sta pointer
-    lda #>Outside1_npcs
-    sta pointer + 1
-    jsr LoadNpcs
+    jsr GenerateNpcs
 
 
     lda #OUTSIDE_ENTRY_FROM_HOUSE_X

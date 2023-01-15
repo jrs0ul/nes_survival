@@ -39,6 +39,137 @@ LoadNpcs:
 
     rts
 ;-------------------------------------
+;Generate random npcs
+GenerateNpcs:
+    jsr UpdateRandomNumber
+    and #%00000111 ; 7
+    clc
+    adc #1
+    sta NpcCount
+    sta TempNpcCnt
+
+    lda Hours
+    lsr
+    lsr
+    lsr
+    lsr
+    tax
+    lda palette_fade_for_periods, x
+    sta TempFrame
+
+
+    ldx #0
+@npcLoop:
+    ;npc type
+    lda TempFrame
+    cmp #$40    ;check if it's night
+    beq @makeWolf
+    lda #%00000011
+    jmp @storeType
+@makeWolf:
+    lda #%00000001
+@storeType:
+    sta Npcs, x
+    inx
+    stx TempZ
+
+@generateCoords:
+    ;x
+    jsr UpdateRandomNumber
+    and #%00011111 ; 32
+    sta TempPointX
+    ;y
+    jsr UpdateRandomNumber
+    and #%00001111; 16
+    clc
+    adc #4
+    sta TempPointY
+    ;screen idx
+    jsr UpdateRandomNumber
+    and #%00000011 ; 3
+    clc
+    adc #1
+    sta TempIndex
+
+    jsr TestGeneratedNpcCollision
+    bne @generateCoords
+
+    ldx TempZ
+    ;x
+    lda TempPointX
+    asl
+    asl
+    asl ; x8
+    sta Npcs, x
+    inx
+    ;y
+    lda TempPointY
+    asl
+    asl
+    asl
+    sta Npcs, x
+    inx
+    ;screen
+    lda TempIndex
+    sta Npcs, x
+    inx
+    ;dir
+    lda #1
+    sta Npcs, x
+    inx
+    ;frame
+    inx
+    ;timer
+    inx
+    ;hp
+    inx
+
+
+    
+
+    dec TempNpcCnt
+    bne @npcLoop
+    
+
+    rts
+;------------------------------------
+;x - TempPointX, y - TempPointY, screen - TempIndex
+TestGeneratedNpcCollision:
+
+    lda TempIndex
+    tax
+    lda collision_list_low, x
+    sta pointer
+    lda collision_list_high, x
+    sta pointer + 1
+
+    lda TempPointX
+    tax
+    lda x_collision_pattern, x
+    sta Temp
+    txa
+    lsr
+    lsr
+    lsr
+    clc
+    adc TempPointY
+    adc TempPointY
+    adc TempPointY
+    adc TempPointY
+    tay
+
+    lda (pointer), y
+    and Temp
+    beq @not_colliding
+    lda #1
+    jmp @exit
+@not_colliding:
+    lda #0
+
+@exit:
+    rts
+
+;-------------------------------------
 ;Player's knifer collides with all the npcs
 PlayerHitsNpcs:
 
