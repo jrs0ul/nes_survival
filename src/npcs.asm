@@ -64,9 +64,13 @@ GenerateNpcs:
     lda TempFrame
     cmp #$40    ;check if it's night
     beq @makeWolf
+    lda #2      ; this should be loaded from the npc types, but oh well..
+    sta TempNpcRows
     lda #%00000011
     jmp @storeType
 @makeWolf:
+    lda #3
+    sta TempNpcRows
     lda #%00000001
 @storeType:
     sta Npcs, x
@@ -93,6 +97,7 @@ GenerateNpcs:
 
     jsr TestGeneratedNpcCollision
     bne @generateCoords
+    
 
     ldx TempZ
     ;x
@@ -143,6 +148,11 @@ TestGeneratedNpcCollision:
     lda collision_list_high, x
     sta pointer + 1
 
+
+    lda TempPointY
+    sta TempY
+@RowLoop:
+
     lda TempPointX
     tax
     lda x_collision_pattern, x
@@ -152,19 +162,49 @@ TestGeneratedNpcCollision:
     lsr
     lsr
     clc
-    adc TempPointY
-    adc TempPointY
-    adc TempPointY
-    adc TempPointY
+    adc TempY
+    adc TempY
+    adc TempY
+    adc TempY
     tay
 
     lda (pointer), y
     and Temp
-    beq @not_colliding
-    lda #1
-    jmp @exit
-@not_colliding:
+    bne @collisionDetected
+
+    lda TempPointX
+    clc
+    adc #1
+    bcs @collisionDetected
+
+    tax
+    lda x_collision_pattern, x
+    sta Temp
+    txa
+    lsr
+    lsr
+    lsr
+    clc
+    adc TempY
+    adc TempY
+    adc TempY
+    adc TempY
+    tay
+
+    lda (pointer), y
+    and Temp
+    bne @collisionDetected
+
+    inc TempY
+    dec TempNpcRows
+    bne @RowLoop
+
     lda #0
+    jmp @exit
+
+
+@collisionDetected:
+    lda #1
 
 @exit:
     rts
