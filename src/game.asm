@@ -91,6 +91,15 @@ palette_fade_for_periods: ; each period is 1h 30 mins
     .byte $40 ;21:00
     .byte $40 ;22:30
 
+PopUpMenu:
+    .byte $78,$72,$72,$72,$72,$72,$72,$79
+    .byte $76,$00,$00,$00,$00,$00,$00,$77
+    .byte $76,$00,$00,$3c,$48,$48,$44,$77
+    .byte $76,$00,$00,$00,$00,$00,$00,$77
+    .byte $76,$00,$00,$3e,$3a,$4d,$00,$77
+    .byte $76,$00,$00,$00,$00,$00,$00,$77
+    .byte $7a,$72,$72,$72,$72,$72,$72,$7b
+
 
 
 ;--------------
@@ -328,7 +337,13 @@ Hours:
 Inventory:
     .res INVENTORY_MAX_ITEMS 
 
-InventoryPointerPos:
+InventoryPointerPos: ;y
+    .res 1
+InventoryPointerX:
+    .res 1
+OldInventoryPointerY:
+    .res 1
+FoodMenuIndex: ; COOK OR EAT ?
     .res 1
 
 InventoryItemIndex:
@@ -395,7 +410,14 @@ MustLoadTitle:
     .res 1
 MustLoadGameOver:
     .res 1
+MustDrawPopupMenu:
+    .res 1
 ;--
+
+FoodMenuActivated:  ; press b on raw meat in menu
+    .res 1
+
+
 CarrySet:
     .res 1
 
@@ -722,6 +744,7 @@ ReadControllerLoop:
     lda MustLoadSomething
     beq DoneLoadingMaps
 
+    jsr DrawPopUpMenu
     jsr LoadTitle
     jsr LoadGameOver
     jsr LoadMenu
@@ -809,6 +832,68 @@ endOfNmi:
 .include "npcs.asm"
 .include "LoadOutsideMap.asm"
 .include "random.asm"
+.include "menu.asm"
+
+
+;--------------------------------------------
+DrawPopUpMenu:
+    lda MustDrawPopupMenu
+    beq @exit
+    
+    lda #0
+    sta $2001
+
+    lda FirstNametableAddr
+    clc
+    adc #1
+    sta Temp
+
+    ldy #0
+    lda #$49
+    sta TempY
+    sty TempIndex
+
+@menuRowLoop:
+
+    lda $2002
+    lda Temp
+    sta $2006
+    lda TempY
+    sta $2006
+
+    ldx #0
+@menuCellLoop:
+    stx TempX
+    ldx TempIndex 
+    lda PopUpMenu, x
+    sta $2007
+    ldx TempX
+    inx
+    inc TempIndex
+    cpx #8
+    bne @menuCellLoop
+
+    lda TempY
+    clc
+    adc #$20
+    bcs @incrementUpperAddress
+    sta TempY
+    jmp @incrementRow
+@incrementUpperAddress:
+    sta TempY
+    inc Temp
+@incrementRow:
+    iny
+    cpy #7
+    bne @menuRowLoop
+
+
+    lda #0
+    sta MustDrawPopupMenu
+    sta MustLoadSomething
+    
+@exit:
+    rts
 
 
 ;--------------------------------------------
@@ -1196,128 +1281,6 @@ DecreaseWarmth:
 
     lda #1
     sta WarmthUpdated
-    rts
-;-------------------------------------
-UpdateInventorySprites:
-
-    ldx #0
-    lda #0
-    sta TempSpriteIdx
-    sta TempSpriteCount
-
-    lda #32
-    sta TempTileYPos
-
-
-@itemLoop:
-
-    lda Inventory, x
-    asl
-    asl ;inventory_index * 4
-    tay
-    lda inventory_data, y ;grab sprite index
-    bne @store_sprite_index
-    lda #$FD ;empty sprite index
-@store_sprite_index:
-    sta TempTileIndex ; save sprite index
-    iny
-    lda inventory_data, y
-    sta TempPaletteIndex ; save palette
-
-    stx TempInventoryIndex ; save x index
-    lda TempTileYPos
-    clc
-    adc #INVENTORY_STEP_PIXELS
-    sta TempTileYPos
-
-    ldy #0
-@twoTileLoop: ;item consists of two tiles
-
-    lda TempTileYPos
-    ldx TempSpriteIdx
-    sta FIRST_SPRITE, x ;set Y coordinate
-
-    inc TempSpriteIdx
-    lda TempTileIndex
-    sty TempTileIndexOffset
-    clc
-    adc TempTileIndexOffset
-    ldx TempSpriteIdx
-    sta FIRST_SPRITE, x
-
-    inc TempSpriteIdx
-    ;attributes
-    ldx TempSpriteIdx
-    lda #0
-    clc
-    adc TempPaletteIndex
-    sta FIRST_SPRITE, x
-    inc TempSpriteIdx
-    ;x coordinate
-    lda #INVENTORY_SPRITE_X
-    cpy #1
-    bne @saveX
-    clc
-    adc #8
-@saveX:
-    ldx TempSpriteIdx
-    sta FIRST_SPRITE, x
-    inc TempSpriteIdx
-    inc TempSpriteCount
-    iny
-    cpy #2
-    bcc @twoTileLoop
-
-    ldx TempInventoryIndex ;restore x index
-@next:
-    inx
-    cpx #INVENTORY_MAX_ITEMS
-    bcc @itemLoop
-
-
-    ldx TempSpriteIdx
-    lda InventoryPointerPos
-    sec
-    sbc #1                  ;subtract 1 because the gfx in the tile skips first pixel row
-    sta FIRST_SPRITE, x
-    inc TempSpriteIdx
-    lda #$FC
-    ldx TempSpriteIdx
-    sta FIRST_SPRITE, x
-    inc TempSpriteIdx
-    ldx TempSpriteIdx
-    lda #%00000011
-    sta FIRST_SPRITE, x
-    inc TempSpriteIdx
-    ldx TempSpriteIdx
-    lda #INVENTORY_POINTER_X
-    sta FIRST_SPRITE, x
-    inc TempSpriteCount
-
-
-    inx
-    lda #63
-
-    cmp TempSpriteCount
-    bcc @done
-    sec
-    sbc TempSpriteCount
-
-    tay
-@hideSpritesLoop:
-    lda #$FE
-    sta FIRST_SPRITE, x
-    inx
-    inx
-    inx
-    inx
-
-    dey
-    bne @hideSpritesLoop
-@done:
-
-
-
     rts
 
 ;---------------------------------------
@@ -2071,162 +2034,6 @@ CheckStartButton:
 
 @exit:
     rts
-;-------------------------------------
-
-ExitMenuState:
-    lda #STATE_GAME
-    sta GameState
-
-    lda InHouse
-    beq @loadOutside ;InHouse = 0
-    lda #1
-    sta MustLoadHouseInterior
-    sta MustLoadSomething
-    jmp @exit
-@loadOutside:
-    lda #1
-    sta MustLoadOutside
-    sta MustLoadSomething
-@exit:
-
-    rts
-;-------------------------------------
-MenuInput:
-    lda Buttons
-    cmp MenuButtons
-    beq @exit
-
-    lda Buttons
-    and #BUTTON_DOWN_MASK
-    beq @CheckUp
-
-    lda InventoryPointerPos
-    cmp #INVENTORY_SPRITE_MAX_Y - 12
-    bcs @CheckUp
-    clc
-    adc #12
-    sta InventoryPointerPos
-    inc InventoryItemIndex
-
-    jmp @CheckB
-
-@CheckUp:
-    lda Buttons
-    and #BUTTON_UP_MASK
-    beq @CheckB
-
-    lda InventoryPointerPos
-    cmp #INVENTORY_SPRITE_MIN_Y + 12
-    bcc @CheckB
-    sec
-    sbc #12
-    sta InventoryPointerPos
-    dec InventoryItemIndex
-
-@CheckB:
-    jsr Button_B_Pressed
-
-@exit:
-    lda Buttons
-    sta MenuButtons
-
-    rts
-;--------------------------------------
-Button_B_Pressed:
-    lda Buttons
-    and #BUTTON_B_MASK
-    beq @exit
-    ldx InventoryItemIndex
-
-    lda Inventory, x
-    beq @exit
-    asl
-    asl
-    tay
-    iny
-    iny
-    iny
-    lda inventory_data, y ; power
-    sta Temp ; save power for later
-    dey
-    lda inventory_data, y ; type
-
-    cmp #ITEM_TYPE_FUEL
-    beq @addFuel
-
-@checkFood:
-    cmp #ITEM_TYPE_FOOD
-    beq @addFood
-
-    jmp @clearItem
-
-@addFuel:
-    lda InHouse
-    beq @exit ; can't use a stick outside the hut
-    jsr UseFuel
-    jmp @clearItem
-;--------
-@addFood:
-    jsr UseFood
-@clearItem:
-    lda #0
-    sta Inventory, x
-    jsr ExitMenuState
-
-@exit:
-    rts
-;--------------------------------------
-UseFuel:
-    lda #MAX_FUEL_DELAY
-    sta FuelDelay
-
-    lda Fuel
-    bne @clampFuel
-
-    lda Fuel + 1
-    clc
-    adc Temp
-    cmp #10
-    bcs @clampFuel
-    jmp @saveFuel
-@clampFuel:
-    lda #0
-    sta Fuel + 1
-    sta Fuel + 2
-    lda #1
-    sta Fuel
-    jmp @exit
-@saveFuel:
-    sta Fuel + 1
-@exit:
-    rts
-;--------------------------------------
-UseFood:
-    lda #MAX_FOOD_DELAY
-    sta FoodDelay
-
-    lda Food    ; highest digit
-    bne @clampFood
-
-    lda Food + 1
-    clc
-    adc Temp
-    cmp #10
-    bcs @clampFood
-    jmp @saveFood
-@clampFood:
-    lda #0
-    sta Food + 1
-    sta Food + 2
-    lda #1
-    sta Food
-    jmp @exit
-@saveFood:
-    sta Food + 1
-
-@exit:
-
-    rts
 ;--------------------------------------
 
 ProcessButtons:
@@ -2551,140 +2358,6 @@ LoadTheHouseInterior:
 
 @nope:
     rts
-;-----------------------------------
-LoadMenu:
-
-    lda MustLoadMenu
-    beq @exit
-
-    lda #$00
-    sta $2000
-    sta $2001
-
-    lda #<menu_screen
-    sta pointer
-    lda #>menu_screen
-    sta pointer + 1
-
-    lda FirstNametableAddr
-    sta NametableAddress
-
-    jsr LoadNametable
-
-    lda #<menu_palette
-    sta pointer
-    lda #>menu_palette
-    sta pointer + 1
-    lda #32
-    sta Temp
-    jsr LoadPalette
-
-
-    jsr UpdateMenuStats
-
-    lda #0
-    sta MustLoadMenu
-    sta MustLoadSomething
-
-    lda #STATE_MENU
-    sta GameState
-@exit:
-
-    rts
-;----------------------------------
-UpdateMenuStats:
-    lda $2002
-    lda FirstNametableAddr
-    sta $2006
-    lda #$BB
-    sta $2006
-
-    ldy #0
-@hpLoop:
-    lda #CHARACTER_ZERO
-    clc 
-    adc HP, y
-    sta $2007
-    iny
-    cpy #3
-    bne @hpLoop
-
-
-    lda $2002
-    lda FirstNametableAddr
-    sta $2006
-    lda #$FB
-    sta $2006
-
-    ldy #0
-@foodLoop:
-    lda #CHARACTER_ZERO
-    clc 
-    adc Food, y
-    sta $2007
-    iny
-    cpy #3
-    bne @foodLoop
-
-    lda $2002
-    lda FirstNametableAddr
-    clc
-    adc #1
-    sta $2006
-    lda #$3B
-    sta $2006
-
-    ldy #0
-@warmthLoop:
-    lda #CHARACTER_ZERO
-    clc 
-    adc Warmth, y
-    sta $2007
-    iny
-    cpy #3
-    bne @warmthLoop
-
-
-    lda $2002
-    lda FirstNametableAddr
-    clc
-    adc #1
-    sta $2006
-    lda #$DB
-    sta $2006
-
-    ldy #0
-@fuelLoop:
-    lda #CHARACTER_ZERO
-    clc 
-    adc Fuel, y
-    sta $2007
-    iny
-    cpy #3
-    bne @fuelLoop
-
-
-    lda $2002
-    lda FirstNametableAddr
-    clc
-    adc #3
-    sta $2006
-    lda #$3B
-    sta $2006
-
-    ldy #0
-@daysLoop:
-    lda #CHARACTER_ZERO
-    clc 
-    adc Days, y
-    sta $2007
-    iny
-    cpy #3
-    bne @daysLoop
-
-
-    rts
-
 
 ;-----------------------------------
 CheckIfExitedHouse:
