@@ -1069,6 +1069,21 @@ WarmthLogics:
     jsr IncreaseWarmth
     jmp @exit
 @decreaseWarmth:
+    lda Hours
+    lsr
+    lsr
+    lsr
+    lsr
+    tax
+    lda palette_fade_for_periods, x
+    cmp #$40
+    beq @nightFreeze
+    lda #1
+    jmp @saveTempDecrease
+@nightFreeze:
+    lda #5
+@saveTempDecrease:
+    sta Temp
     jsr DecreaseWarmth
     lda Warmth
     clc
@@ -1097,6 +1112,8 @@ FoodLogics:
     sta DigitPtr
     lda #>Food
     sta DigitPtr + 1
+    lda #1
+    sta Temp
     jsr DecreaseDigits
     lda #1
     sta FoodUpdated
@@ -1127,6 +1144,8 @@ DecreaseFuel:
     sta DigitPtr
     lda #>Fuel
     sta DigitPtr + 1
+    lda #2
+    sta Temp
     jsr DecreaseDigits
 @exit:
     rts
@@ -1137,6 +1156,8 @@ DecreaseLife:
     sta DigitPtr
     lda #>HP
     sta DigitPtr + 1
+    lda #1
+    sta Temp
     jsr DecreaseDigits
     lda #1
     sta HpUpdated
@@ -1147,6 +1168,8 @@ IncreaseWarmth:
     sta DigitPtr
     lda #>Warmth
     sta DigitPtr + 1
+    lda #3
+    sta Temp
     jsr IncreaseDigits
     lda #1
     sta WarmthUpdated
@@ -1157,6 +1180,8 @@ IncreaseDays:
     sta DigitPtr
     lda #>Days
     sta DigitPtr + 1
+    lda #1
+    sta Temp
     jsr IncreaseDigits
     lda #1
     sta DaysUpdated
@@ -1878,28 +1903,39 @@ ResetEntityVariables:
 
     rts
 ;-------------------------------------
+;Decrement digits from 100 to 000
+;Temp is the decrement
 DecreaseDigits:
 
     ldy #2
-    lda (DigitPtr), y 
-    beq @decreaseSecondDigit ; the last digit was 0
+    lda (DigitPtr), y
+    cmp Temp
+    bcc @decreaseSecondDigit ; the last digit was less than Temp
 
     lda (DigitPtr), y
     sec
-    sbc #1
+    sbc Temp
     sta (DigitPtr), y
     jmp @exit
 @decreaseSecondDigit:
+
+    sta TempIndex ; store last digit that's less than Temp
+    lda Temp
+    sec
+    sbc TempIndex
+    sta Temp
+    lda #10
+    sec
+    sbc Temp
+    sta (DigitPtr), y
+
     ldy #1
     lda (DigitPtr), y
-    beq @decreaseThirdDigit
+    beq @decreaseThirdDigit ; second digit is zero
 
     lda (DigitPtr), y
     sec
     sbc #1
-    sta (DigitPtr), y
-    lda #9
-    ldy #2
     sta (DigitPtr), y
     jmp @exit
 @decreaseThirdDigit:
@@ -1911,8 +1947,6 @@ DecreaseDigits:
     sbc #1
     sta (DigitPtr), y
     lda #9
-    ldy #2
-    sta (DigitPtr), y
     ldy #1
     sta (DigitPtr), y
 
@@ -1921,33 +1955,32 @@ DecreaseDigits:
 
 ;-------------------------------------
 ;Increase stat number from 000 to 100
+;Temp is the number to increment
 IncreaseDigits:
-
     ldy #0
     lda (DigitPtr), y
     bne @exit           ;the highest digit is not zero anymore, let's stop
 
     ldy #2
-    lda (DigitPtr), y
-    cmp #9
-    beq @increaseSecondDigit
 
     lda (DigitPtr), y
     clc
-    adc #1
+    adc Temp
+    cmp #10
+    bcs @increaseSecondDigit
     sta (DigitPtr), y
     jmp @exit
 @increaseSecondDigit:
-    ldy #1
+    sec
+    sbc #10
+    sta (DigitPtr), y
+
+    ldy #1 ;second digit
     lda (DigitPtr), y
     cmp #9
     beq @increaseThirdDigit
-    lda (DigitPtr), y
     clc
     adc #1
-    sta (DigitPtr), y
-    lda #0
-    ldy #2
     sta (DigitPtr), y
     jmp @exit
 @increaseThirdDigit:
