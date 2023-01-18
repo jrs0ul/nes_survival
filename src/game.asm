@@ -206,6 +206,12 @@ PaletteUpdateSize:
     .res 1
 RamPalette:
     .res 32
+DigitChangeSize: ;dedicated byte for Decrease/IncreaseDigits, because I can
+    .res 1
+LastDigit:
+    .res 1
+TempDigit:
+    .res 1
 ;--------------
 .segment "BSS" ; variables in ram
 
@@ -1168,7 +1174,7 @@ WarmthLogics:
 @nightFreeze:
     lda #5
 @saveTempDecrease:
-    sta Temp
+    sta DigitChangeSize
     jsr DecreaseWarmth
     lda Warmth
     clc
@@ -1198,7 +1204,7 @@ FoodLogics:
     lda #>Food
     sta DigitPtr + 1
     lda #1
-    sta Temp
+    sta DigitChangeSize
     jsr DecreaseDigits
     lda #1
     sta FoodUpdated
@@ -1230,7 +1236,7 @@ DecreaseFuel:
     lda #>Fuel
     sta DigitPtr + 1
     lda #2
-    sta Temp
+    sta DigitChangeSize
     jsr DecreaseDigits
 @exit:
     rts
@@ -1242,7 +1248,7 @@ DecreaseLife:
     lda #>HP
     sta DigitPtr + 1
     lda #1
-    sta Temp
+    sta DigitChangeSize
     jsr DecreaseDigits
     lda #1
     sta HpUpdated
@@ -1254,7 +1260,7 @@ IncreaseWarmth:
     lda #>Warmth
     sta DigitPtr + 1
     lda #3
-    sta Temp
+    sta DigitChangeSize
     jsr IncreaseDigits
     lda #1
     sta WarmthUpdated
@@ -1266,7 +1272,7 @@ IncreaseDays:
     lda #>Days
     sta DigitPtr + 1
     lda #1
-    sta Temp
+    sta DigitChangeSize
     jsr IncreaseDigits
     lda #1
     sta DaysUpdated
@@ -1867,29 +1873,47 @@ ResetEntityVariables:
     rts
 ;-------------------------------------
 ;Decrement digits from 100 to 000
-;Temp is the decrement
+;DigitChangeSize is the decrement
 DecreaseDigits:
 
     ldy #2
     lda (DigitPtr), y
-    cmp Temp
+    cmp DigitChangeSize
     bcc @decreaseSecondDigit ; the last digit was less than Temp
 
     lda (DigitPtr), y
     sec
-    sbc Temp
+    sbc DigitChangeSize
     sta (DigitPtr), y
     jmp @exit
 @decreaseSecondDigit:
 
-    sta TempIndex ; store last digit that's less than Temp
-    lda Temp
+    sta LastDigit ; store last digit that's less than Temp
+
+    ;check first two digits
+    ldy #1
+    lda (DigitPtr), y
+    sta TempDigit
+    ldy #0
+    lda (DigitPtr), y
+    clc
+    adc TempDigit
+    cmp #0
+    bne @cont
+
+    ldy #2
+    lda #0
+    sta (DigitPtr), y
+    jmp @exit
+@cont:
+    ldy #2
+    lda DigitChangeSize
     sec
-    sbc TempIndex
-    sta Temp
+    sbc LastDigit
+    sta DigitChangeSize
     lda #10
     sec
-    sbc Temp
+    sbc DigitChangeSize
     sta (DigitPtr), y
 
     ldy #1
@@ -1918,7 +1942,7 @@ DecreaseDigits:
 
 ;-------------------------------------
 ;Increase stat number from 000 to 100
-;Temp is the number to increment
+;DigitChangeSize is the number to increment
 IncreaseDigits:
     ldy #0
     lda (DigitPtr), y
@@ -1928,7 +1952,7 @@ IncreaseDigits:
 
     lda (DigitPtr), y
     clc
-    adc Temp
+    adc DigitChangeSize
     cmp #10
     bcs @increaseSecondDigit
     sta (DigitPtr), y

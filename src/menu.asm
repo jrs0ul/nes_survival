@@ -219,13 +219,7 @@ Button_B_Pressed:
     lda FoodMenuIndex
     bne @eat
     ;cook
-
-    lda InHouse
-    beq @cantcook
-
-    lda #3
-    sta Inventory, x ; put cooked meat
-@cantcook:
+    jsr CookMeat
     lda #1
     sta MustLoadSomething
     sta MustLoadMenu
@@ -281,6 +275,22 @@ Button_B_Pressed:
     jsr ExitMenuState
 
 @exit:
+    rts
+;-------------------------------------
+CookMeat:
+    lda InHouse
+    beq @cantcook
+
+    lda Fuel
+    clc
+    adc Fuel + 1
+    adc Fuel + 2
+    cmp #0
+    beq @cantcook
+
+    lda #3
+    sta Inventory, x ; put cooked meat
+@cantcook:
     rts
 ;--------------------------------------
 LoadSelectedItemStuff:
@@ -361,11 +371,13 @@ ExitMenuState:
     lda #STATE_GAME
     sta GameState
 
+    lda FoodMenuActivated
+    beq @ignorethis
     lda #0
     sta FoodMenuActivated
     lda OldInventoryPointerY
     sta InventoryPointerPos
-
+@ignorethis:
     lda InHouse
     beq @loadOutside ;InHouse = 0
     lda #1
