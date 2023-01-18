@@ -715,7 +715,9 @@ doNpcAI:
 @doAI:
     inx
     inx
+    sty TempPush
     jsr SingleNpcAI
+    ldy TempPush
 
 @nextNpc:
     dey

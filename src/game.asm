@@ -1203,7 +1203,7 @@ FoodLogics:
     sta DigitPtr
     lda #>Food
     sta DigitPtr + 1
-    lda #1
+    lda #3
     sta DigitChangeSize
     jsr DecreaseDigits
     lda #1
