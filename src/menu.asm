@@ -284,9 +284,26 @@ CookMeat:
     lda Fuel
     clc
     adc Fuel + 1
-    adc Fuel + 2
     cmp #0
-    beq @cantcook
+    bne @cook ; fuel > 9
+
+    lda Fuel + 2
+    cmp #COOKING_FUEL_COST
+    bcc @cantcook
+
+@cook:
+    lda #COOKING_FUEL_COST
+    sta DigitChangeSize
+    lda #MAX_FUEL_DELAY
+    sta FuelDelay
+    lda #<Fuel
+    sta DigitPtr
+    lda #>Fuel
+    sta DigitPtr + 1
+
+    stx TempPush
+    jsr DecreaseDigits
+    ldx TempPush
 
     lda #3
     sta Inventory, x ; put cooked meat

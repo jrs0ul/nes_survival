@@ -126,6 +126,9 @@ PopUpMenu:
 
     MAX_V_SCROLL               = 255
 
+
+    HOURS_MAX                  = 240
+
     PLAYER_ATTACK_DELAY        = 16
 
     INPUT_DELAY                = 130
@@ -164,7 +167,11 @@ PopUpMenu:
     MAX_FOOD_DELAY             = $60
     MAX_FUEL_DELAY             = $55
 
+    DECREMENT_FOOD_DEFAULT     = $3
+
     FIRE_ANIMATION_DELAY       = $20
+
+    COOKING_FUEL_COST          = 5
 
 
     INVENTORY_SPRITE_X         = 48
@@ -1089,7 +1096,7 @@ RunTime:
     sta Minutes
     inc Hours
     lda Hours
-    cmp #240
+    cmp #HOURS_MAX
     bcc @adaptPalette
     lda #0
     sta Hours
@@ -1203,7 +1210,7 @@ FoodLogics:
     sta DigitPtr
     lda #>Food
     sta DigitPtr + 1
-    lda #3
+    lda #DECREMENT_FOOD_DEFAULT
     sta DigitChangeSize
     jsr DecreaseDigits
     lda #1
