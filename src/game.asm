@@ -1,11 +1,8 @@
-.segment "CHARS"
-    .incbin "tile.chr" 
-
 .segment "HEADER"
- ; this header is to set up a NROM mapper 000 with fixed banks (no bank switching)
+ 
   .byte 'N', 'E', 'S', $1A   ; these bytes always start off an ines file
   .byte $02                   ; PRG 32K (1 for 16K)
-  .byte $01                   ; CHR 8K
+  .byte $00                   ; CHR RAM
 
 ;============================================================================================
 ; iNES flag 6
@@ -30,6 +27,7 @@
 
 .include "data/map_list.asm"
 .include "data/house.asm"
+mytiles_chr: .incbin "tile.chr"
 .include "data/music.asm"
 .include "data/sfx.s"
 .include "data/title.asm"
@@ -573,6 +571,8 @@ clrmem:
     inx
     bne clrmem
 
+    jsr CopyCHRTiles
+
     ldx #<sounds
     ldy #>sounds
     jsr famistudio_sfx_init
@@ -847,7 +847,28 @@ endOfNmi:
 .include "random.asm"
 .include "menu.asm"
 
+;--------------------------------------------
+CopyCHRTiles:
+    src = 0
+    lda #<mytiles_chr  ; load the source address into a pointer in zero page
+    sta src
+    lda #>mytiles_chr
+    sta src+1
 
+    ldy #0       ; starting index into the first page
+    sty $2001  ; turn off rendering just in case
+    sty $2006  ; load the destination address into the PPU
+    sty $2006
+    ldx #32      ; number of 256-byte pages to copy
+@loop:
+    lda (src),y  ; copy one byte
+    sta $2007
+    iny
+    bne @loop  ; repeat until we finish the page
+    inc src+1  ; go to the next page
+    dex
+    bne @loop  ; repeat until we've copied enough pages
+    rts
 ;--------------------------------------------
 DrawPopUpMenu:
     lda MustDrawPopupMenu
