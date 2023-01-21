@@ -1,8 +1,8 @@
 .segment "HEADER"
  
   .byte 'N', 'E', 'S', $1A   ; these bytes always start off an ines file
-  .byte $02                   ; PRG 32K (1 for 16K)
-  .byte $00                   ; CHR RAM
+  .byte 8                    ; 8 Banks x16KB
+  .byte $00                  ; CHR RAM
 
 ;============================================================================================
 ; iNES flag 6
@@ -16,18 +16,25 @@
 ; ||||+---- 1: Ignore mirroring control or above mirroring bit; instead provide four-screen VRAM
 ; ++++----- Lower nybble of mapper number
 ;============================================================================================
-  .byte %00000001                   ; NROM mapper 0, other mappers have more complicated values here
-  .byte $0, $0, $0, $0, $0, $0
+  .byte %00100001                   ; NROM mapper 0, other mappers have more complicated values here
+  .byte $0, $0, $0, $07, $0, $0
 
 .segment "VECTORS"
     .word nmi, reset, 0
 ;==========================================================
+
+.segment "ROM0"
+
+mytiles_chr: .incbin "tile.chr"
+.include "data/map_list.asm"
+.include "data/house.asm"
+.include "data/collision_data.asm"
+
+
+
 .segment "RODATA" ; data in rom
 
 
-.include "data/map_list.asm"
-.include "data/house.asm"
-mytiles_chr: .incbin "tile.chr"
 .include "data/music.asm"
 .include "data/sfx.s"
 .include "data/title.asm"
@@ -37,7 +44,6 @@ mytiles_chr: .incbin "tile.chr"
 .include "data/npc_data.asm"
 .include "data/item_list.asm" ;items in maps
 .include "data/npc_list.asm"  ;npcs in maps
-.include "data/collision_data.asm"
 
 zerosprite:
     .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
