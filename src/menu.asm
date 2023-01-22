@@ -2,6 +2,9 @@ LoadMenu:
 
     lda MustLoadMenu
     beq @exit
+    
+    ldy #1
+    jsr bankswitch_y
 
     lda #$00
     sta $2000
@@ -267,7 +270,6 @@ Button_B_Pressed:
     lda #0
     sta FoodMenuIndex
 
-    ;jsr UseFood
     jmp @exit
 @clearItem:
     lda #0
@@ -384,31 +386,6 @@ UseFood:
     rts
 ;-------------------------------------
 
-ExitMenuState:
-    lda #STATE_GAME
-    sta GameState
-
-    lda FoodMenuActivated
-    beq @ignorethis
-    lda #0
-    sta FoodMenuActivated
-    lda OldInventoryPointerY
-    sta InventoryPointerPos
-@ignorethis:
-    lda InHouse
-    beq @loadOutside ;InHouse = 0
-    lda #1
-    sta MustLoadHouseInterior
-    sta MustLoadSomething
-    jmp @exit
-@loadOutside:
-    lda #1
-    sta MustLoadOutside
-    sta MustLoadSomething
-@exit:
-
-    rts
-;-------------------------------------
 UpdateInventorySprites:
 
     ldx #0
@@ -530,4 +507,34 @@ UpdateInventorySprites:
 
 
     rts
+;----------------------------------
+
+
+ExitMenuState:
+    lda #STATE_GAME
+    sta GameState
+
+    lda FoodMenuActivated
+    beq @ignorethis
+    lda #0
+    sta FoodMenuActivated
+    lda OldInventoryPointerY
+    sta InventoryPointerPos
+@ignorethis:
+    lda InHouse
+    beq @loadOutside ;InHouse = 0
+    lda #1
+    sta MustLoadHouseInterior
+    sta MustLoadSomething
+    jmp @exit
+@loadOutside:
+    lda #1
+    sta MustLoadOutside
+    sta MustLoadSomething
+@exit:
+    ldy #0
+    jsr bankswitch_y
+
+    rts
+;-------------------------------------
 

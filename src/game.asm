@@ -30,16 +30,41 @@ mytiles_chr: .incbin "tile.chr"
 .include "data/house.asm"
 .include "data/collision_data.asm"
 
+;===========================================================
+.segment "ROM1"
+
+menu_palette:
+    .byte $10,$0F,$00,$10, $0f,$07,$00,$31, $0f,$17,$27,$31, $31,$10,$0f,$01    ;background
+    .byte $10,$07,$17,$27, $10,$06,$16,$37, $10,$17,$21,$31, $10,$0f,$17,$16    ;OAM sprites
+
+PopUpMenu:
+    .byte $78,$72,$72,$72,$72,$72,$72,$79
+    .byte $76,$00,$00,$00,$00,$00,$00,$77
+    .byte $76,$00,$00,$3c,$48,$48,$44,$77
+    .byte $76,$00,$00,$00,$00,$00,$00,$77
+    .byte $76,$00,$00,$3e,$3a,$4d,$00,$77
+    .byte $76,$00,$00,$00,$00,$00,$00,$77
+    .byte $7a,$72,$72,$72,$72,$72,$72,$7b
+
+.include "data/menu_screen.asm"
+
+;============================================================
+.segment "ROM2"
+
+.include "data/title.asm"
+.include "data/game_over.asm"
+
+;============================================================
 
 
-.segment "RODATA" ; data in rom
+.segment "RODATA" ; ROM7
 
+banktable:              ; Write to this table to switch banks.
+    .byte $00, $01, $02, $03, $04, $05, $06
+    .byte $07, $08, $09, $0A, $0B, $0C, $0D, $0E
 
 .include "data/music.asm"
 .include "data/sfx.s"
-.include "data/title.asm"
-.include "data/game_over.asm"
-.include "data/menu_screen.asm"
 .include "data/inventory_data.asm"
 .include "data/npc_data.asm"
 .include "data/item_list.asm" ;items in maps
@@ -59,9 +84,6 @@ house_palette:
     .byte $0C,$16,$27,$37, $0C,$07,$00,$31, $0C,$17,$27,$31, $0C,$10,$0f,$01    ;background
     .byte $0C,$00,$21,$31, $0C,$27,$21,$31, $0C,$17,$21,$31, $0C,$0f,$37,$16    ;OAM sprites
 
-menu_palette:
-    .byte $10,$0F,$00,$10, $0f,$07,$00,$31, $0f,$17,$27,$31, $31,$10,$0f,$01    ;background
-    .byte $10,$07,$17,$27, $10,$06,$16,$37, $10,$17,$21,$31, $10,$0f,$17,$16    ;OAM sprites
 
 sprites:
     .byte $0A, $FF, $00000011, $08   ; sprite 0 
@@ -94,15 +116,6 @@ palette_fade_for_periods: ; each period is 1h 30 mins
     .byte $40 ;19:30
     .byte $40 ;21:00
     .byte $40 ;22:30
-
-PopUpMenu:
-    .byte $78,$72,$72,$72,$72,$72,$72,$79
-    .byte $76,$00,$00,$00,$00,$00,$00,$77
-    .byte $76,$00,$00,$3c,$48,$48,$44,$77
-    .byte $76,$00,$00,$00,$00,$00,$00,$77
-    .byte $76,$00,$00,$3e,$3a,$4d,$00,$77
-    .byte $76,$00,$00,$00,$00,$00,$00,$77
-    .byte $7a,$72,$72,$72,$72,$72,$72,$7b
 
 
 
@@ -193,7 +206,8 @@ PopUpMenu:
 
 ;===================================================================
 .segment "ZEROPAGE"
-
+current_bank: 
+    .res 1
 pointer:
     .res 2
 DigitPtr:
@@ -546,6 +560,12 @@ SourceMapIdx:
 ;====================================================================================
 .segment "CODE"
 
+bankswitch_y:
+    sty current_bank      ; save the current bank in RAM so the NMI handler can restore it
+bankswitch_nosave:
+    lda banktable, y      ; read a byte from the banktable
+    sta banktable, y      ; and write it back, switching banks 
+    rts
 
 reset:
     sei
@@ -608,12 +628,13 @@ paletteCopy:
     jsr AdaptBackgroundPalette
     lda #32
     sta PaletteUpdateSize
-    
 
-    
     jsr loadSprites
 
 ;---
+    ldy #2
+    jsr bankswitch_y ;switching to Title/Game Over bank
+
     lda #<title
     sta pointer
     lda #>title
@@ -1740,6 +1761,7 @@ LoadTitle:
     lda MustLoadTitle
     beq @exit
 
+
     lda #STATE_TITLE
     sta GameState
     lda #$00
@@ -1765,6 +1787,9 @@ LoadTitle:
 LoadGameOver:
     lda MustLoadGameOver
     beq @exit
+    
+    ldy #2
+    jsr bankswitch_y
 
     lda #STATE_GAME_OVER
     sta GameState
@@ -2038,6 +2063,9 @@ CheckStartButton:
 
     lda #STATE_GAME
     sta GameState
+
+    ldy #0
+    jsr bankswitch_y
 
     jsr ResetEntityVariables
     lda #1
