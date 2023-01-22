@@ -510,6 +510,10 @@ UpdateInventorySprites:
 
 
     rts
+
+
+
+
 ;----------------------------------
 
 .segment "CODE"

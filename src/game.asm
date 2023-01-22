@@ -29,6 +29,13 @@ mytiles_chr: .incbin "tile.chr"
 .include "data/map_list.asm"
 .include "data/house.asm"
 .include "data/collision_data.asm"
+.include "data/item_list.asm" ;items in maps
+.include "data/npc_list.asm"  ;npcs in maps
+
+house_palette:
+    .byte $0C,$16,$27,$37, $0C,$07,$00,$31, $0C,$17,$27,$31, $0C,$10,$0f,$01    ;background
+    .byte $0C,$00,$21,$31, $0C,$27,$21,$31, $0C,$17,$21,$31, $0C,$0f,$37,$16    ;OAM sprites
+
 
 ;===========================================================
 .segment "ROM1"
@@ -67,8 +74,6 @@ banktable:              ; Write to this table to switch banks.
 .include "data/sfx.s"
 .include "data/inventory_data.asm"
 .include "data/npc_data.asm"
-.include "data/item_list.asm" ;items in maps
-.include "data/npc_list.asm"  ;npcs in maps
 
 zerosprite:
     .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
@@ -79,11 +84,6 @@ zerosprite:
 palette:
     .byte $0C,$00,$21,$31, $0C,$1B,$21,$31, $0C,$18,$21,$31, $0C,$10,$0f,$01    ;background
     .byte $0C,$0f,$17,$20, $0C,$06,$16,$39, $0C,$17,$21,$31, $0C,$0f,$37,$16    ;OAM sprites
-
-house_palette:
-    .byte $0C,$16,$27,$37, $0C,$07,$00,$31, $0C,$17,$27,$31, $0C,$10,$0f,$01    ;background
-    .byte $0C,$00,$21,$31, $0C,$27,$21,$31, $0C,$17,$21,$31, $0C,$0f,$37,$16    ;OAM sprites
-
 
 sprites:
     .byte $0A, $FF, $00000011, $08   ; sprite 0 
@@ -1393,45 +1393,6 @@ AnimateFire:
 @exit:
     rts
 
-
-;-------------------------------
-UpdateFireplace:
-
-    lda InHouse
-    beq @exit
-
-    lda $2002
-    lda #$21
-    sta $2006
-    lda #$0E
-    sta $2006
-
-    lda Fuel
-    clc
-    adc Fuel + 1
-    adc Fuel + 2
-    cmp #0
-    beq @putFireOut
-    lda FireFrame
-    asl
-    sta Temp
-    lda #$5C
-    clc
-    adc Temp
-    sta $2007
-    adc #1
-    sta $2007
-    jmp @exit
-@putFireOut:
-    lda #0
-    sta $2007
-    sta $2007
-
-@exit:
-    rts
-
-
-
 ;----------------------------------
 HandleInput:
 
@@ -2359,6 +2320,44 @@ FlipStartingNametable:
 
     rts
 ;----------------------------------
+.segment "ROM0"
+
+UpdateFireplace:
+
+    lda InHouse
+    beq @exit
+
+    lda $2002
+    lda #$21
+    sta $2006
+    lda #$0E
+    sta $2006
+
+    lda Fuel
+    clc
+    adc Fuel + 1
+    adc Fuel + 2
+    cmp #0
+    beq @putFireOut
+    lda FireFrame
+    asl
+    sta Temp
+    lda #$5C
+    clc
+    adc Temp
+    sta $2007
+    adc #1
+    sta $2007
+    jmp @exit
+@putFireOut:
+    lda #0
+    sta $2007
+    sta $2007
+
+@exit:
+    rts
+
+;-----------------------------------
 CheckIfEnteredHouse:
 
     lda InHouse
@@ -2412,8 +2411,52 @@ CheckIfEnteredHouse:
 
 @nope:
     rts
-;---------------------------
 
+
+;-----------------------------------
+CheckIfExitedHouse:
+
+    lda InHouse
+    beq @nope
+
+    lda PlayerY
+    cmp #HOUSE_EXIT_Y
+    bcc @nope
+
+    ldx #0
+@copyCollisionMapLoop:
+    lda bg_collision, x
+    sta CollisionMap, x
+    inx
+    cpx #COLLISION_MAP_SIZE
+    bne @copyCollisionMapLoop
+
+    lda #0
+    sta InHouse
+    
+    lda #<Outside1_items
+    sta pointer
+    lda #>Outside1_items
+    sta pointer + 1
+    jsr LoadItems
+
+    jsr GenerateNpcs
+
+
+    lda #OUTSIDE_ENTRY_FROM_HOUSE_X
+    sta PlayerX
+    lda #OUTSIDE_ENTRY_FROM_HOUSE_Y
+    sta PlayerY
+
+    lda #1
+    sta MustLoadOutside
+    sta MustLoadSomething
+
+@nope:
+    rts
+
+.segment "CODE"
+;-------------------------------------
 LoadTheHouseInterior:
 
     lda MustLoadHouseInterior
@@ -2457,47 +2500,6 @@ LoadTheHouseInterior:
 @nope:
     rts
 
-;-----------------------------------
-CheckIfExitedHouse:
-
-    lda InHouse
-    beq @nope
-
-    lda PlayerY
-    cmp #HOUSE_EXIT_Y
-    bcc @nope
-
-    ldx #0
-@copyCollisionMapLoop:
-    lda bg_collision, x
-    sta CollisionMap, x
-    inx
-    cpx #COLLISION_MAP_SIZE
-    bne @copyCollisionMapLoop
-
-    lda #0
-    sta InHouse
-    
-    lda #<Outside1_items
-    sta pointer
-    lda #>Outside1_items
-    sta pointer + 1
-    jsr LoadItems
-
-    jsr GenerateNpcs
-
-
-    lda #OUTSIDE_ENTRY_FROM_HOUSE_X
-    sta PlayerX
-    lda #OUTSIDE_ENTRY_FROM_HOUSE_Y
-    sta PlayerY
-
-    lda #1
-    sta MustLoadOutside
-    sta MustLoadSomething
-
-@nope:
-    rts
 ;-----------------------------------
 UpdateSprites:
     
