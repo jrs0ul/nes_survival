@@ -44,6 +44,8 @@ LoadMenu:
 
     rts
 
+.segment "ROM1"
+
 ;----------------------------------
 UpdateMenuStats:
     lda $2002
@@ -274,7 +276,8 @@ Button_B_Pressed:
 @clearItem:
     lda #0
     sta Inventory, x
-    jsr ExitMenuState
+    lda #1
+    sta MustExitMenuState
 
 @exit:
     rts
@@ -509,6 +512,7 @@ UpdateInventorySprites:
     rts
 ;----------------------------------
 
+.segment "CODE"
 
 ExitMenuState:
     lda #STATE_GAME

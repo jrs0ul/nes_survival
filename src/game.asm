@@ -445,6 +445,10 @@ MustDrawPopupMenu:
     .res 1
 ;--
 
+MustExitMenuState: ;if you want to exit the menu state when in bank1
+    .res 1
+
+
 FoodMenuActivated:  ; press b on raw meat in menu
     .res 1
 
@@ -722,6 +726,14 @@ update_game_sprites:
     jsr UpdateSprites
     jmp doSomeLogics
 update_menu_sprites:
+    lda MustExitMenuState
+    beq updateInventory
+exitMenu:
+    jsr ExitMenuState
+    lda #0
+    sta MustExitMenuState
+    jmp nextIteration
+updateInventory:
     jsr UpdateInventorySprites
     jmp doSomeLogics
 hide_sprites:
