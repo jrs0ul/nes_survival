@@ -36,6 +36,7 @@ LoadMenu:
     sta MustLoadSomething
     sta InventoryActivated
     sta InventoryItemIndex
+    sta BaseMenuIndex
 
     lda #INVENTORY_POINTER_X
     sta InventoryPointerX
@@ -495,6 +496,12 @@ DoRegularInput:
 
     lda BaseMenuIndex
     beq @activateInventory
+
+    ;sleep
+    lda InHouse
+    beq @exit
+
+    jsr Sleep
     jmp @exit
 
 @activateInventory:
@@ -509,6 +516,172 @@ DoRegularInput:
 
 @exit:
 
+    rts
+
+;--------------------------------------
+Sleep:
+    lda Hours
+    clc
+    adc #SLEEP_TIME
+    sta Hours
+    bcs @hoursOverFlow
+    cmp #HOURS_MAX
+    bcs @increaseDays
+    jmp @adaptPalette
+
+@hoursOverFlow:
+    lda Hours
+    sec
+    sbc #15
+    sta Hours
+    jsr IncreaseDays
+    jmp @adaptPalette
+
+@increaseDays:
+    lda Hours
+    sec
+    sbc #HOURS_MAX
+    sta Hours
+    jsr IncreaseDays
+
+@adaptPalette:
+    jsr AdaptBackgroundPalette
+    lda #1
+    sta MustExitMenuState
+
+
+    lda Food
+    clc
+    adc Food + 1
+    adc Food + 2
+    cmp #0
+    beq @decreaseHealthFromHunger
+
+    lda HP
+    bne @makeHundred
+
+    lda HP + 1
+    clc
+    adc #3
+    cmp #10
+    bcs @makeHundred
+    sta HP + 1
+    jmp @checkWarmth
+
+@makeHundred:
+    lda #1
+    sta HP
+    lda #0
+    sta HP + 1
+    sta HP + 2
+    jmp @checkWarmth
+
+@decreaseHealthFromHunger:
+
+    lda HP + 1
+    cmp #5
+    bcs @subtractHPHunger
+
+    lda HP
+    beq @kill
+
+    lda #10
+
+@subtractHPHunger:
+    sec
+    sbc #5
+    sta HP + 1
+
+@checkWarmth:
+
+    lda Warmth
+    clc
+    adc Warmth + 1
+    adc Warmth + 2
+    cmp #0
+    bne @checkFuel
+
+    lda HP + 1
+    cmp #5
+    bcs @subtractHPCold
+
+    lda HP
+    beq @kill
+
+    lda #10
+
+@subtractHPCold:
+    sec
+    sbc #5
+    sta HP + 1
+
+@checkFuel:
+
+    lda Fuel
+    clc
+    adc Fuel + 1
+    adc Fuel + 2
+    cmp #0
+    bne @subtractStuff
+
+    lda Warmth + 1
+    cmp #5
+    bcs @subtractWarmth
+
+    lda Warmth
+    beq @zeroWarmth
+
+    lda #10
+
+@subtractWarmth:
+    sec
+    sbc #5
+    sta Warmth + 1
+
+    jmp @subtractStuff
+
+@zeroWarmth:
+    lda #0
+    sta Warmth
+    sta Warmth + 1
+    sta Warmth + 2
+    jmp @subtractStuff
+
+
+@kill:
+    lda #0
+    sta HP
+    sta HP + 1
+    sta HP + 2
+
+@subtractStuff:
+    lda #0
+    sta Fuel
+    sta Fuel + 1
+    sta Fuel + 2
+
+    lda Food + 1
+    cmp #5
+    bcs @subtractFood
+
+    lda Food
+    beq @makeFoodZero
+
+    lda #10
+
+@subtractFood:
+    sec
+    sbc #5
+    sta Food + 1
+    jmp @exit
+
+@makeFoodZero:
+    lda #0
+    sta Food
+    sta Food + 1
+    sta Food + 2
+
+@exit:
     rts
 
 ;--------------------------------------

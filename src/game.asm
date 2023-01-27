@@ -168,6 +168,7 @@ palette_fade_for_periods: ; each period is 1h 30 mins
 
 
     HOURS_MAX                  = 240
+    SLEEP_TIME                 = 60
 
     PLAYER_ATTACK_DELAY        = 16
 
