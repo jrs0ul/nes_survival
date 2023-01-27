@@ -520,6 +520,14 @@ DoRegularInput:
 
 ;--------------------------------------
 Sleep:
+    lda #SLEEP_POS_X
+    sta PlayerY
+    lda #SLEEP_POS_Y
+    sta PlayerX
+    lda #2
+    sta PlayerFrame
+    lda #16
+    sta WalkAnimationIndex
     lda Hours
     clc
     adc #SLEEP_TIME
@@ -680,6 +688,7 @@ Sleep:
     sta Food
     sta Food + 1
     sta Food + 2
+
 
 @exit:
     rts

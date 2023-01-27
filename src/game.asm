@@ -194,6 +194,9 @@ palette_fade_for_periods: ; each period is 1h 30 mins
 
     HOUSE_EXIT_Y               = 168
 
+    SLEEP_POS_X                = 100
+    SLEEP_POS_Y                = 72
+
     HOUSE_ENTRY_POINT_X        = 128
     HOUSE_ENTRY_POINT_Y        = 152
 
