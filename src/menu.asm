@@ -57,6 +57,7 @@ UpdateMenuGfx:
 
     jsr DrawInventoryGrid
     jsr DrawFoodMenu
+    jsr ClearFoodMenu
 
     lda #0
     sta MustLoadSomething
@@ -73,7 +74,6 @@ DrawInventoryGrid:
 
     lda FirstNametableAddr
     clc
-    ;adc #1
     sta Temp
 
     ldy #0
@@ -180,9 +180,72 @@ DrawFoodMenu:
 
 @exit:
     rts
+;----------------------------
+ClearFoodMenu:
+    lda MustClearFoodMenu
+    beq @exit
+    
+    lda #0
+    sta $2001
+
+    lda FirstNametableAddr
+    clc
+    adc #1
+    sta Temp
+
+    ldy #0
+    lda #$49
+    sta TempY
+    sty TempIndex
+
+@menuRowLoop:
+
+    lda $2002
+    lda Temp
+    sta $2006
+    lda TempY
+    sta $2006
+
+    ldx #0
+@menuCellLoop:
+    stx TempX
+    ldx TempIndex 
+    lda PopUpMenuClear, x
+    sta $2007
+    ldx TempX
+    inx
+    inc TempIndex
+    cpx #8
+    bne @menuCellLoop
+
+    lda TempY
+    clc
+    adc #$20
+    bcs @incrementUpperAddress
+    sta TempY
+    jmp @incrementRow
+@incrementUpperAddress:
+    sta TempY
+    inc Temp
+@incrementRow:
+    iny
+    cpy #7
+    bne @menuRowLoop
+
+
+    lda #0
+    sta MustClearFoodMenu
+
+@exit:
+    rts
+
 
 ;----------------------------------
 UpdateMenuStats:
+
+    lda #0
+    sta $2001
+
     lda $2002
     lda FirstNametableAddr
     sta $2006
@@ -314,11 +377,18 @@ InventoryInput:
 
     lda InventoryPointerY
     cmp #INVENTORY_SPRITE_MAX_Y - 12
-    bcs @CheckUp
+    bcs @rewindUp
     clc
     adc #12
     sta InventoryPointerY
     inc InventoryItemIndex
+    jmp @CheckB
+@rewindUp:
+    lda #INVENTORY_SPRITE_MIN_Y
+    sta InventoryPointerY
+    lda #0
+    sta InventoryItemIndex
+
 
     jmp @CheckB
 
@@ -329,11 +399,17 @@ InventoryInput:
 
     lda InventoryPointerY
     cmp #INVENTORY_SPRITE_MIN_Y + 12
-    bcc @CheckB
+    bcc @rewindDown
     sec
     sbc #12
     sta InventoryPointerY
     dec InventoryItemIndex
+    jmp @CheckB
+@rewindDown:
+    lda #INVENTORY_SPRITE_MAX_Y - 12
+    sta InventoryPointerY
+    lda #9
+    sta InventoryItemIndex
 
 @CheckB:
     lda Buttons
@@ -379,8 +455,9 @@ InventoryInput:
 @clearItem:
     lda #0
     sta Inventory, x
-    lda #1
-    sta MustExitMenuState
+    ;lda #1
+    ;sta MustExitMenuState
+    jsr UpdateMenuStats
 
 @CheckA:
     lda Buttons
@@ -456,8 +533,17 @@ FoodMenuInput:
 @clearItem:
     lda #0
     sta Inventory, x
+    sta FoodMenuActivated
+    jsr UpdateMenuStats
     lda #1
-    sta MustExitMenuState
+    sta InventoryActivated
+    lda #INVENTORY_POINTER_X
+    sta InventoryPointerX
+    lda OldInventoryPointerY
+    sta InventoryPointerY
+    lda #1
+    sta MustLoadSomething
+    sta MustClearFoodMenu
 
 @exit:
     rts

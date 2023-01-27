@@ -191,12 +191,13 @@ AddAndDeactivateItems:
 
     sty TempY
 
-    ldy #INVENTORY_MAX_ITEMS - 1
+    ldy #0 
 @inventoryLoop:
     lda Inventory, y
     beq @addItem
-    dey
-    bpl @inventoryLoop
+    iny
+    cmp #INVENTORY_MAX_ITEMS
+    bcc @inventoryLoop
     jmp @exit ; no place in the inventory?
 
 @addItem:
