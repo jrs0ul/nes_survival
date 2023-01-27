@@ -34,17 +34,151 @@ LoadMenu:
     lda #0
     sta MustLoadMenu
     sta MustLoadSomething
+    sta InventoryActivated
+    sta InventoryItemIndex
 
     lda #INVENTORY_POINTER_X
     sta InventoryPointerX
+
+    lda #BASE_MENU_MIN_Y
+    sta InventoryPointerY
 
     lda #STATE_MENU
     sta GameState
 @exit:
 
     rts
-
+;------------------------------------
 .segment "ROM1"
+;------------------------------------
+UpdateMenuGfx:
+
+
+    jsr DrawInventoryGrid
+    jsr DrawFoodMenu
+
+    lda #0
+    sta MustLoadSomething
+
+@exit:
+    rts
+;----------------------------------
+DrawInventoryGrid:
+    lda MustDrawInventoryGrid
+    beq @exit
+
+    lda #0
+    sta $2001
+
+    lda FirstNametableAddr
+    clc
+    ;adc #1
+    sta Temp
+
+    ldy #0
+    lda #$A5
+    sta TempY
+    sty TempIndex
+
+@menuRowLoop:
+
+    lda $2002
+    lda Temp
+    sta $2006
+    lda TempY
+    sta $2006
+
+    ldx #0
+@menuCellLoop:
+    stx TempX
+    ldx TempIndex 
+    lda inventory_grid, x
+    sta $2007
+    ldx TempX
+    inx
+    inc TempIndex
+    cpx #9
+    bne @menuCellLoop
+
+    lda TempY
+    clc
+    adc #$20
+    bcs @incrementUpperAddress
+    sta TempY
+    jmp @incrementRow
+@incrementUpperAddress:
+    sta TempY
+    inc Temp
+@incrementRow:
+    iny
+    cpy #16
+    bne @menuRowLoop
+
+
+    lda #0
+    sta MustDrawInventoryGrid
+
+
+@exit:
+    rts
+;----------------------------------
+DrawFoodMenu:
+    lda MustDrawFoodMenu
+    beq @exit
+    
+    lda #0
+    sta $2001
+
+    lda FirstNametableAddr
+    clc
+    adc #1
+    sta Temp
+
+    ldy #0
+    lda #$49
+    sta TempY
+    sty TempIndex
+
+@menuRowLoop:
+
+    lda $2002
+    lda Temp
+    sta $2006
+    lda TempY
+    sta $2006
+
+    ldx #0
+@menuCellLoop:
+    stx TempX
+    ldx TempIndex 
+    lda PopUpMenu, x
+    sta $2007
+    ldx TempX
+    inx
+    inc TempIndex
+    cpx #8
+    bne @menuCellLoop
+
+    lda TempY
+    clc
+    adc #$20
+    bcs @incrementUpperAddress
+    sta TempY
+    jmp @incrementRow
+@incrementUpperAddress:
+    sta TempY
+    inc Temp
+@incrementRow:
+    iny
+    cpy #7
+    bne @menuRowLoop
+
+
+    lda #0
+    sta MustDrawFoodMenu
+
+@exit:
+    rts
 
 ;----------------------------------
 UpdateMenuStats:
@@ -145,32 +279,44 @@ MenuInput:
     cmp MenuButtons
     beq @exit
 
+    lda InventoryActivated
+    bne @DoInventoryInput
+
+    lda FoodMenuActivated
+    bne @DoFoodMenuInput
+
+    jsr DoRegularInput
+    jmp @exit
+
+@DoInventoryInput:
+    jsr InventoryInput
+    jmp @exit
+
+@DoFoodMenuInput:
+    jsr FoodMenuInput
+    jmp @exit
+
+
+@exit:
+    lda Buttons
+    sta MenuButtons
+
+    rts
+;--------------------------------------
+InventoryInput:
+
 @checkDown:
 
     lda Buttons
     and #BUTTON_DOWN_MASK
     beq @CheckUp
 
-    lda FoodMenuActivated
-    beq @regularMenuDown
-
-    lda InventoryPointerPos
-    cmp #112
-    bcs @CheckUp
-    clc
-    adc #16
-    sta InventoryPointerPos
-    inc FoodMenuIndex
-
-    jmp @CheckB
-
-@regularMenuDown:
-    lda InventoryPointerPos
+    lda InventoryPointerY
     cmp #INVENTORY_SPRITE_MAX_Y - 12
     bcs @CheckUp
     clc
     adc #12
-    sta InventoryPointerPos
+    sta InventoryPointerY
     inc InventoryItemIndex
 
     jmp @CheckB
@@ -180,64 +326,19 @@ MenuInput:
     and #BUTTON_UP_MASK
     beq @CheckB
 
-    lda FoodMenuActivated
-    beq @regularMenuUp
-
-    lda InventoryPointerPos
-    cmp #112
-    bcc @CheckB
-    sec 
-    sbc #16
-    sta InventoryPointerPos
-    dec FoodMenuIndex
-
-    jmp @CheckB
-@regularMenuUp:
-    lda InventoryPointerPos
+    lda InventoryPointerY
     cmp #INVENTORY_SPRITE_MIN_Y + 12
     bcc @CheckB
     sec
     sbc #12
-    sta InventoryPointerPos
+    sta InventoryPointerY
     dec InventoryItemIndex
 
 @CheckB:
-    jsr Button_B_Pressed
-
-@exit:
-    lda Buttons
-    sta MenuButtons
-
-    rts
-;--------------------------------------
-Button_B_Pressed:
     lda Buttons
     and #BUTTON_B_MASK
-    beq @exit
+    beq @CheckA
 
-    lda FoodMenuActivated
-    beq @checkItemSelect
-
-    jsr LoadSelectedItemStuff
-    beq @exit
-
-    lda FoodMenuIndex
-    bne @eat
-    ;cook
-    jsr CookMeat
-    lda #1
-    sta MustLoadSomething
-    sta MustLoadMenu
-    lda #0
-    sta FoodMenuActivated
-    lda OldInventoryPointerY
-    sta InventoryPointerPos
-    jmp @exit
-@eat:
-    jsr UseFood
-    jmp @clearItem
-
-@checkItemSelect:
     jsr LoadSelectedItemStuff
     beq @exit
     dey
@@ -261,18 +362,96 @@ Button_B_Pressed:
 @addFood:
     lda #1
     sta MustLoadSomething
-    sta MustDrawPopupMenu
+    sta MustDrawFoodMenu
     sta FoodMenuActivated
     lda #80
     sta InventoryPointerX
-    lda InventoryPointerPos
+    lda InventoryPointerY
     sta OldInventoryPointerY
     lda #96
-    sta InventoryPointerPos
+    sta InventoryPointerY
     lda #0
     sta FoodMenuIndex
+    sta InventoryActivated
 
     jmp @exit
+@clearItem:
+    lda #0
+    sta Inventory, x
+    lda #1
+    sta MustExitMenuState
+
+@CheckA:
+    lda Buttons
+    and #BUTTON_A_MASK
+    beq @exit
+
+    lda #1
+    sta MustLoadSomething
+    sta MustLoadMenu
+
+
+
+@exit:
+    rts
+
+
+;--------------------------------------
+FoodMenuInput:
+@checkDown:
+    lda Buttons
+    and #BUTTON_DOWN_MASK
+    beq @CheckUp
+
+    lda InventoryPointerY
+    cmp #112
+    bcs @CheckUp
+    clc
+    adc #16
+    sta InventoryPointerY
+    inc FoodMenuIndex
+
+    jmp @CheckB
+
+@CheckUp:
+    lda Buttons
+    and #BUTTON_UP_MASK
+    beq @CheckB
+
+    lda InventoryPointerY
+    cmp #112
+    bcc @CheckB
+    sec 
+    sbc #16
+    sta InventoryPointerY
+    dec FoodMenuIndex
+
+    jmp @CheckB
+
+@CheckB:
+    lda Buttons
+    and #BUTTON_B_MASK
+    beq @exit
+
+    jsr LoadSelectedItemStuff
+    beq @exit
+
+    lda FoodMenuIndex
+    bne @eat
+    ;cook
+    jsr CookMeat
+    lda #1
+    sta MustLoadSomething
+    sta MustLoadMenu
+    lda #0
+    sta FoodMenuActivated
+    lda OldInventoryPointerY
+    sta InventoryPointerY
+    jmp @exit
+@eat:
+    jsr UseFood
+    
+
 @clearItem:
     lda #0
     sta Inventory, x
@@ -282,6 +461,57 @@ Button_B_Pressed:
 @exit:
     rts
 ;-------------------------------------
+DoRegularInput:
+@checkDown:
+    lda Buttons
+    and #BUTTON_DOWN_MASK
+    beq @CheckUp
+
+    lda InventoryPointerY
+    cmp #64
+    bcs @CheckB
+    clc
+    adc #16
+    sta InventoryPointerY
+    inc BaseMenuIndex
+
+@CheckUp:
+    lda Buttons
+    and #BUTTON_UP_MASK
+    beq @CheckB
+
+    lda InventoryPointerY
+    cmp #BASE_MENU_MIN_Y
+    beq @CheckB
+    sec
+    sbc #16
+    sta InventoryPointerY
+    dec BaseMenuIndex
+
+@CheckB:
+    lda Buttons
+    and #BUTTON_B_MASK
+    beq @exit
+
+    lda BaseMenuIndex
+    beq @activateInventory
+    jmp @exit
+
+@activateInventory:
+
+    lda #1
+    sta InventoryActivated
+    sta MustLoadSomething
+    sta MustDrawInventoryGrid
+    lda #INVENTORY_SPRITE_MIN_Y
+    sta InventoryPointerY
+
+
+@exit:
+
+    rts
+
+;--------------------------------------
 CookMeat:
     lda InHouse
     beq @cantcook
@@ -399,6 +629,12 @@ UpdateInventorySprites:
     lda #32
     sta TempTileYPos
 
+    lda InventoryActivated
+    bne @itemLoop
+
+@checkFoodMenu:
+    lda FoodMenuActivated
+    beq @ThePointer
 
 @itemLoop:
 
@@ -465,9 +701,10 @@ UpdateInventorySprites:
     cpx #INVENTORY_MAX_ITEMS
     bcc @itemLoop
 
+@ThePointer:
 
     ldx TempSpriteIdx
-    lda InventoryPointerPos
+    lda InventoryPointerY
     sec
     sbc #1                  ;subtract 1 because the gfx in the tile skips first pixel row
     sta FIRST_SPRITE, x
@@ -527,7 +764,7 @@ ExitMenuState:
     lda #0
     sta FoodMenuActivated
     lda OldInventoryPointerY
-    sta InventoryPointerPos
+    sta InventoryPointerY
 @ignorethis:
     lda InHouse
     beq @loadOutside ;InHouse = 0

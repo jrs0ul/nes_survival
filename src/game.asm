@@ -37,6 +37,8 @@ house_palette:
     .byte $0C,$00,$21,$31, $0C,$27,$21,$31, $0C,$17,$21,$31, $0C,$0f,$37,$16    ;OAM sprites
 
 
+
+
 ;===========================================================
 .segment "ROM1"
 
@@ -52,6 +54,26 @@ PopUpMenu:
     .byte $76,$00,$00,$3e,$3a,$4d,$00,$77
     .byte $76,$00,$00,$00,$00,$00,$00,$77
     .byte $7a,$72,$72,$72,$72,$72,$72,$7b
+
+inventory_grid: ;at 5,5
+    .byte $78,$72,$72,$79,$0,$0,$0,$0,$0
+    .byte $74,$70,$70,$71,$0,$0,$0,$0,$0
+    .byte $76,$00,$00,$77,$0,$0,$0,$0,$0
+    .byte $75,$72,$72,$73,$0,$0,$0,$0,$0
+    .byte $74,$70,$70,$71,$0,$0,$0,$0,$0
+    .byte $76,$00,$00,$77,$0,$0,$0,$0,$0
+    .byte $75,$72,$72,$73,$0,$0,$0,$0,$0
+    .byte $74,$70,$70,$71,$0,$0,$0,$0,$0
+    .byte $76,$00,$00,$77,$0,$0,$0,$0,$0
+    .byte $75,$72,$72,$73,$0,$0,$0,$0,$0
+    .byte $74,$70,$70,$71,$0,$0,$0,$0,$0
+    .byte $76,$00,$00,$77,$0,$0,$0,$0,$0
+    .byte $75,$72,$72,$73,$0,$0,$0,$0,$0
+    .byte $74,$70,$70,$71,$0,$0,$0,$0,$0
+    .byte $76,$00,$00,$77,$0,$0,$0,$0,$0
+    .byte $7a,$72,$72,$7b,$0,$0,$0,$0,$0
+
+
 
 .include "data/menu_screen.asm"
 
@@ -137,6 +159,7 @@ palette_fade_for_periods: ; each period is 1h 30 mins
     BUTTON_START_MASK           = %00010000
 
     BUTTON_B_MASK               = %01000000
+    BUTTON_A_MASK               = %10000000
 
     PLAYER_SPEED               = 2
     NPC_SPEED                  = 1
@@ -196,6 +219,7 @@ palette_fade_for_periods: ; each period is 1h 30 mins
     INVENTORY_SPRITE_MAX_Y     = 164
     INVENTORY_POINTER_X        = 30
     INVENTORY_STEP_PIXELS      = 12
+    BASE_MENU_MIN_Y            = 48 ;pointer position in base action menu
 
     ITEM_TYPE_FOOD             = 1
     ITEM_TYPE_FUEL             = 2
@@ -368,7 +392,7 @@ Hours:
 Inventory:
     .res INVENTORY_MAX_ITEMS 
 
-InventoryPointerPos: ;y
+InventoryPointerY:
     .res 1
 InventoryPointerX:
     .res 1
@@ -380,6 +404,8 @@ FoodMenuIndex: ; COOK OR EAT ?
 InventoryItemIndex:
     .res 1
 
+BaseMenuIndex: ; INVENTORY OR SLEEP ?
+    .res 1
 
 WarmthDelay:
     .res 1
@@ -441,7 +467,10 @@ MustLoadTitle:
     .res 1
 MustLoadGameOver:
     .res 1
-MustDrawPopupMenu:
+
+MustDrawInventoryGrid:
+    .res 1
+MustDrawFoodMenu:
     .res 1
 ;--
 
@@ -449,6 +478,8 @@ MustExitMenuState: ;if you want to exit the menu state when in bank1
     .res 1
 
 
+InventoryActivated:
+    .res 1
 FoodMenuActivated:  ; press b on raw meat in menu
     .res 1
 
@@ -796,7 +827,7 @@ ReadControllerLoop:
     lda MustLoadSomething
     beq DoneLoadingMaps
 
-    jsr DrawPopUpMenu
+    jsr UpdateMenuState
     jsr LoadTitle
     jsr LoadGameOver
     jsr LoadMenu
@@ -909,62 +940,13 @@ CopyCHRTiles:
     bne @loop  ; repeat until we've copied enough pages
     rts
 ;--------------------------------------------
-DrawPopUpMenu:
-    lda MustDrawPopupMenu
-    beq @exit
-    
-    lda #0
-    sta $2001
+UpdateMenuState:
+    lda GameState
+    cmp #STATE_MENU
+    bne @exit
 
-    lda FirstNametableAddr
-    clc
-    adc #1
-    sta Temp
+    jsr UpdateMenuGfx   ; code from ROM1
 
-    ldy #0
-    lda #$49
-    sta TempY
-    sty TempIndex
-
-@menuRowLoop:
-
-    lda $2002
-    lda Temp
-    sta $2006
-    lda TempY
-    sta $2006
-
-    ldx #0
-@menuCellLoop:
-    stx TempX
-    ldx TempIndex 
-    lda PopUpMenu, x
-    sta $2007
-    ldx TempX
-    inx
-    inc TempIndex
-    cpx #8
-    bne @menuCellLoop
-
-    lda TempY
-    clc
-    adc #$20
-    bcs @incrementUpperAddress
-    sta TempY
-    jmp @incrementRow
-@incrementUpperAddress:
-    sta TempY
-    inc Temp
-@incrementRow:
-    iny
-    cpy #7
-    bne @menuRowLoop
-
-
-    lda #0
-    sta MustDrawPopupMenu
-    sta MustLoadSomething
-    
 @exit:
     rts
 
@@ -1855,8 +1837,8 @@ ResetEntityVariables:
     sta ScreenCount
 
 
-    lda #INVENTORY_SPRITE_MIN_Y
-    sta InventoryPointerPos
+    lda #BASE_MENU_MIN_Y
+    sta InventoryPointerY
     lda #0
     sta InventoryItemIndex
 
@@ -1874,6 +1856,7 @@ ResetEntityVariables:
     sta TilesScroll
     sta TimesShiftedLeft
     sta TimesShiftedRight
+    sta BaseMenuIndex
     sta InHouse
     lda #$50
     sta PlayerX
