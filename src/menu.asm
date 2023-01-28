@@ -431,7 +431,10 @@ FoodMenuInput:
     jsr CookMeat
     lda #1
     sta MustLoadSomething
-    sta MustLoadMenu
+    sta MustClearFoodMenu
+    sta InventoryActivated
+    lda #INVENTORY_POINTER_X
+    sta InventoryPointerX
     lda #0
     sta FoodMenuActivated
     lda OldInventoryPointerY
@@ -489,7 +492,7 @@ DoRegularInput:
 @CheckB:
     lda Buttons
     and #BUTTON_B_MASK
-    beq @exit
+    beq @CheckA
 
     lda BaseMenuIndex
     beq @activateInventory
@@ -500,6 +503,15 @@ DoRegularInput:
 
     jsr Sleep
     jmp @exit
+
+@CheckA:
+    lda Buttons
+    and #BUTTON_A_MASK
+    beq @exit
+
+    lda #1
+    sta MustExitMenuState
+
 
 @activateInventory:
 
