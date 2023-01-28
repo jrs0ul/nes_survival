@@ -69,56 +69,26 @@ DrawInventoryGrid:
     lda MustDrawInventoryGrid
     beq @exit
 
-    lda #0
-    sta $2001
-
     lda FirstNametableAddr
     clc
     sta Temp
 
-    ldy #0
     lda #$A5
-    sta TempY
-    sty TempIndex
+    sta TempX
 
-@menuRowLoop:
+    lda #9
+    sta TempPointX
+    lda #16
+    sta TempPointY
 
-    lda $2002
-    lda Temp
-    sta $2006
-    lda TempY
-    sta $2006
-
-    ldx #0
-@menuCellLoop:
-    stx TempX
-    ldx TempIndex 
-    lda inventory_grid, x
-    sta $2007
-    ldx TempX
-    inx
-    inc TempIndex
-    cpx #9
-    bne @menuCellLoop
-
-    lda TempY
-    clc
-    adc #$20
-    bcs @incrementUpperAddress
-    sta TempY
-    jmp @incrementRow
-@incrementUpperAddress:
-    sta TempY
-    inc Temp
-@incrementRow:
-    iny
-    cpy #16
-    bne @menuRowLoop
-
+    lda #<inventory_grid
+    sta pointer
+    lda #>inventory_grid
+    sta pointer + 1
+    jsr TransferTiles
 
     lda #0
     sta MustDrawInventoryGrid
-
 
 @exit:
     rts
@@ -126,54 +96,25 @@ DrawInventoryGrid:
 DrawFoodMenu:
     lda MustDrawFoodMenu
     beq @exit
-    
-    lda #0
-    sta $2001
 
     lda FirstNametableAddr
     clc
     adc #1
     sta Temp
 
-    ldy #0
     lda #$49
-    sta TempY
-    sty TempIndex
+    sta TempX
 
-@menuRowLoop:
+    lda #8
+    sta TempPointX
+    lda #7
+    sta TempPointY
 
-    lda $2002
-    lda Temp
-    sta $2006
-    lda TempY
-    sta $2006
-
-    ldx #0
-@menuCellLoop:
-    stx TempX
-    ldx TempIndex 
-    lda PopUpMenu, x
-    sta $2007
-    ldx TempX
-    inx
-    inc TempIndex
-    cpx #8
-    bne @menuCellLoop
-
-    lda TempY
-    clc
-    adc #$20
-    bcs @incrementUpperAddress
-    sta TempY
-    jmp @incrementRow
-@incrementUpperAddress:
-    sta TempY
-    inc Temp
-@incrementRow:
-    iny
-    cpy #7
-    bne @menuRowLoop
-
+    lda #<PopUpMenu
+    sta pointer
+    lda #>PopUpMenu
+    sta pointer + 1
+    jsr TransferTiles
 
     lda #0
     sta MustDrawFoodMenu
@@ -184,53 +125,25 @@ DrawFoodMenu:
 ClearFoodMenu:
     lda MustClearFoodMenu
     beq @exit
-    
-    lda #0
-    sta $2001
 
     lda FirstNametableAddr
     clc
     adc #1
     sta Temp
 
-    ldy #0
     lda #$49
-    sta TempY
-    sty TempIndex
+    sta TempX
 
-@menuRowLoop:
+    lda #8
+    sta TempPointX
+    lda #7
+    sta TempPointY
 
-    lda $2002
-    lda Temp
-    sta $2006
-    lda TempY
-    sta $2006
-
-    ldx #0
-@menuCellLoop:
-    stx TempX
-    ldx TempIndex 
-    lda PopUpMenuClear, x
-    sta $2007
-    ldx TempX
-    inx
-    inc TempIndex
-    cpx #8
-    bne @menuCellLoop
-
-    lda TempY
-    clc
-    adc #$20
-    bcs @incrementUpperAddress
-    sta TempY
-    jmp @incrementRow
-@incrementUpperAddress:
-    sta TempY
-    inc Temp
-@incrementRow:
-    iny
-    cpy #7
-    bne @menuRowLoop
+    lda #<PopUpMenuClear
+    sta pointer
+    lda #>PopUpMenuClear
+    sta pointer + 1
+    jsr TransferTiles
 
 
     lda #0
@@ -238,8 +151,6 @@ ClearFoodMenu:
 
 @exit:
     rts
-
-
 ;----------------------------------
 UpdateMenuStats:
 

@@ -1,3 +1,54 @@
+;----------------------------------
+;pointer - data
+;Temp - screen High address
+;TempX - screen Lower address
+;TempPointX - column count
+;TempPointY - row count
+TransferTiles:
+    lda #0  ;turn off ppu
+    sta $2001
+
+    ldy #0
+    sty TempIndex
+
+@menuRowLoop:
+
+    sty TempY
+
+    lda $2002
+    lda Temp
+    sta $2006
+    lda TempX
+    sta $2006
+
+    ldx #0
+
+@menuCellLoop:
+    ldy TempIndex 
+    lda (pointer), y
+    sta $2007
+    inx
+    inc TempIndex
+    cpx TempPointX
+    bne @menuCellLoop
+
+    lda TempX
+    clc
+    adc #$20
+    bcs @incrementUpperAddress
+    sta TempX
+    jmp @incrementRow
+@incrementUpperAddress:
+    sta TempX
+    inc Temp
+@incrementRow:
+    ldy TempY
+    iny
+    cpy TempPointY
+    bne @menuRowLoop
+
+
+    rts
 
 ;---------------------------------
 ; Loads palettes
