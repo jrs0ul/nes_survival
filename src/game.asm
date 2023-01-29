@@ -33,9 +33,18 @@ mytiles_chr: .incbin "tile.chr"
 .include "data/npc_list.asm"  ;npcs in maps
 
 house_palette:
-    .byte $0C,$16,$27,$37, $0C,$07,$00,$31, $0C,$17,$27,$31, $0C,$10,$0f,$01    ;background
+    .byte $0C,$16,$27,$37, $0C,$07,$00,$31, $0C,$17,$27,$31, $0C,$20,$10,$01    ;background
     .byte $0C,$00,$21,$31, $0C,$27,$21,$31, $0C,$17,$21,$31, $0C,$0f,$37,$16    ;OAM sprites
 
+zerosprite:
+    .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
+    .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
+    .byte $72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72
+    .byte $72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72
+    .byte $00,$57,$31,$30,$30,$00,$3f,$48,$48,$3d,$00,$30,$36,$37,$00,$50
+    .byte $3a,$4b,$46,$4d,$41,$00,$30,$38,$33,$00,$00,$3d,$30,$30,$30,$00
+    .byte $70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70
+    .byte $70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70
 
 
 
@@ -107,18 +116,14 @@ banktable:              ; Write to this table to switch banks.
 .include "data/inventory_data.asm"
 .include "data/npc_data.asm"
 
-zerosprite:
-    .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
-    .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
-    .byte $00,$57,$30,$30,$30,$00,$3F,$48,$48,$3D,$00,$30,$30,$30,$00,$50
-    .byte $3A,$4B,$46,$4D,$41,$00,$30,$30,$30,$00,$00,$00,$3D,$30,$30,$30
+
 
 palette:
-    .byte $0C,$00,$21,$31, $0C,$1B,$21,$31, $0C,$18,$21,$31, $0C,$10,$0f,$01    ;background
+    .byte $0C,$00,$21,$31, $0C,$1B,$21,$31, $0C,$18,$21,$31, $0C,$20,$10,$01    ;background
     .byte $0C,$0f,$17,$20, $0C,$06,$16,$39, $0C,$17,$21,$31, $0C,$0f,$37,$16    ;OAM sprites
 
 sprites:
-    .byte $0A, $FF, $00000011, $08   ; sprite 0 
+    .byte $11, $FF, $00000011, $08   ; sprite 0 
     .byte $00, $00, %00000011, $00
     .byte $00, $01, %00000011, $00
     .byte $00, $10, %00000011, $00
@@ -900,7 +905,7 @@ WaitSprite0:
     and #%01000000
     beq WaitSprite0      ; wait until sprite 0 is hit
 
-    ldx #$F
+    ldx #219
 WaitScanline:
     dex
     bne WaitScanline
@@ -985,7 +990,7 @@ UploadBgColumns:
     sta pointer + 1
 
     ;calculate source address
-    lda #64 ; skip two rows
+    lda #128 ; skip four rows
     clc
     adc BgColumnIdxToUpload
     sta pointer2
@@ -1002,8 +1007,8 @@ UploadBgColumns:
     lda pointer2
     sta $2006
 
-    ldx #SCREEN_ROW_COUNT - 3 ; skip two rows that are invisible anyway and the one that's covered
-    ldy #64  ;  skip two rows
+    ldx #SCREEN_ROW_COUNT - 5 ; skip two rows that are invisible anyway and 3 for HUD
+    ldy #128  ;  skip four rows
 @loop:
     lda (pointer), y
     sta $2007
@@ -1047,7 +1052,7 @@ UpdateAttributeColumn:
     adc AttribColumnIdxToUpdate
     sta pointer
 
-    ldx #8 ; 
+    ldx #7 ;
     lda #$C0
     clc
     adc AttribColumnIdxToUpdate
@@ -1587,7 +1592,7 @@ UpdateStatusDigits:
     lda $2002
     lda #$20
     sta $2006
-    lda #$22
+    lda #$42
     sta $2006
 
     ldy #0
@@ -1605,7 +1610,7 @@ UpdateStatusDigits:
     lda $2002
     lda #$20
     sta $2006
-    lda #$36
+    lda #$56
     sta $2006
 
 
@@ -1631,7 +1636,7 @@ UpdateStatusDigits:
     lda $2002
     lda #$20
     sta $2006
-    lda #$2B
+    lda #$4B
     sta $2006
 
     ldy #0
@@ -1659,7 +1664,7 @@ UpdateDays:
     lda $2002
     lda #$20
     sta $2006
-    lda #$3D
+    lda #$5C
     sta $2006
 
     ldy #0
@@ -1678,7 +1683,7 @@ UpdateDays:
 ;-----------------------------------
 LoadStatusBar:
     ldy #$00
-    ldx #$40 ;64 tiles
+    ldx #128 ;tiles
     lda $2002
     lda #$20
     sta $2006
