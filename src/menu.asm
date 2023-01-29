@@ -602,6 +602,7 @@ Sleep:
     lda HP
     beq @kill
 
+    dec HP
     lda #10
 
 @subtractHPHunger:
@@ -625,6 +626,7 @@ Sleep:
     lda HP
     beq @kill
 
+    dec HP
     lda #10
 
 @subtractHPCold:
@@ -648,6 +650,7 @@ Sleep:
     lda Warmth
     beq @zeroWarmth
 
+    dec Warmth
     lda #10
 
 @subtractWarmth:
@@ -684,6 +687,7 @@ Sleep:
     lda Food
     beq @makeFoodZero
 
+    dec Food
     lda #10
 
 @subtractFood:
