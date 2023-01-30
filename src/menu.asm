@@ -439,6 +439,7 @@ FoodMenuInput:
     sta FoodMenuActivated
     lda OldInventoryPointerY
     sta InventoryPointerY
+    jsr UpdateMenuStats
     jmp @exit
 @eat:
     jsr UseFood

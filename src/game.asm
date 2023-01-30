@@ -33,16 +33,16 @@ mytiles_chr: .incbin "tile.chr"
 .include "data/npc_list.asm"  ;npcs in maps
 
 house_palette:
-    .byte $0C,$16,$27,$37, $0C,$07,$00,$31, $0C,$17,$27,$31, $0C,$20,$10,$01    ;background
-    .byte $0C,$00,$21,$31, $0C,$27,$21,$31, $0C,$17,$21,$31, $0C,$0f,$37,$16    ;OAM sprites
+    .byte $0C,$16,$27,$37, $0C,$07,$00,$31, $0C,$17,$27,$31, $0C,$20,$37,$16    ;background
+    .byte $0C,$0f,$17,$20, $0C,$06,$16,$39, $0C,$17,$21,$31, $0C,$0f,$37,$16    ;OAM sprites
 
 zerosprite:
     .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
     .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
     .byte $72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72
     .byte $72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72
-    .byte $00,$57,$31,$30,$30,$00,$3f,$48,$48,$3d,$00,$30,$36,$37,$00,$50
-    .byte $3a,$4b,$46,$4d,$41,$00,$30,$38,$33,$00,$00,$3d,$30,$30,$30,$00
+    .byte $00,$57,$31,$30,$30,$00,$00,$00,$56,$30,$36,$37,$00,$00,$00,$55
+    .byte $30,$38,$33,$00,$00,$00,$00,$00,$00,$00,$00,$00,$89,$8A,$8B,$00
     .byte $70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70
     .byte $70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70
 
@@ -119,7 +119,7 @@ banktable:              ; Write to this table to switch banks.
 
 
 palette:
-    .byte $0C,$00,$21,$31, $0C,$1B,$21,$31, $0C,$18,$21,$31, $0C,$20,$10,$01    ;background
+    .byte $0C,$00,$21,$31, $0C,$1B,$21,$31, $0C,$18,$21,$31, $0C,$20,$37,$16    ;background
     .byte $0C,$0f,$17,$20, $0C,$06,$16,$39, $0C,$17,$21,$31, $0C,$0f,$37,$16    ;OAM sprites
 
 sprites:
@@ -153,6 +153,25 @@ palette_fade_for_periods: ; each period is 1h 30 mins
     .byte $40 ;19:30
     .byte $40 ;21:00
     .byte $40 ;22:30
+
+sun_moon_sprites_for_periods:
+    .byte 232, 246, 0, 0 ;$40
+    .byte 232, 246, 0, 0 ;$40
+    .byte 232, 246, 0, 0 ;$40
+    .byte 232, 246, 0, 0 ;$40
+    .byte 240, 246, 0, 0 ; 30
+    .byte 240, 246, 224, 244 ; 20
+    .byte 240, 248, 224, 243 ; 10
+    .byte 232, 243, 0, 0 ; 0
+    .byte 232, 243, 0, 0 ; 0
+    .byte 232, 243, 0, 0 ; 0
+    .byte 240, 243, 0, 0 ; 10
+    .byte 240, 243, 224, 247 ; 20
+    .byte 224, 246, 240,  245; 30
+    .byte 232, 246, 0, 0 ;$40
+    .byte 232, 246, 0, 0 ;$40
+    .byte 232, 246, 0, 0 ;$40
+    
 
 
 
@@ -1610,7 +1629,7 @@ UpdateStatusDigits:
     lda $2002
     lda #$20
     sta $2006
-    lda #$56
+    lda #$50
     sta $2006
 
 
@@ -1636,7 +1655,7 @@ UpdateStatusDigits:
     lda $2002
     lda #$20
     sta $2006
-    lda #$4B
+    lda #$49
     sta $2006
 
     ldy #0
@@ -1654,32 +1673,10 @@ UpdateStatusDigits:
     lda DaysUpdated
     beq @exit
 
-    jsr UpdateDays
 
 @exit:
     rts
-;----------------------------------
-UpdateDays:
 
-    lda $2002
-    lda #$20
-    sta $2006
-    lda #$5C
-    sta $2006
-
-    ldy #0
-    sty DaysUpdated
-@DaysLoop:
-    lda #CHARACTER_ZERO
-    clc
-    adc Days, y
-    sta $2007
-    iny
-    cpy #3
-    bcc @DaysLoop
-
-
-    rts
 ;-----------------------------------
 LoadStatusBar:
     ldy #$00
@@ -2654,6 +2651,56 @@ UpdateSprites:
 @noKnife:
 ;---
     inx; next sprite byte
+;------sun-moon indicator
+
+    lda Hours
+    lsr
+    lsr
+    lsr
+    lsr
+    asl
+    asl
+    tay
+
+    lda #15
+    sta FIRST_SPRITE, x
+    inx
+    iny
+    lda sun_moon_sprites_for_periods, y
+    sta FIRST_SPRITE, x
+    inx
+    lda #0
+    sta FIRST_SPRITE, x
+    inx
+    dey
+    lda sun_moon_sprites_for_periods, y
+    sta FIRST_SPRITE, x
+    inx
+    inc TempSpriteCount
+    iny
+    iny
+    lda sun_moon_sprites_for_periods, y
+    sta TempFrame
+    beq @no_second_celestial_body
+;--
+    iny
+    lda #15
+    sta FIRST_SPRITE, x
+    inx
+    lda sun_moon_sprites_for_periods, y
+    sta FIRST_SPRITE, x
+    inx
+    lda #0
+    sta FIRST_SPRITE, x
+    inx
+    lda TempFrame
+    sta FIRST_SPRITE, x
+
+    inc TempSpriteCount
+
+    inx
+;--------------------
+@no_second_celestial_body:
     jsr UpdateNpcSpritesInWorld
     jsr UpdateItemSpritesInWorld
 
