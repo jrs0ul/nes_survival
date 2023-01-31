@@ -4,6 +4,20 @@ LoadOutsideMap:
     sta $2000
     sta $2001
 
+    lda MustCopyMainChr
+    beq @continueLoad ;nope we don't need to load CHR
+
+    lda #<main_tiles_chr
+    sta pointer
+    lda #>main_tiles_chr
+    sta pointer + 1
+
+    jsr CopyCHRTiles
+    lda #0
+    sta MustCopyMainChr
+
+@continueLoad:
+
     ldy CurrentMapSegmentIndex
     lda map_list_low, y
     sta pointer
@@ -82,7 +96,7 @@ LoadOutsideMap:
     ;copy outside map palette to ram
     ldy #0
 @paletteCopy:
-    lda palette, y
+    lda main_palette, y
     sta RamPalette, y
     iny
     cpy #32

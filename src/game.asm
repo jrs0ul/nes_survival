@@ -25,7 +25,8 @@
 
 .segment "ROM0"
 
-mytiles_chr: .incbin "tile.chr"
+main_tiles_chr: .incbin "main.chr"
+
 .include "data/map_list.asm"
 .include "data/house.asm"
 .include "data/collision_data.asm"
@@ -99,6 +100,13 @@ inventory_grid: ;at 5,5
 ;============================================================
 .segment "ROM2"
 
+title_tiles_chr: .incbin "title.chr"
+
+title_palette:
+
+    .byte $0F,$07,$05,$26, $0F,$01,$26,$07, $0F,$26,$26,$35, $0F,$07,$26,$35    ;background
+    .byte $0F,$0f,$17,$20, $0F,$06,$26,$39, $0F,$17,$21,$31, $0F,$0f,$37,$26    ;OAM sprites
+
 .include "data/title.asm"
 .include "data/game_over.asm"
 
@@ -118,7 +126,7 @@ banktable:              ; Write to this table to switch banks.
 
 
 
-palette:
+main_palette:
     .byte $0C,$00,$21,$31, $0C,$1B,$21,$31, $0C,$18,$21,$31, $0C,$20,$37,$16    ;background
     .byte $0C,$0f,$17,$20, $0C,$06,$16,$39, $0C,$17,$21,$31, $0C,$0f,$37,$16    ;OAM sprites
 
@@ -493,6 +501,9 @@ TimesShiftedRight:
 MustUpdatePalette: ;flag that signals the palette update
     .res 1
 
+MustCopyMainChr:
+    .res 1
+
 MustLoadSomething:
     .res 1
 MustLoadHouseInterior:
@@ -672,7 +683,6 @@ clrmem:
     inx
     bne clrmem
 
-    jsr CopyCHRTiles
 
     ldx #<sounds
     ldy #>sounds
@@ -689,26 +699,26 @@ vblankwait2:      ; Second wait for vblank, PPU is ready after this
     bit $2002
     bpl vblankwait2
 
-
-    ldy #0
-paletteCopy:
-    lda palette, y
-    sta RamPalette, y
-    iny
-    cpy #32
-    bne paletteCopy
-
-    lda #255
-    sta CurrentPaletteDecrementValue
-    jsr AdaptBackgroundPalette
-    lda #32
-    sta PaletteUpdateSize
-
     jsr loadSprites
 
 ;---
     ldy #2
     jsr bankswitch_y ;switching to Title/Game Over bank
+
+    lda #<title_palette
+    sta pointer
+    lda #>title_palette
+    sta pointer + 1
+    lda #32
+    sta Temp
+    jsr LoadPalette
+
+
+    lda #<title_tiles_chr
+    sta pointer
+    lda #>title_tiles_chr
+    sta pointer + 1
+    jsr CopyCHRTiles
 
     lda #<title
     sta pointer
@@ -958,27 +968,25 @@ endOfNmi:
 .include "menu.asm"
 
 ;--------------------------------------------
+;copy chr tiles from ROM bank to a CHR RAM
+;pointer -  sits at zero page, points to the chr data
 CopyCHRTiles:
-    src = 0
-    lda #<mytiles_chr  ; load the source address into a pointer in zero page
-    sta src
-    lda #>mytiles_chr
-    sta src+1
 
-    ldy #0       ; starting index into the first page
+    ldy #0     ; starting index into the first page
     sty $2001  ; turn off rendering just in case
     sty $2006  ; load the destination address into the PPU
     sty $2006
     ldx #32      ; number of 256-byte pages to copy
 @loop:
-    lda (src),y  ; copy one byte
+    lda (pointer),y  ; copy one byte
     sta $2007
     iny
     bne @loop  ; repeat until we finish the page
-    inc src+1  ; go to the next page
+    inc pointer + 1  ; go to the next page
     dex
     bne @loop  ; repeat until we've copied enough pages
     rts
+
 ;--------------------------------------------
 UpdateMenuState:
     lda GameState
@@ -1207,7 +1215,7 @@ AdaptBackgroundPalette:
     sta CurrentPaletteDecrementValue
    
 @paletteLoop:
-    lda palette, y ;palette from ROM
+    lda main_palette, y ;palette from ROM
     sec
     sbc palette_fade_for_periods, x
     bcs @saveColor
@@ -1760,15 +1768,30 @@ LoadTitle:
 LoadGameOver:
     lda MustLoadGameOver
     beq @exit
-    
+
     ldy #2
     jsr bankswitch_y
 
-    lda #STATE_GAME_OVER
-    sta GameState
-    lda #$00
+    lda #0
     sta $2000
     sta $2001
+
+    lda #<title_tiles_chr
+    sta pointer
+    lda #>title_tiles_chr
+    sta pointer + 1
+    jsr CopyCHRTiles
+
+    lda #<title_palette
+    sta pointer
+    lda #>title_palette
+    sta pointer + 1
+    lda #32
+    sta Temp
+    jsr LoadPalette
+
+    lda #STATE_GAME_OVER
+    sta GameState
 
     lda #<game_over
     sta pointer
@@ -2045,6 +2068,7 @@ CheckStartButton:
     lda #1
     sta MustLoadOutside
     sta MustLoadSomething
+    sta MustCopyMainChr
 
     lda #<Outside1_items
     sta pointer
