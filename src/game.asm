@@ -54,7 +54,7 @@ zerosprite:
 
 menu_palette:
     .byte $10,$0F,$00,$10, $0f,$07,$00,$31, $0f,$17,$27,$31, $31,$10,$0f,$01    ;background
-    .byte $10,$07,$17,$27, $10,$06,$16,$37, $10,$17,$21,$31, $10,$0f,$17,$16    ;OAM sprites
+    .byte $10,$07,$17,$27, $10,$06,$16,$37, $0C,$0f,$16,$39, $10,$0f,$17,$16    ;OAM sprites
 
 PopUpMenu:
     .byte $78,$72,$72,$72,$72,$72,$72,$79
@@ -128,7 +128,7 @@ banktable:              ; Write to this table to switch banks.
 
 main_palette:
     .byte $0C,$00,$21,$31, $0C,$1B,$21,$31, $0C,$18,$21,$31, $0C,$20,$37,$16    ;background
-    .byte $0C,$0f,$17,$20, $0C,$06,$16,$39, $0C,$17,$21,$31, $0C,$0f,$37,$16    ;OAM sprites
+    .byte $0C,$0f,$17,$20, $0C,$06,$16,$39, $0C,$0f,$16,$39, $0C,$0f,$37,$16    ;OAM sprites
 
 sprites:
     .byte $11, $FF, $00000011, $08   ; sprite 0 
@@ -269,6 +269,7 @@ sun_moon_sprites_for_periods:
 
     ITEM_TYPE_FOOD             = 1
     ITEM_TYPE_FUEL             = 2
+    ITEM_TYPE_MEDICINE         = 3
 
     INVENTORY_MAX_ITEMS        = 10
 

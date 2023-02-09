@@ -339,6 +339,10 @@ InventoryInput:
     cmp #ITEM_TYPE_FOOD
     beq @addFood
 
+@checkMedicine:
+    cmp #ITEM_TYPE_MEDICINE
+    beq @addMedicine
+
     jmp @clearItem
 
 @addFuel:
@@ -346,6 +350,11 @@ InventoryInput:
     beq @exit ; can't use a stick outside the hut
     jsr UseFuel
     jmp @clearItem
+
+@addMedicine:
+    jsr UseMedicine
+    jmp @clearItem
+    jmp @exit
 ;--------
 @addFood:
     lda #1
@@ -758,6 +767,32 @@ LoadSelectedItemStuff:
 @empty:
     lda #0
 
+@exit:
+    rts
+
+
+;TODO: eliminate repetetive code
+;---------------------------------------
+UseMedicine:
+
+    lda HP
+    bne @clampHp
+
+    lda HP + 1
+    clc
+    adc Temp
+    cmp #10
+    bcs @clampHp
+    jmp @saveHp
+@clampHp:
+    lda #0
+    sta HP + 1
+    sta HP + 2
+    lda #1
+    sta HP
+    jmp @exit
+@saveHp:
+    sta HP + 1
 @exit:
     rts
 
