@@ -545,8 +545,8 @@ Sleep:
     sta PlayerX
     lda #2
     sta PlayerFrame
-    lda #16
-    sta WalkAnimationIndex
+    lda #1
+    sta PlayerAnimationRowIndex
     lda Hours
     clc
     adc #SLEEP_TIME

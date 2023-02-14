@@ -179,7 +179,20 @@ sun_moon_sprites_for_periods:
     .byte 232, 246, 0, 0 ;$40
     .byte 232, 246, 0, 0 ;$40
     .byte 232, 246, 0, 0 ;$40
-    
+
+player_anim_row_sequence:
+   .byte 0
+   .byte 16
+   .byte 32
+   .byte 16
+   .byte 48
+
+npc_anim_row_sequence:
+    .byte 0
+    .byte 32
+    .byte 64
+    .byte 32
+    .byte 128
 
 
 
@@ -376,7 +389,7 @@ PlayerX:
 PlayerY:
     .res 1
 
-WalkAnimationIndex:
+PlayerAnimationRowIndex: ;which animation row to use for player sprites at the moment
     .res 1
 WalkTimer:
     .res 1
@@ -565,6 +578,11 @@ TempPointX:
 TempPointY:
     .res 1
 TempIndex:
+    .res 1
+TempRegX:
+    .res 1
+
+TempAnimIndex:
     .res 1
 
 ;inventory temps
@@ -1163,8 +1181,8 @@ Logics:
     beq @hideAttackAnim
     jmp @noAttack
 @hideAttackAnim:
-    lda #16
-    sta WalkAnimationIndex
+    lda #1
+    sta PlayerAnimationRowIndex
 @noAttack:
 
     jsr CheckIfEnteredHouse
@@ -1396,16 +1414,16 @@ AnimateWalk:
     lda #0
     sta WalkTimer
 
-    lda WalkAnimationIndex
+    lda PlayerAnimationRowIndex
     clc
-    adc #16
-    cmp #64
+    adc #1
+    cmp #4
     bcs @resetWalk
     jmp @saveWalk
 @resetWalk:
     lda #0
 @saveWalk:
-    sta WalkAnimationIndex
+    sta PlayerAnimationRowIndex
 @exit:
     rts
 ;--------------------------------
@@ -2186,8 +2204,8 @@ CheckB:
     lda AttackTimer
     bne @exit
 
-    lda #64
-    sta WalkAnimationIndex
+    lda #4
+    sta PlayerAnimationRowIndex
 
     lda #PLAYER_ATTACK_DELAY
     sta AttackTimer
@@ -2597,6 +2615,11 @@ UpdateSprites:
     sta FIRST_SPRITE, x
     inx
 ;----
+
+    ldy PlayerAnimationRowIndex
+    lda player_anim_row_sequence, y
+    sta TempAnimIndex
+
     ;sprite 3
     lda PlayerY
     clc
@@ -2608,7 +2631,7 @@ UpdateSprites:
     lda TempFrame
     clc
     adc #17
-    adc WalkAnimationIndex
+    adc TempAnimIndex
     sta FIRST_SPRITE, x
     inx
     lda FIRST_SPRITE, x
@@ -2619,7 +2642,7 @@ UpdateSprites:
     lda TempFrame
     clc
     adc #16
-    adc WalkAnimationIndex
+    adc TempAnimIndex
     sta FIRST_SPRITE, x
     inx
     lda FIRST_SPRITE, x
@@ -2642,7 +2665,7 @@ UpdateSprites:
     lda TempFrame
     clc
     adc #16
-    adc WalkAnimationIndex
+    adc TempAnimIndex
     sta FIRST_SPRITE, x
     inx
     lda FIRST_SPRITE, x
@@ -2653,7 +2676,7 @@ UpdateSprites:
     lda TempFrame
     clc
     adc #17
-    adc WalkAnimationIndex
+    adc TempAnimIndex
     sta FIRST_SPRITE, x
     inx
     lda FIRST_SPRITE, x

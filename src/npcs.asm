@@ -431,16 +431,7 @@ UpdateSingleNpcSprites:
     sta TempDir
     iny
     lda Npcs, y ; frame
-    lsr
-    lsr
-    lsr
-    lsr
-    lsr
-    asl
-    asl
-    asl
-    asl
-    asl
+    jsr NpcCalcAnimationFrame
     sta TempFrame
     dey
     dey
@@ -482,6 +473,21 @@ UpdateSingleNpcSprites:
     bne @rowloop
 @nextNpc:
     rts
+;------------------------------------
+NpcCalcAnimationFrame:
+    lsr
+    lsr
+    lsr
+    lsr
+    lsr 
+    stx TempRegX
+    tax
+    lda npc_anim_row_sequence, x
+
+    ldx TempRegX
+
+    rts
+
 ;------------------------------------
 CalcNpcY:
     iny
@@ -734,7 +740,7 @@ SingleNpcAI:
     lda Npcs, x ; load dir
     sta TempDir
     inx
-    lda Npcs, x ; frame
+    lda Npcs, x ; frame, 0..128, step 2
     clc
     adc #2
     cmp #128
