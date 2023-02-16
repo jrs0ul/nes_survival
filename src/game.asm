@@ -192,7 +192,7 @@ npc_anim_row_sequence:
     .byte 32
     .byte 64
     .byte 32
-    .byte 128
+    .byte 96
 
 
 
@@ -608,6 +608,8 @@ TempYOffset:
     .res 1
 TempNpcType: ;temp value of an npc, if it's a predator or not
     .res 1
+TempNpcState: ;attacking or idle
+    .res 1
 TempNpcTimer:
     .res 1
 TempNpcRows:
@@ -646,7 +648,7 @@ ItemCount:
 
 Npcs:   ;animals and stuff
     .res 64 ; max 8 npcs * 8 bytes:
-            ;   (npc type(7 bits) + alive(1 bit),
+            ;   (npc type(6 bits) + state(2 bit, 0 - dead, 1 - alive, 2 - attacks),
             ;   x,
             ;   y,
             ;   screen_index

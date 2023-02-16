@@ -66,7 +66,7 @@ GenerateNpcs:
     beq @makeWolf
     lda #2      ; this should be loaded from the npc types, but oh well..
     sta TempNpcRows
-    lda #%00000011
+    lda #%00000101
     jmp @storeType
 @makeWolf:
     lda #3
@@ -240,9 +240,15 @@ CheckSingleNpcAgainstPlayerHit:
     asl ; y * 8
     tay
 
-    lda Npcs, y ; index + alive
+    lda Npcs, y; let's get the state
+    and #%00000011
+    cmp #0
+    beq @exit ; it's dead
+    sta TempNpcState
+
+    lda Npcs, y ; let's get DB index
     lsr
-    bcc @exit ; dead already
+    lsr ;eliminate 2 state bits
 
     sty Temp
     asl
@@ -338,7 +344,7 @@ KnifeNpcsCollision:
     dey
     dey
     lda Npcs, y
-    and #%11111110;
+    and #%11111100; drop two last bits that stand for status
     sta Npcs, y
 
     lda TempNpcType
@@ -407,8 +413,13 @@ UpdateSingleNpcSprites:
     tay
     lda Npcs, y ; index + alive
 
+    and #%00000011
+    cmp #0
+    beq @nextNpc ;npc not active
+
+    lda Npcs, y
     lsr
-    bcc @nextNpc ;npc not active
+    lsr
 
     sty Temp; store Npcs index
     asl
@@ -665,25 +676,15 @@ doNpcAI:
     asl
     asl ; a * 8
     tax
-    lda Npcs, x ;type + active
-    lsr
-    bcc @nextNpc ; not active
-    sta TempNpcIndex
-    stx TempIndex
-    asl
-    asl
-    tax
-    inx
-    lda npc_data, x; rows
-    sta TempNpcRows
-    inx
-    lda npc_data, x; y offset for collision
-    sta TempYOffset
-    inx
-    lda npc_data, x; npc type
-    sta TempNpcType
-    ldx TempIndex
 
+    lda Npcs, x ;type + active
+    and #%00000011
+    sta TempNpcState
+    cmp #0
+    beq @nextNpc ; not active
+
+    jsr FetchNpcVars
+    
     inx
     inx
     inx
@@ -734,8 +735,76 @@ doNpcAI:
     sta NpcAIUpdateDelay
     rts
 ;-----------------------------------
+FetchNpcVars:
+    lda Npcs, x
+    lsr
+    lsr
+    sta TempNpcIndex
+    stx TempIndex
+    asl
+    asl
+    tax
+    inx
+    lda npc_data, x; rows
+    sta TempNpcRows
+    inx
+    lda npc_data, x; y offset for collision
+    sta TempYOffset
+    inx
+    lda npc_data, x; npc type
+    sta TempNpcType
+    ldx TempIndex
+
+    rts
+
+
+;-----------------------------------
 SingleNpcAI:
 
+    lda TempNpcState
+    cmp #2 ;is attack?
+    beq @attackState
+
+@idleState:
+    jsr NpcMovement
+    jmp @nextNpc
+@attackState:
+    inx ; dir 
+    inx ; frame
+    inx ; timer
+    lda Npcs, x
+    clc
+    adc #1
+    cmp #64
+    bcs @exitAttackState
+    sta Npcs, x
+    cmp #32
+    bcc @nextNpc
+@resetAttackFrame:
+    dex
+    lda #32
+    sta Npcs, x
+    jmp @nextNpc
+@exitAttackState:
+    lda #0
+    sta Npcs, x ;reset timer
+    dex ;frame
+    dex ;dir
+    dex ;screen
+    dex ;y
+    dex ;x
+    dex ; state
+    lda Npcs, x
+    and #%11111100
+    clc
+    adc #1
+    sta Npcs, x
+
+@nextNpc:
+
+    rts
+;--------------------------
+NpcMovement:
     inx
     lda Npcs, x ; load dir
     sta TempDir
@@ -781,7 +850,7 @@ SingleNpcAI:
     jsr HorizontalMovement
     lda MustRedir
     bne @changeDir
-;---------------------------------------------------
+    ;--
 @YMovement:
     lda TempDir
     lsr
@@ -811,8 +880,8 @@ SingleNpcAI:
 @changeDir:
     jsr ChangeNpcDirection
 @nextNpc:
-
     rts
+
 ;--------------------------
 HorizontalMovement:
     cmp #1 ; right?
@@ -1161,7 +1230,30 @@ OnCollisionWithPlayer:
     bcc @exit
     ;---
 
+    dex
+    dex
+    dex
+    lda Npcs, x
+    and #%11111100
+    clc
+    adc #2 ;set the attack state
+    sta Npcs, x
+    inx
+    inx
+    inx
+    inx
+    inx
+    lda #128
+    sta Npcs, x ;attack frame
+    inx ; timer
+    lda #0
+    sta Npcs, x
+    dex
+    dex
+    dex
+    
     jsr DecreaseLife
+
 
     lda #0
 
