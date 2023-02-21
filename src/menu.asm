@@ -57,7 +57,8 @@ UpdateMenuGfx:
 
     jsr DrawInventoryGrid
     jsr DrawFoodMenu
-    jsr ClearFoodMenu
+    jsr DrawItemMenu
+    jsr ClearSubMenu
 
     lda #0
     sta MustLoadSomething
@@ -73,10 +74,10 @@ DrawInventoryGrid:
     clc
     sta Temp
 
-    lda #$A5
+    lda #$A4
     sta TempX
 
-    lda #9
+    lda #10
     sta TempPointX
     lda #16
     sta TempPointY
@@ -102,17 +103,17 @@ DrawFoodMenu:
     adc #1
     sta Temp
 
-    lda #$49
+    lda #$48
     sta TempX
 
-    lda #8
+    lda #9
     sta TempPointX
-    lda #7
+    lda #9
     sta TempPointY
 
-    lda #<PopUpMenu
+    lda #<FoodMenu
     sta pointer
-    lda #>PopUpMenu
+    lda #>FoodMenu
     sta pointer + 1
     jsr TransferTiles
 
@@ -121,9 +122,9 @@ DrawFoodMenu:
 
 @exit:
     rts
-;----------------------------
-ClearFoodMenu:
-    lda MustClearFoodMenu
+;-------------------------
+DrawItemMenu:
+    lda MustDrawItemMenu
     beq @exit
 
     lda FirstNametableAddr
@@ -131,12 +132,42 @@ ClearFoodMenu:
     adc #1
     sta Temp
 
-    lda #$49
+    lda #$48
     sta TempX
 
-    lda #8
+    lda #9
     sta TempPointX
     lda #7
+    sta TempPointY
+
+    lda #<ItemMenu
+    sta pointer
+    lda #>ItemMenu
+    sta pointer + 1
+    jsr TransferTiles
+
+    lda #0
+    sta MustDrawItemMenu
+
+@exit:
+    rts
+
+;----------------------------
+ClearSubMenu:
+    lda MustClearSubMenu
+    beq @exit
+
+    lda FirstNametableAddr
+    clc
+    adc #1
+    sta Temp
+
+    lda #$48
+    sta TempX
+
+    lda #9
+    sta TempPointX
+    lda #9
     sta TempPointY
 
     lda #<PopUpMenuClear
@@ -147,7 +178,7 @@ ClearFoodMenu:
 
 
     lda #0
-    sta MustClearFoodMenu
+    sta MustClearSubMenu
 
 @exit:
     rts
@@ -259,6 +290,9 @@ MenuInput:
 
     lda FoodMenuActivated
     bne @DoFoodMenuInput
+    
+    lda ItemMenuActivated
+    bne @DoItemMenuInput
 
     jsr DoRegularInput
     jmp @exit
@@ -271,6 +305,9 @@ MenuInput:
     jsr FoodMenuInput
     jmp @exit
 
+@DoItemMenuInput:
+    jsr ItemMenuInput
+    jmp @exit
 
 @exit:
     lda Buttons
@@ -332,28 +369,25 @@ InventoryInput:
     dey
     lda inventory_data, y ; type
 
-    cmp #ITEM_TYPE_FUEL
-    beq @addFuel
 
 @checkFood:
     cmp #ITEM_TYPE_FOOD
     beq @addFood
 
-@checkMedicine:
-    cmp #ITEM_TYPE_MEDICINE
-    beq @addMedicine
+    lda #1
+    sta MustLoadSomething
+    sta MustDrawItemMenu
+    sta ItemMenuActivated
+    lda #72
+    sta InventoryPointerX
+    lda InventoryPointerY
+    sta OldInventoryPointerY
+    lda #96
+    sta InventoryPointerY
+    lda #0
+    sta ItemMenuIndex
+    sta InventoryActivated
 
-    jmp @clearItem
-
-@addFuel:
-    lda InHouse
-    beq @exit ; can't use a stick outside the hut
-    jsr UseFuel
-    jmp @clearItem
-
-@addMedicine:
-    jsr UseMedicine
-    jmp @clearItem
     jmp @exit
 ;--------
 @addFood:
@@ -375,8 +409,6 @@ InventoryInput:
 @clearItem:
     lda #0
     sta Inventory, x
-    ;lda #1
-    ;sta MustExitMenuState
     jsr UpdateMenuStats
 
 @CheckA:
@@ -440,7 +472,7 @@ FoodMenuInput:
     jsr CookMeat
     lda #1
     sta MustLoadSomething
-    sta MustClearFoodMenu
+    sta MustClearSubMenu
     sta InventoryActivated
     lda #INVENTORY_POINTER_X
     sta InventoryPointerX
@@ -467,10 +499,92 @@ FoodMenuInput:
     sta InventoryPointerY
     lda #1
     sta MustLoadSomething
-    sta MustClearFoodMenu
+    sta MustClearSubMenu
 
 @exit:
     rts
+;-------------------------------------
+ItemMenuInput:
+@checkDown:
+    lda Buttons
+    and #BUTTON_DOWN_MASK
+    beq @CheckUp
+
+    lda InventoryPointerY
+    cmp #112
+    bcs @CheckUp
+    clc
+    adc #16
+    sta InventoryPointerY
+    inc ItemMenuIndex
+
+    jmp @CheckB
+
+@CheckUp:
+    lda Buttons
+    and #BUTTON_UP_MASK
+    beq @CheckB
+
+    lda InventoryPointerY
+    cmp #112
+    bcc @CheckB
+    sec 
+    sbc #16
+    sta InventoryPointerY
+    dec ItemMenuIndex
+
+    jmp @CheckB
+
+@CheckB:
+    lda Buttons
+    and #BUTTON_B_MASK
+    beq @exit
+
+    jsr LoadSelectedItemStuff
+    beq @exit
+
+    lda ItemMenuIndex
+    bne @store
+    ;use
+    lda TempIndex
+    cmp #ITEM_TYPE_FUEL
+    bne @medicine
+    jsr UseFuel
+    jmp @clearItem
+@medicine:
+    jsr UseMedicine
+    jmp @clearItem
+@store:
+    
+    ldy #255
+@stashLoop:
+    iny
+    cpy #10
+    bcs @exit
+    lda Storage, y
+    bne @stashLoop
+    lda Inventory, x
+    sta Storage, y
+
+@clearItem:
+    lda #0
+    sta Inventory, x
+    sta ItemMenuActivated
+    jsr UpdateMenuStats
+    lda #1
+    sta InventoryActivated
+    lda #INVENTORY_POINTER_X
+    sta InventoryPointerX
+    lda OldInventoryPointerY
+    sta InventoryPointerY
+    lda #1
+    sta MustLoadSomething
+    sta MustClearSubMenu
+
+@exit:
+    rts
+
+
 ;-------------------------------------
 DoRegularInput:
 @checkDown:
@@ -759,6 +873,8 @@ LoadSelectedItemStuff:
     tay
     iny
     iny
+    lda inventory_data, y
+    sta TempIndex
     iny
     lda inventory_data, y 
     sta Temp ;power
@@ -991,11 +1107,19 @@ ExitMenuState:
     sta GameState
 
     lda FoodMenuActivated
-    beq @ignorethis
+    beq @checkItemMenu
     lda #0
     sta FoodMenuActivated
     lda OldInventoryPointerY
     sta InventoryPointerY
+@checkItemMenu:
+    lda ItemMenuActivated
+    beq @ignorethis
+    lda #0
+    sta ItemMenuActivated
+    lda OldInventoryPointerY
+    sta InventoryPointerY
+
 @ignorethis:
     lda InHouse
     beq @loadOutside ;InHouse = 0
