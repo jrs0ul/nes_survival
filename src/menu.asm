@@ -33,6 +33,7 @@ LoadMenu:
 
     lda #0
     sta MustLoadMenu
+    sta StashActivated
     sta MustLoadSomething
     sta InventoryActivated
     sta InventoryItemIndex
@@ -288,6 +289,9 @@ MenuInput:
     lda InventoryActivated
     bne @DoInventoryInput
 
+    lda StashActivated
+    bne @DoInventoryInput
+
     lda FoodMenuActivated
     bne @DoFoodMenuInput
     
@@ -364,6 +368,24 @@ InventoryInput:
     and #BUTTON_B_MASK
     beq @CheckA
 
+    jsr OnItemClicked
+    jmp @exit
+    
+@CheckA:
+    lda Buttons
+    and #BUTTON_A_MASK
+    beq @exit
+
+    lda #1
+    sta MustLoadSomething
+    sta MustLoadMenu
+
+
+
+@exit:
+    rts
+;--------------------------------------
+OnItemClicked:
     jsr LoadSelectedItemStuff
     beq @exit
     dey
@@ -395,7 +417,7 @@ InventoryInput:
     sta MustLoadSomething
     sta MustDrawFoodMenu
     sta FoodMenuActivated
-    lda #80
+    lda #72
     sta InventoryPointerX
     lda InventoryPointerY
     sta OldInventoryPointerY
@@ -411,20 +433,8 @@ InventoryInput:
     sta Inventory, x
     jsr UpdateMenuStats
 
-@CheckA:
-    lda Buttons
-    and #BUTTON_A_MASK
-    beq @exit
-
-    lda #1
-    sta MustLoadSomething
-    sta MustLoadMenu
-
-
-
 @exit:
     rts
-
 
 ;--------------------------------------
 FoodMenuInput:
@@ -434,7 +444,7 @@ FoodMenuInput:
     beq @CheckUp
 
     lda InventoryPointerY
-    cmp #112
+    cmp #128
     bcs @CheckUp
     clc
     adc #16
@@ -461,13 +471,13 @@ FoodMenuInput:
 @CheckB:
     lda Buttons
     and #BUTTON_B_MASK
-    beq @exit
+    beq @CheckA
 
     jsr LoadSelectedItemStuff
     beq @exit
 
     lda FoodMenuIndex
-    bne @eat
+    bne @otherOptions
     ;cook
     jsr CookMeat
     lda #1
@@ -482,6 +492,12 @@ FoodMenuInput:
     sta InventoryPointerY
     jsr UpdateMenuStats
     jmp @exit
+@otherOptions:
+    cmp #2
+    bne @eat
+    
+    jsr StoreItemInStash
+    bne @exit
 @eat:
     jsr UseFood
     
@@ -500,8 +516,32 @@ FoodMenuInput:
     lda #1
     sta MustLoadSomething
     sta MustClearSubMenu
+    jmp @exit
 
+@CheckA:
+    lda Buttons
+    and #BUTTON_A_MASK
+    beq @exit
+
+    jsr ExitSubmenu
 @exit:
+    rts
+;-------------------------------------
+ExitSubmenu:
+    lda #0
+    sta FoodMenuActivated
+    jsr UpdateMenuStats
+    lda #1
+    sta InventoryActivated
+    lda #INVENTORY_POINTER_X
+    sta InventoryPointerX
+    lda OldInventoryPointerY
+    sta InventoryPointerY
+    lda #1
+    sta MustLoadSomething
+    sta MustClearSubMenu
+
+
     rts
 ;-------------------------------------
 ItemMenuInput:
@@ -538,7 +578,7 @@ ItemMenuInput:
 @CheckB:
     lda Buttons
     and #BUTTON_B_MASK
-    beq @exit
+    beq @CheckA
 
     jsr LoadSelectedItemStuff
     beq @exit
@@ -549,22 +589,17 @@ ItemMenuInput:
     lda TempIndex
     cmp #ITEM_TYPE_FUEL
     bne @medicine
+    lda InHouse
+    beq @exit
     jsr UseFuel
     jmp @clearItem
 @medicine:
     jsr UseMedicine
     jmp @clearItem
 @store:
-    
-    ldy #255
-@stashLoop:
-    iny
-    cpy #10
-    bcs @exit
-    lda Storage, y
-    bne @stashLoop
-    lda Inventory, x
-    sta Storage, y
+
+    jsr StoreItemInStash
+    bne @exit ;failed to add to stash
 
 @clearItem:
     lda #0
@@ -581,9 +616,47 @@ ItemMenuInput:
     sta MustLoadSomething
     sta MustClearSubMenu
 
+@CheckA:
+    lda Buttons
+    and #BUTTON_A_MASK
+    beq @exit
+
+    lda #0
+    sta ItemMenuActivated
+    jsr UpdateMenuStats
+    lda #1
+    sta InventoryActivated
+    lda #INVENTORY_POINTER_X
+    sta InventoryPointerX
+    lda OldInventoryPointerY
+    sta InventoryPointerY
+    lda #1
+    sta MustLoadSomething
+    sta MustClearSubMenu
+
 @exit:
     rts
+;------------------------------------
+;x is inventory item index
+StoreItemInStash:
+    lda InHouse
+    beq @fail
+    ldy #255
+@stashLoop:
+    iny
+    cpy #INVENTORY_MAX_ITEMS
+    bcs @fail
+    lda Storage, y
+    bne @stashLoop
+    lda Inventory, x
+    sta Storage, y
 
+    lda #0
+    jmp @exit
+@fail:
+    lda #1
+@exit:
+    rts
 
 ;-------------------------------------
 DoRegularInput:
@@ -593,7 +666,7 @@ DoRegularInput:
     beq @CheckUp
 
     lda InventoryPointerY
-    cmp #64
+    cmp #112
     bcs @CheckB
     clc
     adc #16
@@ -621,6 +694,9 @@ DoRegularInput:
     lda BaseMenuIndex
     beq @activateInventory
 
+    cmp #3
+    beq @stashList
+
     ;sleep
     lda InHouse
     beq @exit
@@ -635,6 +711,17 @@ DoRegularInput:
 
     lda #1
     sta MustExitMenuState
+
+@stashList:
+    lda InHouse
+    beq @exit
+    lda #1
+    sta StashActivated
+    sta MustLoadSomething
+    sta MustDrawInventoryGrid
+    lda #INVENTORY_SPRITE_MIN_Y
+    sta InventoryPointerY
+    jmp @exit
 
 
 @activateInventory:
@@ -981,11 +1068,20 @@ UpdateInventorySprites:
 
 @checkFoodMenu:
     lda FoodMenuActivated
+    clc
+    adc ItemMenuActivated
+    adc StashActivated
     beq @ThePointer
 
 @itemLoop:
 
+    lda StashActivated
+    beq @useInventory
+    lda Storage, x
+    jmp @cnt
+@useInventory:
     lda Inventory, x
+@cnt:
     asl
     asl ;inventory_index * 4
     tay
@@ -1004,44 +1100,7 @@ UpdateInventorySprites:
     adc #INVENTORY_STEP_PIXELS
     sta TempTileYPos
 
-    ldy #0
-@twoTileLoop: ;item consists of two tiles
-
-    lda TempTileYPos
-    ldx TempSpriteIdx
-    sta FIRST_SPRITE, x ;set Y coordinate
-
-    inc TempSpriteIdx
-    lda TempTileIndex
-    sty TempTileIndexOffset
-    clc
-    adc TempTileIndexOffset
-    ldx TempSpriteIdx
-    sta FIRST_SPRITE, x
-
-    inc TempSpriteIdx
-    ;attributes
-    ldx TempSpriteIdx
-    lda #0
-    clc
-    adc TempPaletteIndex
-    sta FIRST_SPRITE, x
-    inc TempSpriteIdx
-    ;x coordinate
-    lda #INVENTORY_SPRITE_X
-    cpy #1
-    bne @saveX
-    clc
-    adc #8
-@saveX:
-    ldx TempSpriteIdx
-    sta FIRST_SPRITE, x
-    inc TempSpriteIdx
-    inc TempSpriteCount
-    iny
-    cpy #2
-    bcc @twoTileLoop
-
+    jsr TwoTileLoop
     ldx TempInventoryIndex ;restore x index
 @next:
     inx
@@ -1095,7 +1154,47 @@ UpdateInventorySprites:
 
     rts
 
+;----------------------------------
+TwoTileLoop:
+    ldy #0
+@twoTileLoop: ;item consists of two tiles
 
+    lda TempTileYPos
+    ldx TempSpriteIdx
+    sta FIRST_SPRITE, x ;set Y coordinate
+
+    inc TempSpriteIdx
+    lda TempTileIndex
+    sty TempTileIndexOffset
+    clc
+    adc TempTileIndexOffset
+    ldx TempSpriteIdx
+    sta FIRST_SPRITE, x
+
+    inc TempSpriteIdx
+    ;attributes
+    ldx TempSpriteIdx
+    lda #0
+    clc
+    adc TempPaletteIndex
+    sta FIRST_SPRITE, x
+    inc TempSpriteIdx
+    ;x coordinate
+    lda #INVENTORY_SPRITE_X
+    cpy #1
+    bne @saveX
+    clc
+    adc #8
+@saveX:
+    ldx TempSpriteIdx
+    sta FIRST_SPRITE, x
+    inc TempSpriteIdx
+    inc TempSpriteCount
+    iny
+    cpy #2
+    bcc @twoTileLoop
+
+    rts
 
 
 ;----------------------------------
@@ -1114,11 +1213,16 @@ ExitMenuState:
     sta InventoryPointerY
 @checkItemMenu:
     lda ItemMenuActivated
-    beq @ignorethis
+    beq @checkStash
     lda #0
     sta ItemMenuActivated
     lda OldInventoryPointerY
     sta InventoryPointerY
+@checkStash:
+    lda StashActivated
+    beq @ignorethis
+    lda #0
+    sta StashActivated
 
 @ignorethis:
     lda InHouse

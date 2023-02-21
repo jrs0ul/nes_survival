@@ -569,6 +569,8 @@ FoodMenuActivated:  ; press b on raw meat in menu
     .res 1
 ItemMenuActivated:
     .res 1
+StashActivated:
+    .res 1
 
 
 CarrySet:
