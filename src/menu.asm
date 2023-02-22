@@ -35,6 +35,10 @@ LoadMenu:
     sta MustLoadMenu
     sta StashActivated
     sta MustLoadSomething
+    sta StashFoodMenuActivated
+    sta StashItemMenuActivated
+    sta FoodMenuActivated
+    sta ItemMenuActivated
     sta InventoryActivated
     sta InventoryItemIndex
     sta BaseMenuIndex
@@ -472,7 +476,6 @@ OnItemClicked:
     jsr ActivateSubmenu
     lda #0
     sta ItemMenuIndex
-    ;sta StashActivated
 
 
     jmp @exit
@@ -500,7 +503,6 @@ OnItemClicked:
     jsr ActivateSubmenu
     lda #0
     sta FoodMenuIndex
-    ;sta StashActivated
 
 
     jmp @exit
@@ -572,24 +574,10 @@ FoodMenuInput:
     bne @otherOptions
     ;cook
     jsr CookMeat
-    lda #1
-    sta MustLoadSomething
-    sta MustClearSubMenu
-    sta InventoryActivated
-    lda #INVENTORY_POINTER_X
-    sta InventoryPointerX
-    lda StashActivated
-    beq @hideInventoryMenu
     lda #0
     sta StashFoodMenuActivated
-    jmp @finish
-@hideInventoryMenu:
-    lda #0
     sta FoodMenuActivated
-@finish:
-    lda OldInventoryPointerY
-    sta InventoryPointerY
-    jsr UpdateMenuStats
+    jsr ExitSubmenu
     jmp @exit
 @otherOptions:
     cmp #2
@@ -602,6 +590,7 @@ FoodMenuInput:
 @storeItem:
     jsr StoreItemInStash
     bne @exit
+    jmp @clearItem
 @eat:
     jsr UseFood
     
@@ -618,6 +607,7 @@ FoodMenuInput:
 @hidemenu:
     lda #0
     sta StashFoodMenuActivated
+    sta FoodMenuActivated
     jsr ExitSubmenu
     jmp @exit
 
@@ -627,6 +617,7 @@ FoodMenuInput:
     beq @exit
 
     lda #0
+    sta StashFoodMenuActivated
     sta FoodMenuActivated
     jsr ExitSubmenu
 @exit:
@@ -736,9 +727,13 @@ ItemMenuInput:
 HideItemMenu:
     lda #0
     sta ItemMenuActivated
+    sta StashItemMenuActivated
     jsr UpdateMenuStats
+    lda StashActivated
+    bne @cont
     lda #1
     sta InventoryActivated
+@cont:
     lda #INVENTORY_POINTER_X
     sta InventoryPointerX
     lda OldInventoryPointerY

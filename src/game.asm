@@ -288,6 +288,10 @@ npc_anim_row_sequence:
     SLEEP_POS_X                = 100
     SLEEP_POS_Y                = 72
 
+    OUTDOORS_MAP_SCREEN_COUNT  = 5
+    PLAYER_START_X             = $50
+    PLAYER_START_Y             = $90
+
     HOUSE_ENTRY_POINT_X        = 128
     HOUSE_ENTRY_POINT_Y        = 152
 
@@ -1944,12 +1948,13 @@ ResetEntityVariables:
     dex
 @clearInventoryLoop:
     sta Inventory, x
+    sta Storage, x
     dex
     bne @clearInventoryLoop
 
     sta CurrentMapSegmentIndex
 
-    lda #5 ;  screens in the outdoors map
+    lda #OUTDOORS_MAP_SCREEN_COUNT ;  screens in the outdoors map
     sta ScreenCount
 
 
@@ -1974,11 +1979,11 @@ ResetEntityVariables:
     sta TimesShiftedRight
     sta BaseMenuIndex
     sta InHouse
-    lda #$50
+    lda #PLAYER_START_X
     sta PlayerX
-    lda #$90
+    lda #PLAYER_START_Y
     sta PlayerY
-    lda #$01
+    lda #1
     sta PlayerAlive
 
     lda #31
@@ -1998,8 +2003,6 @@ ResetEntityVariables:
 
     lda #255
     sta CurrentPaletteDecrementValue
-
-
 
     rts
 ;-------------------------------------
