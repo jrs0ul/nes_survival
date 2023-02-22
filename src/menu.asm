@@ -59,6 +59,8 @@ UpdateMenuGfx:
     jsr DrawInventoryGrid
     jsr DrawFoodMenu
     jsr DrawItemMenu
+    jsr DrawStashFoodMenu
+    jsr DrawStashItemMenu
     jsr ClearSubMenu
 
     lda #0
@@ -122,6 +124,65 @@ DrawFoodMenu:
     sta MustDrawFoodMenu
 
 @exit:
+    rts
+;-------------------------
+DrawStashFoodMenu:
+    lda MustDrawStashFoodMenu
+    beq @exit
+
+    lda FirstNametableAddr
+    clc
+    adc #1
+    sta Temp
+
+    lda #$48
+    sta TempX
+
+    lda #9
+    sta TempPointX
+    lda #9
+    sta TempPointY
+
+    lda #<StashFoodMenu
+    sta pointer
+    lda #>StashFoodMenu
+    sta pointer + 1
+    jsr TransferTiles
+
+    lda #0
+    sta MustDrawStashFoodMenu
+
+@exit:
+    rts
+;-------------------------
+DrawStashItemMenu:
+    lda MustDrawStashItemMenu
+    beq @exit
+
+    lda FirstNametableAddr
+    clc
+    adc #1
+    sta Temp
+
+    lda #$48
+    sta TempX
+
+    lda #9
+    sta TempPointX
+    lda #7
+    sta TempPointY
+
+    lda #<StashItemMenu
+    sta pointer
+    lda #>StashItemMenu
+    sta pointer + 1
+    jsr TransferTiles
+
+    lda #0
+    sta MustDrawStashItemMenu
+
+@exit:
+
     rts
 ;-------------------------
 DrawItemMenu:
@@ -289,14 +350,21 @@ MenuInput:
     lda InventoryActivated
     bne @DoInventoryInput
 
-    lda StashActivated
-    bne @DoInventoryInput
 
     lda FoodMenuActivated
     bne @DoFoodMenuInput
+
+    lda StashFoodMenuActivated
+    bne @DoFoodMenuInput
+
+    lda StashItemMenuActivated
+    bne @DoItemMenuInput
     
     lda ItemMenuActivated
     bne @DoItemMenuInput
+    
+    lda StashActivated
+    bne @DoInventoryInput
 
     jsr DoRegularInput
     jmp @exit
@@ -386,26 +454,35 @@ InventoryInput:
     rts
 ;--------------------------------------
 OnItemClicked:
+
     jsr LoadSelectedItemStuff
     beq @exit
-    dey
-    lda inventory_data, y ; type
 
-
-@checkFood:
+    lda TempIndex
     cmp #ITEM_TYPE_FOOD
     beq @addFood
 
+    lda StashActivated
+    beq @ItemFromInventory
+
+    lda #1
+    sta MustLoadSomething
+    sta MustDrawStashItemMenu
+    sta StashItemMenuActivated
+    jsr ActivateSubmenu
+    lda #0
+    sta ItemMenuIndex
+    ;sta StashActivated
+
+
+    jmp @exit
+
+@ItemFromInventory:
     lda #1
     sta MustLoadSomething
     sta MustDrawItemMenu
     sta ItemMenuActivated
-    lda #72
-    sta InventoryPointerX
-    lda InventoryPointerY
-    sta OldInventoryPointerY
-    lda #96
-    sta InventoryPointerY
+    jsr ActivateSubmenu
     lda #0
     sta ItemMenuIndex
     sta InventoryActivated
@@ -413,28 +490,43 @@ OnItemClicked:
     jmp @exit
 ;--------
 @addFood:
+    lda StashActivated
+    beq @useFromInventory
+
+    lda #1
+    sta MustLoadSomething
+    sta MustDrawStashFoodMenu
+    sta StashFoodMenuActivated
+    jsr ActivateSubmenu
+    lda #0
+    sta FoodMenuIndex
+    ;sta StashActivated
+
+
+    jmp @exit
+@useFromInventory:
     lda #1
     sta MustLoadSomething
     sta MustDrawFoodMenu
     sta FoodMenuActivated
+    jsr ActivateSubmenu
+    lda #0
+    sta FoodMenuIndex
+    sta InventoryActivated
+
+@exit:
+    rts
+;-------------------------------------
+ActivateSubmenu:
     lda #72
     sta InventoryPointerX
     lda InventoryPointerY
     sta OldInventoryPointerY
     lda #96
     sta InventoryPointerY
-    lda #0
-    sta FoodMenuIndex
-    sta InventoryActivated
 
-    jmp @exit
-@clearItem:
-    lda #0
-    sta Inventory, x
-    jsr UpdateMenuStats
-
-@exit:
     rts
+
 
 ;--------------------------------------
 FoodMenuInput:
@@ -486,8 +578,15 @@ FoodMenuInput:
     sta InventoryActivated
     lda #INVENTORY_POINTER_X
     sta InventoryPointerX
+    lda StashActivated
+    beq @hideInventoryMenu
+    lda #0
+    sta StashFoodMenuActivated
+    jmp @finish
+@hideInventoryMenu:
     lda #0
     sta FoodMenuActivated
+@finish:
     lda OldInventoryPointerY
     sta InventoryPointerY
     jsr UpdateMenuStats
@@ -495,7 +594,12 @@ FoodMenuInput:
 @otherOptions:
     cmp #2
     bne @eat
-    
+    lda StashActivated
+    beq @storeItem
+    jsr TakeItemFromStash
+    bne @exit
+    jmp @clearItem
+@storeItem:
     jsr StoreItemInStash
     bne @exit
 @eat:
@@ -503,19 +607,18 @@ FoodMenuInput:
     
 
 @clearItem:
+    lda StashActivated
+    beq @useInventory
+    lda #0
+    sta Storage, x
+    jmp @hidemenu
+@useInventory:
     lda #0
     sta Inventory, x
-    sta FoodMenuActivated
-    jsr UpdateMenuStats
-    lda #1
-    sta InventoryActivated
-    lda #INVENTORY_POINTER_X
-    sta InventoryPointerX
-    lda OldInventoryPointerY
-    sta InventoryPointerY
-    lda #1
-    sta MustLoadSomething
-    sta MustClearSubMenu
+@hidemenu:
+    lda #0
+    sta StashFoodMenuActivated
+    jsr ExitSubmenu
     jmp @exit
 
 @CheckA:
@@ -523,16 +626,19 @@ FoodMenuInput:
     and #BUTTON_A_MASK
     beq @exit
 
+    lda #0
+    sta FoodMenuActivated
     jsr ExitSubmenu
 @exit:
     rts
 ;-------------------------------------
 ExitSubmenu:
-    lda #0
-    sta FoodMenuActivated
     jsr UpdateMenuStats
+    lda StashActivated
+    bne @continue
     lda #1
     sta InventoryActivated
+@continue:
     lda #INVENTORY_POINTER_X
     sta InventoryPointerX
     lda OldInventoryPointerY
@@ -584,7 +690,7 @@ ItemMenuInput:
     beq @exit
 
     lda ItemMenuIndex
-    bne @store
+    bne @stashAction
     ;use
     lda TempIndex
     cmp #ITEM_TYPE_FUEL
@@ -596,31 +702,38 @@ ItemMenuInput:
 @medicine:
     jsr UseMedicine
     jmp @clearItem
-@store:
-
+@stashAction:
+    lda StashActivated
+    bne @take_from_stash
     jsr StoreItemInStash
     bne @exit ;failed to add to stash
+    jmp @clearItem
+@take_from_stash:
+    jsr TakeItemFromStash
+    bne @exit ;failed to retrieve
 
 @clearItem:
+    lda StashActivated
+    beq @useInventory
+    lda #0
+    sta Storage, x
+    jmp @hidemenu
+@useInventory:
     lda #0
     sta Inventory, x
-    sta ItemMenuActivated
-    jsr UpdateMenuStats
-    lda #1
-    sta InventoryActivated
-    lda #INVENTORY_POINTER_X
-    sta InventoryPointerX
-    lda OldInventoryPointerY
-    sta InventoryPointerY
-    lda #1
-    sta MustLoadSomething
-    sta MustClearSubMenu
-
+@hidemenu:
+    jsr HideItemMenu
 @CheckA:
     lda Buttons
     and #BUTTON_A_MASK
     beq @exit
 
+    jsr HideItemMenu
+@exit:
+    rts
+
+;----------------------------------
+HideItemMenu:
     lda #0
     sta ItemMenuActivated
     jsr UpdateMenuStats
@@ -634,8 +747,26 @@ ItemMenuInput:
     sta MustLoadSomething
     sta MustClearSubMenu
 
+    rts
+;-----------------------------------
+TakeItemFromStash:
+    ldy #255
+@inventoryLoop:
+    iny
+    cpy #INVENTORY_MAX_ITEMS
+    bcs @fail
+    lda Inventory, y
+    bne @inventoryLoop
+    lda Storage, x
+    sta Inventory, y
+
+    lda #0
+    jmp @exit
+@fail:
+    lda #1
 @exit:
     rts
+
 ;------------------------------------
 ;x is inventory item index
 StoreItemInStash:
@@ -946,14 +1077,26 @@ CookMeat:
     jsr DecreaseDigits
     ldx TempPush
 
+    lda StashActivated
+    bne @putToStash
     lda #3
     sta Inventory, x ; put cooked meat
+    jmp @cantcook
+@putToStash:
+    lda #3
+    sta Storage, x
 @cantcook:
     rts
 ;--------------------------------------
 LoadSelectedItemStuff:
     ldx InventoryItemIndex
+    lda StashActivated ; let's check what's active
+    beq @useInventory
+    lda Storage, x
+    jmp @cont
+@useInventory:
     lda Inventory, x
+@cont:
     beq @empty
     asl
     asl
@@ -1071,6 +1214,8 @@ UpdateInventorySprites:
     clc
     adc ItemMenuActivated
     adc StashActivated
+    adc StashItemMenuActivated
+    adc StashFoodMenuActivated
     beq @ThePointer
 
 @itemLoop:
@@ -1213,18 +1358,33 @@ ExitMenuState:
     sta InventoryPointerY
 @checkItemMenu:
     lda ItemMenuActivated
-    beq @checkStash
+    beq @checkStashItemMenu
     lda #0
     sta ItemMenuActivated
     lda OldInventoryPointerY
     sta InventoryPointerY
-@checkStash:
-    lda StashActivated
+@checkStashItemMenu:
+    lda StashItemMenuActivated
+    beq @checkStashFoodMenu
+    lda #0
+    sta StashItemMenuActivated
+    lda OldInventoryPointerY
+    sta InventoryPointerY
+@checkStashFoodMenu:
+    lda StashFoodMenuActivated
     beq @ignorethis
+    lda #0
+    sta StashFoodMenuActivated
+    lda OldInventoryPointerY
+    sta InventoryPointerY
+
+    
+
+@ignorethis:
+    
     lda #0
     sta StashActivated
 
-@ignorethis:
     lda InHouse
     beq @loadOutside ;InHouse = 0
     lda #1

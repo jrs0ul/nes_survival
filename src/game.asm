@@ -56,7 +56,7 @@ menu_palette:
     .byte $10,$0F,$00,$10, $0f,$07,$00,$31, $0f,$17,$27,$31, $31,$10,$0f,$01    ;background
     .byte $10,$07,$17,$27, $10,$06,$16,$37, $0C,$0f,$16,$39, $10,$0f,$17,$16    ;OAM sprites
 
-FoodMenu: ; food menu
+FoodMenu: 
     .byte $78,$72,$72,$72,$72,$72,$72,$72,$79
     .byte $76,$00,$00,$00,$00,$00,$00,$00,$77
     .byte $76,$00,$00,$3c,$48,$48,$44,$00,$77
@@ -76,6 +76,28 @@ ItemMenu:
     .byte $76,$00,$00,$4C,$4D,$48,$4B,$3E,$77
     .byte $76,$00,$00,$00,$00,$00,$00,$00,$77
     .byte $7a,$72,$72,$72,$72,$72,$72,$72,$7b
+
+StashFoodMenu: 
+    .byte $78,$72,$72,$72,$72,$72,$72,$72,$79
+    .byte $76,$00,$00,$00,$00,$00,$00,$00,$77
+    .byte $76,$00,$00,$3c,$48,$48,$44,$00,$77
+    .byte $76,$00,$00,$00,$00,$00,$00,$00,$77
+    .byte $76,$00,$00,$3e,$3a,$4d,$00,$00,$77
+    .byte $76,$00,$00,$00,$00,$00,$00,$00,$77
+    .byte $76,$00,$00,$4D,$3A,$44,$3E,$00,$77
+    .byte $76,$00,$00,$00,$00,$00,$00,$00,$77
+    .byte $7a,$72,$72,$72,$72,$72,$72,$72,$7b
+
+
+StashItemMenu:
+    .byte $78,$72,$72,$72,$72,$72,$72,$72,$79
+    .byte $76,$00,$00,$00,$00,$00,$00,$00,$77
+    .byte $76,$00,$00,$4E,$4C,$3E,$00,$00,$77
+    .byte $76,$00,$00,$00,$00,$00,$00,$00,$77
+    .byte $76,$00,$00,$4D,$3A,$44,$3E,$00,$77
+    .byte $76,$00,$00,$00,$00,$00,$00,$00,$77
+    .byte $7a,$72,$72,$72,$72,$72,$72,$72,$7b
+
 
 
 PopUpMenuClear:
@@ -555,6 +577,10 @@ MustDrawFoodMenu:
     .res 1
 MustDrawItemMenu:
     .res 1
+MustDrawStashItemMenu:
+    .res 1
+MustDrawStashFoodMenu:
+    .res 1
 MustClearSubMenu:
     .res 1
 ;--
@@ -567,7 +593,11 @@ InventoryActivated:
     .res 1
 FoodMenuActivated:  ; press b on raw meat in menu
     .res 1
+StashFoodMenuActivated:
+    .res 1
 ItemMenuActivated:
+    .res 1
+StashItemMenuActivated:
     .res 1
 StashActivated:
     .res 1
