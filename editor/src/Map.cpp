@@ -25,14 +25,14 @@ bool Map::load(const char* tilesPath, const char* collisionPath){
         tiles[i] = new unsigned[_width];
     }
 
-    char dname[255];
-
-    if (!fscanf(file,"%s\n", dname))
+    if (!fscanf(file,"%s\n", mapName))
     {
         fclose(file);
         return false;
     }
-    printf("%s\n", dname);
+    printf("%s\n", mapName);
+
+    unsigned char dname[255];
 
     for (unsigned i = 0; i<_height; i++)
     {
@@ -42,7 +42,6 @@ bool Map::load(const char* tilesPath, const char* collisionPath){
             return(false);
         }
 
-        //printf("%s\n", dname);
         int num;
 
         for (unsigned a = 0; a < _width / 2; a++)
@@ -82,6 +81,56 @@ bool Map::load(const char* tilesPath, const char* collisionPath){
 
     }
 
+    int attributeCounter = 0;
+
+    for (unsigned i = 0; i < 2; ++i)
+    {
+
+        if (!fscanf(file, "%s ", dname))
+        {
+            fclose(file);
+            return(false);
+        }
+
+        int num;
+
+        for (unsigned a = 0; a < _width / 2; a++)
+        {
+            if (!fscanf(file,"$%X,", &num))
+            {
+                fclose(file);
+                return false;
+            }
+
+            attributes[attributeCounter] = num;
+            ++attributeCounter;
+        }
+
+        if (!fscanf(file, "%s ", dname))
+        {
+            fclose(file);
+            return(false);
+        }
+
+
+        for (unsigned a = _width / 2; a < _width; a++)
+        {
+            if (!fscanf(file,"$%X,", &num))
+            {
+                fclose(file);
+                return false;
+            }
+
+            attributes[attributeCounter] = num;
+            ++attributeCounter;
+        }
+
+
+
+
+    }
+
+
     fclose(file);
 
     file = fopen(collisionPath,"rt");
@@ -92,12 +141,12 @@ bool Map::load(const char* tilesPath, const char* collisionPath){
     }
 
     
-    if (!fscanf(file, "%s\n", dname))
+    if (!fscanf(file, "%s\n", collisionMapName))
     {
         fclose(file);
         return false;
     }
-    printf("%s\n", dname);
+    printf("%s\n", collisionMapName);
 
 
     colision = new bool*[_height];
@@ -245,14 +294,89 @@ void Map::save(const char *tilesPath, const char* collisionPath){
 
     if (f)
     {
+        fprintf(f, "%s\n", mapName);
+
         for (unsigned int i = 0; i<_height; i++)
         {
-            for (unsigned int a = 0; a<_width; a++)
+            fprintf(f, "    %s", ".byte ");
+
+
+            if (_width <= 16)
             {
-                fprintf(f, "%4d", tiles[i][a]);
+                for (unsigned int a = 0; a < _width; a++)
+                {
+                    fprintf(f, "$%02x", tiles[i][a]);
+                    
+                    if (a < _width - 1)
+                    {
+                        fprintf(f, ",");
+                    }
+                }
+            }
+            else
+            {
+                for (unsigned int a = 0; a < 16; a++)
+                {
+                    fprintf(f, "$%02x", tiles[i][a]);
+                    
+                    if (a < 15)
+                    {
+                        fprintf(f, ",");
+                    }
+
+                }
+
+                fprintf(f,"\n");
+                fprintf(f, "    %s", ".byte ");
+
+                for (unsigned int a = 16; a < _width; a++)
+                {
+                    fprintf(f, "$%02x", tiles[i][a]);
+                    
+                    if (a < _width - 1)
+                    {
+                        fprintf(f, ",");
+                    }
+
+                }
+
+
             }
 
             fprintf(f,"\n");
+        }
+
+        for (unsigned i = 0; i < 2; ++i)
+        {
+            fprintf(f, "    %s", ".byte ");
+
+            for (unsigned int a = 0; a < 16; a++)
+            {
+                fprintf(f, "$%02x", attributes[i*32+a]);
+
+                if (a < 15)
+                {
+                    fprintf(f, ",");
+                }
+
+            }
+
+            fprintf(f,"\n");
+            fprintf(f, "    %s", ".byte ");
+
+            for (unsigned int a = 16; a < _width; a++)
+            {
+                fprintf(f, "$%02x", attributes[i * 32  + a]);
+
+                if (a < _width - 1)
+                {
+                    fprintf(f, ",");
+                }
+
+            }
+            fprintf(f,"\n");
+
+
         }
 
         fclose(f);
@@ -264,7 +388,7 @@ void Map::save(const char *tilesPath, const char* collisionPath){
 
     if (f)
     {
-        fprintf(f, "%s\n", "collision:");
+        fprintf(f, "%s\n", collisionMapName);
 
         for (unsigned int i = 0; i<_height; i++)
         {

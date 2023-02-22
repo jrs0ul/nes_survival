@@ -44,6 +44,9 @@ class Map{
     unsigned int      tilesize;
 
     bool              tilesetInfo[512];
+    unsigned char     mapName[512];
+    unsigned char     collisionMapName[512];
+    unsigned          attributes[64];
     Vector3D mappos;
 
 public:
