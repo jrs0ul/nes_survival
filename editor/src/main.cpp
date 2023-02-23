@@ -1,24 +1,3 @@
-/***************************************************************************
- *   Copyright (C) 2008 by jrs0ul   *
- *   jrs0ul@gmail.com   *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
-
-
 #ifdef WIN32
 #pragma comment(lib,"SDL.lib")
 #pragma comment(lib,"SDLmain.lib")
@@ -78,6 +57,15 @@ const unsigned BUTTON_TILES_DEC = 25;
 const unsigned BUTTON_TILES_INC = 26;
 const unsigned BUTTON_FIRST_TILE = 27;
 const unsigned BUTTON_SAVE = 18;
+const unsigned BUTTON_SHOW_COLLISION = 11;
+const unsigned BUTTON_SELECT_COLLISION = 12;
+
+const unsigned BUTTON_PALETTE_0 = 8;
+const unsigned BUTTON_PALETTE_1 = 15;
+const unsigned BUTTON_PALETTE_2 = 16;
+const unsigned BUTTON_PALETTE_3 = 17;
+
+const unsigned TILE_BUTTONS_ORIGIN_X = 300;
 
 
 Uint32 tick = 0;
@@ -118,6 +106,8 @@ int mx,my;
 unsigned char currenttile=0;
 int currentchar = 0;
 unsigned char firsttile = 0;
+
+unsigned char currentPalette = 0;
 
 int charsIDs[]={1,4,7,8};
 
@@ -222,11 +212,11 @@ void DrawPanel(){
 
     if ( SHOW_COLISSION )
     {
-        mygtai[11].draw ( pics,2, 5 );
+        mygtai[BUTTON_SHOW_COLLISION].draw ( pics,2, 5 );
     }
     else
     {
-        mygtai[11].draw ( pics,2, 4 );
+        mygtai[BUTTON_SHOW_COLLISION].draw ( pics,2, 4 );
     }
 
    /* if ( SHOW_DUDE )
@@ -263,6 +253,27 @@ void DrawPanel(){
         mygtai[13].draw ( pics,5,5 );
     else
         mygtai[13].draw ( pics,5,4 );*/
+
+
+    mygtai[BUTTON_PALETTE_0].draw(pics, -1, 0, 
+                                  tempAttributeColors[0].c[0],
+                                  tempAttributeColors[0].c[1],
+                                  tempAttributeColors[0].c[2]);
+    mygtai[BUTTON_PALETTE_1].draw(pics, -1, 0, 
+                                  tempAttributeColors[1].c[0],
+                                  tempAttributeColors[1].c[1],
+                                  tempAttributeColors[1].c[2]);
+    mygtai[BUTTON_PALETTE_2].draw(pics, -1, 0, 
+                                  tempAttributeColors[2].c[0],
+                                  tempAttributeColors[2].c[1],
+                                  tempAttributeColors[2].c[2]);
+    mygtai[BUTTON_PALETTE_3].draw(pics, -1, 0, 
+                                  tempAttributeColors[3].c[0],
+                                  tempAttributeColors[3].c[1],
+                                  tempAttributeColors[3].c[2]);
+
+
+
 
     if ( SELECT_LEV1 )
         mygtai[6].draw ( pics, 2, 0, 1.0f, 0,0 );
@@ -488,7 +499,7 @@ void CheckKeys()
 
             if (SELECT_ATTRIBUTES)
             {
-                map.setAttribute(tilex, tiley, 1);
+                map.setAttribute(tilex, tiley, currentPalette);
             }
 
             if ( SELECT_COLISSION )
@@ -557,6 +568,28 @@ void CheckKeys()
             {
                 SELECT_ATTRIBUTES = !SELECT_ATTRIBUTES;
             }
+
+
+            if (mygtai[BUTTON_PALETTE_0].pointerOntop((int)Cross.x(), (int)Cross.z()))
+            {
+                currentPalette = 0;
+            }
+
+            if (mygtai[BUTTON_PALETTE_1].pointerOntop((int)Cross.x(), (int)Cross.z()))
+            {
+                currentPalette = 1;
+            }
+
+            if (mygtai[BUTTON_PALETTE_2].pointerOntop((int)Cross.x(), (int)Cross.z()))
+            {
+                currentPalette = 2;
+            }
+
+            if (mygtai[BUTTON_PALETTE_3].pointerOntop((int)Cross.x(), (int)Cross.z()))
+            {
+                currentPalette = 3;
+            }
+
 
 
 
@@ -647,20 +680,20 @@ int main ( int argc, char* argv[] )
     mygtai[0].init ( 10,20,32,32 );
     mygtai[1].init ( 46,20,32,32 );
     mygtai[2].init ( 82,20,32,32 );
-    mygtai[11].init ( 118,20,32,32 );
+    mygtai[BUTTON_SHOW_COLLISION].init ( 82,20,32,32 );
     mygtai[13].init ( 154,20,32,32 );
 
     mygtai[6].init ( 10,55,32,32 );
     mygtai[7].init ( 46,55,32,32 );
-    mygtai[8].init ( 82,55,32,32 );
-    mygtai[12].init ( 118,55,32,32 );
+    mygtai[BUTTON_SELECT_COLLISION].init ( 82,55,32,32 );
     mygtai[14].init ( 154,55,32,32 );
 
 
    
-    mygtai[15].init ( 204,20,32,32 );
-    mygtai[16].init ( 250,20,32,32 );
-    mygtai[17].init ( 296,20,32,32 );
+    mygtai[BUTTON_PALETTE_0].init ( 130,20,32,32 );
+    mygtai[BUTTON_PALETTE_1].init ( 166,20,32,32 );
+    mygtai[BUTTON_PALETTE_2].init ( 202,20,32,32 );
+    mygtai[BUTTON_PALETTE_3].init ( 238,20,32,32 );
 
     mygtai[BUTTON_SAVE].init ( SCREENW - 42, 20, 32, 32 );
 
@@ -672,12 +705,12 @@ int main ( int argc, char* argv[] )
     mygtai[23].init ( 496,55,32,32 );
     mygtai[24].init ( 532,55,32,32 );
 
-    mygtai[BUTTON_TILES_DEC].init ( 204,55,32,32 );
+    mygtai[BUTTON_TILES_DEC].init ( TILE_BUTTONS_ORIGIN_X, 55,32,32 );
 
     unsigned tileRow = 0;
     for (unsigned i = BUTTON_FIRST_TILE; i < BUTTON_FIRST_TILE + TILE_STEP; ++i)
     {
-        mygtai[i].init(250 + (i - BUTTON_FIRST_TILE - (16 * tileRow)) * 34, 10 + tileRow * 34, 32, 32);
+        mygtai[i].init(TILE_BUTTONS_ORIGIN_X + 40 + (i - BUTTON_FIRST_TILE - (16 * tileRow)) * 34, 10 + tileRow * 34, 32, 32);
         
         if (((i - BUTTON_FIRST_TILE) + 1) % 16 == 0 && (i - BUTTON_FIRST_TILE) > 0)
         {
@@ -685,7 +718,7 @@ int main ( int argc, char* argv[] )
         }
     }
     
-    mygtai[BUTTON_TILES_INC].init ( 250 + 16 * 34,55,32,32 );
+    mygtai[BUTTON_TILES_INC].init ( TILE_BUTTONS_ORIGIN_X + 48 + 16 * 34,55,32,32 );
 
 
 

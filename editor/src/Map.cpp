@@ -1,4 +1,5 @@
 #include <cstdio>
+#include <cassert>
 
 
 #include "Matrix.h"
@@ -285,35 +286,46 @@ void Map::setCollision(unsigned long x, unsigned long y, bool val)
         colision[y][x] = val;
     }
 }
-//---------------------------------------------------------------
-void Map::setAttribute(unsigned long x, unsigned long y, unsigned value)
+//-----------------------------------------------------
+static unsigned calcBitPairNumber(unsigned x, unsigned y, unsigned& attributeIndex)
 {
     unsigned ix = x / 4;
     unsigned iy = y / 4;
 
-    unsigned targetAttribIndex = iy * 8 + ix;
+    attributeIndex = iy * 8 + ix;
 
-    //unsigned attrib = attributes[targetAttribIndex];
+    unsigned bitpairX = (x - ix * 4) / 2;
+    unsigned bitpairY = (y - iy * 4) / 2;
+    return   bitpairY * 2 + bitpairX;
+
+}
+
+//---------------------------------------------------------------
+void Map::setAttribute(unsigned long x, unsigned long y, unsigned value)
+{
+
+    unsigned targetAttribIndex = 0;
+    unsigned bitPairNum = calcBitPairNumber(x, y, targetAttribIndex);
+
+    assert(bitPairNum < 4);
+
+    unsigned char mask = 3 << (bitPairNum * 2);
+    unsigned char pl = value << (bitPairNum * 2);
+
+    unsigned char attrib = attributes[targetAttribIndex];
 
 
-    attributes[targetAttribIndex] = 0;
+    attributes[targetAttribIndex] = (attrib & ~mask) | pl;
 
 }
 //----------------------------------------------------------
 unsigned int Map::getAttribute(unsigned long x, unsigned long y)
 {
-    unsigned ix = x / 4;
-    unsigned iy = y / 4;
 
-    unsigned attrib  = attributes[iy * 8 + ix];
+    unsigned attridx = 0;
+    unsigned bitPairNum = 3 - calcBitPairNumber(x, y, attridx);
 
-
-    unsigned bitpairX = x - ix * 4;
-    unsigned bitpairY = y - iy * 4;
-    unsigned bitPairNum = 3 - ((bitpairY * 2 + bitpairX) / 2);
-
-
-    unsigned char pl = attrib << (bitPairNum * 2);
+    unsigned char pl = attributes[attridx] << (bitPairNum * 2);
 
     return pl >> 6;
 }
