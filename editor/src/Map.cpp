@@ -285,6 +285,38 @@ void Map::setCollision(unsigned long x, unsigned long y, bool val)
         colision[y][x] = val;
     }
 }
+//---------------------------------------------------------------
+void Map::setAttribute(unsigned long x, unsigned long y, unsigned value)
+{
+    unsigned ix = x / 4;
+    unsigned iy = y / 4;
+
+    unsigned targetAttribIndex = iy * 8 + ix;
+
+    //unsigned attrib = attributes[targetAttribIndex];
+
+
+    attributes[targetAttribIndex] = 0;
+
+}
+//----------------------------------------------------------
+unsigned int Map::getAttribute(unsigned long x, unsigned long y)
+{
+    unsigned ix = x / 4;
+    unsigned iy = y / 4;
+
+    unsigned attrib  = attributes[iy * 8 + ix];
+
+
+    unsigned bitpairX = x - ix * 4;
+    unsigned bitpairY = y - iy * 4;
+    unsigned bitPairNum = 3 - ((bitpairY * 2 + bitpairX) / 2);
+
+
+    unsigned char pl = attrib << (bitPairNum * 2);
+
+    return pl >> 6;
+}
 
 //----------------------------------------------------------
 void Map::save(const char *tilesPath, const char* collisionPath){

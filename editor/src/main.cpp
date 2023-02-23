@@ -49,6 +49,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <cmath>
+#include <cassert>
 
 
 #include "Image.h"
@@ -91,6 +92,12 @@ bool _QuitApp = false;
 Map map;
 
 
+COLOR tempAttributeColors[4] = {COLOR(1.f, 1.f, 0, 0.2f),
+                                COLOR(0, 0, 1.f, 0.2f),
+                                COLOR(0, 1.f, 0, 0.2f),
+                                COLOR(0, 1.f, 1.f, 0.2f)};
+
+
 Mygtas mygtai[MAX_BUTTON];
 
 Vector3D Cross;
@@ -98,8 +105,10 @@ Vector3D Cross;
 int tilex,tiley;
 bool SHOW_LEV1= true;
 bool SELECT_LEV1= true;
-bool SHOW_COL= true;
-bool SELECT_COL= false;
+bool SHOW_COLISSION= true;
+bool SELECT_COLISSION= false;
+bool SHOW_ATTRIBUTES = true;
+bool SELECT_ATTRIBUTES = false;
 
 
 unsigned char GlobalKey;
@@ -188,24 +197,37 @@ void DrawPanel(){
     DrawText ( 10,10,buf,pics,0, 0.7f );
 
     if ( SHOW_LEV1 )
+    {
         mygtai[0].draw ( pics,2, 5 );
+    }
     else
+    {
         mygtai[0].draw ( pics,2, 4 );
+    }
 
-    /*if ( SHOW_LEV2 )
-        mygtai[1].draw ( pics,5,5 );
+    if ( SHOW_ATTRIBUTES )
+    {
+        mygtai[1].draw ( pics, 2, 5 );
+    }
     else
-        mygtai[1].draw ( pics,5,4 );
+    {
+        mygtai[1].draw ( pics, 2, 4 );
+    }
 
+    /*
     if ( SHOW_LEV3 )
         mygtai[2].draw ( pics,5,5 );
     else
         mygtai[2].draw ( pics,5,4 );*/
 
-    if ( SHOW_COL )
+    if ( SHOW_COLISSION )
+    {
         mygtai[11].draw ( pics,2, 5 );
+    }
     else
+    {
         mygtai[11].draw ( pics,2, 4 );
+    }
 
    /* if ( SHOW_DUDE )
         mygtai[19].draw ( pics,5,5 );
@@ -247,17 +269,21 @@ void DrawPanel(){
     else
         mygtai[6].draw ( pics,2, 0 );
 
-   /* if ( SELECT_LEV2 )
-        mygtai[7].draw ( pics,5,1,1.0f,0,0 );
+    if ( SELECT_ATTRIBUTES )
+    {
+        mygtai[7].draw ( pics, 2,1,1.0f,0,0 );
+    }
     else
-        mygtai[7].draw ( pics,5,1 );
+    {
+        mygtai[7].draw ( pics, 2,1 );
+    }
 
-    if ( SELECT_LEV3 )
+    /*if ( SELECT_LEV3 )
         mygtai[8].draw ( pics,5,2,1.0f,0,0 );
     else
         mygtai[8].draw ( pics,5,2 );*/
 
-    if ( SELECT_COL )
+    if ( SELECT_COLISSION )
         mygtai[12].draw ( pics, 2, 3, 1.0f, 0, 0 );
     else
         mygtai[12].draw ( pics, 2, 3 );
@@ -295,7 +321,31 @@ static void RenderScreen ( void ){
     if ( SHOW_LEV1 )
         map.draw ( pics, 1, SCREENW, SCREENH);
 
-    if ( SHOW_COL )
+    if (SHOW_ATTRIBUTES)
+    {
+
+        for (unsigned a = 0; a < map.height(); a+=2 )
+        {
+            for (unsigned i = 0; i < map.width(); i+=2 )
+            {
+                unsigned index = map.getAttribute(i, a);
+                //printf("%u %u: index %u\n", i,a,index);
+                assert(index < 4);
+                
+                DrawBlock (pics, (int)(map.getMapPos().x()) - 16 + i * 32,
+                            (int)(map.getMapPos().z()) - 16 + a * 32, 
+                            64, 64,
+                            tempAttributeColors[index],
+                            tempAttributeColors[index]
+                            );
+                
+            }
+        }
+
+
+    }
+
+    if ( SHOW_COLISSION )
     {
         for (unsigned a = 0; a < map.height(); a++ )
             for (unsigned i = 0; i < map.width(); i++ )
@@ -435,8 +485,16 @@ void CheckKeys()
             {
                 map.setTile(tilex, tiley, currenttile);
             }
-            if ( SELECT_COL )
+
+            if (SELECT_ATTRIBUTES)
+            {
+                map.setAttribute(tilex, tiley, 1);
+            }
+
+            if ( SELECT_COLISSION )
+            {
                 map.setCollision ( tilex,tiley,true );
+            }
 
         }
 
@@ -444,9 +502,19 @@ void CheckKeys()
         if ( ( bm & SDL_BUTTON ( 3 ) ) )
         {
             if ( SELECT_LEV1 )
+            {
                 map.setTile ( tilex, tiley, 0 );
-            if ( SELECT_COL )
+            }
+
+            if (SELECT_ATTRIBUTES)
+            {
+                map.setAttribute(tilex, tiley, 0);
+            }
+
+            if ( SELECT_COLISSION )
+            {
                 map.setCollision ( tilex,tiley,false );
+            }
         }
 
     }
@@ -457,9 +525,14 @@ void CheckKeys()
         if ( ( !bm ) && ( oldmousekey & SDL_BUTTON ( 1 ) ) )
         {
             if ( ( mygtai[0].pointerOntop ( (int)Cross.x(), (int)Cross.z() ) ) )
+            {
                 SHOW_LEV1 = !SHOW_LEV1;
+            }
+
             if ( ( mygtai[11].pointerOntop ( (int)Cross.x(), (int)Cross.z() ) ) )
-                SHOW_COL = !SHOW_COL;
+            {
+                SHOW_COLISSION = !SHOW_COLISSION;
+            }
 
             for (unsigned i = BUTTON_FIRST_TILE; i < BUTTON_FIRST_TILE + TILE_STEP; ++i)
             {
@@ -474,10 +547,25 @@ void CheckKeys()
                 SELECT_LEV1 = !SELECT_LEV1;
             }
 
+            if ( ( mygtai[1].pointerOntop ( (int)Cross.x(), (int)Cross.z() ) ) )
+            {
+                SHOW_ATTRIBUTES = !SHOW_ATTRIBUTES;
+            }
+            
+
+            if ( ( mygtai[7].pointerOntop ( (int)Cross.x(), (int)Cross.z() ) ) )
+            {
+                SELECT_ATTRIBUTES = !SELECT_ATTRIBUTES;
+            }
+
+
+
 
    
             if ( ( mygtai[12].pointerOntop ( (int)Cross.x(), (int)Cross.z() ) ) )
-                SELECT_COL = !SELECT_COL;
+            {
+                SELECT_COLISSION = !SELECT_COLISSION;
+            }
 
       
             if ( ( mygtai[BUTTON_TILES_DEC].pointerOntop ( (int)Cross.x(), (int)Cross.z() ) ) )
@@ -663,6 +751,7 @@ int main ( int argc, char* argv[] )
         printf("Error loading maps %s %s !\n", MapTilesIn, MapCollisionIn);
     }
 
+    printf("\nStarting loop\n");
     while ( !_QuitApp )
     {
 
