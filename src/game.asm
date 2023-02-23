@@ -28,24 +28,11 @@
 main_tiles_chr: .incbin "main.chr"
 
 .include "data/map_list.asm"
-.include "data/house.asm"
 .include "data/collision_data.asm"
 .include "data/item_list.asm" ;items in maps
 .include "data/npc_list.asm"  ;npcs in maps
 
-house_palette:
-    .byte $0C,$16,$27,$37, $0C,$07,$00,$31, $0C,$17,$27,$31, $0C,$20,$37,$16    ;background
-    .byte $0C,$0f,$17,$20, $0C,$06,$16,$39, $0C,$17,$21,$31, $0C,$0f,$37,$16    ;OAM sprites
 
-zerosprite:
-    .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
-    .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
-    .byte $72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72
-    .byte $72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72
-    .byte $00,$57,$31,$30,$30,$00,$00,$00,$56,$30,$36,$37,$00,$00,$00,$55
-    .byte $30,$38,$33,$00,$00,$00,$00,$00,$00,$00,$00,$00,$89,$8A,$8B,$00
-    .byte $70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70
-    .byte $70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70
 
 
 
@@ -147,7 +134,18 @@ title_palette:
 .include "data/game_over.asm"
 
 ;============================================================
+.segment "ROM3" ; indoors
 
+house_tiles_chr: .incbin "house.chr"
+.include "data/house.asm"
+
+house_palette:
+    .byte $0C,$16,$27,$37, $0C,$07,$00,$31, $0C,$17,$27,$31, $0C,$20,$37,$16    ;background
+    .byte $0C,$0f,$17,$20, $0C,$06,$16,$39, $0C,$17,$21,$31, $0C,$0f,$37,$16    ;OAM sprites
+
+
+
+;=============================================================
 
 .segment "RODATA" ; ROM7
 
@@ -160,6 +158,15 @@ banktable:              ; Write to this table to switch banks.
 .include "data/inventory_data.asm"
 .include "data/npc_data.asm"
 
+zerosprite:
+    .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
+    .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
+    .byte $72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72
+    .byte $72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72
+    .byte $00,$57,$31,$30,$30,$00,$00,$00,$56,$30,$36,$37,$00,$00,$00,$55
+    .byte $30,$38,$33,$00,$00,$00,$00,$00,$00,$00,$00,$00,$89,$8A,$8B,$00
+    .byte $70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70
+    .byte $70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70
 
 
 main_palette:
@@ -2553,6 +2560,7 @@ CheckIfExitedHouse:
 
     lda #1
     sta MustLoadOutside
+    sta MustCopyMainChr
     sta MustLoadSomething
 
 @nope:
@@ -2565,9 +2573,18 @@ LoadTheHouseInterior:
     lda MustLoadHouseInterior
     beq @nope
 
+    ldy #3
+    jsr bankswitch_y
+
     lda #$00
     sta $2000
     sta $2001
+
+    lda #<house_tiles_chr
+    sta pointer
+    lda #>house_tiles_chr
+    sta pointer + 1
+    jsr CopyCHRTiles
 
     lda #1
     sta InHouse
@@ -2591,6 +2608,8 @@ LoadTheHouseInterior:
     sta Temp
     jsr LoadPalette
 
+    ldy #0
+    jsr bankswitch_y
 
     lda #0
     sta MustLoadHouseInterior
