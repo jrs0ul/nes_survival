@@ -115,7 +115,7 @@ DrawFoodMenu:
 
     lda #9
     sta TempPointX
-    lda #9
+    lda #11
     sta TempPointY
 
     lda #<FoodMenu
@@ -144,7 +144,7 @@ DrawStashFoodMenu:
 
     lda #9
     sta TempPointX
-    lda #9
+    lda #11
     sta TempPointY
 
     lda #<StashFoodMenu
@@ -173,7 +173,7 @@ DrawStashItemMenu:
 
     lda #9
     sta TempPointX
-    lda #7
+    lda #9
     sta TempPointY
 
     lda #<StashItemMenu
@@ -203,7 +203,7 @@ DrawItemMenu:
 
     lda #9
     sta TempPointX
-    lda #7
+    lda #9
     sta TempPointY
 
     lda #<ItemMenu
@@ -233,7 +233,7 @@ ClearSubMenu:
 
     lda #9
     sta TempPointX
-    lda #9
+    lda #11
     sta TempPointY
 
     lda #<PopUpMenuClear
@@ -538,7 +538,7 @@ FoodMenuInput:
     beq @CheckUp
 
     lda InventoryPointerY
-    cmp #128
+    cmp #144
     bcs @CheckUp
     clc
     adc #16
@@ -581,7 +581,7 @@ FoodMenuInput:
     jmp @exit
 @otherOptions:
     cmp #2
-    bne @eat
+    bne @checkEat
     lda StashActivated
     beq @storeItem
     jsr TakeItemFromStash
@@ -591,7 +591,9 @@ FoodMenuInput:
     jsr StoreItemInStash
     bne @exit
     jmp @clearItem
-@eat:
+@checkEat:
+    cmp #1
+    bne @clearItem
     jsr UseFood
     
 
@@ -648,7 +650,7 @@ ItemMenuInput:
     beq @CheckUp
 
     lda InventoryPointerY
-    cmp #112
+    cmp #128
     bcs @CheckUp
     clc
     adc #16
@@ -681,7 +683,7 @@ ItemMenuInput:
     beq @exit
 
     lda ItemMenuIndex
-    bne @stashAction
+    bne @checkIfStash
     ;use
     lda TempIndex
     cmp #ITEM_TYPE_FUEL
@@ -693,7 +695,9 @@ ItemMenuInput:
 @medicine:
     jsr UseMedicine
     jmp @clearItem
-@stashAction:
+@checkIfStash:
+    cmp #1
+    bne @clearItem ; DROP
     lda StashActivated
     bne @take_from_stash
     jsr StoreItemInStash
