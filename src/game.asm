@@ -34,8 +34,6 @@ main_tiles_chr: .incbin "main.chr"
 
 
 
-
-
 ;===========================================================
 .segment "ROM1"
 
@@ -1519,6 +1517,7 @@ HandleInput:
     cmp #STATE_MENU
     bne @checkIfGame
     jsr MenuInput
+    jmp @finishInput
 @checkIfGame:
     cmp #STATE_GAME
     bne @finishInput
@@ -2471,8 +2470,7 @@ UpdateFireplace:
 CheckIfEnteredHouse:
 
     lda InHouse
-    cmp #1
-    beq @nope
+    bne @nope ; already in
 
     lda PlayerX
     clc
@@ -2523,12 +2521,72 @@ CheckIfEnteredHouse:
     rts
 
 
+;----------------------------------
+CheckBed:
+    lda PlayerX
+    cmp #64
+    bcc @nope
+    cmp #88
+    bcs @nope
+    lda PlayerY
+    cmp #80
+    bcc @nope
+    cmp #128
+    bcs @nope
+
+    lda Buttons
+    and #BUTTON_B_MASK
+    beq @nope
+
+    lda #1
+    sta MustLoadSomething
+    sta MustLoadMenu
+    lda #0
+    sta Buttons
+    sta OldButtons
+
+    lda #1
+    jmp @exit
+
+@nope:
+    lda #0
+@exit:
+    rts
+
+
 ;-----------------------------------
 CheckIfExitedHouse:
 
     lda InHouse
     beq @nope
 
+    ;The bed
+    jsr CheckBed
+    bne @nope
+
+@checkFireplace:
+
+    lda PlayerX
+    cmp #104
+    bcc @checkExit
+    cmp #128
+    bcs @checkExit
+    lda PlayerY
+    cmp #80
+    bcs @checkExit
+    lda Buttons
+    and #BUTTON_B_MASK
+    beq @checkExit
+
+    lda #1
+    sta MustLoadSomething
+    sta MustLoadMenu
+    
+
+    jmp @nope
+
+
+@checkExit:
     lda PlayerY
     cmp #HOUSE_EXIT_Y
     bcc @nope
