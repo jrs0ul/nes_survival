@@ -786,6 +786,14 @@ StoreItemInStash:
 
 ;-------------------------------------
 DoRegularInput:
+
+    lda PlayerInteractedWithStorage
+    bne @stashList
+    lda PlayerInteractedWithFireplace
+    bne @activateInventory
+    lda PlayerInteractedWithBed
+    bne @setPointerToSleep
+
 @checkDown:
     lda Buttons
     and #BUTTON_DOWN_MASK
@@ -817,6 +825,11 @@ DoRegularInput:
     and #BUTTON_B_MASK
     beq @CheckA
 
+    lda OldButtons
+    and #BUTTON_B_MASK
+    bne @CheckA
+
+
     lda BaseMenuIndex
     beq @activateInventory
 
@@ -841,26 +854,44 @@ DoRegularInput:
 @stashList:
     lda InHouse
     beq @exit
-    lda #1
-    sta StashActivated
-    sta MustLoadSomething
-    sta MustDrawInventoryGrid
-    lda #INVENTORY_SPRITE_MIN_Y
-    sta InventoryPointerY
+    jsr OpenUpStash
     jmp @exit
 
 
 @activateInventory:
-
+    lda #0
+    sta PlayerInteractedWithFireplace
     lda #1
     sta InventoryActivated
     sta MustLoadSomething
     sta MustDrawInventoryGrid
     lda #INVENTORY_SPRITE_MIN_Y
     sta InventoryPointerY
+    jmp @exit
+
+@setPointerToSleep:
+
+    lda #0
+    sta PlayerInteractedWithBed
+    lda #4
+    sta BaseMenuIndex
+    lda #112
+    sta InventoryPointerY
 
 
 @exit:
+
+    rts
+;-------------------------------------
+OpenUpStash:
+    lda #0
+    sta PlayerInteractedWithStorage
+    lda #1
+    sta StashActivated
+    sta MustLoadSomething
+    sta MustDrawInventoryGrid
+    lda #INVENTORY_SPRITE_MIN_Y
+    sta InventoryPointerY
 
     rts
 

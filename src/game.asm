@@ -594,6 +594,13 @@ MustClearSubMenu:
     .res 1
 ;--
 
+PlayerInteractedWithStorage:
+    .res 1
+PlayerInteractedWithBed:
+    .res 1
+PlayerInteractedWithFireplace:
+    .res 1
+
 MustExitMenuState: ;if you want to exit the menu state when in bank1
     .res 1
 
@@ -2266,6 +2273,20 @@ CheckB:
     and #BUTTON_B_MASK
     bne @exit
 
+    lda InHouse
+    beq @useForAttack
+
+    jsr CheckBed
+    bne @exit
+    jsr CheckFireplace
+    bne @exit
+    jsr CheckStashBox
+    bne @exit
+    jsr CheckToolTable
+    bne @exit
+
+@useForAttack:
+
     lda AttackTimer
     bne @exit
 
@@ -2534,16 +2555,10 @@ CheckBed:
     cmp #128
     bcs @nope
 
-    lda Buttons
-    and #BUTTON_B_MASK
-    beq @nope
-
     lda #1
     sta MustLoadSomething
     sta MustLoadMenu
-    lda #0
-    sta Buttons
-    sta OldButtons
+    sta PlayerInteractedWithBed
 
     lda #1
     jmp @exit
@@ -2552,39 +2567,82 @@ CheckBed:
     lda #0
 @exit:
     rts
+;-----------------------------------
+CheckFireplace:
 
+    lda PlayerX
+    cmp #104
+    bcc @nope
+    cmp #128
+    bcs @nope
+    lda PlayerY
+    cmp #80
+    bcs @nope
+    
+
+    lda #1
+    sta MustLoadSomething
+    sta MustLoadMenu
+    sta PlayerInteractedWithFireplace
+
+    jmp @exit
+
+@nope:
+    lda #0
+@exit:
+    rts
+;-----------------------------------
+CheckStashBox:
+
+    lda PlayerX
+    cmp #144
+    bcc @nope
+    cmp #168
+    bcs @nope
+    lda PlayerY
+    cmp #80
+    bcs @nope
+
+    lda #1
+    sta MustLoadSomething
+    sta MustLoadMenu
+    sta PlayerInteractedWithStorage
+    
+
+    jmp @exit
+@nope:
+    lda #0
+@exit:
+    rts
+;-----------------------------------
+CheckToolTable:
+
+    lda PlayerX
+    cmp #152
+    bcc @nope
+    cmp #184
+    bcs @nope
+    lda PlayerY
+    cmp #120
+    bcs @nope
+    cmp #112
+    bcc @nope
+
+    lda #1
+    sta MustLoadSomething
+    sta MustLoadMenu
+
+    jmp @exit
+@nope:
+    lda #0
+@exit:
+    rts
 
 ;-----------------------------------
 CheckIfExitedHouse:
 
     lda InHouse
     beq @nope
-
-    ;The bed
-    jsr CheckBed
-    bne @nope
-
-@checkFireplace:
-
-    lda PlayerX
-    cmp #104
-    bcc @checkExit
-    cmp #128
-    bcs @checkExit
-    lda PlayerY
-    cmp #80
-    bcs @checkExit
-    lda Buttons
-    and #BUTTON_B_MASK
-    beq @checkExit
-
-    lda #1
-    sta MustLoadSomething
-    sta MustLoadMenu
-    
-
-    jmp @nope
-
 
 @checkExit:
     lda PlayerY
