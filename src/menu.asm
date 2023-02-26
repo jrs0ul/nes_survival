@@ -33,6 +33,7 @@ LoadMenu:
 
     lda #0
     sta MustLoadMenu
+    sta CraftingActivated
     sta StashActivated
     sta MustLoadSomething
     sta StashFoodMenuActivated
@@ -370,6 +371,9 @@ MenuInput:
     lda StashActivated
     bne @DoInventoryInput
 
+    lda CraftingActivated
+    bne @DoCraftingInput
+
     jsr DoRegularInput
     jmp @exit
 
@@ -385,11 +389,143 @@ MenuInput:
     jsr ItemMenuInput
     jmp @exit
 
+@DoCraftingInput:
+    jsr CraftingInput
+
 @exit:
     lda Buttons
     sta MenuButtons
 
     rts
+;--------------------------------------
+CraftingInput:
+
+@checkDown:
+
+    lda Buttons
+    and #BUTTON_DOWN_MASK
+    beq @CheckUp
+
+    lda InventoryPointerY
+    cmp #INVENTORY_SPRITE_MAX_Y - 12
+    bcs @rewindUp
+    clc
+    adc #12
+    sta InventoryPointerY
+    inc InventoryItemIndex
+    jmp @CheckB
+@rewindUp:
+    lda #INVENTORY_SPRITE_MIN_Y
+    sta InventoryPointerY
+    lda #0
+    sta InventoryItemIndex
+
+
+    jmp @CheckB
+
+@CheckUp:
+    lda Buttons
+    and #BUTTON_UP_MASK
+    beq @CheckB
+
+    lda InventoryPointerY
+    cmp #INVENTORY_SPRITE_MIN_Y + 12
+    bcc @rewindDown
+    sec
+    sbc #12
+    sta InventoryPointerY
+    dec InventoryItemIndex
+    jmp @CheckB
+@rewindDown:
+    lda #INVENTORY_SPRITE_MAX_Y - 12
+    sta InventoryPointerY
+    lda #9
+    sta InventoryItemIndex
+
+@CheckB:
+    lda Buttons
+    and #BUTTON_B_MASK
+    beq @CheckA
+
+    lda InventoryItemIndex
+    tay
+    lda Inventory, y
+    beq @exit ;empty slot was picked
+    tya
+    ldx CurrentCraftingComponent
+    cpx #1
+    bne @storeIndex
+    ldy #0
+    lda CraftingIndexes, y
+    cmp InventoryItemIndex
+    beq @exit
+    lda InventoryItemIndex
+
+@storeIndex:
+    sta CraftingIndexes, x
+    inc CurrentCraftingComponent
+    lda CurrentCraftingComponent
+    cmp #2
+    bcs @tryCrafting
+    jmp @exit
+@tryCrafting:
+    jsr CraftFromSelectedComponents
+
+    jmp @revert
+    
+@CheckA:
+    lda Buttons
+    and #BUTTON_A_MASK
+    beq @exit
+@revert:
+    lda #1
+    sta MustLoadSomething
+    sta MustLoadMenu
+    lda #0
+    sta CurrentCraftingComponent
+    lda #255
+    ldx #0
+    sta CraftingIndexes, x
+    inx
+    sta CraftingIndexes, x
+
+@exit:
+    rts
+
+;--------------------------------------
+CraftFromSelectedComponents:
+
+    ldx #0
+    lda CraftingIndexes, x
+    tay
+    lda Inventory, y
+    cmp #4
+    bne @exit
+
+    inx
+    lda CraftingIndexes, x
+    tay
+    lda Inventory, y
+    cmp #4
+    bne @exit
+
+    dex
+    lda CraftingIndexes, x
+    tay
+    lda #0
+    sta Inventory, y
+
+    inx
+    lda CraftingIndexes,x
+    tay
+    lda #0
+    sta Inventory, y
+    lda #5
+    sta Inventory,y
+
+@exit:
+    rts
+
 ;--------------------------------------
 InventoryInput:
 
@@ -797,6 +933,8 @@ DoRegularInput:
     bne @activateInventory
     lda PlayerInteractedWithBed
     bne @setPointerToSleep
+    lda PlayerInteractedWithTooltable
+    bne @crafting
 
 @checkDown:
     lda Buttons
@@ -840,6 +978,9 @@ DoRegularInput:
     cmp #3
     beq @stashList
 
+    cmp #2
+    beq @crafting
+
     ;sleep
     lda InHouse
     beq @exit
@@ -861,16 +1002,13 @@ DoRegularInput:
     jsr OpenUpStash
     jmp @exit
 
+@crafting:
+    jsr OpenupCrafting
+    jmp @exit
+
 
 @activateInventory:
-    lda #0
-    sta PlayerInteractedWithFireplace
-    lda #1
-    sta InventoryActivated
-    sta MustLoadSomething
-    sta MustDrawInventoryGrid
-    lda #INVENTORY_SPRITE_MIN_Y
-    sta InventoryPointerY
+    jsr OpenupInventory
     jmp @exit
 
 @setPointerToSleep:
@@ -886,6 +1024,34 @@ DoRegularInput:
 @exit:
 
     rts
+;------------------------------------
+OpenupCrafting:
+    lda InHouse
+    beq @exit
+    lda #1
+    sta MustLoadSomething
+    sta MustDrawInventoryGrid
+    sta CraftingActivated
+    lda #INVENTORY_SPRITE_MIN_Y
+    sta InventoryPointerY
+    lda #0
+    sta PlayerInteractedWithTooltable
+    sta CurrentCraftingComponent
+@exit:
+    rts
+;------------------------------------
+OpenupInventory:
+    lda #0
+    sta PlayerInteractedWithFireplace
+    lda #1
+    sta InventoryActivated
+    sta MustLoadSomething
+    sta MustDrawInventoryGrid
+    lda #INVENTORY_SPRITE_MIN_Y
+    sta InventoryPointerY
+
+    rts
+
 ;-------------------------------------
 OpenUpStash:
     lda #0
@@ -1246,6 +1412,7 @@ UpdateInventorySprites:
     adc StashActivated
     adc StashItemMenuActivated
     adc StashFoodMenuActivated
+    adc CraftingActivated
     beq @ThePointer
 
 @itemLoop:

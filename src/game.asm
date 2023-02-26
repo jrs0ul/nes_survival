@@ -610,6 +610,8 @@ PlayerInteractedWithBed:
     .res 1
 PlayerInteractedWithFireplace:
     .res 1
+PlayerInteractedWithTooltable:
+    .res 1
 
 MustExitMenuState: ;if you want to exit the menu state when in bank1
     .res 1
@@ -626,6 +628,13 @@ ItemMenuActivated:
 StashItemMenuActivated:
     .res 1
 StashActivated:
+    .res 1
+CraftingActivated:
+    .res 1
+
+CraftingIndexes:
+    .res 2; item index A + index B
+CurrentCraftingComponent:
     .res 1
 
 
@@ -2641,6 +2650,7 @@ CheckToolTable:
     lda #1
     sta MustLoadSomething
     sta MustLoadMenu
+    sta PlayerInteractedWithTooltable
 
     jmp @exit
 @nope:

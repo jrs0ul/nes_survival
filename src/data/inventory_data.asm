@@ -7,3 +7,4 @@ inventory_data:
     .byte 22, 1, 1, 0 ; raw meat
     .byte 22, 0, 1, 4 ; cooked meat
     .byte 38, 2, 3, 1 ; rowan berries
+    .byte 102, 2, 1, 3 ; jam
