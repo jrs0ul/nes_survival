@@ -39,7 +39,7 @@ main_tiles_chr: .incbin "main.chr"
 
 menu_palette:
     .byte $10,$0F,$00,$10, $0f,$07,$00,$31, $0f,$17,$27,$31, $31,$10,$0f,$01    ;background
-    .byte $10,$07,$17,$27, $10,$06,$16,$37, $0C,$0f,$16,$39, $10,$0f,$17,$16    ;OAM sprites
+    .byte $10,$07,$17,$27, $10,$06,$16,$37, $0C,$0f,$16,$39, $10,$0f,$37,$16    ;OAM sprites
 
 FoodMenu: 
     .byte $78,$72,$72,$72,$72,$72,$72,$72,$79
@@ -125,7 +125,7 @@ inventory_grid: ;at 5,5
     .byte $7a,$72,$72,$7b,$0,$0,$0,$0,$0,$0
 
 
-
+.include "data/recipes.asm"
 .include "data/menu_screen.asm"
 
 ;============================================================
@@ -163,7 +163,7 @@ banktable:              ; Write to this table to switch banks.
 
 .include "data/music.asm"
 .include "data/sfx.s"
-.include "data/inventory_data.asm"
+.include "data/item_data.asm"
 .include "data/npc_data.asm"
 
 zerosprite:
@@ -610,6 +610,8 @@ PlayerInteractedWithBed:
     .res 1
 PlayerInteractedWithFireplace:
     .res 1
+PlayerInteractedWithTooltable:
+    .res 1
 
 MustExitMenuState: ;if you want to exit the menu state when in bank1
     .res 1
@@ -626,6 +628,13 @@ ItemMenuActivated:
 StashItemMenuActivated:
     .res 1
 StashActivated:
+    .res 1
+CraftingActivated:
+    .res 1
+
+CraftingIndexes:
+    .res 2; item index A + index B
+CurrentCraftingComponent:
     .res 1
 
 
@@ -2641,6 +2650,7 @@ CheckToolTable:
     lda #1
     sta MustLoadSomething
     sta MustLoadMenu
+    sta PlayerInteractedWithTooltable
 
     jmp @exit
 @nope:
