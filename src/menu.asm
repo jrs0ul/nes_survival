@@ -473,7 +473,7 @@ CraftingInput:
 @tryCrafting:
     jsr CraftFromSelectedComponents
 
-    jmp @revert
+    jmp @resetIndexes
     
 @CheckA:
     lda Buttons
@@ -485,8 +485,10 @@ CraftingInput:
     sta MustLoadMenu
     lda #0
     sta CurrentCraftingComponent
+@resetIndexes:
     lda #255
     ldx #0
+    stx CurrentCraftingComponent
     sta CraftingIndexes, x
     inx
     sta CraftingIndexes, x
