@@ -62,7 +62,7 @@ LoadMenu:
 
 UpdateMenuGfx:
 
-
+    jsr DrawMenuTitle
     jsr DrawInventoryGrid
     jsr DrawFoodMenu
     jsr DrawItemMenu
@@ -72,6 +72,57 @@ UpdateMenuGfx:
 
     lda #0
     sta MustLoadSomething
+
+@exit:
+    rts
+;----------------------------------
+DrawMenuTitle:
+    lda MustDrawMenuTitle
+    beq @exit
+
+    lda FirstNametableAddr
+    clc
+    sta Temp
+
+    lda #$40
+    sta TempX
+
+    lda #9
+    sta TempPointX
+    lda #1
+    sta TempPointY
+
+    lda CraftingActivated
+    beq @storage
+    lda #<crafting_title
+    sta pointer
+    lda #>crafting_title
+    sta pointer + 1
+
+    jmp @draw
+    
+@storage:
+    lda StashActivated
+    beq @Inventory_title
+    lda #<storage_title
+    sta pointer
+    lda #>storage_title
+    sta pointer + 1
+    jmp @draw
+@Inventory_title:
+    lda #11
+    sta TempPointX
+    lda #<inventory_title
+    sta pointer
+    lda #>inventory_title
+    sta pointer + 1
+
+
+@draw:
+    jsr TransferTiles
+
+    lda #0
+    sta MustDrawMenuTitle
 
 @exit:
     rts
@@ -1052,6 +1103,7 @@ OpenupCrafting:
     lda #1
     sta MustLoadSomething
     sta MustDrawInventoryGrid
+    sta MustDrawMenuTitle
     sta CraftingActivated
     lda #INVENTORY_SPRITE_MIN_Y
     sta InventoryPointerY
@@ -1068,6 +1120,7 @@ OpenupInventory:
     sta InventoryActivated
     sta MustLoadSomething
     sta MustDrawInventoryGrid
+    sta MustDrawMenuTitle
     lda #INVENTORY_SPRITE_MIN_Y
     sta InventoryPointerY
 
@@ -1081,6 +1134,7 @@ OpenUpStash:
     sta StashActivated
     sta MustLoadSomething
     sta MustDrawInventoryGrid
+    sta MustDrawMenuTitle
     lda #INVENTORY_SPRITE_MIN_Y
     sta InventoryPointerY
 

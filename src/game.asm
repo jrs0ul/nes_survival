@@ -41,6 +41,15 @@ menu_palette:
     .byte $10,$0F,$00,$10, $0f,$07,$00,$31, $0f,$17,$27,$31, $31,$10,$0f,$01    ;background
     .byte $10,$07,$17,$27, $10,$06,$16,$37, $0C,$0f,$16,$39, $10,$0f,$37,$16    ;OAM sprites
 
+
+storage_title:
+    .byte $00,$00,$4C,$4D,$48,$4B,$3A,$40,$3E
+inventory_title:
+    .byte $00,$00,$42,$47,$4F,$3E,$47,$4D,$48,$4B,$52
+crafting_title:
+    .byte $00,$00,$3C,$4B,$3A,$3F,$4D,$00,$00
+
+
 FoodMenu: 
     .byte $78,$72,$72,$72,$72,$72,$72,$72,$79
     .byte $76,$00,$00,$00,$00,$00,$00,$00,$77
@@ -588,6 +597,8 @@ MustLoadMenu:
 MustLoadTitle:
     .res 1
 MustLoadGameOver:
+    .res 1
+MustDrawMenuTitle:
     .res 1
 
 MustDrawInventoryGrid:
