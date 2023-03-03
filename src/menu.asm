@@ -1299,10 +1299,10 @@ LoadSelectedItemStuff:
     tay
     iny
     iny
-    lda inventory_data, y
+    lda item_data, y
     sta TempIndex
     iny
-    lda inventory_data, y 
+    lda item_data, y 
     sta Temp ;power
     lda #1
     jmp @exit
@@ -1427,13 +1427,13 @@ UpdateInventorySprites:
     asl
     asl ;inventory_index * 4
     tay
-    lda inventory_data, y ;grab sprite index
+    lda item_data, y ;grab sprite index
     bne @store_sprite_index
     lda #$FD ;empty sprite index
 @store_sprite_index:
     sta TempTileIndex ; save sprite index
     iny
-    lda inventory_data, y
+    lda item_data, y
     sta TempPaletteIndex ; save palette
 
     stx TempInventoryIndex ; save x index

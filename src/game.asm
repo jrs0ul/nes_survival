@@ -39,7 +39,7 @@ main_tiles_chr: .incbin "main.chr"
 
 menu_palette:
     .byte $10,$0F,$00,$10, $0f,$07,$00,$31, $0f,$17,$27,$31, $31,$10,$0f,$01    ;background
-    .byte $10,$07,$17,$27, $10,$06,$16,$37, $0C,$0f,$16,$39, $10,$0f,$17,$16    ;OAM sprites
+    .byte $10,$07,$17,$27, $10,$06,$16,$37, $0C,$0f,$16,$39, $10,$0f,$37,$16    ;OAM sprites
 
 FoodMenu: 
     .byte $78,$72,$72,$72,$72,$72,$72,$72,$79
@@ -163,7 +163,7 @@ banktable:              ; Write to this table to switch banks.
 
 .include "data/music.asm"
 .include "data/sfx.s"
-.include "data/inventory_data.asm"
+.include "data/item_data.asm"
 .include "data/npc_data.asm"
 
 zerosprite:
