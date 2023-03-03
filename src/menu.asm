@@ -96,6 +96,19 @@ DrawMenuTitle:
     lda #1
     sta TempPointY
 
+    lda EquipmentActivated
+    beq @crafting
+    
+    lda #11
+    sta TempPointX
+    lda #<equipment_title
+    sta pointer
+    lda #>equipment_title
+    sta pointer + 1
+    
+    jmp @draw
+
+@crafting:
     lda CraftingActivated
     beq @storage
     lda #<crafting_title
@@ -486,6 +499,9 @@ MenuInput:
     lda ItemMenuActivated
     bne @DoItemMenuInput
 
+    lda EquipmentActivated
+    bne @DoEquipmentInput
+
     ;put stash sub menus before this
     lda StashActivated
     bne @DoInventoryInput
@@ -513,6 +529,10 @@ MenuInput:
 
 @DoItemMenuInput:
     jsr ItemMenuInput
+    jmp @exit
+
+@DoEquipmentInput:
+    jsr EquipmentInput
     jmp @exit
 
 @DoCraftingInput:
@@ -672,49 +692,48 @@ CraftFromSelectedComponents:
     rts
 
 ;--------------------------------------
+EquipmentInput:
+
+@CheckB:
+    lda Buttons
+    and #BUTTON_B_MASK
+    beq @CheckA
+
+    
+    jmp @exit
+    
+@CheckA:
+    lda Buttons
+    and #BUTTON_A_MASK
+    beq @exit
+
+    lda #0
+    sta EquipmentActivated
+    lda #1
+    sta MustLoadSomething
+    sta MustLoadMenu
+
+
+@exit:
+    rts
+
+
+;--------------------------------------
 InventoryInput:
 
-@checkDown:
-
-    lda Buttons
-    and #BUTTON_DOWN_MASK
-    beq @CheckUp
-
-    lda InventoryPointerY
-    cmp #INVENTORY_SPRITE_MAX_Y - 12
-    bcs @rewindUp
-    clc
-    adc #12
-    sta InventoryPointerY
-    inc InventoryItemIndex
-    jmp @CheckB
-@rewindUp:
+    lda #12
+    sta MenuStep
     lda #INVENTORY_SPRITE_MIN_Y
-    sta InventoryPointerY
-    lda #0
-    sta InventoryItemIndex
-
-
-    jmp @CheckB
-
-@CheckUp:
-    lda Buttons
-    and #BUTTON_UP_MASK
-    beq @CheckB
-
-    lda InventoryPointerY
-    cmp #INVENTORY_SPRITE_MIN_Y + 12
-    bcc @rewindDown
-    sec
-    sbc #12
-    sta InventoryPointerY
-    dec InventoryItemIndex
-    jmp @CheckB
-@rewindDown:
+    sta MenuUpperLimit
     lda #INVENTORY_SPRITE_MAX_Y - 12
-    sta InventoryPointerY
-    lda #9
-    sta InventoryItemIndex
+    sta MenuLowerLimit
+    lda #<InventoryItemIndex
+    sta pointer
+    lda #>InventoryItemIndex
+    sta pointer + 1
+    lda #INVENTORY_MAX_ITEMS - 1
+    jsr MenuInputUpDownCheck
+
 
 @CheckB:
     lda Buttons
@@ -732,7 +751,6 @@ InventoryInput:
     lda #1
     sta MustLoadSomething
     sta MustLoadMenu
-
 
 
 @exit:
@@ -848,35 +866,19 @@ ActivateSubmenu:
 
 ;--------------------------------------
 FoodMenuInput:
-@checkDown:
-    lda Buttons
-    and #BUTTON_DOWN_MASK
-    beq @CheckUp
-
-    lda InventoryPointerY
-    cmp #144
-    bcs @CheckUp
-    clc
-    adc #16
-    sta InventoryPointerY
-    inc FoodMenuIndex
-
-    jmp @CheckB
-
-@CheckUp:
-    lda Buttons
-    and #BUTTON_UP_MASK
-    beq @CheckB
-
-    lda InventoryPointerY
-    cmp #112
-    bcc @CheckB
-    sec 
-    sbc #16
-    sta InventoryPointerY
-    dec FoodMenuIndex
-
-    jmp @CheckB
+    lda #16
+    sta MenuStep
+    lda #144
+    sta MenuLowerLimit
+    lda #96
+    sta MenuUpperLimit
+    lda #<FoodMenuIndex
+    sta pointer
+    lda #>FoodMenuIndex
+    sta pointer + 1
+    lda #4
+    sta MenuMaxItem
+    jsr MenuInputUpDownCheck
 
 @CheckB:
     lda Buttons
@@ -1033,35 +1035,20 @@ MaterialMenuInput:
 
 ;-------------------------------------
 ItemMenuInput:
-@checkDown:
-    lda Buttons
-    and #BUTTON_DOWN_MASK
-    beq @CheckUp
 
-    lda InventoryPointerY
-    cmp #128
-    bcs @CheckUp
-    clc
-    adc #16
-    sta InventoryPointerY
-    inc ItemMenuIndex
-
-    jmp @CheckB
-
-@CheckUp:
-    lda Buttons
-    and #BUTTON_UP_MASK
-    beq @CheckB
-
-    lda InventoryPointerY
-    cmp #112
-    bcc @CheckB
-    sec 
-    sbc #16
-    sta InventoryPointerY
-    dec ItemMenuIndex
-
-    jmp @CheckB
+    lda #16
+    sta MenuStep
+    lda #96
+    sta MenuUpperLimit
+    lda #128
+    sta MenuLowerLimit
+    lda #3
+    lda #<ItemMenuIndex
+    sta pointer
+    lda #>ItemMenuIndex
+    sta pointer + 1
+    sta MenuMaxItem
+    jsr MenuInputUpDownCheck
 
 @CheckB:
     lda Buttons
@@ -1211,31 +1198,19 @@ DoRegularInput:
     lda PlayerInteractedWithTooltable
     bne @crafting
 
-@checkDown:
-    lda Buttons
-    and #BUTTON_DOWN_MASK
-    beq @CheckUp
-
-    lda InventoryPointerY
-    cmp #112
-    bcs @CheckB
-    clc
-    adc #16
-    sta InventoryPointerY
-    inc BaseMenuIndex
-
-@CheckUp:
-    lda Buttons
-    and #BUTTON_UP_MASK
-    beq @CheckB
-
-    lda InventoryPointerY
-    cmp #BASE_MENU_MIN_Y
-    beq @CheckB
-    sec
-    sbc #16
-    sta InventoryPointerY
-    dec BaseMenuIndex
+    lda #16
+    sta MenuStep
+    lda #112
+    sta MenuLowerLimit
+    lda #BASE_MENU_MIN_Y
+    sta MenuUpperLimit
+    lda #<BaseMenuIndex
+    sta pointer
+    lda #>BaseMenuIndex
+    sta pointer + 1
+    lda #4
+    sta MenuMaxItem
+    jsr MenuInputUpDownCheck
 
 @CheckB:
     lda Buttons
@@ -1255,6 +1230,9 @@ DoRegularInput:
 
     cmp #2
     beq @crafting
+
+    cmp #1
+    beq @equipment
 
     ;sleep
     lda InHouse
@@ -1281,6 +1259,9 @@ DoRegularInput:
     jsr OpenupCrafting
     jmp @exit
 
+@equipment:
+    jsr OpenEquipment
+    jmp @exit
 
 @activateInventory:
     jsr OpenupInventory
@@ -1297,6 +1278,74 @@ DoRegularInput:
 
 
 @exit:
+
+    rts
+;------------------------------------
+MenuInputUpDownCheck:
+
+@checkDown:
+    lda Buttons
+    and #BUTTON_DOWN_MASK
+    beq @CheckUp
+
+    lda InventoryPointerY
+    cmp MenuLowerLimit
+    bcs @rewindUp;
+    clc
+    adc MenuStep
+    sta InventoryPointerY
+    ldy #0
+    lda (pointer), y
+    clc
+    adc #1
+    sta (pointer), y
+
+    jmp @exit
+
+@rewindUp:
+    lda MenuUpperLimit
+    sta InventoryPointerY
+    lda #0
+    ldy #0
+    sta (pointer), y
+
+    jmp @exit
+
+@CheckUp:
+    lda Buttons
+    and #BUTTON_UP_MASK
+    beq @exit
+
+    lda InventoryPointerY
+    cmp MenuUpperLimit
+    beq @rewindDown
+    sec
+    sbc MenuStep
+    sta InventoryPointerY
+    ldy #0
+    lda (pointer), y
+    sec
+    sbc #1
+    sta (pointer), y
+    jmp @exit
+@rewindDown:
+    lda MenuLowerLimit
+    sta InventoryPointerY
+    lda MenuMaxItem
+    ldy #0
+    sta (pointer), y
+@exit:
+    rts
+
+;------------------------------------
+OpenEquipment:
+    lda #1
+    sta MustLoadSomething
+    sta MustDrawMenuTitle
+    sta EquipmentActivated
+    sta MustDrawInventoryGrid
+    lda #INVENTORY_SPRITE_MIN_Y
+    sta InventoryPointerY
 
     rts
 ;------------------------------------
@@ -1693,10 +1742,16 @@ UpdateInventorySprites:
     adc CraftingActivated
     adc MaterialMenuActivated
     adc StashMaterialMenuActivated
+    adc EquipmentActivated
     beq @ThePointer
 
 @itemLoop:
+    lda EquipmentActivated
+    beq @checkIfStash
+    lda EquipedItem
+    jmp @cnt
 
+@checkIfStash:
     lda StashActivated
     beq @useInventory
     lda Storage, x
@@ -1725,6 +1780,8 @@ UpdateInventorySprites:
     jsr TwoTileLoop
     ldx TempInventoryIndex ;restore x index
 @next:
+    lda EquipmentActivated
+    bne @ThePointer
     inx
     cpx #INVENTORY_MAX_ITEMS
     bcc @itemLoop
