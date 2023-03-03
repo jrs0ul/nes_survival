@@ -58,6 +58,8 @@ LoadMenu:
 ;------------------------------------
 .segment "ROM1"
 ;------------------------------------
+
+
 UpdateMenuGfx:
 
 
@@ -495,19 +497,43 @@ CraftingInput:
 ;--------------------------------------
 CraftFromSelectedComponents:
 
+    ldx #255
+    stx TempRegX
+@loop:
+    ldx TempRegX
+    inx
+    cpx #12
+    bcs @exit
+
+    lda recipes, x
+    sta TempY
+    inx
+    lda recipes, x
+    sta TempZ
+    inx
+    lda recipes, x
+    sta Temp
+    stx TempRegX
+
+
     ldx #0
     lda CraftingIndexes, x
     tay
     lda Inventory, y
-    cmp #4
-    bne @exit
+    cmp TempY ;ingredient A
+    bne @loop
 
     inx
     lda CraftingIndexes, x
     tay
     lda Inventory, y
-    cmp #4
-    bne @exit
+    cmp TempZ ;ingredient B
+    bne @loop
+
+
+    lda CraftingIndexes,x
+    lda Temp ;result
+    sta Inventory,y
 
     dex
     lda CraftingIndexes, x
@@ -515,13 +541,6 @@ CraftFromSelectedComponents:
     lda #0
     sta Inventory, y
 
-    inx
-    lda CraftingIndexes,x
-    tay
-    lda #0
-    sta Inventory, y
-    lda #5
-    sta Inventory,y
 
 @exit:
     rts

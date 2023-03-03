@@ -125,7 +125,7 @@ inventory_grid: ;at 5,5
     .byte $7a,$72,$72,$7b,$0,$0,$0,$0,$0,$0
 
 
-
+.include "data/recipes.asm"
 .include "data/menu_screen.asm"
 
 ;============================================================
