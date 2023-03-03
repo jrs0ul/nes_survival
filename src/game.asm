@@ -50,6 +50,17 @@ crafting_title:
     .byte $00,$00,$3C,$4B,$3A,$3F,$4D,$00,$00
 
 
+MaterialMenu: 
+    .byte $78,$72,$72,$72,$72,$72,$72,$72,$79
+    .byte $76,$00,$00,$00,$00,$00,$00,$00,$77
+    .byte $76,$00,$00,$4C,$4D,$48,$4B,$3E,$77
+    .byte $76,$00,$00,$00,$00,$00,$00,$00,$77
+    .byte $76,$00,$00,$3D,$4B,$48,$49,$00,$77
+    .byte $76,$00,$00,$00,$00,$00,$00,$00,$77
+    .byte $7a,$72,$72,$72,$72,$72,$72,$72,$7b
+
+
+
 FoodMenu: 
     .byte $78,$72,$72,$72,$72,$72,$72,$72,$79
     .byte $76,$00,$00,$00,$00,$00,$00,$00,$77
@@ -93,6 +104,15 @@ StashItemMenu:
     .byte $78,$72,$72,$72,$72,$72,$72,$72,$79
     .byte $76,$00,$00,$00,$00,$00,$00,$00,$77
     .byte $76,$00,$00,$4E,$4C,$3E,$00,$00,$77
+    .byte $76,$00,$00,$00,$00,$00,$00,$00,$77
+    .byte $76,$00,$00,$4D,$3A,$44,$3E,$00,$77
+    .byte $76,$00,$00,$00,$00,$00,$00,$00,$77
+    .byte $76,$00,$00,$3D,$4B,$48,$49,$00,$77
+    .byte $76,$00,$00,$00,$00,$00,$00,$00,$77
+    .byte $7a,$72,$72,$72,$72,$72,$72,$72,$7b
+
+StashMaterialMenu: 
+    .byte $78,$72,$72,$72,$72,$72,$72,$72,$79
     .byte $76,$00,$00,$00,$00,$00,$00,$00,$77
     .byte $76,$00,$00,$4D,$3A,$44,$3E,$00,$77
     .byte $76,$00,$00,$00,$00,$00,$00,$00,$77
@@ -347,6 +367,7 @@ npc_anim_row_sequence:
     ITEM_TYPE_FOOD             = 1
     ITEM_TYPE_FUEL             = 2
     ITEM_TYPE_MEDICINE         = 3
+    ITEM_TYPE_MATERIAL         = 4
 
     INVENTORY_MAX_ITEMS        = 10
 
@@ -607,9 +628,13 @@ MustDrawFoodMenu:
     .res 1
 MustDrawItemMenu:
     .res 1
+MustDrawMaterialMenu:
+    .res 1
 MustDrawStashItemMenu:
     .res 1
 MustDrawStashFoodMenu:
+    .res 1
+MustDrawStashMaterialMenu:
     .res 1
 MustClearSubMenu:
     .res 1
@@ -637,6 +662,10 @@ StashFoodMenuActivated:
 ItemMenuActivated:
     .res 1
 StashItemMenuActivated:
+    .res 1
+MaterialMenuActivated:
+    .res 1
+StashMaterialMenuActivated:
     .res 1
 StashActivated:
     .res 1
