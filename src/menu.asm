@@ -546,47 +546,20 @@ MenuInput:
 ;--------------------------------------
 CraftingInput:
 
-@checkDown:
 
-    lda Buttons
-    and #BUTTON_DOWN_MASK
-    beq @CheckUp
-
-    lda InventoryPointerY
-    cmp #INVENTORY_SPRITE_MAX_Y - 12
-    bcs @rewindUp
-    clc
-    adc #12
-    sta InventoryPointerY
-    inc InventoryItemIndex
-    jmp @CheckB
-@rewindUp:
+    lda #12
+    sta MenuStep
     lda #INVENTORY_SPRITE_MIN_Y
-    sta InventoryPointerY
-    lda #0
-    sta InventoryItemIndex
-
-
-    jmp @CheckB
-
-@CheckUp:
-    lda Buttons
-    and #BUTTON_UP_MASK
-    beq @CheckB
-
-    lda InventoryPointerY
-    cmp #INVENTORY_SPRITE_MIN_Y + 12
-    bcc @rewindDown
-    sec
-    sbc #12
-    sta InventoryPointerY
-    dec InventoryItemIndex
-    jmp @CheckB
-@rewindDown:
+    sta MenuUpperLimit
     lda #INVENTORY_SPRITE_MAX_Y - 12
-    sta InventoryPointerY
-    lda #9
-    sta InventoryItemIndex
+    sta MenuLowerLimit
+    lda #<InventoryItemIndex
+    sta pointer
+    lda #>InventoryItemIndex
+    sta pointer + 1
+    lda #INVENTORY_MAX_ITEMS - 1
+    jsr MenuInputUpDownCheck
+
 
 @CheckB:
     lda Buttons
@@ -698,6 +671,21 @@ EquipmentInput:
     lda Buttons
     and #BUTTON_B_MASK
     beq @CheckA
+
+    ;let's simply unequip
+    ldx #255
+@loop:
+    inx
+    cpx #INVENTORY_MAX_ITEMS
+    bcs @exit
+    lda Inventory, x
+    bne @loop
+
+    lda EquipedItem
+    sta Inventory, x
+    lda #0
+    sta EquipedItem
+
 
     
     jmp @exit
@@ -962,35 +950,22 @@ ExitSubmenu:
     rts
 ;-------------------------------------
 MaterialMenuInput:
-@checkDown:
-    lda Buttons
-    and #BUTTON_DOWN_MASK
-    beq @CheckUp
 
-    lda InventoryPointerY
-    cmp #112
-    bcs @CheckUp
-    clc
-    adc #16
-    sta InventoryPointerY
-    inc ItemMenuIndex
+    lda #16
+    sta MenuStep
+    lda #112
+    sta MenuLowerLimit
+    lda #96
+    sta MenuUpperLimit
+    lda #<ItemMenuIndex
+    sta pointer
+    lda #>ItemMenuIndex
+    sta pointer + 1
+    lda #2
+    sta MenuMaxItem
 
-    jmp @CheckB
+    jsr MenuInputUpDownCheck
 
-@CheckUp:
-    lda Buttons
-    and #BUTTON_UP_MASK
-    beq @CheckB
-
-    lda InventoryPointerY
-    cmp #112
-    bcc @CheckB
-    sec 
-    sbc #16
-    sta InventoryPointerY
-    dec ItemMenuIndex
-
-    jmp @CheckB
 
 @CheckB:
     lda Buttons

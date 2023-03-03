@@ -1956,6 +1956,9 @@ ResetEntityVariables:
     lda #1
     sta PlayerAlive
 
+    lda #8
+    sta EquipedItem
+
     lda #31
     sta BgColumnIdxToUpload
     lda #24
