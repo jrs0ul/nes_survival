@@ -8,6 +8,6 @@ item_data:
     .byte 22, 0, 1, 4 ; cooked meat
     .byte 38, 2, 3, 1 ; rowan berries
     .byte 102, 2, 1, 3 ; jam
-    .byte 54, 3, 2, 0 ; rock
-    .byte 70, 0, 2, 0 ; spear
-    .byte 86, 0, 2, 0 ; knife
+    .byte 54, 3, 4, 0 ; rock
+    .byte 70, 0, 5, 0 ; spear
+    .byte 86, 0, 5, 0 ; knife
