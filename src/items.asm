@@ -196,7 +196,7 @@ AddAndDeactivateItems:
     lda Inventory, y
     beq @addItem
     iny
-    cmp #INVENTORY_MAX_ITEMS
+    cpy #INVENTORY_MAX_ITEMS
     bcc @inventoryLoop
     jmp @exit ; no place in the inventory?
 
