@@ -100,6 +100,38 @@ sprites:
     .byte $00, $10, %00000011, $00
     .byte $00, $11, %00000011, $00
 
+
+;position of knife sprite depending on the player frame
+knife_pos_flipped:
+    .byte 16,  8 ; left/right
+    .byte  0,  0 ; up
+    .byte  8, 16 ; down
+
+knife_pos_normal:
+    .byte  248,  8 ; left/right (248 = -8)
+    .byte  8  ,  0 ; up
+    .byte  0  , 16 ; down
+
+knife_collision_pos_flip:
+    .byte 22, 9, 22, 15  ; l/r
+    .byte 2,  1,  6, 1   ; up
+    .byte 10, 22, 14, 22 ;down
+knife_collision_pos:
+    .byte 250, 9, 250, 15
+    .byte 10, 1, 14, 1
+    .byte 2, 24, 6, 24
+
+fist_collision_pos_flip:
+    .byte 18, 9, 18, 15  ; l/r
+    .byte 2,  4,  6, 4   ; up
+    .byte 10, 18, 14, 18 ;down
+fist_collision_pos:
+    .byte 254, 9, 254, 15
+    .byte 10, 4, 14, 4
+    .byte 2, 18, 6, 18
+
+
+
 npc_direction_list:
     .byte 0
     .byte %00000100 ; Up
@@ -379,11 +411,16 @@ InputProcessed:
 RandomNumber:
     .res 1
 
+;attack square
 KnifeX:
     .res 1
 KnifeY:
     .res 1
-
+KnifeBRX:
+    .res 1
+KnifeBRY:
+    .res 1
+;--
 FireFrame:  ;an animation frame of fire in the fireplace
     .res 1
 FireFrameDelay:
@@ -642,6 +679,10 @@ TempNpcTimer:
 TempNpcRows:
     .res 1
 TempFrameOffset:
+    .res 1
+TempPointX2:
+    .res 1
+TempPointY2:
     .res 1
 
 DropedItemX: ;x coordinate of item droped by npc
@@ -2936,99 +2977,63 @@ UpdateSprites:
 SetKnifeSprite:
 
     lda PlayerFlip
-    beq @nF
+    beq @notFlipped
 
     lda #%01000000
     sta Temp
 
-
     lda PlayerFrame
-    beq @horizF
-    cmp #2
-    beq @gDown
-
-    lda PlayerY
-    sta TempPointY
-
-    lda PlayerX
+    asl
+    tay
+    lda knife_pos_flipped, y
     sta TempPointX
-
-    jmp @updateKnife
-@gDown:
+    iny
+    lda knife_pos_flipped, y
+    sta TempPointY
     lda PlayerY
     clc
-    adc #16
+    adc TempPointY
     sta TempPointY
 
     lda PlayerX
     clc
-    adc #8
-    sta TempPointX
-
-
-    jmp @updateKnife
-@horizF:
-    lda PlayerY
-    clc
-    adc #8
-    sta TempPointY
-
-    lda PlayerX
-    clc
-    adc #16
+    adc TempPointX
     sta TempPointX
 
     jmp @updateKnife
-@nF:
+@notFlipped:
 
     lda #%00000000
     sta Temp
 
     lda PlayerFrame
-    beq @horizNF
-    cmp #2
-    beq @gDownNF
-
-
-    lda PlayerY
+    asl
+    tay
+    lda knife_pos_normal, y
+    sta TempPointX
+    iny
+    lda knife_pos_normal, y
     sta TempPointY
+    lda PlayerY
+    clc
+    adc TempPointY
+    sta TempPointY
+    sta KnifeY
 
     lda PlayerX
     clc
-    adc #8
+    adc TempPointX
     sta TempPointX
+    sta KnifeX
 
-    jmp @updateKnife
-@gDownNF:
-    lda PlayerY
-    clc
-    adc #16
-    sta TempPointY
-
-    lda PlayerX
-    sta TempPointX
-
-
-    jmp @updateKnife
-@horizNF:
-    lda PlayerY
-    clc
-    adc #8
-    sta TempPointY
-
-    lda PlayerX
-    sec
-    sbc #8
-    sta TempPointX
-@updateKnife:
+@updateKnife: ;update the actual sprite
 ;----------------------
 
+    lda EquipedItem
+    beq @exit
     inx
-    lda TempPointY;KnifeY
+    lda TempPointY
     sta FIRST_SPRITE,x
-    clc
-    adc #4
-    sta KnifeY
     inx
     lda #240
     clc
@@ -3038,11 +3043,8 @@ SetKnifeSprite:
     lda Temp
     sta FIRST_SPRITE,x
     inx
-    lda TempPointX;KnifeX
+    lda TempPointX
     sta FIRST_SPRITE,x
-    clc
-    adc #4
-    sta KnifeX
     inc TempSpriteCount
 
 @exit:

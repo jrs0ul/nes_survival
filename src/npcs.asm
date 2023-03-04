@@ -317,18 +317,13 @@ CheckSingleNpcAgainstPlayerHit:
 KnifeNpcsCollision:
     lda #0
     sta TempItemScreen
-    lda TempPointX
-    cmp KnifeX
-    bcs @exit
+
+    jsr PreparePlayerAttackSquare
+    
     lda TempPointX
     clc
-    adc #16 ; two tiles
-    cmp KnifeX
-    bcc @exit
-
-    lda TempPointY
-    cmp KnifeY
-    bcs @exit
+    adc #16
+    sta TempPointX2
 
     lda TempPointY
     ldx TempNpcRows
@@ -337,10 +332,46 @@ KnifeNpcsCollision:
     adc #8
     dex
     bne @addRowsLoop
-    cmp KnifeY
-    bcc @exit
-    ;---
+    sta TempPointY2
 
+
+
+    ;knife Point1 vs npc point1-poin2
+    lda KnifeBRX
+    cmp TempPointX
+    bcc @checkOtherKnifePoint
+
+    cmp TempPointX2
+    bcs @checkOtherKnifePoint
+
+    ;check Y1
+    lda KnifeBRY
+    cmp TempPointY
+    bcc @checkOtherKnifePoint
+
+    cmp TempPointY2
+    bcs @checkOtherKnifePoint
+    jmp @collisionDetected
+
+@checkOtherKnifePoint:
+
+    lda KnifeX
+    cmp TempPointX
+    bcc @exit
+
+    cmp TempPointX2
+    bcs @exit
+
+    lda KnifeY
+    cmp TempPointY
+    bcc @exit
+
+    cmp TempPointY2
+    bcs @exit
+
+
+    ;-------------------------
+@collisionDetected:
     dey
     dey
     lda Npcs, y
@@ -387,6 +418,142 @@ KnifeNpcsCollision:
 
 @exit:
     rts
+
+;-------------------------------------
+PreparePlayerAttackSquare:
+
+    sty TempY
+
+
+    lda EquipedItem
+    beq @nothingEquiped
+
+    
+    lda PlayerFlip
+    beq @notFlipped
+
+    lda PlayerFrame
+    asl
+    asl
+    tay
+    lda knife_collision_pos_flip, y
+    clc
+    adc PlayerX
+    sta KnifeX
+    iny
+    lda knife_collision_pos_flip, y
+    clc
+    adc PlayerY
+    sta KnifeY
+    iny
+    lda knife_collision_pos_flip, y
+    clc
+    adc PlayerX
+    sta KnifeBRX
+    iny
+    lda knife_collision_pos_flip, y
+    clc
+    adc PlayerY
+    sta KnifeBRY
+
+    jmp @calcCollision
+
+@notFlipped:
+    
+    lda PlayerFrame
+    asl
+    asl
+    tay
+    lda knife_collision_pos, y
+    clc
+    adc PlayerX
+    sta KnifeX
+    iny
+    lda knife_collision_pos, y
+    clc
+    adc PlayerY
+    sta KnifeY
+    iny
+    lda knife_collision_pos, y
+    clc
+    adc PlayerX
+    sta KnifeBRX
+    iny
+    lda knife_collision_pos, y
+    clc 
+    adc PlayerY
+    sta KnifeBRY
+
+    jmp @calcCollision
+
+@nothingEquiped:
+    
+    lda PlayerFlip
+    beq @notFlippedUnarmed
+
+    lda PlayerFrame
+    asl
+    asl
+    tay
+    lda fist_collision_pos_flip, y
+    clc
+    adc PlayerX
+    sta KnifeX
+    iny
+    lda fist_collision_pos_flip, y
+    clc
+    adc PlayerY
+    sta KnifeY
+    iny
+    lda fist_collision_pos_flip, y
+    clc
+    adc PlayerX
+    sta KnifeBRX
+    iny
+    lda fist_collision_pos_flip, y
+    clc
+    adc PlayerY
+    sta KnifeBRY
+
+    jmp @calcCollision
+
+@notFlippedUnarmed:
+    
+    lda PlayerFrame
+    asl
+    asl
+    tay
+    lda fist_collision_pos, y
+    clc
+    adc PlayerX
+    sta KnifeX
+    iny
+    lda fist_collision_pos, y
+    clc
+    adc PlayerY
+    sta KnifeY
+    iny
+    lda fist_collision_pos, y
+    clc
+    adc PlayerX
+    sta KnifeBRX
+    iny
+    lda fist_collision_pos, y
+    clc 
+    adc PlayerY
+    sta KnifeBRY
+
+    jmp @calcCollision
+
+
+
+@calcCollision:
+
+    ldy TempY
+
+    rts
+
+
 ;-------------------------------------
 UpdateNpcSpritesInWorld:
 
