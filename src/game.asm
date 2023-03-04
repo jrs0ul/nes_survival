@@ -283,6 +283,7 @@ npc_anim_row_sequence:
     ITEM_TYPE_FUEL             = 2
     ITEM_TYPE_MEDICINE         = 3
     ITEM_TYPE_MATERIAL         = 4
+    ITEM_TYPE_TOOL             = 5
 
     INVENTORY_MAX_ITEMS        = 10
 
@@ -559,6 +560,10 @@ MustDrawStashFoodMenu:
     .res 1
 MustDrawStashMaterialMenu:
     .res 1
+MustDrawToolMenu:
+    .res 1
+MustDrawStashToolMenu:
+    .res 1
 MustClearSubMenu:
     .res 1
 ;--
@@ -600,6 +605,11 @@ MaterialMenuActivated:
     .res 1
 StashMaterialMenuActivated:
     .res 1
+StashToolMenuActivated:
+    .res 1
+ToolMenuActivated:
+    .res 1
+
 StashActivated:
     .res 1
 CraftingActivated:

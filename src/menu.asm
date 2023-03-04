@@ -45,6 +45,9 @@ LoadMenu:
     sta BaseMenuIndex
     sta MaterialMenuActivated
     sta StashMaterialMenuActivated
+    sta EquipmentActivated
+    sta ToolMenuActivated
+    sta StashToolMenuActivated
 
     lda #INVENTORY_POINTER_X
     sta InventoryPointerX
@@ -69,7 +72,9 @@ UpdateMenuGfx:
     jsr DrawFoodMenu
     jsr DrawItemMenu
     jsr DrawMaterialMenu
+    jsr DrawToolMenu
     jsr DrawStashMaterialMenu
+    jsr DrawStashToolMenu
     jsr DrawStashFoodMenu
     jsr DrawStashItemMenu
     jsr ClearSubMenu
@@ -259,6 +264,65 @@ DrawStashItemMenu:
 @exit:
 
     rts
+;-------------------------
+DrawToolMenu:
+    lda MustDrawToolMenu
+    beq @exit
+
+    lda FirstNametableAddr
+    clc
+    adc #1
+    sta Temp
+
+    lda #$48
+    sta TempX
+
+    lda #9
+    sta TempPointX
+    lda #9
+    sta TempPointY
+
+    lda #<ToolMenu
+    sta pointer
+    lda #>ToolMenu
+    sta pointer + 1
+    jsr TransferTiles
+
+    lda #0
+    sta MustDrawToolMenu
+
+@exit:
+    rts
+;-------------------------
+DrawStashToolMenu:
+    lda MustDrawStashToolMenu
+    beq @exit
+
+    lda FirstNametableAddr
+    clc
+    adc #1
+    sta Temp
+
+    lda #$48
+    sta TempX
+
+    lda #9
+    sta TempPointX
+    lda #9
+    sta TempPointY
+
+    lda #<StashToolMenu
+    sta pointer
+    lda #>StashToolMenu
+    sta pointer + 1
+    jsr TransferTiles
+
+    lda #0
+    sta MustDrawStashToolMenu
+
+@exit:
+    rts
+
 ;-------------------------
 DrawItemMenu:
     lda MustDrawItemMenu
@@ -496,6 +560,9 @@ MenuInput:
     lda StashMaterialMenuActivated
     bne @DoMaterialInput
 
+    lda StashToolMenuActivated
+    bne @DoToolInput
+
     lda ItemMenuActivated
     bne @DoItemMenuInput
 
@@ -511,6 +578,9 @@ MenuInput:
 
     lda MaterialMenuActivated
     bne @DoMaterialInput
+
+    lda ToolMenuActivated
+    bne @DoToolInput
 
     jsr DoRegularInput
     jmp @exit
@@ -533,6 +603,10 @@ MenuInput:
 
 @DoEquipmentInput:
     jsr EquipmentInput
+    jmp @exit
+
+@DoToolInput:
+    jsr ToolInput
     jmp @exit
 
 @DoCraftingInput:
@@ -756,6 +830,9 @@ OnItemClicked:
     cmp #ITEM_TYPE_MATERIAL
     beq @material
 
+    cmp #ITEM_TYPE_TOOL
+    beq @tool
+
     ;regular item
 
     lda StashActivated
@@ -773,15 +850,7 @@ OnItemClicked:
     jmp @exit
 
 @ItemFromInventory:
-    lda #1
-    sta MustLoadSomething
-    sta MustDrawItemMenu
-    sta ItemMenuActivated
-    jsr ActivateSubmenu
-    lda #0
-    sta ItemMenuIndex
-    sta InventoryActivated
-
+    jsr RegularItemClicked
     jmp @exit
 ;--------
 @addFood:
@@ -811,8 +880,55 @@ OnItemClicked:
 ;-----------
 @material:
    jsr MaterialItemClicked
+   jmp @exit
+@tool:
+    jsr ToolItemClicked
+
 @exit:
     rts
+;-------------------------------------
+RegularItemClicked:
+    lda #1
+    sta MustLoadSomething
+    sta MustDrawItemMenu
+    sta ItemMenuActivated
+    jsr ActivateSubmenu
+    lda #0
+    sta ItemMenuIndex
+    sta InventoryActivated
+
+    rts
+;-------------------------------------
+ToolItemClicked:
+
+    lda StashActivated
+    bne @stashedTool
+
+    lda #1
+    sta MustLoadSomething
+    sta MustDrawToolMenu
+    sta ToolMenuActivated
+    jsr ActivateSubmenu
+    lda #0
+    sta ItemMenuIndex
+    sta InventoryActivated
+    
+    jmp @exit
+
+@stashedTool:
+
+    lda #1
+    sta MustLoadSomething
+    sta MustDrawStashToolMenu
+    sta StashToolMenuActivated
+    jsr ActivateSubmenu
+    lda #0
+    sta ItemMenuIndex
+    sta InventoryActivated
+
+@exit:
+    rts
+
 ;-------------------------------------
 MaterialItemClicked:
     lda StashActivated
@@ -1005,6 +1121,90 @@ MaterialMenuInput:
     jsr HideMaterialMenu
 @exit:
     rts
+;------------------------------------
+ToolInput:
+
+    lda #16
+    sta MenuStep
+    lda #96
+    sta MenuUpperLimit
+    lda #128
+    sta MenuLowerLimit
+    lda #<ItemMenuIndex
+    sta pointer
+    lda #>ItemMenuIndex
+    sta pointer + 1
+    lda #3
+    sta MenuMaxItem
+    jsr MenuInputUpDownCheck
+
+@CheckB:
+    lda Buttons
+    and #BUTTON_B_MASK
+    beq @CheckA
+
+    jsr LoadSelectedItemStuff
+    beq @exit
+
+    lda ItemMenuIndex
+    bne @checkIfStash
+
+    lda EquipedItem
+    sta Temp
+
+    lda StashActivated
+    beq @inventory
+    lda Storage, x
+    jmp @equip
+@inventory:
+    lda Inventory, x
+@equip:
+    sta EquipedItem
+    lda Temp
+    beq @clearItem
+    lda StashActivated
+    beq @useInv
+    lda Temp
+    sta Storage, x
+    jmp @hidemenu
+@useInv:
+    lda Temp
+    sta Inventory, x
+    jmp @hidemenu
+
+@checkIfStash:
+    cmp #1
+    bne @clearItem ; DROP
+    lda StashActivated
+    bne @take_from_stash
+    jsr StoreItemInStash
+    bne @exit ;failed to add to stash
+    jmp @clearItem
+@take_from_stash:
+    jsr TakeItemFromStash
+    bne @exit ;failed to retrieve
+
+@clearItem:
+    lda StashActivated
+    beq @useInventory
+    lda #0
+    sta Storage, x
+    jmp @hidemenu
+@useInventory:
+    lda #0
+    sta Inventory, x
+@hidemenu:
+    jsr HideToolMenu
+    jmp @exit
+@CheckA:
+    lda Buttons
+    and #BUTTON_A_MASK
+    beq @exit
+
+    jsr HideToolMenu
+@exit:
+    rts
+
 
 
 
@@ -1017,11 +1217,11 @@ ItemMenuInput:
     sta MenuUpperLimit
     lda #128
     sta MenuLowerLimit
-    lda #3
     lda #<ItemMenuIndex
     sta pointer
     lda #>ItemMenuIndex
     sta pointer + 1
+    lda #3
     sta MenuMaxItem
     jsr MenuInputUpDownCheck
 
@@ -1098,6 +1298,27 @@ HideItemMenu:
     sta MustClearSubMenu
 
     rts
+;---------------------------------
+HideToolMenu:
+    lda #0
+    sta ToolMenuActivated
+    sta StashToolMenuActivated
+    jsr UpdateMenuStats
+    lda StashActivated
+    bne @cont
+    lda #1
+    sta InventoryActivated
+@cont:
+    lda #INVENTORY_POINTER_X
+    sta InventoryPointerX
+    lda OldInventoryPointerY
+    sta InventoryPointerY
+    lda #1
+    sta MustLoadSomething
+    sta MustClearSubMenu
+
+    rts
+
 ;----------------------------------
 HideMaterialMenu:
     lda #0
@@ -1718,6 +1939,8 @@ UpdateInventorySprites:
     adc MaterialMenuActivated
     adc StashMaterialMenuActivated
     adc EquipmentActivated
+    adc ToolMenuActivated
+    adc StashToolMenuActivated
     beq @ThePointer
 
 @itemLoop:
