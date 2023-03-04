@@ -33,127 +33,10 @@ main_tiles_chr: .incbin "main.chr"
 .include "data/npc_list.asm"  ;npcs in maps
 
 
-
 ;===========================================================
 .segment "ROM1"
 
-menu_palette:
-    .byte $10,$0F,$00,$10, $0f,$07,$00,$31, $0f,$17,$27,$31, $31,$10,$0f,$01    ;background
-    .byte $10,$07,$17,$27, $10,$06,$16,$37, $0C,$0f,$16,$39, $10,$0f,$37,$16    ;OAM sprites
-
-
-storage_title:
-    .byte $00,$00,$4C,$4D,$48,$4B,$3A,$40,$3E
-inventory_title:
-    .byte $00,$00,$42,$47,$4F,$3E,$47,$4D,$48,$4B,$52
-crafting_title:
-    .byte $00,$00,$3C,$4B,$3A,$3F,$4D,$00,$00
-
-
-MaterialMenu: 
-    .byte $78,$72,$72,$72,$72,$72,$72,$72,$79
-    .byte $76,$00,$00,$00,$00,$00,$00,$00,$77
-    .byte $76,$00,$00,$4C,$4D,$48,$4B,$3E,$77
-    .byte $76,$00,$00,$00,$00,$00,$00,$00,$77
-    .byte $76,$00,$00,$3D,$4B,$48,$49,$00,$77
-    .byte $76,$00,$00,$00,$00,$00,$00,$00,$77
-    .byte $7a,$72,$72,$72,$72,$72,$72,$72,$7b
-
-
-
-FoodMenu: 
-    .byte $78,$72,$72,$72,$72,$72,$72,$72,$79
-    .byte $76,$00,$00,$00,$00,$00,$00,$00,$77
-    .byte $76,$00,$00,$3c,$48,$48,$44,$00,$77
-    .byte $76,$00,$00,$00,$00,$00,$00,$00,$77
-    .byte $76,$00,$00,$3e,$3a,$4d,$00,$00,$77
-    .byte $76,$00,$00,$00,$00,$00,$00,$00,$77
-    .byte $76,$00,$00,$4C,$4D,$48,$4B,$3E,$77
-    .byte $76,$00,$00,$00,$00,$00,$00,$00,$77
-    .byte $76,$00,$00,$3D,$4B,$48,$49,$00,$77
-    .byte $76,$00,$00,$00,$00,$00,$00,$00,$77
-    .byte $7a,$72,$72,$72,$72,$72,$72,$72,$7b
-
-
-ItemMenu:
-    .byte $78,$72,$72,$72,$72,$72,$72,$72,$79
-    .byte $76,$00,$00,$00,$00,$00,$00,$00,$77
-    .byte $76,$00,$00,$4E,$4C,$3E,$00,$00,$77
-    .byte $76,$00,$00,$00,$00,$00,$00,$00,$77
-    .byte $76,$00,$00,$4C,$4D,$48,$4B,$3E,$77
-    .byte $76,$00,$00,$00,$00,$00,$00,$00,$77
-    .byte $76,$00,$00,$3D,$4B,$48,$49,$00,$77
-    .byte $76,$00,$00,$00,$00,$00,$00,$00,$77
-    .byte $7a,$72,$72,$72,$72,$72,$72,$72,$7b
-
-StashFoodMenu: 
-    .byte $78,$72,$72,$72,$72,$72,$72,$72,$79
-    .byte $76,$00,$00,$00,$00,$00,$00,$00,$77
-    .byte $76,$00,$00,$3c,$48,$48,$44,$00,$77
-    .byte $76,$00,$00,$00,$00,$00,$00,$00,$77
-    .byte $76,$00,$00,$3e,$3a,$4d,$00,$00,$77
-    .byte $76,$00,$00,$00,$00,$00,$00,$00,$77
-    .byte $76,$00,$00,$4D,$3A,$44,$3E,$00,$77
-    .byte $76,$00,$00,$00,$00,$00,$00,$00,$77
-    .byte $76,$00,$00,$3D,$4B,$48,$49,$00,$77
-    .byte $76,$00,$00,$00,$00,$00,$00,$00,$77
-    .byte $7a,$72,$72,$72,$72,$72,$72,$72,$7b
-
-
-StashItemMenu:
-    .byte $78,$72,$72,$72,$72,$72,$72,$72,$79
-    .byte $76,$00,$00,$00,$00,$00,$00,$00,$77
-    .byte $76,$00,$00,$4E,$4C,$3E,$00,$00,$77
-    .byte $76,$00,$00,$00,$00,$00,$00,$00,$77
-    .byte $76,$00,$00,$4D,$3A,$44,$3E,$00,$77
-    .byte $76,$00,$00,$00,$00,$00,$00,$00,$77
-    .byte $76,$00,$00,$3D,$4B,$48,$49,$00,$77
-    .byte $76,$00,$00,$00,$00,$00,$00,$00,$77
-    .byte $7a,$72,$72,$72,$72,$72,$72,$72,$7b
-
-StashMaterialMenu: 
-    .byte $78,$72,$72,$72,$72,$72,$72,$72,$79
-    .byte $76,$00,$00,$00,$00,$00,$00,$00,$77
-    .byte $76,$00,$00,$4D,$3A,$44,$3E,$00,$77
-    .byte $76,$00,$00,$00,$00,$00,$00,$00,$77
-    .byte $76,$00,$00,$3D,$4B,$48,$49,$00,$77
-    .byte $76,$00,$00,$00,$00,$00,$00,$00,$77
-    .byte $7a,$72,$72,$72,$72,$72,$72,$72,$7b
-
-
-
-PopUpMenuClear:
-    .byte $00,$00,$00,$00,$00,$00,$00,$00,$00
-    .byte $00,$00,$00,$00,$00,$00,$00,$00,$00
-    .byte $00,$00,$00,$00,$00,$00,$00,$00,$00
-    .byte $00,$00,$00,$00,$00,$00,$00,$00,$00
-    .byte $00,$00,$00,$00,$00,$00,$00,$00,$00
-    .byte $00,$00,$00,$00,$00,$00,$00,$00,$00
-    .byte $00,$00,$00,$00,$00,$00,$00,$00,$00
-    .byte $00,$00,$00,$00,$00,$00,$00,$00,$00
-    .byte $00,$00,$00,$00,$00,$00,$00,$00,$00
-    .byte $00,$00,$00,$00,$00,$00,$00,$00,$00
-    .byte $00,$00,$00,$00,$00,$00,$00,$00,$00
-
-inventory_grid: ;at 5,5
-    .byte $78,$72,$72,$79,$0,$0,$0,$0,$0,$0
-    .byte $74,$70,$70,$71,$0,$0,$0,$0,$0,$0
-    .byte $76,$00,$00,$77,$0,$0,$0,$0,$0,$0
-    .byte $75,$72,$72,$73,$0,$0,$0,$0,$0,$0
-    .byte $74,$70,$70,$71,$0,$0,$0,$0,$0,$0
-    .byte $76,$00,$00,$77,$0,$0,$0,$0,$0,$0
-    .byte $75,$72,$72,$73,$0,$0,$0,$0,$0,$0
-    .byte $74,$70,$70,$71,$0,$0,$0,$0,$0,$0
-    .byte $76,$00,$00,$77,$0,$0,$0,$0,$0,$0
-    .byte $75,$72,$72,$73,$0,$0,$0,$0,$0,$0
-    .byte $74,$70,$70,$71,$0,$0,$0,$0,$0,$0
-    .byte $76,$00,$00,$77,$0,$0,$0,$0,$0,$0
-    .byte $75,$72,$72,$73,$0,$0,$0,$0,$0,$0
-    .byte $74,$70,$70,$71,$0,$0,$0,$0,$0,$0
-    .byte $76,$00,$00,$77,$0,$0,$0,$0,$0,$0
-    .byte $7a,$72,$72,$7b,$0,$0,$0,$0,$0,$0
-
-
+.include "data/menu_data.asm"
 .include "data/recipes.asm"
 .include "data/menu_screen.asm"
 
@@ -216,6 +99,38 @@ sprites:
     .byte $00, $01, %00000011, $00
     .byte $00, $10, %00000011, $00
     .byte $00, $11, %00000011, $00
+
+
+;position of knife sprite depending on the player frame
+knife_pos_flipped:
+    .byte 16,  8 ; left/right
+    .byte  0,  0 ; up
+    .byte  8, 16 ; down
+
+knife_pos_normal:
+    .byte  248,  8 ; left/right (248 = -8)
+    .byte  8  ,  0 ; up
+    .byte  0  , 16 ; down
+
+knife_collision_pos_flip:
+    .byte 22, 9, 22, 15  ; l/r
+    .byte 2,  1,  6, 1   ; up
+    .byte 10, 22, 14, 22 ;down
+knife_collision_pos:
+    .byte 250, 9, 250, 15
+    .byte 10, 1, 14, 1
+    .byte 2, 24, 6, 24
+
+fist_collision_pos_flip:
+    .byte 18, 9, 18, 15  ; l/r
+    .byte 2,  4,  6, 4   ; up
+    .byte 10, 18, 14, 18 ;down
+fist_collision_pos:
+    .byte 254, 9, 254, 15
+    .byte 10, 4, 14, 4
+    .byte 2, 18, 6, 18
+
+
 
 npc_direction_list:
     .byte 0
@@ -368,6 +283,7 @@ npc_anim_row_sequence:
     ITEM_TYPE_FUEL             = 2
     ITEM_TYPE_MEDICINE         = 3
     ITEM_TYPE_MATERIAL         = 4
+    ITEM_TYPE_TOOL             = 5
 
     INVENTORY_MAX_ITEMS        = 10
 
@@ -496,11 +412,16 @@ InputProcessed:
 RandomNumber:
     .res 1
 
+;attack square
 KnifeX:
     .res 1
 KnifeY:
     .res 1
-
+KnifeBRX:
+    .res 1
+KnifeBRY:
+    .res 1
+;--
 FireFrame:  ;an animation frame of fire in the fireplace
     .res 1
 FireFrameDelay:
@@ -533,6 +454,9 @@ Minutes:
 Hours:
     .res 1
 
+
+EquipedItem: ;equiped item type
+    .res 1
 
 Inventory:
     .res INVENTORY_MAX_ITEMS
@@ -624,6 +548,8 @@ MustDrawMenuTitle:
 
 MustDrawInventoryGrid:
     .res 1
+MustDrawEquipmentGrid:
+    .res 1
 MustDrawFoodMenu:
     .res 1
 MustDrawItemMenu:
@@ -635,6 +561,10 @@ MustDrawStashItemMenu:
 MustDrawStashFoodMenu:
     .res 1
 MustDrawStashMaterialMenu:
+    .res 1
+MustDrawToolMenu:
+    .res 1
+MustDrawStashToolMenu:
     .res 1
 MustClearSubMenu:
     .res 1
@@ -653,6 +583,16 @@ MustExitMenuState: ;if you want to exit the menu state when in bank1
     .res 1
 
 
+MenuUpperLimit:
+    .res 1
+MenuLowerLimit:
+    .res 1
+MenuStep:
+    .res 1
+MenuMaxItem:
+    .res 1
+
+
 InventoryActivated:
     .res 1
 FoodMenuActivated:  ; press b on raw meat in menu
@@ -667,9 +607,16 @@ MaterialMenuActivated:
     .res 1
 StashMaterialMenuActivated:
     .res 1
+StashToolMenuActivated:
+    .res 1
+ToolMenuActivated:
+    .res 1
+
 StashActivated:
     .res 1
 CraftingActivated:
+    .res 1
+EquipmentActivated:
     .res 1
 
 CraftingIndexes:
@@ -744,6 +691,10 @@ TempNpcTimer:
 TempNpcRows:
     .res 1
 TempFrameOffset:
+    .res 1
+TempPointX2:
+    .res 1
+TempPointY2:
     .res 1
 
 DropedItemX: ;x coordinate of item droped by npc
@@ -2022,7 +1973,7 @@ ResetEntityVariables:
     sta Inventory, x
     sta Storage, x
     dex
-    bne @clearInventoryLoop
+    bpl @clearInventoryLoop
 
     sta CurrentMapSegmentIndex
 
@@ -2057,6 +2008,9 @@ ResetEntityVariables:
     sta PlayerY
     lda #1
     sta PlayerAlive
+
+    lda #8
+    sta EquipedItem
 
     lda #31
     sta BgColumnIdxToUpload
@@ -3035,99 +2989,63 @@ UpdateSprites:
 SetKnifeSprite:
 
     lda PlayerFlip
-    beq @nF
+    beq @notFlipped
 
     lda #%01000000
     sta Temp
 
-
     lda PlayerFrame
-    beq @horizF
-    cmp #2
-    beq @gDown
-
-    lda PlayerY
-    sta TempPointY
-
-    lda PlayerX
+    asl
+    tay
+    lda knife_pos_flipped, y
     sta TempPointX
-
-    jmp @updateKnife
-@gDown:
+    iny
+    lda knife_pos_flipped, y
+    sta TempPointY
     lda PlayerY
     clc
-    adc #16
+    adc TempPointY
     sta TempPointY
 
     lda PlayerX
     clc
-    adc #8
-    sta TempPointX
-
-
-    jmp @updateKnife
-@horizF:
-    lda PlayerY
-    clc
-    adc #8
-    sta TempPointY
-
-    lda PlayerX
-    clc
-    adc #16
+    adc TempPointX
     sta TempPointX
 
     jmp @updateKnife
-@nF:
+@notFlipped:
 
     lda #%00000000
     sta Temp
 
     lda PlayerFrame
-    beq @horizNF
-    cmp #2
-    beq @gDownNF
-
-
-    lda PlayerY
+    asl
+    tay
+    lda knife_pos_normal, y
+    sta TempPointX
+    iny
+    lda knife_pos_normal, y
     sta TempPointY
+    lda PlayerY
+    clc
+    adc TempPointY
+    sta TempPointY
+    sta KnifeY
 
     lda PlayerX
     clc
-    adc #8
+    adc TempPointX
     sta TempPointX
+    sta KnifeX
 
-    jmp @updateKnife
-@gDownNF:
-    lda PlayerY
-    clc
-    adc #16
-    sta TempPointY
-
-    lda PlayerX
-    sta TempPointX
-
-
-    jmp @updateKnife
-@horizNF:
-    lda PlayerY
-    clc
-    adc #8
-    sta TempPointY
-
-    lda PlayerX
-    sec
-    sbc #8
-    sta TempPointX
-@updateKnife:
+@updateKnife: ;update the actual sprite
 ;----------------------
 
+    lda EquipedItem
+    beq @exit
     inx
-    lda TempPointY;KnifeY
+    lda TempPointY
     sta FIRST_SPRITE,x
-    clc
-    adc #4
-    sta KnifeY
     inx
     lda #240
     clc
@@ -3137,11 +3055,8 @@ SetKnifeSprite:
     lda Temp
     sta FIRST_SPRITE,x
     inx
-    lda TempPointX;KnifeX
+    lda TempPointX
     sta FIRST_SPRITE,x
-    clc
-    adc #4
-    sta KnifeX
     inc TempSpriteCount
 
 @exit:
