@@ -69,6 +69,7 @@ UpdateMenuGfx:
 
     jsr DrawMenuTitle
     jsr DrawInventoryGrid
+    jsr DrawEquipmentGrid
     jsr DrawFoodMenu
     jsr DrawItemMenu
     jsr DrawMaterialMenu
@@ -176,6 +177,35 @@ DrawInventoryGrid:
 
 @exit:
     rts
+;----------------------------------
+DrawEquipmentGrid:
+    lda MustDrawEquipmentGrid
+    beq @exit
+
+    lda FirstNametableAddr
+    clc
+    sta Temp
+
+    lda #$A4
+    sta TempX
+
+    lda #10
+    sta TempPointX
+    lda #16
+    sta TempPointY
+
+    lda #<equipment_grid
+    sta pointer
+    lda #>equipment_grid
+    sta pointer + 1
+    jsr TransferTiles
+
+    lda #0
+    sta MustDrawEquipmentGrid
+
+@exit:
+    rts
+
 ;----------------------------------
 DrawFoodMenu:
     lda MustDrawFoodMenu
@@ -1539,7 +1569,7 @@ OpenEquipment:
     sta MustLoadSomething
     sta MustDrawMenuTitle
     sta EquipmentActivated
-    sta MustDrawInventoryGrid
+    sta MustDrawEquipmentGrid
     lda #INVENTORY_SPRITE_MIN_Y
     sta InventoryPointerY
 

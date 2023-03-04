@@ -548,6 +548,8 @@ MustDrawMenuTitle:
 
 MustDrawInventoryGrid:
     .res 1
+MustDrawEquipmentGrid:
+    .res 1
 MustDrawFoodMenu:
     .res 1
 MustDrawItemMenu:
