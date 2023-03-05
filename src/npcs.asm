@@ -64,13 +64,21 @@ GenerateNpcs:
     lda TempFrame
     cmp #$40    ;check if it's night
     beq @makeWolf
-    lda #2      ; this should be loaded from the npc types, but oh well..
+    ldy #9
+    lda npc_data, y
     sta TempNpcRows
+    ldy #12
+    lda npc_data, y
+    sta TempHp
     lda #%00000101
     jmp @storeType
 @makeWolf:
-    lda #3
+    ldy #1
+    lda npc_data, y
     sta TempNpcRows
+    ldy #4
+    lda npc_data, y
+    sta TempHp
     lda #%00000001
 @storeType:
     sta Npcs, x
@@ -99,6 +107,17 @@ GenerateNpcs:
     bne @generateCoords
     
 
+   jsr StoreGeneratedNpc
+
+    
+
+    dec TempNpcCnt
+    bne @npcLoop
+    
+
+    rts
+;------------------------------------
+StoreGeneratedNpc:
     ldx TempZ
     ;x
     lda TempPointX
@@ -126,17 +145,13 @@ GenerateNpcs:
     inx
     ;timer
     inx
+    lda TempHp
+    sta Npcs, x
     ;hp
     inx
 
-
-    
-
-    dec TempNpcCnt
-    bne @npcLoop
-    
-
     rts
+
 ;------------------------------------
 ;x - TempPointX, y - TempPointY, screen - TempIndex
 TestGeneratedNpcCollision:
@@ -210,11 +225,13 @@ TestGeneratedNpcCollision:
     rts
 
 ;-------------------------------------
-;Player's knifer collides with all the npcs
+;Player's knife collides with all the npcs
 PlayerHitsNpcs:
 
     lda AttackTimer
     beq @exit
+    lda PlayerDidDmg
+    bne @exit
 
     ldy NpcCount
     beq @exit ; no npcs
@@ -251,6 +268,7 @@ CheckSingleNpcAgainstPlayerHit:
     lsr ;eliminate 2 state bits
 
     sty Temp
+    asl
     asl
     asl
     tay
@@ -372,8 +390,33 @@ KnifeNpcsCollision:
 
     ;-------------------------
 @collisionDetected:
-    dey
-    dey
+
+    iny
+    iny
+    iny
+    iny
+    iny
+    inc PlayerDidDmg
+
+    jsr CalcPlayerDmg
+
+    lda Npcs, y ; hp
+    cmp TempPlayerAttk
+    bcc @instaKill
+
+    sbc TempPlayerAttk ;dmg
+    sta Npcs, y
+    cmp #0
+    bne @doneDoingDmg
+
+@instaKill:
+    lda #0
+    sta Npcs, y
+
+    tya
+    sec
+    sbc #7 ; go to status
+    tay
     lda Npcs, y
     and #%11111100; drop two last bits that stand for status
     sta Npcs, y
@@ -381,6 +424,21 @@ KnifeNpcsCollision:
     lda TempNpcType
     bne @exit ; predators don't drop anything
 
+    jsr DropItemAfterDeath
+    jmp @exit
+
+@doneDoingDmg:
+    dey
+    dey
+    dey
+    dey
+    dey
+
+@exit:
+    rts
+
+;-------------------------------------
+DropItemAfterDeath:
     ;drop item
     inc ItemCount
     lda ItemCount
@@ -414,12 +472,33 @@ KnifeNpcsCollision:
     adc TempItemScreen
     sta Items, y
 
+    rts
+;-------------------------------------
+CalcPlayerDmg:
+    lda #1
+    sta TempPlayerAttk
+    lda EquipedItem
+    beq @exit
 
+    asl
+    asl
+
+    sty TempY
+    tay
+    iny
+    iny
+    iny
+
+    lda item_data, y
+    sta TempPlayerAttk
+
+    ldy TempY
 
 @exit:
     rts
 
-;-------------------------------------
+
+;--------------------------------------
 PreparePlayerAttackSquare:
 
     sty TempY
@@ -589,6 +668,7 @@ UpdateSingleNpcSprites:
     lsr
 
     sty Temp; store Npcs index
+    asl
     asl
     asl
     tay
@@ -908,6 +988,7 @@ FetchNpcVars:
     lsr
     sta TempNpcIndex
     stx TempIndex
+    asl
     asl
     asl
     tax
