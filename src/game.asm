@@ -701,6 +701,9 @@ TempPointY2:
 TempHp:
     .res 1
 
+TempPlayerAttk:
+    .res 1
+
 DropedItemX: ;x coordinate of item droped by npc
     .res 1
 

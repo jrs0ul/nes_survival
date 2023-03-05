@@ -397,17 +397,25 @@ KnifeNpcsCollision:
     iny
     iny
     inc PlayerDidDmg
-    lda Npcs, y ; hp
-    sec 
-    sbc #1 ;dmg
-    sta Npcs, y
-    cmp #1
-    bcs @doneDoingDmg
 
-    
+    jsr CalcPlayerDmg
+
+    lda Npcs, y ; hp
+    cmp TempPlayerAttk
+    bcc @instaKill
+
+    sbc TempPlayerAttk ;dmg
+    sta Npcs, y
+    cmp #0
+    bne @doneDoingDmg
+
+@instaKill:
+    lda #0
+    sta Npcs, y
+
     tya
     sec
-    sbc #7
+    sbc #7 ; go to status
     tay
     lda Npcs, y
     and #%11111100; drop two last bits that stand for status
@@ -416,6 +424,21 @@ KnifeNpcsCollision:
     lda TempNpcType
     bne @exit ; predators don't drop anything
 
+    jsr DropItemAfterDeath
+    jmp @exit
+
+@doneDoingDmg:
+    dey
+    dey
+    dey
+    dey
+    dey
+
+@exit:
+    rts
+
+;-------------------------------------
+DropItemAfterDeath:
     ;drop item
     inc ItemCount
     lda ItemCount
@@ -448,19 +471,34 @@ KnifeNpcsCollision:
     clc
     adc TempItemScreen
     sta Items, y
-    jmp @exit
 
-@doneDoingDmg:
-    dey
-    dey
-    dey
-    dey
-    dey
+    rts
+;-------------------------------------
+CalcPlayerDmg:
+    lda #1
+    sta TempPlayerAttk
+    lda EquipedItem
+    beq @exit
+
+    asl
+    asl
+
+    sty TempY
+    tay
+    iny
+    iny
+    iny
+
+    lda item_data, y
+    sta TempPlayerAttk
+
+    ldy TempY
 
 @exit:
     rts
 
-;-------------------------------------
+
+;--------------------------------------
 PreparePlayerAttackSquare:
 
     sty TempY
