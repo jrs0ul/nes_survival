@@ -396,6 +396,8 @@ WalkTimer:
     .res 1
 AttackTimer:
     .res 1
+PlayerDidDmg:
+    .res 1
 PlayerFrame:
     .res 1
 PlayerFlip:
@@ -695,6 +697,8 @@ TempFrameOffset:
 TempPointX2:
     .res 1
 TempPointY2:
+    .res 1
+TempHp:
     .res 1
 
 DropedItemX: ;x coordinate of item droped by npc
@@ -2308,6 +2312,8 @@ CheckB:
 
     lda #PLAYER_ATTACK_DELAY
     sta AttackTimer
+    lda #0
+    sta PlayerDidDmg
 
     lda #1
     ldx #FAMISTUDIO_SFX_CH0
