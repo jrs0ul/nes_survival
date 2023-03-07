@@ -895,7 +895,13 @@ endlessLoop:
     beq update_menu_sprites
     jmp hide_sprites
 
+
+
 checkItems:
+    lda GameState
+    cmp #STATE_MENU
+    beq nextIteration
+
     dec ItemUpdateDelay
     bne npcAI
 
