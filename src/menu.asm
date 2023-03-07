@@ -1803,6 +1803,10 @@ CookMeat:
     lda InHouse
     beq @cantcook
 
+    lda TempItemIndex
+    cmp #2
+    bne @cantcook
+
     lda Fuel
     clc
     adc Fuel + 1
@@ -1843,9 +1847,11 @@ LoadSelectedItemStuff:
     lda StashActivated ; let's check what's active
     beq @useInventory
     lda Storage, x
+    sta TempItemIndex
     jmp @cont
 @useInventory:
     lda Inventory, x
+    sta TempItemIndex
 @cont:
     beq @empty
     asl
