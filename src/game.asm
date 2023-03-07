@@ -73,7 +73,7 @@ banktable:              ; Write to this table to switch banks.
     .byte $00, $01, $02, $03, $04, $05, $06
     .byte $07, $08, $09, $0A, $0B, $0C, $0D, $0E
 
-.include "data/music.asm"
+.include "data/music.s"
 .include "data/sfx.s"
 .include "data/item_data.asm"
 .include "data/npc_data.asm"
@@ -218,6 +218,7 @@ npc_anim_row_sequence:
 
 
     HOURS_MAX                  = 240
+    MINUTES_MAX                = 60
     SLEEP_TIME                 = 60
 
     PLAYER_ATTACK_DELAY        = 16
@@ -570,6 +571,8 @@ MustDrawStashToolMenu:
     .res 1
 MustClearSubMenu:
     .res 1
+MustRestartIndoorsMusic:
+    .res 1
 ;--
 
 PlayerInteractedWithStorage:
@@ -800,7 +803,7 @@ clrmem:
     ldy #>music_data_untitled
     lda #1
     jsr famistudio_init
-    lda #0
+    lda #2
     jsr famistudio_music_play
    
 vblankwait2:      ; Second wait for vblank, PPU is ready after this
@@ -1286,7 +1289,7 @@ RunTime:
 
     inc Minutes
     lda Minutes
-    cmp #60
+    cmp #MINUTES_MAX
     bcc @exit
 
     
@@ -1891,6 +1894,9 @@ LoadGameOver:
     sta pointer + 1
     jsr CopyCHRTiles
 
+    lda #2
+    jsr famistudio_music_play
+
     lda #<title_palette
     sta pointer
     lda #>title_palette
@@ -1915,7 +1921,7 @@ LoadGameOver:
 
 
     lda $2002
-    lda FirstNametableAddr
+    lda NametableAddress
     clc
     adc #1
     sta $2006
@@ -2554,6 +2560,7 @@ CheckIfEnteredHouse:
 
     lda #1
     sta MustLoadHouseInterior
+    sta MustRestartIndoorsMusic
     sta MustLoadSomething
     lda #HOUSE_ENTRY_POINT_X
     sta PlayerX
@@ -2728,6 +2735,13 @@ LoadTheHouseInterior:
     lda #1
     sta InHouse
 
+    lda MustRestartIndoorsMusic
+    beq @loadHouseStuff
+    jsr famistudio_music_play
+    lda #0
+    sta MustRestartIndoorsMusic
+
+@loadHouseStuff:
     lda #<house
     sta pointer
     lda #>house
