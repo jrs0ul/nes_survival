@@ -1628,6 +1628,7 @@ Sleep:
     sta PlayerFrame
     lda #1
     sta PlayerAnimationRowIndex
+    
     lda Hours
     clc
     adc #SLEEP_TIME
@@ -1640,7 +1641,7 @@ Sleep:
 @hoursOverFlow:
     lda Hours
     sec
-    sbc #15
+    sbc #HOURS_MAX
     sta Hours
     jsr IncreaseDays
     jmp @adaptPalette

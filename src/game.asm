@@ -218,6 +218,7 @@ npc_anim_row_sequence:
 
 
     HOURS_MAX                  = 240
+    MINUTES_MAX                = 60
     SLEEP_TIME                 = 60
 
     PLAYER_ATTACK_DELAY        = 16
@@ -1288,7 +1289,7 @@ RunTime:
 
     inc Minutes
     lda Minutes
-    cmp #60
+    cmp #MINUTES_MAX
     bcc @exit
 
     
@@ -1920,7 +1921,7 @@ LoadGameOver:
 
 
     lda $2002
-    lda FirstNametableAddr
+    lda NametableAddress
     clc
     adc #1
     sta $2006
