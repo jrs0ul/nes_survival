@@ -16,6 +16,10 @@ LoadOutsideMap:
     lda #0
     sta MustCopyMainChr
 
+    lda #0
+    jsr famistudio_music_play
+    
+
 @continueLoad:
 
     ldy CurrentMapSegmentIndex
