@@ -106,7 +106,7 @@ LoadOutsideMap:
     cpy #32
     bne @paletteCopy
 
-    jsr AdaptBackgroundPalette
+    jsr AdaptBackgroundPaletteByTime
     lda #32
     sta PaletteUpdateSize
 

@@ -57,6 +57,9 @@ LoadMenu:
 
     lda #STATE_MENU
     sta GameState
+
+    lda #0
+    sta MustUpdatePalette
 @exit:
 
     rts
@@ -1654,9 +1657,13 @@ Sleep:
     jsr IncreaseDays
 
 @adaptPalette:
-    jsr AdaptBackgroundPalette
+    jsr AdaptBackgroundPaletteByTime
     lda #1
     sta MustExitMenuState
+    sta SleepPaletteAnimationState ; set fade-out
+    lda #0
+    sta SleepFadeTimer
+    sta FadeIdx
 
 
     lda Food

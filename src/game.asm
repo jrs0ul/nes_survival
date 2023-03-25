@@ -59,9 +59,7 @@ title_palette:
 house_tiles_chr: .incbin "house.chr"
 .include "data/house.asm"
 
-house_palette:
-    .byte $0C,$16,$27,$37, $0C,$07,$00,$31, $0C,$17,$27,$31, $0C,$20,$37,$16    ;background
-    .byte $0C,$0f,$17,$20, $0C,$06,$16,$39, $0C,$17,$21,$31, $0C,$0f,$37,$16    ;OAM sprites
+
 
 
 
@@ -88,6 +86,9 @@ zerosprite:
     .byte $70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70
     .byte $70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70
 
+house_palette:
+    .byte $0C,$16,$27,$37, $0C,$07,$00,$31, $0C,$17,$27,$31, $0C,$20,$37,$16    ;background
+    .byte $0C,$0f,$17,$20, $0C,$06,$16,$39, $0C,$17,$21,$31, $0C,$0f,$37,$16    ;OAM sprites
 
 main_palette:
     .byte $0C,$00,$21,$31, $0C,$1B,$21,$31, $0C,$18,$21,$31, $0C,$20,$37,$16    ;background
@@ -138,6 +139,13 @@ npc_direction_list:
     .byte %00000001 ; R
     .byte %00001000
     .byte %00000010
+
+SleepPaletteTransitions:
+    .byte $00
+    .byte $10
+    .byte $20
+    .byte $30
+    .byte $40
 
 palette_fade_for_periods: ; each period is 1h 30 mins
     .byte $40 ;00:00 period start
@@ -627,6 +635,14 @@ EquipmentActivated:
 CraftingIndexes:
     .res 2; item index A + index B
 CurrentCraftingComponent:
+    .res 1
+
+
+SleepPaletteAnimationState:
+    .res 1; 0 - nothing, 1 - fade-out, 2 - fade-in
+SleepFadeTimer:
+    .res 1
+FadeIdx:
     .res 1
 
 
@@ -1270,6 +1286,8 @@ Logics:
 
     jsr RunTime
 
+    jsr DoPaletteFades
+
 @doneLogics:
     
     lda AttackTimer
@@ -1291,6 +1309,57 @@ Logics:
 
     rts
 ;-------------------------------
+DoPaletteFades:
+
+    lda SleepPaletteAnimationState
+    beq @exit
+
+
+    inc SleepFadeTimer
+    lda SleepFadeTimer
+    cmp #10
+    bcc @exit
+
+    lda #0
+    sta SleepFadeTimer
+    inc FadeIdx
+    ldx FadeIdx
+    cpx #5
+    bcs @resetFadeState
+    jmp @doFade
+@resetFadeState:
+    lda #0
+    sta SleepPaletteAnimationState
+@doFade:
+
+    ldy #0
+@paletteLoop:
+
+    lda house_palette, y
+    sec
+    sbc SleepPaletteTransitions, x
+    bcs @saveColor
+    lda #$0F
+
+@saveColor:
+    sta RamPalette, y
+    iny
+    cpy #32 
+    bne @paletteLoop
+
+
+    lda #32
+    sta PaletteUpdateSize
+    lda #1
+    sta MustUpdatePalette
+
+    
+@exit:
+
+
+    rts
+
+;-------------------------------
 RunTime:
 
     inc Minutes
@@ -1310,12 +1379,12 @@ RunTime:
     jsr IncreaseDays
 
 @adaptPalette:
-    jsr AdaptBackgroundPalette
+    jsr AdaptBackgroundPaletteByTime
 
 @exit:
     rts
 ;-------------------------------
-AdaptBackgroundPalette:
+AdaptBackgroundPaletteByTime:
     lda InHouse
     bne @exit
 
@@ -1880,6 +1949,7 @@ LoadTitle:
     lda #0
     sta MustLoadTitle
     sta MustLoadSomething
+    sta MustUpdatePalette
 @exit:
     rts
 ;-------------------------------------
@@ -1913,6 +1983,9 @@ LoadGameOver:
 
     lda #STATE_GAME_OVER
     sta GameState
+
+    lda #0
+    sta MustUpdatePalette
 
     lda #<game_over
     sta pointer
