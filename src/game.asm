@@ -252,6 +252,16 @@ npc_anim_row_sequence:
 
     SLEEP_POS_X                = 100
     SLEEP_POS_Y                = 72
+    SLEEP_FADE_DELAY           = 10
+    SLEEP_STATE_FADE_IN        = 2
+    SLEEP_FADE_MAX_ITERATION   = 5
+
+    SLEEP_ADD_HP_TIMES_TEN     = 3
+    SLEEP_SUB_HP_HUNGER_TT     = 5
+    SLEEP_SUB_HP_COLD_TT       = 5
+
+
+    PALETTE_SIZE_MAX           = 32
 
     OUTDOORS_MAP_SCREEN_COUNT  = 5
     PLAYER_START_X             = $50
@@ -1316,14 +1326,14 @@ DoSleepPaletteFades:
 
     inc SleepFadeTimer
     lda SleepFadeTimer
-    cmp #10
+    cmp #SLEEP_FADE_DELAY
     bcc @exit
 
     lda #0
     sta SleepFadeTimer
 
     lda SleepPaletteAnimationState
-    cmp #2
+    cmp #SLEEP_STATE_FADE_IN
     bne @incIndex
 
     dec FadeIdx
@@ -1339,14 +1349,14 @@ DoSleepPaletteFades:
 @incIndex:
     inc FadeIdx
     ldx FadeIdx
-    cpx #5
+    cpx #SLEEP_FADE_MAX_ITERATION
     bcs @resetFadeState
     jmp @doFade
 @resetFadeState:    ;finished fading out, let's sleep
     jsr DoSleep
-    lda #2
+    lda #SLEEP_STATE_FADE_IN
     sta SleepPaletteAnimationState
-    lda #5
+    lda #SLEEP_FADE_MAX_ITERATION
     sta FadeIdx
 @doFade:
 
@@ -1362,11 +1372,11 @@ DoSleepPaletteFades:
 @saveColor:
     sta RamPalette, y
     iny
-    cpy #32 
+    cpy #PALETTE_SIZE_MAX 
     bne @paletteLoop
 
 
-    lda #32
+    lda #PALETTE_SIZE_MAX
     sta PaletteUpdateSize
     lda #1
     sta MustUpdatePalette
@@ -1426,7 +1436,7 @@ DoSleep:
 
     lda HP + 1
     clc
-    adc #3
+    adc #SLEEP_ADD_HP_TIMES_TEN
     cmp #10
     bcs @makeHundred
     sta HP + 1
@@ -1443,7 +1453,7 @@ DoSleep:
 @decreaseHealthFromHunger:
 
     lda HP + 1
-    cmp #5
+    cmp #SLEEP_SUB_HP_HUNGER_TT
     bcs @subtractHPHunger
 
     lda HP
@@ -1454,7 +1464,7 @@ DoSleep:
 
 @subtractHPHunger:
     sec
-    sbc #5
+    sbc #SLEEP_SUB_HP_HUNGER_TT
     sta HP + 1
 
 @checkWarmth:
@@ -1467,7 +1477,7 @@ DoSleep:
     bne @checkFuel
 
     lda HP + 1
-    cmp #5
+    cmp #SLEEP_SUB_HP_COLD_TT
     bcs @subtractHPCold
 
     lda HP
@@ -1478,7 +1488,7 @@ DoSleep:
 
 @subtractHPCold:
     sec
-    sbc #5
+    sbc #SLEEP_SUB_HP_HUNGER_TT
     sta HP + 1
 
 @checkFuel:
