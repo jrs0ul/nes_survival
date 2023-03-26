@@ -59,11 +59,6 @@ title_palette:
 house_tiles_chr: .incbin "house.chr"
 .include "data/house.asm"
 
-house_palette:
-    .byte $0C,$16,$27,$37, $0C,$07,$00,$31, $0C,$17,$27,$31, $0C,$20,$37,$16    ;background
-    .byte $0C,$0f,$17,$20, $0C,$06,$16,$39, $0C,$17,$21,$31, $0C,$0f,$37,$16    ;OAM sprites
-
-
 
 ;=============================================================
 
@@ -88,6 +83,9 @@ zerosprite:
     .byte $70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70
     .byte $70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70
 
+house_palette:
+    .byte $0C,$16,$27,$37, $0C,$07,$00,$31, $0C,$17,$27,$31, $0C,$20,$37,$16    ;background
+    .byte $0C,$0f,$17,$20, $0C,$06,$16,$39, $0C,$17,$21,$31, $0C,$0f,$37,$16    ;OAM sprites
 
 main_palette:
     .byte $0C,$00,$21,$31, $0C,$1B,$21,$31, $0C,$18,$21,$31, $0C,$20,$37,$16    ;background
@@ -138,6 +136,13 @@ npc_direction_list:
     .byte %00000001 ; R
     .byte %00001000
     .byte %00000010
+
+SleepPaletteTransitions:
+    .byte $00
+    .byte $10
+    .byte $20
+    .byte $30
+    .byte $40
 
 palette_fade_for_periods: ; each period is 1h 30 mins
     .byte $40 ;00:00 period start
@@ -247,6 +252,16 @@ npc_anim_row_sequence:
 
     SLEEP_POS_X                = 100
     SLEEP_POS_Y                = 72
+    SLEEP_FADE_DELAY           = 10
+    SLEEP_STATE_FADE_IN        = 2
+    SLEEP_FADE_MAX_ITERATION   = 5
+
+    SLEEP_ADD_HP_TIMES_TEN     = 3
+    SLEEP_SUB_HP_HUNGER_TT     = 5
+    SLEEP_SUB_HP_COLD_TT       = 5
+
+
+    PALETTE_SIZE_MAX           = 32
 
     OUTDOORS_MAP_SCREEN_COUNT  = 5
     PLAYER_START_X             = $50
@@ -630,6 +645,14 @@ CurrentCraftingComponent:
     .res 1
 
 
+SleepPaletteAnimationState:
+    .res 1; 0 - nothing, 1 - fade-out, 2 - fade-in
+SleepFadeTimer:
+    .res 1
+FadeIdx:
+    .res 1
+
+
 CarrySet:
     .res 1
 
@@ -886,6 +909,9 @@ endlessLoop:
 
     dec InputUpdateDelay
     bne checkItems
+
+    lda SleepPaletteAnimationState ; don't do input while sleeping
+    bne update_game_sprites
 
     jsr HandleInput
     lda GameState
@@ -1270,6 +1296,8 @@ Logics:
 
     jsr RunTime
 
+    jsr DoSleepPaletteFades
+
 @doneLogics:
     
     lda AttackTimer
@@ -1291,6 +1319,252 @@ Logics:
 
     rts
 ;-------------------------------
+DoSleepPaletteFades:
+
+    lda SleepPaletteAnimationState
+    beq @exit
+
+    inc SleepFadeTimer
+    lda SleepFadeTimer
+    cmp #SLEEP_FADE_DELAY
+    bcc @exit
+
+    lda #0
+    sta SleepFadeTimer
+
+    lda SleepPaletteAnimationState
+    cmp #SLEEP_STATE_FADE_IN
+    bne @incIndex
+
+    dec FadeIdx
+    ldx FadeIdx
+    beq @resetFadeIn
+    jmp @doFade
+@resetFadeIn: ;finished fading in after sleep
+    lda #0
+    sta SleepPaletteAnimationState
+    jsr AdaptBackgroundPaletteByTime
+    jmp @doFade
+
+@incIndex:
+    inc FadeIdx
+    ldx FadeIdx
+    cpx #SLEEP_FADE_MAX_ITERATION
+    bcs @resetFadeState
+    jmp @doFade
+@resetFadeState:    ;finished fading out, let's sleep
+    jsr DoSleep
+    lda #SLEEP_STATE_FADE_IN
+    sta SleepPaletteAnimationState
+    lda #SLEEP_FADE_MAX_ITERATION
+    sta FadeIdx
+@doFade:
+
+    ldy #0
+@paletteLoop:
+
+    lda house_palette, y
+    sec
+    sbc SleepPaletteTransitions, x
+    bcs @saveColor
+    lda #$0F
+
+@saveColor:
+    sta RamPalette, y
+    iny
+    cpy #PALETTE_SIZE_MAX 
+    bne @paletteLoop
+
+
+    lda #PALETTE_SIZE_MAX
+    sta PaletteUpdateSize
+    lda #1
+    sta MustUpdatePalette
+
+@exit:
+
+
+    rts
+
+;-------------------------------
+DoSleep:
+    lda #SLEEP_POS_X
+    sta PlayerY
+    lda #SLEEP_POS_Y
+    sta PlayerX
+    lda #2
+    sta PlayerFrame
+    lda #1
+    sta PlayerAnimationRowIndex
+    
+    lda Hours
+    clc
+    adc #SLEEP_TIME
+    sta Hours
+    bcs @hoursOverFlow
+    cmp #HOURS_MAX
+    bcs @increaseDays
+    jmp @adaptPalette
+
+@hoursOverFlow:
+    lda Hours
+    sec
+    sbc #HOURS_MAX
+    sta Hours
+    jsr IncreaseDays
+    jmp @adaptPalette
+
+@increaseDays:
+    lda Hours
+    sec
+    sbc #HOURS_MAX
+    sta Hours
+    jsr IncreaseDays
+
+@adaptPalette:
+      
+
+    lda Food
+    clc
+    adc Food + 1
+    adc Food + 2
+    cmp #0
+    beq @decreaseHealthFromHunger
+
+    lda HP
+    bne @makeHundred
+
+    lda HP + 1
+    clc
+    adc #SLEEP_ADD_HP_TIMES_TEN
+    cmp #10
+    bcs @makeHundred
+    sta HP + 1
+    jmp @checkWarmth
+
+@makeHundred:
+    lda #1
+    sta HP
+    lda #0
+    sta HP + 1
+    sta HP + 2
+    jmp @checkWarmth
+
+@decreaseHealthFromHunger:
+
+    lda HP + 1
+    cmp #SLEEP_SUB_HP_HUNGER_TT
+    bcs @subtractHPHunger
+
+    lda HP
+    beq @kill
+
+    dec HP
+    lda #10
+
+@subtractHPHunger:
+    sec
+    sbc #SLEEP_SUB_HP_HUNGER_TT
+    sta HP + 1
+
+@checkWarmth:
+
+    lda Warmth
+    clc
+    adc Warmth + 1
+    adc Warmth + 2
+    cmp #0
+    bne @checkFuel
+
+    lda HP + 1
+    cmp #SLEEP_SUB_HP_COLD_TT
+    bcs @subtractHPCold
+
+    lda HP
+    beq @kill
+
+    dec HP
+    lda #10
+
+@subtractHPCold:
+    sec
+    sbc #SLEEP_SUB_HP_HUNGER_TT
+    sta HP + 1
+
+@checkFuel:
+
+    lda Fuel
+    clc
+    adc Fuel + 1
+    adc Fuel + 2
+    cmp #0
+    bne @subtractStuff
+
+    lda Warmth + 1
+    cmp #5
+    bcs @subtractWarmth
+
+    lda Warmth
+    beq @zeroWarmth
+
+    dec Warmth
+    lda #10
+
+@subtractWarmth:
+    sec
+    sbc #5
+    sta Warmth + 1
+
+    jmp @subtractStuff
+
+@zeroWarmth:
+    lda #0
+    sta Warmth
+    sta Warmth + 1
+    sta Warmth + 2
+    jmp @subtractStuff
+
+
+@kill:
+    lda #0
+    sta HP
+    sta HP + 1
+    sta HP + 2
+
+@subtractStuff:
+    lda #0
+    sta Fuel
+    sta Fuel + 1
+    sta Fuel + 2
+
+    lda Food + 1
+    cmp #5
+    bcs @subtractFood
+
+    lda Food
+    beq @makeFoodZero
+
+    dec Food
+    lda #10
+
+@subtractFood:
+    sec
+    sbc #5
+    sta Food + 1
+    jmp @exit
+
+@makeFoodZero:
+    lda #0
+    sta Food
+    sta Food + 1
+    sta Food + 2
+
+
+@exit:
+    rts
+
+
+;-------------------------------
 RunTime:
 
     inc Minutes
@@ -1310,12 +1584,12 @@ RunTime:
     jsr IncreaseDays
 
 @adaptPalette:
-    jsr AdaptBackgroundPalette
+    jsr AdaptBackgroundPaletteByTime
 
 @exit:
     rts
 ;-------------------------------
-AdaptBackgroundPalette:
+AdaptBackgroundPaletteByTime:
     lda InHouse
     bne @exit
 
@@ -1880,6 +2154,7 @@ LoadTitle:
     lda #0
     sta MustLoadTitle
     sta MustLoadSomething
+    sta MustUpdatePalette
 @exit:
     rts
 ;-------------------------------------
@@ -1913,6 +2188,9 @@ LoadGameOver:
 
     lda #STATE_GAME_OVER
     sta GameState
+
+    lda #0
+    sta MustUpdatePalette
 
     lda #<game_over
     sta pointer
@@ -2015,6 +2293,9 @@ ResetEntityVariables:
     sta FireFrameDelay
 
     lda #0
+    sta SleepPaletteAnimationState
+    sta FadeIdx
+    sta SleepFadeTimer
     sta GlobalScroll
     sta TilesScroll
     sta TimesShiftedLeft
