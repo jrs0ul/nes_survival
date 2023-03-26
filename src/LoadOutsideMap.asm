@@ -1,5 +1,12 @@
 LoadOutsideMap:
 
+    lda LocationIndex
+    beq @startLoad
+    
+    ldy #4
+    jsr bankswitch_y
+
+@startLoad:
     lda #$00
     sta $2000
     sta $2001
@@ -23,11 +30,23 @@ LoadOutsideMap:
 @continueLoad:
 
     ldy CurrentMapSegmentIndex
+    lda LocationIndex
+    beq @grabFirstLocationMap1
+    
+    lda map_list_low2, y
+    sta pointer
+    lda map_list_high2, y
+    sta pointer + 1
+
+    jmp @loadMap1
+
+@grabFirstLocationMap1:
     lda map_list_low, y
     sta pointer
     lda map_list_high, y
     sta pointer + 1
 
+@loadMap1:
     lda FirstNametableAddr
     sta NametableAddress
 
@@ -44,11 +63,24 @@ LoadOutsideMap:
     cpy ScreenCount
     bcs @loadRest
 
+    lda LocationIndex
+    beq @grabFirstLocationMap2
+    
+    lda map_list_low2, y
+    sta pointer
+    lda map_list_high2, y
+    sta pointer + 1
 
+    jmp @loadMap2
+
+
+@grabFirstLocationMap2:
     lda map_list_low, y
     sta pointer
     lda map_list_high, y
     sta pointer + 1
+
+@loadMap2:
 
     lda SecondNametableAddr
     sta NametableAddress
@@ -114,7 +146,13 @@ LoadOutsideMap:
     sta MustLoadOutside
     sta MustLoadSomething
 
+    lda LocationIndex
+    beq @FirstLocationScreens
+    lda #2
+    jmp @saveScreenCount
+@FirstLocationScreens:
     lda #5
+@saveScreenCount:
     sta ScreenCount
 
 

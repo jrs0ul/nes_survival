@@ -29,8 +29,6 @@ main_tiles_chr: .incbin "main.chr"
 
 .include "data/map_list.asm"
 .include "data/collision_data.asm"
-.include "data/item_list.asm" ;items in maps
-.include "data/npc_list.asm"  ;npcs in maps
 
 
 ;===========================================================
@@ -58,7 +56,13 @@ title_palette:
 
 house_tiles_chr: .incbin "house.chr"
 .include "data/house.asm"
+;============================================================
+.segment "ROM4" ; other location
 
+main_tiles_chr2: .incbin "main.chr"
+
+.include "data/map_list2.asm"
+.include "data/collision_data2.asm"
 
 ;=============================================================
 
@@ -73,6 +77,9 @@ banktable:              ; Write to this table to switch banks.
 .include "data/item_data.asm"
 .include "data/npc_data.asm"
 
+.include "data/item_list.asm" ;items in maps
+.include "data/npc_list.asm"  ;npcs in maps
+
 zerosprite:
     .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
     .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
@@ -82,6 +89,41 @@ zerosprite:
     .byte $30,$38,$33,$00,$00,$00,$00,$00,$00,$00,$00,$00,$89,$8A,$8B,$00
     .byte $70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70
     .byte $70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70
+
+x_collision_pattern:
+    .byte %10000000
+    .byte %01000000
+    .byte %00100000
+    .byte %00010000
+    .byte %00001000
+    .byte %00000100
+    .byte %00000010
+    .byte %00000001
+    .byte %10000000
+    .byte %01000000
+    .byte %00100000
+    .byte %00010000
+    .byte %00001000
+    .byte %00000100
+    .byte %00000010
+    .byte %00000001
+    .byte %10000000
+    .byte %01000000
+    .byte %00100000
+    .byte %00010000
+    .byte %00001000
+    .byte %00000100
+    .byte %00000010
+    .byte %00000001
+    .byte %10000000
+    .byte %01000000
+    .byte %00100000
+    .byte %00010000
+    .byte %00001000
+    .byte %00000100
+    .byte %00000010
+    .byte %00000001
+
 
 house_palette:
     .byte $0C,$16,$27,$37, $0C,$07,$00,$31, $0C,$17,$27,$31, $0C,$20,$37,$16    ;background
@@ -665,7 +707,8 @@ NextItemMapScreenIndex:
 ItemMapScreenIndex:
     .res 1
 
-
+LocationIndex:
+    .res 1
 
 Temp:
     .res 1
@@ -1152,6 +1195,19 @@ UploadBgColumns:
     bcs @exit
 
     ;calculate source address
+
+    lda LocationIndex
+    beq @location0
+
+    lda map_list_low2, y
+    clc
+    adc BgColumnIdxToUpload
+    sta pointer
+    lda map_list_high2, y
+    sta pointer + 1
+
+    jmp @start
+@location0:
     lda map_list_low, y
     clc
     adc BgColumnIdxToUpload
@@ -1159,6 +1215,7 @@ UploadBgColumns:
     lda map_list_high, y
     sta pointer + 1
 
+@start:
     ;calculate source address
     lda #128 ; skip four rows
     clc
@@ -1209,6 +1266,19 @@ UpdateAttributeColumn:
 
     ldy SourceMapIdx
 
+    lda LocationIndex
+    beq @location0
+
+    lda map_list_low2, y
+    clc
+    adc #$C0
+    sta pointer
+    lda map_list_high2, y
+    adc #$3
+    sta pointer + 1
+
+    jmp @start
+@location0:
     lda map_list_low, y
     clc
     adc #$C0
@@ -1216,6 +1286,8 @@ UpdateAttributeColumn:
     lda map_list_high, y
     adc #$3
     sta pointer + 1
+
+@start:
 
     lda pointer
     clc
@@ -1312,12 +1384,53 @@ Logics:
 @noAttack:
 
     jsr CheckIfEnteredHouse
+    jsr CheckIfEnteredSecondLocation
     jsr CheckIfExitedHouse
 
 
 @exit:
 
     rts
+;-------------------------------
+CheckIfEnteredSecondLocation:
+
+    lda CurrentMapSegmentIndex
+    cmp #4
+    bne @exit
+    lda PlayerY
+    cmp #32
+    bcc @Entered
+    jmp @exit
+@Entered:
+    lda #1
+    sta MustLoadSomething
+    sta MustLoadOutside
+    ;sta MustCopyMainChr
+    ;lda #1
+    sta LocationIndex
+    lda #0
+    sta TilesScroll
+    sta GlobalScroll
+    sta TimesShiftedLeft
+    sta TimesShiftedRight
+    sta ScrollDirection
+    sta OldGlobalScroll
+    sta OldScrollDirection
+    sta CurrentMapSegmentIndex
+    sta NpcCount
+    sta ItemCount
+    lda #2
+    sta ScreenCount
+
+    jsr LoadCollisionMap
+
+    lda #208
+    sta PlayerY
+
+@exit:
+    rts
+
+
 ;-------------------------------
 DoSleepPaletteFades:
 
@@ -2482,21 +2595,8 @@ CheckStartButton:
 
     jsr GenerateNpcs
        
-@collision:
-    ldx #0
-@copyCollisionMapLoop:
-    lda bg_collision, x
-    sta CollisionMap, x
-    inx
-    cpx #COLLISION_MAP_SIZE
-    bne @copyCollisionMapLoop
-
-    lda #0      ;load the first column
-    sta RightCollisionColumnIndex
-    jsr LoadRightCollisionColumn
-    lda #255;-1
-    sta LeftCollisionColumnIndex
-
+    jsr LoadCollisionMap
+    
 
     jmp @exit
 @someOtherState:
@@ -2522,6 +2622,33 @@ CheckStartButton:
 
 @exit:
     rts
+;--------------------------------------
+LoadCollisionMap:
+    ldx #0
+@copyCollisionMapLoop:
+
+    lda LocationIndex
+    beq @location0
+    lda bg2_collision, x
+    jmp @start
+@location0:
+    lda bg_collision, x
+@start:
+    sta CollisionMap, x
+    inx
+    cpx #COLLISION_MAP_SIZE
+    bne @copyCollisionMapLoop
+
+    lda #0      ;load the first column
+    sta RightCollisionColumnIndex
+    jsr LoadRightCollisionColumn
+    lda #255;-1
+    sta LeftCollisionColumnIndex
+
+
+    rts
+
+
 ;--------------------------------------
 
 ProcessButtons:
@@ -2765,7 +2892,6 @@ FlipStartingNametable:
 
     rts
 ;----------------------------------
-.segment "ROM0"
 
 UpdateFireplace:
 
@@ -2805,6 +2931,8 @@ UpdateFireplace:
 ;-----------------------------------
 CheckIfEnteredHouse:
 
+    lda LocationIndex
+    bne @nope ;only in location 1
     lda InHouse
     bne @nope ; already in
 
@@ -2999,7 +3127,6 @@ CheckIfExitedHouse:
 @nope:
     rts
 
-.segment "CODE"
 ;-------------------------------------
 LoadTheHouseInterior:
 
