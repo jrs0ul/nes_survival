@@ -60,9 +60,6 @@ house_tiles_chr: .incbin "house.chr"
 .include "data/house.asm"
 
 
-
-
-
 ;=============================================================
 
 .segment "RODATA" ; ROM7
@@ -903,6 +900,9 @@ endlessLoop:
     dec InputUpdateDelay
     bne checkItems
 
+    lda SleepPaletteAnimationState ; don't do input while sleeping
+    bne update_game_sprites
+
     jsr HandleInput
     lda GameState
     cmp #STATE_GAME
@@ -1286,7 +1286,7 @@ Logics:
 
     jsr RunTime
 
-    jsr DoPaletteFades
+    jsr DoSleepPaletteFades
 
 @doneLogics:
     
@@ -1309,11 +1309,10 @@ Logics:
 
     rts
 ;-------------------------------
-DoPaletteFades:
+DoSleepPaletteFades:
 
     lda SleepPaletteAnimationState
     beq @exit
-
 
     inc SleepFadeTimer
     lda SleepFadeTimer
@@ -1322,14 +1321,33 @@ DoPaletteFades:
 
     lda #0
     sta SleepFadeTimer
+
+    lda SleepPaletteAnimationState
+    cmp #2
+    bne @incIndex
+
+    dec FadeIdx
+    ldx FadeIdx
+    beq @resetFadeIn
+    jmp @doFade
+@resetFadeIn: ;finished fading in after sleep
+    lda #0
+    sta SleepPaletteAnimationState
+    jsr AdaptBackgroundPaletteByTime
+    jmp @doFade
+
+@incIndex:
     inc FadeIdx
     ldx FadeIdx
     cpx #5
     bcs @resetFadeState
     jmp @doFade
-@resetFadeState:
-    lda #0
+@resetFadeState:    ;finished fading out, let's sleep
+    jsr DoSleep
+    lda #2
     sta SleepPaletteAnimationState
+    lda #5
+    sta FadeIdx
 @doFade:
 
     ldy #0
@@ -1353,11 +1371,188 @@ DoPaletteFades:
     lda #1
     sta MustUpdatePalette
 
-    
 @exit:
 
 
     rts
+
+;-------------------------------
+DoSleep:
+    lda #SLEEP_POS_X
+    sta PlayerY
+    lda #SLEEP_POS_Y
+    sta PlayerX
+    lda #2
+    sta PlayerFrame
+    lda #1
+    sta PlayerAnimationRowIndex
+    
+    lda Hours
+    clc
+    adc #SLEEP_TIME
+    sta Hours
+    bcs @hoursOverFlow
+    cmp #HOURS_MAX
+    bcs @increaseDays
+    jmp @adaptPalette
+
+@hoursOverFlow:
+    lda Hours
+    sec
+    sbc #HOURS_MAX
+    sta Hours
+    jsr IncreaseDays
+    jmp @adaptPalette
+
+@increaseDays:
+    lda Hours
+    sec
+    sbc #HOURS_MAX
+    sta Hours
+    jsr IncreaseDays
+
+@adaptPalette:
+      
+
+    lda Food
+    clc
+    adc Food + 1
+    adc Food + 2
+    cmp #0
+    beq @decreaseHealthFromHunger
+
+    lda HP
+    bne @makeHundred
+
+    lda HP + 1
+    clc
+    adc #3
+    cmp #10
+    bcs @makeHundred
+    sta HP + 1
+    jmp @checkWarmth
+
+@makeHundred:
+    lda #1
+    sta HP
+    lda #0
+    sta HP + 1
+    sta HP + 2
+    jmp @checkWarmth
+
+@decreaseHealthFromHunger:
+
+    lda HP + 1
+    cmp #5
+    bcs @subtractHPHunger
+
+    lda HP
+    beq @kill
+
+    dec HP
+    lda #10
+
+@subtractHPHunger:
+    sec
+    sbc #5
+    sta HP + 1
+
+@checkWarmth:
+
+    lda Warmth
+    clc
+    adc Warmth + 1
+    adc Warmth + 2
+    cmp #0
+    bne @checkFuel
+
+    lda HP + 1
+    cmp #5
+    bcs @subtractHPCold
+
+    lda HP
+    beq @kill
+
+    dec HP
+    lda #10
+
+@subtractHPCold:
+    sec
+    sbc #5
+    sta HP + 1
+
+@checkFuel:
+
+    lda Fuel
+    clc
+    adc Fuel + 1
+    adc Fuel + 2
+    cmp #0
+    bne @subtractStuff
+
+    lda Warmth + 1
+    cmp #5
+    bcs @subtractWarmth
+
+    lda Warmth
+    beq @zeroWarmth
+
+    dec Warmth
+    lda #10
+
+@subtractWarmth:
+    sec
+    sbc #5
+    sta Warmth + 1
+
+    jmp @subtractStuff
+
+@zeroWarmth:
+    lda #0
+    sta Warmth
+    sta Warmth + 1
+    sta Warmth + 2
+    jmp @subtractStuff
+
+
+@kill:
+    lda #0
+    sta HP
+    sta HP + 1
+    sta HP + 2
+
+@subtractStuff:
+    lda #0
+    sta Fuel
+    sta Fuel + 1
+    sta Fuel + 2
+
+    lda Food + 1
+    cmp #5
+    bcs @subtractFood
+
+    lda Food
+    beq @makeFoodZero
+
+    dec Food
+    lda #10
+
+@subtractFood:
+    sec
+    sbc #5
+    sta Food + 1
+    jmp @exit
+
+@makeFoodZero:
+    lda #0
+    sta Food
+    sta Food + 1
+    sta Food + 2
+
+
+@exit:
+    rts
+
 
 ;-------------------------------
 RunTime:
@@ -2088,6 +2283,9 @@ ResetEntityVariables:
     sta FireFrameDelay
 
     lda #0
+    sta SleepPaletteAnimationState
+    sta FadeIdx
+    sta SleepFadeTimer
     sta GlobalScroll
     sta TilesScroll
     sta TimesShiftedLeft
