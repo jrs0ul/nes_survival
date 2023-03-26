@@ -1409,23 +1409,23 @@ CheckIfEnteredSecondLocation:
     ;lda #1
     sta LocationIndex
     lda #0
-    sta TilesScroll
-    sta GlobalScroll
-    sta TimesShiftedLeft
-    sta TimesShiftedRight
-    sta ScrollDirection
-    sta OldGlobalScroll
-    sta OldScrollDirection
     sta CurrentMapSegmentIndex
     sta NpcCount
     sta ItemCount
     lda #2
     sta ScreenCount
 
+    ldy #4
+    jsr bankswitch_y
+
     jsr LoadCollisionMap
 
     lda #208
     sta PlayerY
+    lda #1
+    sta RightCollisonMapIdx
+    lda #0
+    sta LeftCollisionMapIdx
 
 @exit:
     rts
