@@ -1437,16 +1437,19 @@ CheckIfExitedSecondLocation:
 
     lda #32
     sta PlayerY
+    lda #128
+    sta PlayerX
     lda #5
     sta RightCollisonMapIdx
     lda #0
     sta RightCollisionColumnIndex
-    jsr LoadRightCollisionColumn
+   ; jsr LoadRightCollisionColumn
 
     lda #3
     sta LeftCollisionMapIdx
     sta LeftCollisionColumnIndex
     jsr LoadLeftCollisionColumn
+
 
     jsr GenerateNpcs
     lda #<Outside1_items
@@ -1488,14 +1491,27 @@ CheckIfEnteredSecondLocation:
     jsr bankswitch_y
 
     ldx #0
-    jsr LoadCollisionMap
+@copyCollisionMapLoop:
+    lda bg2_collision, x
+    sta CollisionMap, x
+    inx
+    cpx #COLLISION_MAP_SIZE
+    bne @copyCollisionMapLoop
+
+    lda #1
+    sta RightCollisonMapIdx
+    lda #0      ;load the first column
+    sta RightCollisionColumnIndex
+    jsr LoadRightCollisionColumn
+    lda #255
+    sta LeftCollisionColumnIndex
+
 
     lda #208
     sta PlayerY
-    lda #1
-    sta RightCollisonMapIdx
     lda #0
     sta LeftCollisionMapIdx
+    lda #0
     sta GlobalScroll
     sta TilesScroll
 
