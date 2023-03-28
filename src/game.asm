@@ -1385,6 +1385,7 @@ Logics:
 
     jsr CheckIfEnteredHouse
     jsr CheckIfEnteredSecondLocation
+    jsr CheckIfExitedSecondLocation
     jsr CheckIfExitedHouse
 
 
@@ -1392,6 +1393,74 @@ Logics:
 
     rts
 ;-------------------------------
+CheckIfExitedSecondLocation:
+
+    lda LocationIndex
+    beq @exit
+
+    lda CurrentMapSegmentIndex
+    cmp #0
+
+    lda PlayerY
+    cmp #230
+    bcc @exit
+
+
+    lda #1
+    sta MustLoadSomething
+    sta MustLoadOutside
+
+    lda #0
+    sta LocationIndex
+    sta GlobalScroll
+    sta TilesScroll
+
+    lda #4
+    sta CurrentMapSegmentIndex
+
+    lda #5
+    sta ScreenCount
+
+    ldy #0
+    jsr bankswitch_y
+
+    ldx #0
+@copyCollisionMapLoop:
+
+    lda bg_collision4, x
+@start:
+    sta CollisionMap, x
+    inx
+    cpx #COLLISION_MAP_SIZE
+    bne @copyCollisionMapLoop
+
+
+    lda #32
+    sta PlayerY
+    lda #5
+    sta RightCollisonMapIdx
+    lda #0
+    sta RightCollisionColumnIndex
+    jsr LoadRightCollisionColumn
+
+    lda #3
+    sta LeftCollisionMapIdx
+    sta LeftCollisionColumnIndex
+    jsr LoadLeftCollisionColumn
+
+    jsr GenerateNpcs
+    lda #<Outside1_items
+    sta pointer
+    lda #>Outside1_items
+    sta pointer + 1
+
+    jsr LoadItems
+
+
+@exit:
+    rts
+;------------------------------------
+
 CheckIfEnteredSecondLocation:
 
     lda CurrentMapSegmentIndex
@@ -1418,6 +1487,7 @@ CheckIfEnteredSecondLocation:
     ldy #4
     jsr bankswitch_y
 
+    ldx #0
     jsr LoadCollisionMap
 
     lda #208
@@ -1426,6 +1496,8 @@ CheckIfEnteredSecondLocation:
     sta RightCollisonMapIdx
     lda #0
     sta LeftCollisionMapIdx
+    sta GlobalScroll
+    sta TilesScroll
 
 @exit:
     rts
@@ -2304,6 +2376,7 @@ LoadGameOver:
 
     lda #0
     sta MustUpdatePalette
+    sta SleepPaletteAnimationState
 
     lda #<game_over
     sta pointer
@@ -2594,7 +2667,8 @@ CheckStartButton:
     jsr LoadItems
 
     jsr GenerateNpcs
-       
+    
+    ldx #0
     jsr LoadCollisionMap
     
 
@@ -2624,7 +2698,6 @@ CheckStartButton:
     rts
 ;--------------------------------------
 LoadCollisionMap:
-    ldx #0
 @copyCollisionMapLoop:
 
     lda LocationIndex
@@ -3118,6 +3191,10 @@ CheckIfExitedHouse:
     sta PlayerX
     lda #OUTSIDE_ENTRY_FROM_HOUSE_Y
     sta PlayerY
+
+
+    lda #5
+    sta ScreenCount
 
     lda #1
     sta MustLoadOutside

@@ -60,9 +60,17 @@ LoadOutsideMap:
 
     ldy CurrentMapSegmentIndex
     iny ; map index + 1
-    cpy ScreenCount
-    bcs @loadRest
 
+
+
+    cpy ScreenCount
+    bcc @setMapPointer
+    
+    ldy CurrentMapSegmentIndex
+    dey; map index - 1
+
+
+@setMapPointer:
     lda LocationIndex
     beq @grabFirstLocationMap2
     
