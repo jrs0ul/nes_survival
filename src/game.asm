@@ -1412,8 +1412,6 @@ CheckIfExitedSecondLocation:
 
     lda #0
     sta LocationIndex
-    sta GlobalScroll
-    sta TilesScroll
 
     lda #4
     sta CurrentMapSegmentIndex
@@ -1443,7 +1441,6 @@ CheckIfExitedSecondLocation:
     sta RightCollisonMapIdx
     lda #0
     sta RightCollisionColumnIndex
-   ; jsr LoadRightCollisionColumn
 
     lda #3
     sta LeftCollisionMapIdx
@@ -1477,8 +1474,6 @@ CheckIfEnteredSecondLocation:
     lda #1
     sta MustLoadSomething
     sta MustLoadOutside
-    ;sta MustCopyMainChr
-    ;lda #1
     sta LocationIndex
     lda #0
     sta CurrentMapSegmentIndex
@@ -1506,9 +1501,16 @@ CheckIfEnteredSecondLocation:
     lda #255
     sta LeftCollisionColumnIndex
 
+    lda #<Outside2_items
+    sta pointer
+    lda #>Outside2_items
+    sta pointer + 1
+    jsr LoadItems
 
     lda #208
     sta PlayerY
+    lda #80
+    sta PlayerX
     lda #0
     sta LeftCollisionMapIdx
     lda #0
@@ -3194,6 +3196,9 @@ CheckIfExitedHouse:
     lda #0
     sta InHouse
     
+    lda #5
+    sta ScreenCount
+    
     lda #<Outside1_items
     sta pointer
     lda #>Outside1_items
@@ -3209,8 +3214,6 @@ CheckIfExitedHouse:
     sta PlayerY
 
 
-    lda #5
-    sta ScreenCount
 
     lda #1
     sta MustLoadOutside

@@ -157,6 +157,8 @@ StoreGeneratedNpc:
 TestGeneratedNpcCollision:
 
     lda TempIndex
+    cmp ScreenCount
+    bcs @collisionDetected
     tax
     lda collision_list_low, x
     sta pointer
