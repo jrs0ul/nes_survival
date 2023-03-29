@@ -305,7 +305,8 @@ npc_anim_row_sequence:
 
     PALETTE_SIZE_MAX           = 32
 
-    OUTDOORS_MAP_SCREEN_COUNT  = 5
+    OUTDOORS_LOC1_SCREEN_COUNT = 5
+    OUTDOORS_LOC2_SCREEN_COUNT = 2
     PLAYER_START_X             = $50
     PLAYER_START_Y             = $90
 
@@ -1416,7 +1417,7 @@ CheckIfExitedSecondLocation:
     lda #4
     sta CurrentMapSegmentIndex
 
-    lda #5
+    lda #OUTDOORS_LOC1_SCREEN_COUNT
     sta ScreenCount
 
     ldy #0
@@ -1479,7 +1480,7 @@ CheckIfEnteredSecondLocation:
     sta CurrentMapSegmentIndex
     sta NpcCount
     sta ItemCount
-    lda #2
+    lda #OUTDOORS_LOC2_SCREEN_COUNT
     sta ScreenCount
 
     ldy #4
@@ -2478,7 +2479,7 @@ ResetEntityVariables:
 
     sta CurrentMapSegmentIndex
 
-    lda #OUTDOORS_MAP_SCREEN_COUNT ;  screens in the outdoors map
+    lda #OUTDOORS_LOC1_SCREEN_COUNT ;  screens in the outdoors map
     sta ScreenCount
 
 
@@ -3196,7 +3197,7 @@ CheckIfExitedHouse:
     lda #0
     sta InHouse
     
-    lda #5
+    lda #OUTDOORS_LOC1_SCREEN_COUNT
     sta ScreenCount
     
     lda #<Outside1_items

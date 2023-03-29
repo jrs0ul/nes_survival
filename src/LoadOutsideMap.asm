@@ -160,10 +160,10 @@ LoadOutsideMap:
 
     lda LocationIndex
     beq @FirstLocationScreens
-    lda #2
+    lda #OUTDOORS_LOC2_SCREEN_COUNT
     jmp @saveScreenCount
 @FirstLocationScreens:
-    lda #5
+    lda #OUTDOORS_LOC1_SCREEN_COUNT
 @saveScreenCount:
     sta ScreenCount
 
