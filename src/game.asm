@@ -803,6 +803,11 @@ Items:   ;items that lies in the map
 ItemCount:
     .res 1
 
+Item_Location1_Collection_times:
+    .res 6
+Item_Location2_Collection_times:
+    .res 3
+
 Npcs:   ;animals and stuff
     .res 64 ; max 8 npcs * 8 bytes:
             ;   (npc type(6 bits) + state(2 bit, 0 - dead, 1 - alive, 2 - attacks),
@@ -2535,7 +2540,35 @@ ResetEntityVariables:
     lda #255
     sta CurrentPaletteDecrementValue
 
+    jsr ResetTimesWhenItemsWerePicked
+
     rts
+;-------------------------------------
+ResetTimesWhenItemsWerePicked:
+
+    ldx #5
+@location1_loop:
+
+    lda #255
+    sta Item_Location1_Collection_times, x
+
+    dex
+    bpl @location1_loop
+
+
+    ldx #2
+@location2_loop:
+
+    lda #255
+    sta Item_Location2_Collection_times, x
+
+    dex
+    bpl @location2_loop
+
+
+    rts
+
+
 ;-------------------------------------
 ;Decrement digits from 100 to 000
 ;DigitChangeSize is the decrement

@@ -209,6 +209,23 @@ AddAndDeactivateItems:
 
 
     ldy TempY ; item index
+
+    ;let's store the time when the item was picked up
+    lda LocationIndex
+    beq @location0
+    cpy #3
+    bcs @continue_adding
+    lda Days
+    sta Item_Location2_Collection_times, y
+    jmp @continue_adding
+@location0:
+    cpy #6
+    bcs @continue_adding
+    lda Days
+    sta Item_Location1_Collection_times, y
+
+@continue_adding:
+
     tya
     asl
     asl
