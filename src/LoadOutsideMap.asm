@@ -95,6 +95,10 @@ LoadOutsideMap:
 
     jsr LoadNametable
 
+    lda ScreenCount
+    cmp #3
+    bcc @loadRest ; stuff bellow is not needed if there are 2 screens max
+
     lda BgColumnIdxToUpload
     cmp #16
     bcc @lowerRange
