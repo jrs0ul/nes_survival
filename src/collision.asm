@@ -3,10 +3,23 @@
 LoadRightCollisionColumn:
 
     ldy RightCollisonMapIdx
+
+    lda LocationIndex
+    beq @location0
+
+    lda collision_list_low2, y
+    sta collisionMapPtr
+    lda collision_list_high2, y
+    sta collisionMapPtr + 1
+
+    jmp @start
+@location0:
     lda collision_list_low, y
     sta collisionMapPtr
     lda collision_list_high, y
     sta collisionMapPtr + 1
+
+@start:
 
     lda RightCollisionColumnIndex
     cmp #COLLISION_MAP_COLUMN_COUNT
@@ -35,11 +48,24 @@ LoadRightCollisionColumn:
 LoadLeftCollisionColumn:
 
     ldy LeftCollisionMapIdx
+    
+    lda LocationIndex
+    beq @location0
+
+    lda collision_list_low2, y
+    sta collisionMapPtr
+    lda collision_list_high2, y
+    sta collisionMapPtr + 1
+
+    jmp @start
+
+@location0:
     lda collision_list_low, y
     sta collisionMapPtr
     lda collision_list_high, y
     sta collisionMapPtr + 1
 
+@start:
     lda LeftCollisionColumnIndex
     cmp #COLLISION_MAP_COLUMN_COUNT
     bcs @exit

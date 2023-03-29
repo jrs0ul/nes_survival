@@ -29,8 +29,6 @@ main_tiles_chr: .incbin "main.chr"
 
 .include "data/map_list.asm"
 .include "data/collision_data.asm"
-.include "data/item_list.asm" ;items in maps
-.include "data/npc_list.asm"  ;npcs in maps
 
 
 ;===========================================================
@@ -58,7 +56,13 @@ title_palette:
 
 house_tiles_chr: .incbin "house.chr"
 .include "data/house.asm"
+;============================================================
+.segment "ROM4" ; other location
 
+main_tiles_chr2: .incbin "main.chr"
+
+.include "data/map_list2.asm"
+.include "data/collision_data2.asm"
 
 ;=============================================================
 
@@ -73,6 +77,9 @@ banktable:              ; Write to this table to switch banks.
 .include "data/item_data.asm"
 .include "data/npc_data.asm"
 
+.include "data/item_list.asm" ;items in maps
+.include "data/npc_list.asm"  ;npcs in maps
+
 zerosprite:
     .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
     .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
@@ -82,6 +89,41 @@ zerosprite:
     .byte $30,$38,$33,$00,$00,$00,$00,$00,$00,$00,$00,$00,$89,$8A,$8B,$00
     .byte $70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70
     .byte $70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70
+
+x_collision_pattern:
+    .byte %10000000
+    .byte %01000000
+    .byte %00100000
+    .byte %00010000
+    .byte %00001000
+    .byte %00000100
+    .byte %00000010
+    .byte %00000001
+    .byte %10000000
+    .byte %01000000
+    .byte %00100000
+    .byte %00010000
+    .byte %00001000
+    .byte %00000100
+    .byte %00000010
+    .byte %00000001
+    .byte %10000000
+    .byte %01000000
+    .byte %00100000
+    .byte %00010000
+    .byte %00001000
+    .byte %00000100
+    .byte %00000010
+    .byte %00000001
+    .byte %10000000
+    .byte %01000000
+    .byte %00100000
+    .byte %00010000
+    .byte %00001000
+    .byte %00000100
+    .byte %00000010
+    .byte %00000001
+
 
 house_palette:
     .byte $0C,$16,$27,$37, $0C,$07,$00,$31, $0C,$17,$27,$31, $0C,$20,$37,$16    ;background
@@ -263,7 +305,8 @@ npc_anim_row_sequence:
 
     PALETTE_SIZE_MAX           = 32
 
-    OUTDOORS_MAP_SCREEN_COUNT  = 5
+    OUTDOORS_LOC1_SCREEN_COUNT = 5
+    OUTDOORS_LOC2_SCREEN_COUNT = 2
     PLAYER_START_X             = $50
     PLAYER_START_Y             = $90
 
@@ -665,7 +708,8 @@ NextItemMapScreenIndex:
 ItemMapScreenIndex:
     .res 1
 
-
+LocationIndex:
+    .res 1
 
 Temp:
     .res 1
@@ -1152,6 +1196,19 @@ UploadBgColumns:
     bcs @exit
 
     ;calculate source address
+
+    lda LocationIndex
+    beq @location0
+
+    lda map_list_low2, y
+    clc
+    adc BgColumnIdxToUpload
+    sta pointer
+    lda map_list_high2, y
+    sta pointer + 1
+
+    jmp @start
+@location0:
     lda map_list_low, y
     clc
     adc BgColumnIdxToUpload
@@ -1159,6 +1216,7 @@ UploadBgColumns:
     lda map_list_high, y
     sta pointer + 1
 
+@start:
     ;calculate source address
     lda #128 ; skip four rows
     clc
@@ -1209,6 +1267,19 @@ UpdateAttributeColumn:
 
     ldy SourceMapIdx
 
+    lda LocationIndex
+    beq @location0
+
+    lda map_list_low2, y
+    clc
+    adc #$C0
+    sta pointer
+    lda map_list_high2, y
+    adc #$3
+    sta pointer + 1
+
+    jmp @start
+@location0:
     lda map_list_low, y
     clc
     adc #$C0
@@ -1216,6 +1287,8 @@ UpdateAttributeColumn:
     lda map_list_high, y
     adc #$3
     sta pointer + 1
+
+@start:
 
     lda pointer
     clc
@@ -1312,12 +1385,143 @@ Logics:
 @noAttack:
 
     jsr CheckIfEnteredHouse
+    jsr CheckIfEnteredSecondLocation
+    jsr CheckIfExitedSecondLocation
     jsr CheckIfExitedHouse
 
 
 @exit:
 
     rts
+;-------------------------------
+CheckIfExitedSecondLocation:
+
+    lda LocationIndex
+    beq @exit
+
+    lda CurrentMapSegmentIndex
+    cmp #0
+
+    lda PlayerY
+    cmp #230
+    bcc @exit
+
+
+    lda #1
+    sta MustLoadSomething
+    sta MustLoadOutside
+
+    lda #0
+    sta LocationIndex
+
+    lda #4
+    sta CurrentMapSegmentIndex
+
+    lda #OUTDOORS_LOC1_SCREEN_COUNT
+    sta ScreenCount
+
+    ldy #0
+    jsr bankswitch_y
+
+    ldx #0
+@copyCollisionMapLoop:
+
+    lda bg_collision4, x
+@start:
+    sta CollisionMap, x
+    inx
+    cpx #COLLISION_MAP_SIZE
+    bne @copyCollisionMapLoop
+
+
+    lda #32
+    sta PlayerY
+    lda #128
+    sta PlayerX
+    lda #5
+    sta RightCollisonMapIdx
+    lda #0
+    sta RightCollisionColumnIndex
+
+    lda #3
+    sta LeftCollisionMapIdx
+    sta LeftCollisionColumnIndex
+    jsr LoadLeftCollisionColumn
+
+
+    jsr GenerateNpcs
+    lda #<Outside1_items
+    sta pointer
+    lda #>Outside1_items
+    sta pointer + 1
+
+    jsr LoadItems
+
+
+@exit:
+    rts
+;------------------------------------
+
+CheckIfEnteredSecondLocation:
+
+    lda CurrentMapSegmentIndex
+    cmp #4
+    bne @exit
+    lda PlayerY
+    cmp #32
+    bcc @Entered
+    jmp @exit
+@Entered:
+    lda #1
+    sta MustLoadSomething
+    sta MustLoadOutside
+    sta LocationIndex
+    lda #0
+    sta CurrentMapSegmentIndex
+    sta NpcCount
+    sta ItemCount
+    lda #OUTDOORS_LOC2_SCREEN_COUNT
+    sta ScreenCount
+
+    ldy #4
+    jsr bankswitch_y
+
+    ldx #0
+@copyCollisionMapLoop:
+    lda bg2_collision, x
+    sta CollisionMap, x
+    inx
+    cpx #COLLISION_MAP_SIZE
+    bne @copyCollisionMapLoop
+
+    lda #1
+    sta RightCollisonMapIdx
+    lda #0      ;load the first column
+    sta RightCollisionColumnIndex
+    jsr LoadRightCollisionColumn
+    lda #255
+    sta LeftCollisionColumnIndex
+
+    lda #<Outside2_items
+    sta pointer
+    lda #>Outside2_items
+    sta pointer + 1
+    jsr LoadItems
+
+    lda #208
+    sta PlayerY
+    lda #80
+    sta PlayerX
+    lda #0
+    sta LeftCollisionMapIdx
+    lda #0
+    sta GlobalScroll
+    sta TilesScroll
+
+@exit:
+    rts
+
+
 ;-------------------------------
 DoSleepPaletteFades:
 
@@ -2191,6 +2395,7 @@ LoadGameOver:
 
     lda #0
     sta MustUpdatePalette
+    sta SleepPaletteAnimationState
 
     lda #<game_over
     sta pointer
@@ -2274,7 +2479,7 @@ ResetEntityVariables:
 
     sta CurrentMapSegmentIndex
 
-    lda #OUTDOORS_MAP_SCREEN_COUNT ;  screens in the outdoors map
+    lda #OUTDOORS_LOC1_SCREEN_COUNT ;  screens in the outdoors map
     sta ScreenCount
 
 
@@ -2481,22 +2686,10 @@ CheckStartButton:
     jsr LoadItems
 
     jsr GenerateNpcs
-       
-@collision:
+    
     ldx #0
-@copyCollisionMapLoop:
-    lda bg_collision, x
-    sta CollisionMap, x
-    inx
-    cpx #COLLISION_MAP_SIZE
-    bne @copyCollisionMapLoop
-
-    lda #0      ;load the first column
-    sta RightCollisionColumnIndex
-    jsr LoadRightCollisionColumn
-    lda #255;-1
-    sta LeftCollisionColumnIndex
-
+    jsr LoadCollisionMap
+    
 
     jmp @exit
 @someOtherState:
@@ -2522,6 +2715,32 @@ CheckStartButton:
 
 @exit:
     rts
+;--------------------------------------
+LoadCollisionMap:
+@copyCollisionMapLoop:
+
+    lda LocationIndex
+    beq @location0
+    lda bg2_collision, x
+    jmp @start
+@location0:
+    lda bg_collision, x
+@start:
+    sta CollisionMap, x
+    inx
+    cpx #COLLISION_MAP_SIZE
+    bne @copyCollisionMapLoop
+
+    lda #0      ;load the first column
+    sta RightCollisionColumnIndex
+    jsr LoadRightCollisionColumn
+    lda #255;-1
+    sta LeftCollisionColumnIndex
+
+
+    rts
+
+
 ;--------------------------------------
 
 ProcessButtons:
@@ -2765,7 +2984,6 @@ FlipStartingNametable:
 
     rts
 ;----------------------------------
-.segment "ROM0"
 
 UpdateFireplace:
 
@@ -2805,6 +3023,8 @@ UpdateFireplace:
 ;-----------------------------------
 CheckIfEnteredHouse:
 
+    lda LocationIndex
+    bne @nope ;only in location 1
     lda InHouse
     bne @nope ; already in
 
@@ -2977,6 +3197,9 @@ CheckIfExitedHouse:
     lda #0
     sta InHouse
     
+    lda #OUTDOORS_LOC1_SCREEN_COUNT
+    sta ScreenCount
+    
     lda #<Outside1_items
     sta pointer
     lda #>Outside1_items
@@ -2991,6 +3214,8 @@ CheckIfExitedHouse:
     lda #OUTSIDE_ENTRY_FROM_HOUSE_Y
     sta PlayerY
 
+
+
     lda #1
     sta MustLoadOutside
     sta MustCopyMainChr
@@ -2999,7 +3224,6 @@ CheckIfExitedHouse:
 @nope:
     rts
 
-.segment "CODE"
 ;-------------------------------------
 LoadTheHouseInterior:
 

@@ -1,5 +1,12 @@
 LoadOutsideMap:
 
+    lda LocationIndex
+    beq @startLoad
+    
+    ldy #4
+    jsr bankswitch_y
+
+@startLoad:
     lda #$00
     sta $2000
     sta $2001
@@ -23,11 +30,23 @@ LoadOutsideMap:
 @continueLoad:
 
     ldy CurrentMapSegmentIndex
+    lda LocationIndex
+    beq @grabFirstLocationMap1
+    
+    lda map_list_low2, y
+    sta pointer
+    lda map_list_high2, y
+    sta pointer + 1
+
+    jmp @loadMap1
+
+@grabFirstLocationMap1:
     lda map_list_low, y
     sta pointer
     lda map_list_high, y
     sta pointer + 1
 
+@loadMap1:
     lda FirstNametableAddr
     sta NametableAddress
 
@@ -41,19 +60,44 @@ LoadOutsideMap:
 
     ldy CurrentMapSegmentIndex
     iny ; map index + 1
+
+
+
     cpy ScreenCount
-    bcs @loadRest
+    bcc @setMapPointer
+    
+    ldy CurrentMapSegmentIndex
+    dey; map index - 1
 
 
+@setMapPointer:
+    lda LocationIndex
+    beq @grabFirstLocationMap2
+    
+    lda map_list_low2, y
+    sta pointer
+    lda map_list_high2, y
+    sta pointer + 1
+
+    jmp @loadMap2
+
+
+@grabFirstLocationMap2:
     lda map_list_low, y
     sta pointer
     lda map_list_high, y
     sta pointer + 1
 
+@loadMap2:
+
     lda SecondNametableAddr
     sta NametableAddress
 
     jsr LoadNametable
+
+    lda ScreenCount
+    cmp #3
+    bcc @loadRest ; stuff bellow is not needed if there are 2 screens max
 
     lda BgColumnIdxToUpload
     cmp #16
@@ -114,7 +158,13 @@ LoadOutsideMap:
     sta MustLoadOutside
     sta MustLoadSomething
 
-    lda #5
+    lda LocationIndex
+    beq @FirstLocationScreens
+    lda #OUTDOORS_LOC2_SCREEN_COUNT
+    jmp @saveScreenCount
+@FirstLocationScreens:
+    lda #OUTDOORS_LOC1_SCREEN_COUNT
+@saveScreenCount:
     sta ScreenCount
 
 

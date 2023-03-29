@@ -1,37 +1,3 @@
-x_collision_pattern:
-    .byte %10000000
-    .byte %01000000
-    .byte %00100000
-    .byte %00010000
-    .byte %00001000
-    .byte %00000100
-    .byte %00000010
-    .byte %00000001
-    .byte %10000000
-    .byte %01000000
-    .byte %00100000
-    .byte %00010000
-    .byte %00001000
-    .byte %00000100
-    .byte %00000010
-    .byte %00000001
-    .byte %10000000
-    .byte %01000000
-    .byte %00100000
-    .byte %00010000
-    .byte %00001000
-    .byte %00000100
-    .byte %00000010
-    .byte %00000001
-    .byte %10000000
-    .byte %01000000
-    .byte %00100000
-    .byte %00010000
-    .byte %00001000
-    .byte %00000100
-    .byte %00000010
-    .byte %00000001
-
 
 .include "house_collision.asm"
 .include "field_bg_collision.asm"
