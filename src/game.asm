@@ -344,6 +344,11 @@ npc_anim_row_sequence:
     ITEM_TYPE_MATERIAL         = 4
     ITEM_TYPE_TOOL             = 5
 
+    ITEM_COUNT_LOC1            = 6
+    ITEM_COUNT_LOC2            = 3
+
+    ITEM_RESPAWN_HOURS         = 90
+
     INVENTORY_MAX_ITEMS        = 10
 
     NPC_STEPS_BEFORE_REDIRECT  = 16
@@ -802,6 +807,11 @@ Items:   ;items that lies in the map
             ; screen_index)
 ItemCount:
     .res 1
+
+Item_Location1_Collection_times:
+    .res ITEM_COUNT_LOC1
+Item_Location2_Collection_times:
+    .res ITEM_COUNT_LOC2
 
 Npcs:   ;animals and stuff
     .res 64 ; max 8 npcs * 8 bytes:
@@ -1624,6 +1634,7 @@ DoSleep:
     sbc #HOURS_MAX
     sta Hours
     jsr IncreaseDays
+    jsr ResetTimesWhenItemsWerePicked
 
 @adaptPalette:
       
@@ -1785,6 +1796,7 @@ RunTime:
     bcc @adaptPalette
     lda #0
     sta Hours
+    jsr ResetTimesWhenItemsWerePicked
     jsr IncreaseDays
 
 @adaptPalette:
@@ -2535,7 +2547,11 @@ ResetEntityVariables:
     lda #255
     sta CurrentPaletteDecrementValue
 
+    jsr ResetTimesWhenItemsWerePicked
+
     rts
+
+
 ;-------------------------------------
 ;Decrement digits from 100 to 000
 ;DigitChangeSize is the decrement

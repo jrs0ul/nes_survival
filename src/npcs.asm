@@ -917,6 +917,7 @@ UpdateNpcRow:
 doNpcAI:
 
     ldy NpcCount
+    beq @exit ; no npcs here
     dey; npcCount - 1, first index
 @npcLoop:
     
@@ -982,6 +983,7 @@ doNpcAI:
 
     lda #NPC_AI_DELAY
     sta NpcAIUpdateDelay
+@exit:
     rts
 ;-----------------------------------
 FetchNpcVars:
