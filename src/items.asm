@@ -5,10 +5,40 @@ LoadItems:
     ldy #0
     lda (pointer), y
     sta ItemCount
-    ldx ItemCount
-    beq @exit
+    lda ItemCount
+    beq @exit   ; no items
     iny
+    ldx #0
 @itemLoop:
+
+    lda LocationIndex
+    beq @location0
+    
+    lda Item_Location2_Collection_times, x
+    jmp @checkDay
+@location0:
+    lda Item_Location1_Collection_times, x
+@checkDay:
+    cmp #255
+    beq @loadIt
+
+    sta Temp
+
+    lda Hours
+    sec
+    sbc Temp
+    cmp #ITEM_RESPAWN_HOURS
+    bcc @deactivatedItem
+
+       
+@loadIt:
+    txa
+    asl
+    asl
+    tay
+    iny
+
+
     lda (pointer), y
     dey
     sta Items, y
@@ -27,10 +57,30 @@ LoadItems:
     lda (pointer), y
     dey
     sta Items, y
+    jmp @decrementItemIndex
+
+@deactivatedItem:
+    txa
+    asl
+    asl
+    tay
     iny
+
+
+    lda #0
+    dey
+    sta Items, y
     iny
-    dex
-    bne @itemLoop
+    sta Items, y
+    iny
+    sta Items, y
+    iny
+    sta Items, y
+    
+@decrementItemIndex:
+    inx
+    cpx ItemCount
+    bcc @itemLoop
 @exit:
 
     rts
@@ -174,6 +224,30 @@ CheckYPoints:
 
     rts
 
+;-------------------------------------
+ResetTimesWhenItemsWerePicked:
+
+    ldx #ITEM_COUNT_LOC1 - 1
+@location1_loop:
+
+    lda #255
+    sta Item_Location1_Collection_times, x
+
+    dex
+    bpl @location1_loop
+
+
+    ldx #ITEM_COUNT_LOC2 - 1
+@location2_loop:
+
+    lda #255
+    sta Item_Location2_Collection_times, x
+
+    dex
+    bpl @location2_loop
+
+
+    rts
 
 ;-----------------------------------
 CalcItemMapScreenIndexes:
@@ -213,15 +287,15 @@ AddAndDeactivateItems:
     ;let's store the time when the item was picked up
     lda LocationIndex
     beq @location0
-    cpy #3
+    cpy #ITEM_COUNT_LOC2
     bcs @continue_adding
-    lda Days
+    lda Hours
     sta Item_Location2_Collection_times, y
     jmp @continue_adding
 @location0:
-    cpy #6
+    cpy #ITEM_COUNT_LOC1
     bcs @continue_adding
-    lda Days
+    lda Hours
     sta Item_Location1_Collection_times, y
 
 @continue_adding:
@@ -248,6 +322,7 @@ AddAndDeactivateItems:
 UpdateItemSpritesInWorld:
 
     ldy ItemCount
+    beq @exit ; no items
     dey ;let's start from ItemCount - 1
 @itemLoop:
 
