@@ -664,7 +664,7 @@ CraftingInput:
     sta pointer
     lda #>InventoryItemIndex
     sta pointer + 1
-    lda #INVENTORY_MAX_ITEMS - 1
+    lda #9
     jsr MenuInputUpDownCheck
 
 
@@ -674,6 +674,7 @@ CraftingInput:
     beq @CheckA
 
     lda InventoryItemIndex
+    asl ;item_index * 2
     tay
     lda Inventory, y
     beq @exit ;empty slot was picked
@@ -744,6 +745,7 @@ CraftFromSelectedComponents:
 
     ldx #0
     lda CraftingIndexes, x
+    asl
     tay
     lda Inventory, y
     cmp TempY ;ingredient A
@@ -751,18 +753,18 @@ CraftFromSelectedComponents:
 
     inx
     lda CraftingIndexes, x
+    asl
     tay
     lda Inventory, y
     cmp TempZ ;ingredient B
     bne @loop
 
-
-    lda CraftingIndexes,x
     lda Temp ;result
     sta Inventory,y
 
     dex
     lda CraftingIndexes, x
+    asl
     tay
     lda #0
     sta Inventory, y
@@ -780,10 +782,11 @@ EquipmentInput:
     beq @CheckA
 
     ;let's simply unequip
-    ldx #255
+    ldx #254
 @loop:
     inx
-    cpx #INVENTORY_MAX_ITEMS
+    inx
+    cpx #INVENTORY_MAX_SIZE
     bcs @exit
     lda Inventory, x
     bne @loop
@@ -826,7 +829,7 @@ InventoryInput:
     sta pointer
     lda #>InventoryItemIndex
     sta pointer + 1
-    lda #INVENTORY_MAX_ITEMS - 1
+    lda #9
     jsr MenuInputUpDownCheck
 
 
@@ -1376,10 +1379,11 @@ HideMaterialMenu:
 
 ;-----------------------------------
 TakeItemFromStash:
-    ldy #255
+    ldy #254
 @inventoryLoop:
     iny
-    cpy #INVENTORY_MAX_ITEMS
+    iny
+    cpy #INVENTORY_MAX_SIZE
     bcs @fail
     lda Inventory, y
     bne @inventoryLoop
@@ -1398,10 +1402,11 @@ TakeItemFromStash:
 StoreItemInStash:
     lda InHouse
     beq @fail
-    ldy #255
+    ldy #254
 @stashLoop:
     iny
-    cpy #INVENTORY_MAX_ITEMS
+    iny
+    cpy #INVENTORY_MAX_SIZE
     bcs @fail
     lda Storage, y
     bne @stashLoop
@@ -1678,7 +1683,10 @@ CookMeat:
     rts
 ;--------------------------------------
 LoadSelectedItemStuff:
-    ldx InventoryItemIndex
+    lda InventoryItemIndex
+    asl ;item_index * 2
+    tax
+
     lda StashActivated ; let's check what's active
     beq @useInventory
     lda Storage, x
@@ -1852,8 +1860,9 @@ UpdateInventorySprites:
 @next:
     lda EquipmentActivated
     bne @ThePointer
+    inx ;item hp
     inx
-    cpx #INVENTORY_MAX_ITEMS
+    cpx #INVENTORY_MAX_SIZE
     bcc @itemLoop
 
 @ThePointer:

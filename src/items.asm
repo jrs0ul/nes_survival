@@ -19,7 +19,7 @@ LoadItems:
 @location0:
     lda Item_Location1_Collection_times, x
 @checkDay:
-    cmp #255
+    cmp #ITEM_NEVER_BEEN_PICKED
     beq @loadIt
 
     sta Temp
@@ -30,7 +30,6 @@ LoadItems:
     cmp #ITEM_RESPAWN_HOURS
     bcc @deactivatedItem
 
-       
 @loadIt:
     txa
     asl
@@ -230,7 +229,7 @@ ResetTimesWhenItemsWerePicked:
     ldx #ITEM_COUNT_LOC1 - 1
 @location1_loop:
 
-    lda #255
+    lda #ITEM_NEVER_BEEN_PICKED
     sta Item_Location1_Collection_times, x
 
     dex
@@ -240,7 +239,7 @@ ResetTimesWhenItemsWerePicked:
     ldx #ITEM_COUNT_LOC2 - 1
 @location2_loop:
 
-    lda #255
+    lda #ITEM_NEVER_BEEN_PICKED
     sta Item_Location2_Collection_times, x
 
     dex
@@ -269,8 +268,9 @@ AddAndDeactivateItems:
 @inventoryLoop:
     lda Inventory, y
     beq @addItem
+    iny ;item's hp
     iny
-    cpy #INVENTORY_MAX_ITEMS
+    cpy #INVENTORY_MAX_SIZE
     bcc @inventoryLoop
     jmp @exit ; no place in the inventory?
 

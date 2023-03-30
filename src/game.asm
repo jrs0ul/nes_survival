@@ -347,9 +347,11 @@ npc_anim_row_sequence:
     ITEM_COUNT_LOC1            = 6
     ITEM_COUNT_LOC2            = 3
 
+    ITEM_NEVER_BEEN_PICKED     = 255
+
     ITEM_RESPAWN_HOURS         = 90
 
-    INVENTORY_MAX_ITEMS        = 10
+    INVENTORY_MAX_SIZE         = 20 ;10 * 2; 1st byte - index, 2nd - hp
 
     NPC_STEPS_BEFORE_REDIRECT  = 16
 
@@ -525,10 +527,10 @@ EquipedItem: ;equiped item type
     .res 1
 
 Inventory:
-    .res INVENTORY_MAX_ITEMS
+    .res INVENTORY_MAX_SIZE
 
 Storage:
-    .res INVENTORY_MAX_ITEMS
+    .res INVENTORY_MAX_SIZE
 
 InventoryPointerY:
     .res 1
@@ -2475,13 +2477,14 @@ ResetEntityVariables:
 
     lda #120
     sta Hours
+
     lda #0
     sta Minutes
     sta Days
     sta Days + 1
     sta Days + 2
 
-    ldx #INVENTORY_MAX_ITEMS
+    ldx #INVENTORY_MAX_SIZE
     dex
 @clearInventoryLoop:
     sta Inventory, x
