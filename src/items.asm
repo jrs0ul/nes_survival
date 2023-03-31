@@ -472,3 +472,47 @@ SecondItemSpritePart:
     inc TempSpriteCount
 @exit:
     rts
+;---------------------------------
+;pointer - storage or inventory
+RotFood:
+
+    ldy #0
+@loop:
+    lda (pointer), y
+    beq @nextItem
+    cmp #2
+    bne @checkCooked
+
+    lda #9
+    sta (pointer), y
+    jmp @nextItem
+
+@checkCooked:
+    cmp #3
+    bne @nextItem
+
+    iny
+    lda (pointer), y
+    cmp #50
+    bcc @turnToPoop
+    beq @turnToPoop
+
+    sec
+    sbc #50
+    sta (pointer), y
+    dey
+    jmp @nextItem
+
+@turnToPoop:
+    dey
+    lda #9
+    sta (pointer), y
+
+
+@nextItem:
+    iny
+    iny
+    cmp #INVENTORY_MAX_SIZE
+    bcc @loop
+
+    rts

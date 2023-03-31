@@ -1621,17 +1621,9 @@ DoSleep:
     clc
     adc #SLEEP_TIME
     sta Hours
-    bcs @hoursOverFlow
+    bcs @increaseDays
     cmp #HOURS_MAX
     bcs @increaseDays
-    jmp @adaptPalette
-
-@hoursOverFlow:
-    lda Hours
-    sec
-    sbc #HOURS_MAX
-    sta Hours
-    jsr IncreaseDays
     jmp @adaptPalette
 
 @increaseDays:
@@ -1641,6 +1633,19 @@ DoSleep:
     sta Hours
     jsr IncreaseDays
     jsr ResetTimesWhenItemsWerePicked
+
+    lda #<Inventory
+    sta pointer
+    lda #>Inventory
+    sta pointer + 1
+    jsr RotFood
+
+    lda #<Storage
+    sta pointer
+    lda #>Storage
+    sta pointer + 1
+    jsr RotFood
+
 
 @adaptPalette:
       
@@ -1803,6 +1808,20 @@ RunTime:
     lda #0
     sta Hours
     jsr ResetTimesWhenItemsWerePicked
+
+    lda #<Inventory
+    sta pointer
+    lda #>Inventory
+    sta pointer + 1
+    jsr RotFood
+
+    lda #<Storage
+    sta pointer
+    lda #>Storage
+    sta pointer + 1
+    jsr RotFood
+
+    
     jsr IncreaseDays
 
 @adaptPalette:
