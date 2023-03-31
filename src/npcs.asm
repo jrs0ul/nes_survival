@@ -424,10 +424,10 @@ KnifeNpcsCollision:
     sta Npcs, y
 
     lda TempNpcType
-    bne @exit ; predators don't drop anything
+    bne @wearWeapon ; predators don't drop anything
 
     jsr DropItemAfterDeath
-    jmp @exit
+    jmp @wearWeapon
 
 @doneDoingDmg:
     dey
@@ -435,6 +435,26 @@ KnifeNpcsCollision:
     dey
     dey
     dey
+
+    
+@wearWeapon:
+
+    lda EquipedItem
+    beq @exit
+    lda EquipedItem + 1
+    cmp #10
+    bcc @removeWeapon
+    beq @removeWeapon
+    sec
+    sbc #10
+    sta EquipedItem + 1
+    jmp @exit
+
+@removeWeapon:
+    lda #0
+    sta EquipedItem
+    sta EquipedItem + 1
+
 
 @exit:
     rts

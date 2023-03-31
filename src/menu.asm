@@ -682,11 +682,12 @@ CraftingInput:
     ldx CurrentCraftingComponent
     cpx #1
     bne @storeIndex
+    sty TempY
     ldy #0
     lda CraftingIndexes, y
-    cmp InventoryItemIndex
+    cmp TempY
     beq @exit
-    lda InventoryItemIndex
+    lda TempY
 
 @storeIndex:
     sta CraftingIndexes, x
@@ -729,7 +730,7 @@ CraftFromSelectedComponents:
 @loop:
     ldx TempRegX
     inx
-    cpx #12
+    cpx #RECIPES_SIZE
     bcs @exit
 
     lda recipes, x
@@ -745,7 +746,6 @@ CraftFromSelectedComponents:
 
     ldx #0
     lda CraftingIndexes, x
-    asl
     tay
     lda Inventory, y
     cmp TempY ;ingredient A
@@ -753,7 +753,6 @@ CraftFromSelectedComponents:
 
     inx
     lda CraftingIndexes, x
-    asl
     tay
     lda Inventory, y
     cmp TempZ ;ingredient B
@@ -767,7 +766,6 @@ CraftFromSelectedComponents:
 
     dex
     lda CraftingIndexes, x
-    asl ;index * 2
     tay
     lda #0
     sta Inventory, y

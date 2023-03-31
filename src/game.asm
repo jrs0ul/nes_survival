@@ -357,6 +357,8 @@ npc_anim_row_sequence:
 
     NPC_STEPS_BEFORE_REDIRECT  = 16
 
+    RECIPES_SIZE               = 12
+
 ;===================================================================
 .segment "ZEROPAGE"
 current_bank: 
