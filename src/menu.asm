@@ -760,14 +760,19 @@ CraftFromSelectedComponents:
     bne @loop
 
     lda Temp ;result
-    sta Inventory,y
+    sta Inventory, y
+    iny
+    lda #ITEM_MAX_HP
+    sta Inventory, y
 
     dex
     lda CraftingIndexes, x
-    asl
+    asl ;index * 2
     tay
     lda #0
     sta Inventory, y
+    iny
+    sta Inventory, y ; reset item hp as well
 
 
 @exit:
@@ -781,25 +786,31 @@ EquipmentInput:
     and #BUTTON_B_MASK
     beq @CheckA
 
+    lda EquipedItem
+    beq @exit ; no item equiped
+
     ;let's simply unequip
     ldx #254
 @loop:
     inx
     inx
     cpx #INVENTORY_MAX_SIZE
-    bcs @exit
+    bcs @exit ; no place for an unequiped item
     lda Inventory, x
     bne @loop
 
     lda EquipedItem
     sta Inventory, x
+    inx
+    lda EquipedItem + 1
+    sta Inventory, x ; item's hp
+
     lda #0
     sta EquipedItem
+    sta EquipedItem + 1
 
-
-    
     jmp @exit
-    
+
 @CheckA:
     lda Buttons
     and #BUTTON_A_MASK
@@ -1056,14 +1067,7 @@ FoodMenuInput:
     
 
 @clearItem:
-    lda StashActivated
-    beq @useInventory
-    lda #0
-    sta Storage, x
-    jmp @hidemenu
-@useInventory:
-    lda #0
-    sta Inventory, x
+    jsr ClearThatItem
 @hidemenu:
     lda #0
     sta StashFoodMenuActivated
@@ -1081,6 +1085,23 @@ FoodMenuInput:
     sta FoodMenuActivated
     jsr ExitSubmenu
 @exit:
+    rts
+;-------------------------------------
+ClearThatItem:
+    lda StashActivated
+    beq @useInventory
+    lda #0
+    sta Storage, x
+    inx
+    sta Storage, x
+    jmp @hidemenu
+@useInventory:
+    lda #0
+    sta Inventory, x
+    inx
+    sta Inventory, x
+@hidemenu:
+
     rts
 ;-------------------------------------
 ExitSubmenu:
@@ -1139,14 +1160,7 @@ MaterialMenuInput:
     bne @exit ;failed to retrieve
 
 @clearItem:
-    lda StashActivated
-    beq @useInventory
-    lda #0
-    sta Storage, x
-    jmp @hidemenu
-@useInventory:
-    lda #0
-    sta Inventory, x
+    jsr ClearThatItem
 @hidemenu:
     jsr HideMaterialMenu
 @CheckA:
@@ -1185,29 +1199,10 @@ ToolInput:
     lda ItemMenuIndex
     bne @checkIfStash
 
-    lda EquipedItem
-    sta Temp
-
-    lda StashActivated
-    beq @inventory
-    lda Storage, x
-    jmp @equip
-@inventory:
-    lda Inventory, x
-@equip:
-    sta EquipedItem
-    lda Temp
-    beq @clearItem
-    lda StashActivated
-    beq @useInv
-    lda Temp
-    sta Storage, x
-    jmp @hidemenu
-@useInv:
-    lda Temp
-    sta Inventory, x
-    jmp @hidemenu
-
+    jsr EquipItem
+    beq @hidemenu ;return 0
+    jmp @clearItem ;return 1
+   
 @checkIfStash:
     cmp #1
     bne @clearItem ; DROP
@@ -1221,14 +1216,7 @@ ToolInput:
     bne @exit ;failed to retrieve
 
 @clearItem:
-    lda StashActivated
-    beq @useInventory
-    lda #0
-    sta Storage, x
-    jmp @hidemenu
-@useInventory:
-    lda #0
-    sta Inventory, x
+    jsr ClearThatItem
 @hidemenu:
     jsr HideToolMenu
     jmp @exit
@@ -1242,7 +1230,57 @@ ToolInput:
     rts
 
 
+;-------------------------------------
+EquipItem:
 
+
+    lda EquipedItem
+    sta Temp
+    lda EquipedItem + 1 ;item's hp
+    sta TempHp
+    ;--
+    lda StashActivated
+    beq @inventory
+    lda Storage, x
+    sta EquipedItem
+    inx
+    lda Storage, x
+    jmp @equip_hp
+@inventory:
+    lda Inventory, x
+    sta EquipedItem
+    inx
+    lda Inventory, x
+@equip_hp:
+    sta EquipedItem + 1
+    dex
+    ;--
+    lda Temp
+    beq @clearItem
+    lda StashActivated
+    beq @useInv
+    lda Temp
+    sta Storage, x
+    inx
+    lda TempHp
+    sta Storage, x
+    jmp @hidemenu
+@useInv:
+    lda Temp
+    sta Inventory, x
+    inx
+    lda TempHp
+    sta Inventory, x
+    jmp @hidemenu
+
+
+@clearItem:
+    lda #1 ; clear item
+    jmp @exit
+@hidemenu:
+    lda #0
+@exit:
+    rts
 
 ;-------------------------------------
 ItemMenuInput:
@@ -1295,14 +1333,7 @@ ItemMenuInput:
     bne @exit ;failed to retrieve
 
 @clearItem:
-    lda StashActivated
-    beq @useInventory
-    lda #0
-    sta Storage, x
-    jmp @hidemenu
-@useInventory:
-    lda #0
-    sta Inventory, x
+    jsr ClearThatItem
 @hidemenu:
     jsr HideItemMenu
 @CheckA:
@@ -1389,6 +1420,12 @@ TakeItemFromStash:
     bne @inventoryLoop
     lda Storage, x
     sta Inventory, y
+    ;transfer item's hp
+    inx
+    iny
+    lda Storage, x
+    sta Inventory, y
+    dex
 
     lda #0
     jmp @exit
@@ -1412,6 +1449,12 @@ StoreItemInStash:
     bne @stashLoop
     lda Inventory, x
     sta Storage, y
+    ;store item's hp
+    inx
+    iny
+    lda Inventory, x
+    sta Storage, y
+    dex
 
     lda #0
     jmp @exit

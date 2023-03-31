@@ -309,6 +309,9 @@ AddAndDeactivateItems:
     lsr
     ldy Temp
     sta Inventory, y
+    iny
+    lda #ITEM_MAX_HP
+    sta Inventory, y
     ;deactivate
     lda Items, x
     and #%11111110

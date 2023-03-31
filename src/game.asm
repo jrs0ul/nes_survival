@@ -351,6 +351,8 @@ npc_anim_row_sequence:
 
     ITEM_RESPAWN_HOURS         = 90
 
+    ITEM_MAX_HP                = 100
+
     INVENTORY_MAX_SIZE         = 20 ;10 * 2; 1st byte - index, 2nd - hp
 
     NPC_STEPS_BEFORE_REDIRECT  = 16
@@ -523,8 +525,8 @@ Hours:
     .res 1
 
 
-EquipedItem: ;equiped item type
-    .res 1
+EquipedItem:
+    .res 2   ;item index + hp
 
 Inventory:
     .res INVENTORY_MAX_SIZE
@@ -2531,6 +2533,8 @@ ResetEntityVariables:
 
     lda #8
     sta EquipedItem
+    lda #ITEM_MAX_HP
+    sta EquipedItem + 1
 
     lda #31
     sta BgColumnIdxToUpload
