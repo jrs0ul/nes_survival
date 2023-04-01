@@ -347,11 +347,18 @@ npc_anim_row_sequence:
     ITEM_COUNT_LOC1            = 6
     ITEM_COUNT_LOC2            = 3
 
+    ITEM_NEVER_BEEN_PICKED     = 255
+
     ITEM_RESPAWN_HOURS         = 90
 
+    ITEM_MAX_HP                = 100
+
     INVENTORY_MAX_ITEMS        = 10
+    INVENTORY_MAX_SIZE         = INVENTORY_MAX_ITEMS * 2
 
     NPC_STEPS_BEFORE_REDIRECT  = 16
+
+    RECIPES_SIZE               = 12
 
 ;===================================================================
 .segment "ZEROPAGE"
@@ -521,14 +528,14 @@ Hours:
     .res 1
 
 
-EquipedItem: ;equiped item type
-    .res 1
+EquipedItem:
+    .res 2   ;item index + hp
 
 Inventory:
-    .res INVENTORY_MAX_ITEMS
+    .res INVENTORY_MAX_SIZE
 
 Storage:
-    .res INVENTORY_MAX_ITEMS
+    .res INVENTORY_MAX_SIZE
 
 InventoryPointerY:
     .res 1
@@ -1615,17 +1622,9 @@ DoSleep:
     clc
     adc #SLEEP_TIME
     sta Hours
-    bcs @hoursOverFlow
+    bcs @increaseDays
     cmp #HOURS_MAX
     bcs @increaseDays
-    jmp @adaptPalette
-
-@hoursOverFlow:
-    lda Hours
-    sec
-    sbc #HOURS_MAX
-    sta Hours
-    jsr IncreaseDays
     jmp @adaptPalette
 
 @increaseDays:
@@ -1635,6 +1634,19 @@ DoSleep:
     sta Hours
     jsr IncreaseDays
     jsr ResetTimesWhenItemsWerePicked
+
+    lda #<Inventory
+    sta pointer
+    lda #>Inventory
+    sta pointer + 1
+    jsr RotFood
+
+    lda #<Storage
+    sta pointer
+    lda #>Storage
+    sta pointer + 1
+    jsr RotFood
+
 
 @adaptPalette:
       
@@ -1797,6 +1809,20 @@ RunTime:
     lda #0
     sta Hours
     jsr ResetTimesWhenItemsWerePicked
+
+    lda #<Inventory
+    sta pointer
+    lda #>Inventory
+    sta pointer + 1
+    jsr RotFood
+
+    lda #<Storage
+    sta pointer
+    lda #>Storage
+    sta pointer + 1
+    jsr RotFood
+
+    
     jsr IncreaseDays
 
 @adaptPalette:
@@ -2475,13 +2501,14 @@ ResetEntityVariables:
 
     lda #120
     sta Hours
+
     lda #0
     sta Minutes
     sta Days
     sta Days + 1
     sta Days + 2
 
-    ldx #INVENTORY_MAX_ITEMS
+    ldx #INVENTORY_MAX_SIZE
     dex
 @clearInventoryLoop:
     sta Inventory, x
@@ -2528,6 +2555,8 @@ ResetEntityVariables:
 
     lda #8
     sta EquipedItem
+    lda #ITEM_MAX_HP
+    sta EquipedItem + 1
 
     lda #31
     sta BgColumnIdxToUpload

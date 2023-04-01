@@ -11,3 +11,4 @@ item_data:
     .byte 54, 3, 4, 0 ; rock
     .byte 70, 0, 5, 9 ; spear
     .byte 86, 0, 5, 2 ; knife
+    .byte 118, 0, 2, 1; poop

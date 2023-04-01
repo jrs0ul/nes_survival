@@ -19,7 +19,7 @@ LoadItems:
 @location0:
     lda Item_Location1_Collection_times, x
 @checkDay:
-    cmp #255
+    cmp #ITEM_NEVER_BEEN_PICKED
     beq @loadIt
 
     sta Temp
@@ -30,7 +30,6 @@ LoadItems:
     cmp #ITEM_RESPAWN_HOURS
     bcc @deactivatedItem
 
-       
 @loadIt:
     txa
     asl
@@ -230,7 +229,7 @@ ResetTimesWhenItemsWerePicked:
     ldx #ITEM_COUNT_LOC1 - 1
 @location1_loop:
 
-    lda #255
+    lda #ITEM_NEVER_BEEN_PICKED
     sta Item_Location1_Collection_times, x
 
     dex
@@ -240,7 +239,7 @@ ResetTimesWhenItemsWerePicked:
     ldx #ITEM_COUNT_LOC2 - 1
 @location2_loop:
 
-    lda #255
+    lda #ITEM_NEVER_BEEN_PICKED
     sta Item_Location2_Collection_times, x
 
     dex
@@ -269,8 +268,9 @@ AddAndDeactivateItems:
 @inventoryLoop:
     lda Inventory, y
     beq @addItem
+    iny ;item's hp
     iny
-    cpy #INVENTORY_MAX_ITEMS
+    cpy #INVENTORY_MAX_SIZE
     bcc @inventoryLoop
     jmp @exit ; no place in the inventory?
 
@@ -308,6 +308,9 @@ AddAndDeactivateItems:
     lda Items, x
     lsr
     ldy Temp
+    sta Inventory, y
+    iny
+    lda #ITEM_MAX_HP
     sta Inventory, y
     ;deactivate
     lda Items, x
@@ -468,4 +471,48 @@ SecondItemSpritePart:
     inx
     inc TempSpriteCount
 @exit:
+    rts
+;---------------------------------
+;pointer - storage or inventory
+RotFood:
+
+    ldy #0
+@loop:
+    lda (pointer), y
+    beq @nextItem
+    cmp #2
+    bne @checkCooked
+
+    lda #9
+    sta (pointer), y
+    jmp @nextItem
+
+@checkCooked:
+    cmp #3
+    bne @nextItem
+
+    iny
+    lda (pointer), y
+    cmp #50
+    bcc @turnToPoop
+    beq @turnToPoop
+
+    sec
+    sbc #50
+    sta (pointer), y
+    dey
+    jmp @nextItem
+
+@turnToPoop:
+    dey
+    lda #9
+    sta (pointer), y
+
+
+@nextItem:
+    iny
+    iny
+    cmp #INVENTORY_MAX_SIZE
+    bcc @loop
+
     rts
