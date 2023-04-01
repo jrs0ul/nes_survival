@@ -353,7 +353,8 @@ npc_anim_row_sequence:
 
     ITEM_MAX_HP                = 100
 
-    INVENTORY_MAX_SIZE         = 20 ;10 * 2; 1st byte - index, 2nd - hp
+    INVENTORY_MAX_ITEMS        = 10
+    INVENTORY_MAX_SIZE         = INVENTORY_MAX_ITEMS * 2
 
     NPC_STEPS_BEFORE_REDIRECT  = 16
 
