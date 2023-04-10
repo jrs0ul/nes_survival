@@ -490,6 +490,8 @@ RandomNumber:
 
 SpearActive:
     .res 1
+SpearScreen:
+    .res 1
 SpearX:
     .res 1
 SpearY:
@@ -1432,11 +1434,52 @@ UpdateSpear:
     clc
     adc #3
     sta SpearX
-    cmp #250
+    cmp #252
     bcc @exit
 
+    lda SpearX
+    sec
+    sbc #252
+    lda #0
+    sta SpearX
+    inc SpearScreen
+
+    lda SpearScreen
+    jsr CalcItemMapScreenIndexes
+   
+    lda ItemMapScreenIndex
+    beq @skipPrev
+    lda CurrentMapSegmentIndex
+    cmp PrevItemMapScreenIndex
+    bcc @disable
+@skipPrev:
+    lda CurrentMapSegmentIndex
+    cmp NextItemMapScreenIndex
+    bcs @disable
+
+    lda CurrentMapSegmentIndex
+    cmp ItemMapScreenIndex
+    beq @SpearMatchesScreen
+
+    lda SpearX
+    sec
+    sbc GlobalScroll
+    bcs @disable
+    jmp @exit
+@SpearMatchesScreen:
+    lda SpearX ; x
+    cmp GlobalScroll
+    bcc @disable
+
+
+    
+
+    jmp @exit
+
+@disable:
     lda #0
     sta SpearActive
+
 
 
 @exit:
@@ -2906,17 +2949,35 @@ CheckB:
     lda EquipedItem
     cmp #ITEM_SPEAR
     bne @regularAttack
-
+    
+    ;throw a spear
     lda #1
     sta SpearActive
+
+    lda PlayerY
+    clc
+    adc #8
+    sta SpearY
+
     lda PlayerX
     clc
     adc #8
+    adc GlobalScroll
+    bcs @incrementScreen
+
+
     sta SpearX
-    lda PlayerY
-    clc 
-    adc #8
-    sta SpearY
+    lda CurrentMapSegmentIndex
+    sta SpearScreen
+    jmp @regularAttack
+
+@incrementScreen:
+    sta SpearX
+
+    lda CurrentMapSegmentIndex
+    clc
+    adc #1
+    sta SpearScreen
 
 @regularAttack:
 
@@ -3622,6 +3683,54 @@ UpdateSpearSprite:
     lda SpearActive
     beq @exit
 
+    lda SpearScreen
+    jsr CalcItemMapScreenIndexes
+
+    lda ItemMapScreenIndex
+    beq @skipPrevScreen
+    lda CurrentMapSegmentIndex
+    cmp PrevItemMapScreenIndex
+    bcc @exit
+@skipPrevScreen:
+    lda CurrentMapSegmentIndex
+    cmp NextItemMapScreenIndex
+    bcs @exit
+
+    lda CurrentMapSegmentIndex
+    cmp ItemMapScreenIndex
+    beq @SpearMatchesScreen
+
+    lda SpearX ; x
+    sec
+    sbc GlobalScroll
+    bcs @exit
+    sta TempPointX ; save x
+    jmp @doUpdate
+@SpearMatchesScreen:
+    lda SpearX ; x
+    cmp GlobalScroll
+    bcc @exit
+    sec
+    sbc GlobalScroll
+    sta TempPointX
+
+
+@doUpdate:
+   
+    jsr SetTwoSpearSprites
+
+    lda TempSpriteCount
+    clc
+    adc #2
+    sta TempSpriteCount
+
+
+@exit:
+    rts
+
+;---------------------------------
+SetTwoSpearSprites:
+
     inx
     lda SpearY
     sec
@@ -3634,10 +3743,9 @@ UpdateSpearSprite:
     lda #%01000000
     sta FIRST_SPRITE, x
     inx
-    lda SpearX
+    lda TempPointX
     sec
     sbc #8
-    ;sbc GlobalScroll
     sta FIRST_SPRITE, x
     inx
     ;----
@@ -3652,20 +3760,12 @@ UpdateSpearSprite:
     lda #%01000000
     sta FIRST_SPRITE, x
     inx
-    lda SpearX
-    ;sec
-    ;sbc GlobalScroll
+    lda TempPointX
     sta FIRST_SPRITE, x
 
 
-    lda TempSpriteCount
-    clc
-    adc #2
-    sta TempSpriteCount
-
-
-@exit:
     rts
+
 ;----------------------------------
 SetKnifeSprite:
 
