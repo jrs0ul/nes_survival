@@ -344,6 +344,9 @@ npc_anim_row_sequence:
     ITEM_TYPE_MATERIAL         = 4
     ITEM_TYPE_TOOL             = 5
 
+    ITEM_KNIFE                 = 8
+    ITEM_SPEAR                 = 7
+
     ITEM_COUNT_LOC1            = 6
     ITEM_COUNT_LOC2            = 3
 
@@ -483,6 +486,13 @@ InputProcessed:
     .res 1
 
 RandomNumber:
+    .res 1
+
+SpearActive:
+    .res 1
+SpearX:
+    .res 1
+SpearY:
     .res 1
 
 ;attack square
@@ -1389,7 +1399,9 @@ Logics:
     jsr DoSleepPaletteFades
 
 @doneLogics:
-    
+   
+    jsr UpdateSpear
+
     lda AttackTimer
     beq @noAttack
     dec AttackTimer
@@ -1410,6 +1422,27 @@ Logics:
 @exit:
 
     rts
+;-------------------------------
+UpdateSpear:
+
+    lda SpearActive
+    beq @exit
+
+    lda SpearX
+    clc
+    adc #3
+    sta SpearX
+    cmp #250
+    bcc @exit
+
+    lda #0
+    sta SpearActive
+
+
+@exit:
+
+    rts
+
 ;-------------------------------
 CheckIfExitedSecondLocation:
 
@@ -2870,6 +2903,23 @@ CheckB:
     lda #4
     sta PlayerAnimationRowIndex
 
+    lda EquipedItem
+    cmp #ITEM_SPEAR
+    bne @regularAttack
+
+    lda #1
+    sta SpearActive
+    lda PlayerX
+    clc
+    adc #8
+    sta SpearX
+    lda PlayerY
+    clc 
+    adc #8
+    sta SpearY
+
+@regularAttack:
+
     lda #PLAYER_ATTACK_DELAY
     sta AttackTimer
     lda #0
@@ -3484,6 +3534,8 @@ UpdateSprites:
     beq @noKnife
     jsr SetKnifeSprite
 @noKnife:
+
+    jsr UpdateSpearSprite
 ;---
     inx; next sprite byte
 ;------sun-moon indicator
@@ -3565,7 +3617,87 @@ UpdateSprites:
 
     rts
 ;----------------------------------
+UpdateSpearSprite:
+
+    lda SpearActive
+    beq @exit
+
+    inx
+    lda SpearY
+    sec
+    sbc #4
+    sta FIRST_SPRITE, x
+    inx
+    lda #$E1
+    sta FIRST_SPRITE, x
+    inx
+    lda #%01000000
+    sta FIRST_SPRITE, x
+    inx
+    lda SpearX
+    sec
+    sbc #8
+    ;sbc GlobalScroll
+    sta FIRST_SPRITE, x
+    inx
+    ;----
+    lda SpearY
+    sec
+    sbc #4
+    sta FIRST_SPRITE, x
+    inx
+    lda #$E0
+    sta FIRST_SPRITE, x
+    inx
+    lda #%01000000
+    sta FIRST_SPRITE, x
+    inx
+    lda SpearX
+    ;sec
+    ;sbc GlobalScroll
+    sta FIRST_SPRITE, x
+
+
+    lda TempSpriteCount
+    clc
+    adc #2
+    sta TempSpriteCount
+
+
+@exit:
+    rts
+;----------------------------------
 SetKnifeSprite:
+
+    lda EquipedItem
+    beq @exit
+    cmp #ITEM_KNIFE
+    bne @exit
+
+    jsr PrepareKnifeSprite
+
+@updateKnife: ;update the actual sprite
+;----------------------
+    inx
+    lda TempPointY
+    sta FIRST_SPRITE,x
+    inx
+    lda #240
+    clc
+    adc PlayerFrame
+    sta FIRST_SPRITE,x
+    inx
+    lda Temp
+    sta FIRST_SPRITE,x
+    inx
+    lda TempPointX
+    sta FIRST_SPRITE,x
+    inc TempSpriteCount
+
+@exit:
+    rts
+;---------------------------------
+PrepareKnifeSprite:
 
     lda PlayerFlip
     beq @notFlipped
@@ -3591,7 +3723,7 @@ SetKnifeSprite:
     adc TempPointX
     sta TempPointX
 
-    jmp @updateKnife
+    jmp @exit
 @notFlipped:
 
     lda #%00000000
@@ -3617,29 +3749,9 @@ SetKnifeSprite:
     sta TempPointX
     sta KnifeX
 
-@updateKnife: ;update the actual sprite
-;----------------------
-
-    lda EquipedItem
-    beq @exit
-    inx
-    lda TempPointY
-    sta FIRST_SPRITE,x
-    inx
-    lda #240
-    clc
-    adc PlayerFrame
-    sta FIRST_SPRITE,x
-    inx
-    lda Temp
-    sta FIRST_SPRITE,x
-    inx
-    lda TempPointX
-    sta FIRST_SPRITE,x
-    inc TempSpriteCount
-
 @exit:
     rts
+
 
 ;----------------------------------
 loadSprites:
