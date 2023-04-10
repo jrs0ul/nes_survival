@@ -359,6 +359,12 @@ npc_anim_row_sequence:
     INVENTORY_MAX_ITEMS        = 10
     INVENTORY_MAX_SIZE         = INVENTORY_MAX_ITEMS * 2
 
+    
+    PROJECTILE_DIR_UP          = 1
+    PROJECTILE_DIR_DOWN        = 2
+    PROJECTILE_DIR_LEFT        = 3
+    PROJECTILE_DIR_RIGHT       = 4
+
     NPC_STEPS_BEFORE_REDIRECT  = 16
 
     RECIPES_SIZE               = 12
@@ -495,6 +501,8 @@ SpearScreen:
 SpearX:
     .res 1
 SpearY:
+    .res 1
+SpearDir:
     .res 1
 
 ;attack square
@@ -1430,6 +1438,12 @@ UpdateSpear:
     lda SpearActive
     beq @exit
 
+    lda SpearDir
+    cmp #PROJECTILE_DIR_LEFT
+    bcc @otherDir
+
+    beq @moveLeft
+
     lda SpearX
     clc
     adc #3
@@ -1437,16 +1451,29 @@ UpdateSpear:
     cmp #252
     bcc @exit
 
-    lda SpearX
-    sec
-    sbc #252
     lda #0
     sta SpearX
     inc SpearScreen
 
+    jmp @filter
+
+@moveLeft:
+    lda SpearX
+    sec
+    sbc #3
+    sta SpearX
+    cmp #3
+    bcs @exit
+
+    lda #252
+    sta SpearX
+    dec SpearScreen
+
+
+@filter:
     lda SpearScreen
     jsr CalcItemMapScreenIndexes
-   
+
     lda ItemMapScreenIndex
     beq @skipPrev
     lda CurrentMapSegmentIndex
@@ -1471,9 +1498,13 @@ UpdateSpear:
     cmp GlobalScroll
     bcc @disable
 
+@otherDir:
 
+   
+    jsr MoveSpearVerticaly
+    cmp #1
+    beq @disable
     
-
     jmp @exit
 
 @disable:
@@ -1481,10 +1512,47 @@ UpdateSpear:
     sta SpearActive
 
 
+@exit:
+
+    rts
+;------------------------------
+MoveSpearVerticaly:
+    cmp #PROJECTILE_DIR_DOWN
+    bne @checkUp
+
+    lda SpearY
+    clc
+    adc #3
+    sta SpearY
+    cmp #252
+    bcs @return_disable
+
+
+@checkUp:
+    cmp #PROJECTILE_DIR_UP
+    bne @exit
+
+    lda SpearY
+
+    sec
+    sbc #3
+    sta SpearY
+
+    cmp #3
+    bcc @return_disable
+
+
+    lda #0
+    jmp @exit
+
+@return_disable:
+    lda #1
+
 
 @exit:
 
     rts
+
 
 ;-------------------------------
 CheckIfExitedSecondLocation:
@@ -2949,35 +3017,8 @@ CheckB:
     lda EquipedItem
     cmp #ITEM_SPEAR
     bne @regularAttack
-    
-    ;throw a spear
-    lda #1
-    sta SpearActive
 
-    lda PlayerY
-    clc
-    adc #8
-    sta SpearY
-
-    lda PlayerX
-    clc
-    adc #8
-    adc GlobalScroll
-    bcs @incrementScreen
-
-
-    sta SpearX
-    lda CurrentMapSegmentIndex
-    sta SpearScreen
-    jmp @regularAttack
-
-@incrementScreen:
-    sta SpearX
-
-    lda CurrentMapSegmentIndex
-    clc
-    adc #1
-    sta SpearScreen
+    jsr LaunchSpear
 
 @regularAttack:
 
@@ -2994,6 +3035,55 @@ CheckB:
 @exit:
 
     rts
+;----------------------------------
+LaunchSpear:
+
+    ;throw a spear
+    lda #1
+    sta SpearActive
+
+    lda PlayerFrame
+    beq @horizontalDir
+    sta SpearDir
+    jmp @setOtherParams
+
+@horizontalDir:
+    lda PlayerFlip
+    clc
+    adc #3
+    sta SpearDir
+@setOtherParams:
+
+    lda PlayerY
+    clc
+    adc #8
+    sta SpearY
+
+    lda PlayerX
+    clc
+    adc #8
+    adc GlobalScroll
+    bcs @incrementScreen
+
+
+    sta SpearX
+    lda CurrentMapSegmentIndex
+    sta SpearScreen
+    jmp @exit
+
+@incrementScreen:
+    sta SpearX
+
+    lda CurrentMapSegmentIndex
+    clc
+    adc #1
+    sta SpearScreen
+
+@exit:
+
+    rts
+
+
 ;----------------------------------
 CheckLeft:
     lda Buttons
