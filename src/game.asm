@@ -124,6 +124,13 @@ x_collision_pattern:
     .byte %00000010
     .byte %00000001
 
+spearSprites:
+          ;+Y,frame,attributes,+X
+    .byte 248, $E2, %00000000, 252, 0, $E3, %00000000, 252 ;up
+    .byte 248, $E5, %00000000, 252, 0, $E4, %00000000, 252 ;down
+    .byte 252, $E0, %00000000, 248, 252, $E1, %00000000, 0 ;left
+    .byte 252, $E1, %01000000, 248, 252, $E0, %01000000, 0 ;right
+
 
 house_palette:
     .byte $0C,$16,$27,$37, $0C,$07,$00,$31, $0C,$17,$27,$31, $0C,$20,$37,$16    ;background
@@ -3821,36 +3828,53 @@ UpdateSpearSprite:
 ;---------------------------------
 SetTwoSpearSprites:
 
+    lda SpearDir
+    sec
+    sbc #1
+    asl
+    asl
+    asl
+    tay
+
     inx
     lda SpearY
-    sec
-    sbc #4
+    clc
+    adc spearSprites, y
     sta FIRST_SPRITE, x
     inx
-    lda #$E1
+    iny
+    lda spearSprites, y
     sta FIRST_SPRITE, x
     inx
-    lda #%01000000
+    iny
+    lda spearSprites, y
     sta FIRST_SPRITE, x
     inx
+    iny
     lda TempPointX
-    sec
-    sbc #8
+    clc
+    adc spearSprites, y
     sta FIRST_SPRITE, x
     inx
+    iny
     ;----
     lda SpearY
-    sec
-    sbc #4
+    clc
+    adc spearSprites, y
     sta FIRST_SPRITE, x
     inx
-    lda #$E0
+    iny
+    lda spearSprites, y
     sta FIRST_SPRITE, x
     inx
-    lda #%01000000
+    iny
+    lda spearSprites, y
     sta FIRST_SPRITE, x
     inx
+    iny
     lda TempPointX
+    clc
+    adc spearSprites, y
     sta FIRST_SPRITE, x
 
 
