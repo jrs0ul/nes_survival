@@ -740,6 +740,7 @@ BuildSpearAttackSquare:
     sta KnifeY
     iny
     iny
+    iny
     lda TempSpearX
     clc
     adc spearSprites, y
@@ -753,6 +754,7 @@ BuildSpearAttackSquare:
     adc spearSprites, y
     sta KnifeBRY
 
+    iny
     iny
     iny
 
