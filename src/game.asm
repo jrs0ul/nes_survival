@@ -124,6 +124,13 @@ x_collision_pattern:
     .byte %00000010
     .byte %00000001
 
+spearSprites:
+          ;+Y,frame,attributes,+X
+    .byte 248, $E2, %00000000, 252, 0, $E3, %00000000, 252 ;up
+    .byte 248, $E5, %00000000, 252, 0, $E4, %00000000, 252 ;down
+    .byte 252, $E0, %00000000, 248, 252, $E1, %00000000, 0 ;left
+    .byte 252, $E1, %01000000, 248, 252, $E0, %01000000, 0 ;right
+
 
 house_palette:
     .byte $0C,$16,$27,$37, $0C,$07,$00,$31, $0C,$17,$27,$31, $0C,$20,$37,$16    ;background
@@ -344,6 +351,9 @@ npc_anim_row_sequence:
     ITEM_TYPE_MATERIAL         = 4
     ITEM_TYPE_TOOL             = 5
 
+    ITEM_KNIFE                 = 8
+    ITEM_SPEAR                 = 7
+
     ITEM_COUNT_LOC1            = 6
     ITEM_COUNT_LOC2            = 3
 
@@ -355,6 +365,12 @@ npc_anim_row_sequence:
 
     INVENTORY_MAX_ITEMS        = 10
     INVENTORY_MAX_SIZE         = INVENTORY_MAX_ITEMS * 2
+
+    
+    PROJECTILE_DIR_UP          = 1
+    PROJECTILE_DIR_DOWN        = 2
+    PROJECTILE_DIR_LEFT        = 3
+    PROJECTILE_DIR_RIGHT       = 4
 
     NPC_STEPS_BEFORE_REDIRECT  = 16
 
@@ -485,14 +501,25 @@ InputProcessed:
 RandomNumber:
     .res 1
 
+SpearActive:
+    .res 1
+SpearScreen:
+    .res 1
+SpearX:
+    .res 1
+SpearY:
+    .res 1
+SpearDir:
+    .res 1
+
 ;attack square
-KnifeX:
+AttackTopLeftX:
     .res 1
-KnifeY:
+AttackTopLeftY:
     .res 1
-KnifeBRX:
+AttackBottomRightX:
     .res 1
-KnifeBRY:
+AttackBottomRightY:
     .res 1
 ;--
 FireFrame:  ;an animation frame of fire in the fireplace
@@ -711,7 +738,8 @@ FadeIdx:
 CarrySet:
     .res 1
 
-
+KilledNpcScreenIdx:
+    .res 1
 
 PrevItemMapScreenIndex:
     .res 1
@@ -781,6 +809,8 @@ TempPointX2:
 TempPointY2:
     .res 1
 TempHp:
+    .res 1
+TempSpearX:
     .res 1
 
 TempPlayerAttk:
@@ -1389,7 +1419,9 @@ Logics:
     jsr DoSleepPaletteFades
 
 @doneLogics:
-    
+   
+    jsr UpdateSpear
+
     lda AttackTimer
     beq @noAttack
     dec AttackTimer
@@ -1410,6 +1442,129 @@ Logics:
 @exit:
 
     rts
+;-------------------------------
+UpdateSpear:
+
+    lda SpearActive
+    beq @exit
+
+    lda SpearDir
+    cmp #PROJECTILE_DIR_LEFT
+    bcc @otherDir
+
+    beq @moveLeft
+
+    lda SpearX
+    clc
+    adc #3
+    sta SpearX
+    cmp #252
+    bcc @exit
+
+    lda #0
+    sta SpearX
+    inc SpearScreen
+
+    jmp @filter
+
+@moveLeft:
+    lda SpearX
+    sec
+    sbc #3
+    sta SpearX
+    cmp #3
+    bcs @exit
+
+    lda #252
+    sta SpearX
+    dec SpearScreen
+
+
+@filter:
+    lda SpearScreen
+    jsr CalcItemMapScreenIndexes
+
+    lda ItemMapScreenIndex
+    beq @skipPrev
+    lda CurrentMapSegmentIndex
+    cmp PrevItemMapScreenIndex
+    bcc @disable
+@skipPrev:
+    lda CurrentMapSegmentIndex
+    cmp NextItemMapScreenIndex
+    bcs @disable
+
+    lda CurrentMapSegmentIndex
+    cmp ItemMapScreenIndex
+    beq @SpearMatchesScreen
+
+    lda SpearX
+    sec
+    sbc GlobalScroll
+    bcs @disable
+    jmp @exit
+@SpearMatchesScreen:
+    lda SpearX ; x
+    cmp GlobalScroll
+    bcc @disable
+
+@otherDir:
+
+   
+    jsr MoveSpearVerticaly
+    cmp #1
+    beq @disable
+    
+    jmp @exit
+
+@disable:
+    lda #0
+    sta EquipedItem
+    sta SpearActive
+
+
+@exit:
+
+    rts
+;------------------------------
+MoveSpearVerticaly:
+    cmp #PROJECTILE_DIR_DOWN
+    bne @checkUp
+
+    lda SpearY
+    clc
+    adc #3
+    sta SpearY
+    cmp #252
+    bcs @return_disable
+
+
+@checkUp:
+    cmp #PROJECTILE_DIR_UP
+    bne @exit
+
+    lda SpearY
+
+    sec
+    sbc #3
+    sta SpearY
+
+    cmp #3
+    bcc @return_disable
+
+
+    lda #0
+    jmp @exit
+
+@return_disable:
+    lda #1
+
+
+@exit:
+
+    rts
+
+
 ;-------------------------------
 CheckIfExitedSecondLocation:
 
@@ -2546,6 +2701,8 @@ ResetEntityVariables:
     sta TimesShiftedRight
     sta BaseMenuIndex
     sta InHouse
+    sta LocationIndex
+    sta SpearActive
     lda #PLAYER_START_X
     sta PlayerX
     lda #PLAYER_START_Y
@@ -2553,7 +2710,7 @@ ResetEntityVariables:
     lda #1
     sta PlayerAlive
 
-    lda #8
+    lda #ITEM_SPEAR
     sta EquipedItem
     lda #ITEM_MAX_HP
     sta EquipedItem + 1
@@ -2864,11 +3021,22 @@ CheckB:
 
 @useForAttack:
 
+    lda SpearActive
+    bne @exit
+
     lda AttackTimer
     bne @exit
 
     lda #4
     sta PlayerAnimationRowIndex
+
+    lda EquipedItem
+    cmp #ITEM_SPEAR
+    bne @regularAttack
+
+    jsr LaunchSpear
+
+@regularAttack:
 
     lda #PLAYER_ATTACK_DELAY
     sta AttackTimer
@@ -2883,6 +3051,55 @@ CheckB:
 @exit:
 
     rts
+;----------------------------------
+LaunchSpear:
+
+    ;throw a spear
+    lda #1
+    sta SpearActive
+
+    lda PlayerFrame
+    beq @horizontalDir
+    sta SpearDir
+    jmp @setOtherParams
+
+@horizontalDir:
+    lda PlayerFlip
+    clc
+    adc #3
+    sta SpearDir
+@setOtherParams:
+
+    lda PlayerY
+    clc
+    adc #8
+    sta SpearY
+
+    lda PlayerX
+    clc
+    adc #8
+    adc GlobalScroll
+    bcs @incrementScreen
+
+
+    sta SpearX
+    lda CurrentMapSegmentIndex
+    sta SpearScreen
+    jmp @exit
+
+@incrementScreen:
+    sta SpearX
+
+    lda CurrentMapSegmentIndex
+    clc
+    adc #1
+    sta SpearScreen
+
+@exit:
+
+    rts
+
+
 ;----------------------------------
 CheckLeft:
     lda Buttons
@@ -3484,6 +3701,8 @@ UpdateSprites:
     beq @noKnife
     jsr SetKnifeSprite
 @noKnife:
+
+    jsr UpdateSpearSprite
 ;---
     inx; next sprite byte
 ;------sun-moon indicator
@@ -3565,7 +3784,144 @@ UpdateSprites:
 
     rts
 ;----------------------------------
+UpdateSpearSprite:
+
+    lda SpearActive
+    beq @exit
+
+    lda SpearScreen
+    jsr CalcItemMapScreenIndexes
+
+    lda ItemMapScreenIndex
+    beq @skipPrevScreen
+    lda CurrentMapSegmentIndex
+    cmp PrevItemMapScreenIndex
+    bcc @exit
+@skipPrevScreen:
+    lda CurrentMapSegmentIndex
+    cmp NextItemMapScreenIndex
+    bcs @exit
+
+    lda CurrentMapSegmentIndex
+    cmp ItemMapScreenIndex
+    beq @SpearMatchesScreen
+
+    lda SpearX ; x
+    sec
+    sbc GlobalScroll
+    bcs @exit
+    sta TempPointX ; save x
+    jmp @doUpdate
+@SpearMatchesScreen:
+    lda SpearX ; x
+    cmp GlobalScroll
+    bcc @exit
+    sec
+    sbc GlobalScroll
+    sta TempPointX
+
+
+@doUpdate:
+   
+    jsr SetTwoSpearSprites
+
+    lda TempSpriteCount
+    clc
+    adc #2
+    sta TempSpriteCount
+
+
+@exit:
+    rts
+
+;---------------------------------
+SetTwoSpearSprites:
+
+    lda SpearDir
+    ;(dir - 1) * 8
+    sec
+    sbc #1
+    asl
+    asl
+    asl
+    tay
+
+    inx
+    lda SpearY
+    clc
+    adc spearSprites, y
+    sta FIRST_SPRITE, x
+    inx
+    iny
+    lda spearSprites, y
+    sta FIRST_SPRITE, x
+    inx
+    iny
+    lda spearSprites, y
+    sta FIRST_SPRITE, x
+    inx
+    iny
+    lda TempPointX
+    clc
+    adc spearSprites, y
+    sta FIRST_SPRITE, x
+    inx
+    iny
+    ;----
+    lda SpearY
+    clc
+    adc spearSprites, y
+    sta FIRST_SPRITE, x
+    inx
+    iny
+    lda spearSprites, y
+    sta FIRST_SPRITE, x
+    inx
+    iny
+    lda spearSprites, y
+    sta FIRST_SPRITE, x
+    inx
+    iny
+    lda TempPointX
+    clc
+    adc spearSprites, y
+    sta FIRST_SPRITE, x
+
+
+    rts
+
+;----------------------------------
 SetKnifeSprite:
+
+    lda EquipedItem
+    beq @exit
+    cmp #ITEM_KNIFE
+    bne @exit
+
+    jsr PrepareKnifeSprite
+
+@updateKnife: ;update the actual sprite
+;----------------------
+    inx
+    lda TempPointY
+    sta FIRST_SPRITE,x
+    inx
+    lda #240
+    clc
+    adc PlayerFrame
+    sta FIRST_SPRITE,x
+    inx
+    lda Temp
+    sta FIRST_SPRITE,x
+    inx
+    lda TempPointX
+    sta FIRST_SPRITE,x
+    inc TempSpriteCount
+
+@exit:
+    rts
+;---------------------------------
+PrepareKnifeSprite:
 
     lda PlayerFlip
     beq @notFlipped
@@ -3591,7 +3947,7 @@ SetKnifeSprite:
     adc TempPointX
     sta TempPointX
 
-    jmp @updateKnife
+    jmp @exit
 @notFlipped:
 
     lda #%00000000
@@ -3609,37 +3965,17 @@ SetKnifeSprite:
     clc
     adc TempPointY
     sta TempPointY
-    sta KnifeY
+    sta AttackTopLeftY
 
     lda PlayerX
     clc
     adc TempPointX
     sta TempPointX
-    sta KnifeX
-
-@updateKnife: ;update the actual sprite
-;----------------------
-
-    lda EquipedItem
-    beq @exit
-    inx
-    lda TempPointY
-    sta FIRST_SPRITE,x
-    inx
-    lda #240
-    clc
-    adc PlayerFrame
-    sta FIRST_SPRITE,x
-    inx
-    lda Temp
-    sta FIRST_SPRITE,x
-    inx
-    lda TempPointX
-    sta FIRST_SPRITE,x
-    inc TempSpriteCount
+    sta AttackTopLeftX
 
 @exit:
     rts
+
 
 ;----------------------------------
 loadSprites:

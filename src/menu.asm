@@ -788,6 +788,9 @@ EquipmentInput:
     lda EquipedItem
     beq @exit ; no item equiped
 
+    lda SpearActive
+    bne @exit ; you've launched a spear can't unequip it now
+
     ;let's simply unequip
     ldx #254
 @loop:
@@ -1191,6 +1194,9 @@ ToolInput:
     lda Buttons
     and #BUTTON_B_MASK
     beq @CheckA
+
+    lda SpearActive
+    bne @exit ; can't equip anything when you throw a spear
 
     jsr LoadSelectedItemStuff
     beq @exit

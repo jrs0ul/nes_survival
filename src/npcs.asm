@@ -227,14 +227,17 @@ TestGeneratedNpcCollision:
     rts
 
 ;-------------------------------------
-;Player's knife collides with all the npcs
+;Player's attack box collides with all the npcs
 PlayerHitsNpcs:
 
+    lda SpearActive
+    bne @ignoreTimer ;ignore attack timer and hit multiple npcs
     lda AttackTimer
     beq @exit
     lda PlayerDidDmg
     bne @exit
 
+@ignoreTimer:
     ldy NpcCount
     beq @exit ; no npcs
     dey
@@ -328,17 +331,20 @@ CheckSingleNpcAgainstPlayerHit:
     lda Npcs, y ; y
     sta TempPointY
 ;-------
-    jsr KnifeNpcsCollision
+    lda ItemMapScreenIndex
+    sta KilledNpcScreenIdx
+    jsr AttackBoxNpcsCollision
 @exit:
 
     rts
 
 ;-------------------------------------
-KnifeNpcsCollision:
+AttackBoxNpcsCollision:
     lda #0
     sta TempItemScreen
 
     jsr PreparePlayerAttackSquare
+    beq @exit
     
     lda TempPointX
     clc
@@ -356,8 +362,8 @@ KnifeNpcsCollision:
 
 
 
-    ;knife Point1 vs npc point1-poin2
-    lda KnifeBRX
+    ;attack box Point1 vs npc point1-poin2
+    lda AttackBottomRightX
     cmp TempPointX
     bcc @checkOtherKnifePoint
 
@@ -365,7 +371,7 @@ KnifeNpcsCollision:
     bcs @checkOtherKnifePoint
 
     ;check Y1
-    lda KnifeBRY
+    lda AttackBottomRightY
     cmp TempPointY
     bcc @checkOtherKnifePoint
 
@@ -375,24 +381,27 @@ KnifeNpcsCollision:
 
 @checkOtherKnifePoint:
 
-    lda KnifeX
+    lda AttackTopLeftX
     cmp TempPointX
     bcc @exit
 
     cmp TempPointX2
     bcs @exit
 
-    lda KnifeY
+    lda AttackTopLeftY
     cmp TempPointY
     bcc @exit
 
     cmp TempPointY2
     bcs @exit
 
-
-    ;-------------------------
 @collisionDetected:
 
+    jsr OnCollisionWithAttackRect
+@exit:
+    rts
+;-----------------------------------
+OnCollisionWithAttackRect:
     iny
     iny
     iny
@@ -423,6 +432,7 @@ KnifeNpcsCollision:
     and #%11111100; drop two last bits that stand for status
     sta Npcs, y
 
+
     lda TempNpcType
     bne @wearWeapon ; predators don't drop anything
 
@@ -436,7 +446,6 @@ KnifeNpcsCollision:
     dey
     dey
 
-    
 @wearWeapon:
 
     lda EquipedItem
@@ -455,9 +464,10 @@ KnifeNpcsCollision:
     sta EquipedItem
     sta EquipedItem + 1
 
-
 @exit:
+
     rts
+
 
 ;-------------------------------------
 DropItemAfterDeath:
@@ -489,7 +499,7 @@ DropItemAfterDeath:
     adc #8
     sta Items, y
     iny
-    lda ItemMapScreenIndex
+    lda KilledNpcScreenIdx
     clc
     adc TempItemScreen
     sta Items, y
@@ -529,6 +539,9 @@ PreparePlayerAttackSquare:
     lda EquipedItem
     beq @nothingEquiped
 
+    cmp #ITEM_SPEAR
+    beq @spearEquiped
+
     
     lda PlayerFlip
     beq @notFlipped
@@ -540,22 +553,22 @@ PreparePlayerAttackSquare:
     lda knife_collision_pos_flip, y
     clc
     adc PlayerX
-    sta KnifeX
+    sta AttackTopLeftX
     iny
     lda knife_collision_pos_flip, y
     clc
     adc PlayerY
-    sta KnifeY
+    sta AttackTopLeftY
     iny
     lda knife_collision_pos_flip, y
     clc
     adc PlayerX
-    sta KnifeBRX
+    sta AttackBottomRightX
     iny
     lda knife_collision_pos_flip, y
     clc
     adc PlayerY
-    sta KnifeBRY
+    sta AttackBottomRightY
 
     jmp @calcCollision
 
@@ -568,24 +581,33 @@ PreparePlayerAttackSquare:
     lda knife_collision_pos, y
     clc
     adc PlayerX
-    sta KnifeX
+    sta AttackTopLeftX
     iny
     lda knife_collision_pos, y
     clc
     adc PlayerY
-    sta KnifeY
+    sta AttackTopLeftY
     iny
     lda knife_collision_pos, y
     clc
     adc PlayerX
-    sta KnifeBRX
+    sta AttackBottomRightX
     iny
     lda knife_collision_pos, y
     clc 
     adc PlayerY
-    sta KnifeBRY
+    sta AttackBottomRightY
 
     jmp @calcCollision
+
+@spearEquiped:
+
+    jsr BuildSpearAttackSquare
+
+    beq @fail
+
+    jmp @calcCollision
+
 
 @nothingEquiped:
     
@@ -599,22 +621,22 @@ PreparePlayerAttackSquare:
     lda fist_collision_pos_flip, y
     clc
     adc PlayerX
-    sta KnifeX
+    sta AttackTopLeftX
     iny
     lda fist_collision_pos_flip, y
     clc
     adc PlayerY
-    sta KnifeY
+    sta AttackTopLeftY
     iny
     lda fist_collision_pos_flip, y
     clc
     adc PlayerX
-    sta KnifeBRX
+    sta AttackBottomRightX
     iny
     lda fist_collision_pos_flip, y
     clc
     adc PlayerY
-    sta KnifeBRY
+    sta AttackBottomRightY
 
     jmp @calcCollision
 
@@ -627,33 +649,124 @@ PreparePlayerAttackSquare:
     lda fist_collision_pos, y
     clc
     adc PlayerX
-    sta KnifeX
+    sta AttackTopLeftX
     iny
     lda fist_collision_pos, y
     clc
     adc PlayerY
-    sta KnifeY
+    sta AttackTopLeftY
     iny
     lda fist_collision_pos, y
     clc
     adc PlayerX
-    sta KnifeBRX
+    sta AttackBottomRightX
     iny
     lda fist_collision_pos, y
     clc 
     adc PlayerY
-    sta KnifeBRY
+    sta AttackBottomRightY
 
     jmp @calcCollision
-
-
 
 @calcCollision:
 
     ldy TempY
+    lda #1
+    jmp @end
+
+@fail:
+
+    lda #0
+@end:
 
     rts
+;------------------------------------
+BuildSpearAttackSquare:
 
+    lda SpearActive
+    beq @exit
+
+    lda SpearScreen
+    jsr CalcItemMapScreenIndexes
+
+    lda ItemMapScreenIndex
+    beq @skipPrevScreen
+    lda CurrentMapSegmentIndex
+    cmp PrevItemMapScreenIndex
+    bcc @exit
+@skipPrevScreen:
+    lda CurrentMapSegmentIndex
+    cmp NextItemMapScreenIndex
+    bcs @exit
+
+    lda CurrentMapSegmentIndex
+    cmp ItemMapScreenIndex
+    beq @SpearMatchesScreen
+
+    lda SpearX ; x
+    sec
+    sbc GlobalScroll
+    bcs @exit
+    sta TempSpearX; save x
+    jmp @doUpdate
+@SpearMatchesScreen:
+    lda SpearX ; x
+    cmp GlobalScroll
+    bcc @exit
+    sec
+    sbc GlobalScroll
+    sta TempSpearX
+
+
+
+@doUpdate:
+
+    lda SpearDir
+    sec
+    sbc #1
+    ;(SpearDir - 1) * 8
+    asl
+    asl
+    asl
+    tay
+
+    lda SpearY
+    clc
+    adc spearSprites, y
+    sta AttackTopLeftY
+    iny
+    iny
+    iny
+    lda TempSpearX
+    clc
+    adc spearSprites, y
+    sta AttackTopLeftX
+
+
+    iny
+
+    lda SpearY
+    clc
+    adc spearSprites, y
+    sta AttackBottomRightY
+
+    iny
+    iny
+    iny
+
+    lda TempSpearX
+    clc
+    adc spearSprites, y
+    sta AttackBottomRightX
+
+    
+    lda #1
+    jmp @end
+
+@exit:
+    lda #0
+@end:
+    rts
 
 ;-------------------------------------
 UpdateNpcSpritesInWorld:
