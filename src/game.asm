@@ -738,7 +738,8 @@ FadeIdx:
 CarrySet:
     .res 1
 
-
+KilledNpcScreenIdx:
+    .res 1
 
 PrevItemMapScreenIndex:
     .res 1
@@ -808,6 +809,8 @@ TempPointX2:
 TempPointY2:
     .res 1
 TempHp:
+    .res 1
+TempSpearX:
     .res 1
 
 TempPlayerAttk:
@@ -2697,6 +2700,7 @@ ResetEntityVariables:
     sta TimesShiftedRight
     sta BaseMenuIndex
     sta InHouse
+    sta LocationIndex
     lda #PLAYER_START_X
     sta PlayerX
     lda #PLAYER_START_Y
@@ -2704,7 +2708,7 @@ ResetEntityVariables:
     lda #1
     sta PlayerAlive
 
-    lda #8
+    lda #ITEM_SPEAR
     sta EquipedItem
     lda #ITEM_MAX_HP
     sta EquipedItem + 1
@@ -3829,6 +3833,7 @@ UpdateSpearSprite:
 SetTwoSpearSprites:
 
     lda SpearDir
+    ;(dir - 1) * 8
     sec
     sbc #1
     asl

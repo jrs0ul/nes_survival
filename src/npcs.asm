@@ -230,8 +230,11 @@ TestGeneratedNpcCollision:
 ;Player's knife collides with all the npcs
 PlayerHitsNpcs:
 
+    lda SpearActive
+    bne @ignoreTimer
     lda AttackTimer
     beq @exit
+@ignoreTimer:
     lda PlayerDidDmg
     bne @exit
 
@@ -328,6 +331,8 @@ CheckSingleNpcAgainstPlayerHit:
     lda Npcs, y ; y
     sta TempPointY
 ;-------
+    lda ItemMapScreenIndex
+    sta KilledNpcScreenIdx
     jsr KnifeNpcsCollision
 @exit:
 
@@ -339,6 +344,7 @@ KnifeNpcsCollision:
     sta TempItemScreen
 
     jsr PreparePlayerAttackSquare
+    beq @exit
     
     lda TempPointX
     clc
@@ -393,6 +399,11 @@ KnifeNpcsCollision:
     ;-------------------------
 @collisionDetected:
 
+    jsr OnCollisionWithAttackRect
+@exit:
+    rts
+;-----------------------------------
+OnCollisionWithAttackRect:
     iny
     iny
     iny
@@ -423,6 +434,7 @@ KnifeNpcsCollision:
     and #%11111100; drop two last bits that stand for status
     sta Npcs, y
 
+
     lda TempNpcType
     bne @wearWeapon ; predators don't drop anything
 
@@ -436,7 +448,6 @@ KnifeNpcsCollision:
     dey
     dey
 
-    
 @wearWeapon:
 
     lda EquipedItem
@@ -455,9 +466,10 @@ KnifeNpcsCollision:
     sta EquipedItem
     sta EquipedItem + 1
 
-
 @exit:
+
     rts
+
 
 ;-------------------------------------
 DropItemAfterDeath:
@@ -489,7 +501,7 @@ DropItemAfterDeath:
     adc #8
     sta Items, y
     iny
-    lda ItemMapScreenIndex
+    lda KilledNpcScreenIdx
     clc
     adc TempItemScreen
     sta Items, y
@@ -528,6 +540,9 @@ PreparePlayerAttackSquare:
 
     lda EquipedItem
     beq @nothingEquiped
+
+    cmp #ITEM_SPEAR
+    beq @spearEquiped
 
     
     lda PlayerFlip
@@ -586,6 +601,15 @@ PreparePlayerAttackSquare:
     sta KnifeBRY
 
     jmp @calcCollision
+
+@spearEquiped:
+
+    jsr BuildSpearAttackSquare
+
+    beq @fail
+
+    jmp @calcCollision
+
 
 @nothingEquiped:
     
@@ -651,9 +675,100 @@ PreparePlayerAttackSquare:
 @calcCollision:
 
     ldy TempY
+    lda #1
+    jmp @end
+
+@fail:
+
+    lda #0
+@end:
 
     rts
+;------------------------------------
+BuildSpearAttackSquare:
 
+    lda SpearActive
+    beq @exit
+
+    lda SpearScreen
+    jsr CalcItemMapScreenIndexes
+
+    lda ItemMapScreenIndex
+    beq @skipPrevScreen
+    lda CurrentMapSegmentIndex
+    cmp PrevItemMapScreenIndex
+    bcc @exit
+@skipPrevScreen:
+    lda CurrentMapSegmentIndex
+    cmp NextItemMapScreenIndex
+    bcs @exit
+
+    lda CurrentMapSegmentIndex
+    cmp ItemMapScreenIndex
+    beq @SpearMatchesScreen
+
+    lda SpearX ; x
+    sec
+    sbc GlobalScroll
+    bcs @exit
+    sta TempSpearX; save x
+    jmp @doUpdate
+@SpearMatchesScreen:
+    lda SpearX ; x
+    cmp GlobalScroll
+    bcc @exit
+    sec
+    sbc GlobalScroll
+    sta TempSpearX
+
+
+
+@doUpdate:
+
+    lda SpearDir
+    sec
+    sbc #1
+    ;(SpearDir - 1) * 8
+    asl
+    asl
+    asl
+    tay
+
+    lda SpearY
+    clc
+    adc spearSprites, y
+    sta KnifeY
+    iny
+    iny
+    lda TempSpearX
+    clc
+    adc spearSprites, y
+    sta KnifeX
+
+
+    iny
+
+    lda SpearY
+    clc
+    adc spearSprites, y
+    sta KnifeBRY
+
+    iny
+    iny
+
+    lda TempSpearX
+    clc
+    adc spearSprites, y
+    sta KnifeBRX
+
+    
+    lda #1
+    jmp @end
+
+@exit:
+    lda #0
+@end:
+    rts
 
 ;-------------------------------------
 UpdateNpcSpritesInWorld:
