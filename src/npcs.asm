@@ -227,17 +227,17 @@ TestGeneratedNpcCollision:
     rts
 
 ;-------------------------------------
-;Player's knife collides with all the npcs
+;Player's attack box collides with all the npcs
 PlayerHitsNpcs:
 
     lda SpearActive
-    bne @ignoreTimer
+    bne @ignoreTimer ;ignore attack timer and hit multiple npcs
     lda AttackTimer
     beq @exit
-@ignoreTimer:
     lda PlayerDidDmg
     bne @exit
 
+@ignoreTimer:
     ldy NpcCount
     beq @exit ; no npcs
     dey
@@ -333,13 +333,13 @@ CheckSingleNpcAgainstPlayerHit:
 ;-------
     lda ItemMapScreenIndex
     sta KilledNpcScreenIdx
-    jsr KnifeNpcsCollision
+    jsr AttackBoxNpcsCollision
 @exit:
 
     rts
 
 ;-------------------------------------
-KnifeNpcsCollision:
+AttackBoxNpcsCollision:
     lda #0
     sta TempItemScreen
 
@@ -362,8 +362,8 @@ KnifeNpcsCollision:
 
 
 
-    ;knife Point1 vs npc point1-poin2
-    lda KnifeBRX
+    ;attack box Point1 vs npc point1-poin2
+    lda AttackBottomRightX
     cmp TempPointX
     bcc @checkOtherKnifePoint
 
@@ -371,7 +371,7 @@ KnifeNpcsCollision:
     bcs @checkOtherKnifePoint
 
     ;check Y1
-    lda KnifeBRY
+    lda AttackBottomRightY
     cmp TempPointY
     bcc @checkOtherKnifePoint
 
@@ -381,22 +381,20 @@ KnifeNpcsCollision:
 
 @checkOtherKnifePoint:
 
-    lda KnifeX
+    lda AttackTopLeftX
     cmp TempPointX
     bcc @exit
 
     cmp TempPointX2
     bcs @exit
 
-    lda KnifeY
+    lda AttackTopLeftY
     cmp TempPointY
     bcc @exit
 
     cmp TempPointY2
     bcs @exit
 
-
-    ;-------------------------
 @collisionDetected:
 
     jsr OnCollisionWithAttackRect
@@ -555,22 +553,22 @@ PreparePlayerAttackSquare:
     lda knife_collision_pos_flip, y
     clc
     adc PlayerX
-    sta KnifeX
+    sta AttackTopLeftX
     iny
     lda knife_collision_pos_flip, y
     clc
     adc PlayerY
-    sta KnifeY
+    sta AttackTopLeftY
     iny
     lda knife_collision_pos_flip, y
     clc
     adc PlayerX
-    sta KnifeBRX
+    sta AttackBottomRightX
     iny
     lda knife_collision_pos_flip, y
     clc
     adc PlayerY
-    sta KnifeBRY
+    sta AttackBottomRightY
 
     jmp @calcCollision
 
@@ -583,22 +581,22 @@ PreparePlayerAttackSquare:
     lda knife_collision_pos, y
     clc
     adc PlayerX
-    sta KnifeX
+    sta AttackTopLeftX
     iny
     lda knife_collision_pos, y
     clc
     adc PlayerY
-    sta KnifeY
+    sta AttackTopLeftY
     iny
     lda knife_collision_pos, y
     clc
     adc PlayerX
-    sta KnifeBRX
+    sta AttackBottomRightX
     iny
     lda knife_collision_pos, y
     clc 
     adc PlayerY
-    sta KnifeBRY
+    sta AttackBottomRightY
 
     jmp @calcCollision
 
@@ -623,22 +621,22 @@ PreparePlayerAttackSquare:
     lda fist_collision_pos_flip, y
     clc
     adc PlayerX
-    sta KnifeX
+    sta AttackTopLeftX
     iny
     lda fist_collision_pos_flip, y
     clc
     adc PlayerY
-    sta KnifeY
+    sta AttackTopLeftY
     iny
     lda fist_collision_pos_flip, y
     clc
     adc PlayerX
-    sta KnifeBRX
+    sta AttackBottomRightX
     iny
     lda fist_collision_pos_flip, y
     clc
     adc PlayerY
-    sta KnifeBRY
+    sta AttackBottomRightY
 
     jmp @calcCollision
 
@@ -651,26 +649,24 @@ PreparePlayerAttackSquare:
     lda fist_collision_pos, y
     clc
     adc PlayerX
-    sta KnifeX
+    sta AttackTopLeftX
     iny
     lda fist_collision_pos, y
     clc
     adc PlayerY
-    sta KnifeY
+    sta AttackTopLeftY
     iny
     lda fist_collision_pos, y
     clc
     adc PlayerX
-    sta KnifeBRX
+    sta AttackBottomRightX
     iny
     lda fist_collision_pos, y
     clc 
     adc PlayerY
-    sta KnifeBRY
+    sta AttackBottomRightY
 
     jmp @calcCollision
-
-
 
 @calcCollision:
 
@@ -737,14 +733,14 @@ BuildSpearAttackSquare:
     lda SpearY
     clc
     adc spearSprites, y
-    sta KnifeY
+    sta AttackTopLeftY
     iny
     iny
     iny
     lda TempSpearX
     clc
     adc spearSprites, y
-    sta KnifeX
+    sta AttackTopLeftX
 
 
     iny
@@ -752,7 +748,7 @@ BuildSpearAttackSquare:
     lda SpearY
     clc
     adc spearSprites, y
-    sta KnifeBRY
+    sta AttackBottomRightY
 
     iny
     iny
@@ -761,7 +757,7 @@ BuildSpearAttackSquare:
     lda TempSpearX
     clc
     adc spearSprites, y
-    sta KnifeBRX
+    sta AttackBottomRightX
 
     
     lda #1

@@ -513,13 +513,13 @@ SpearDir:
     .res 1
 
 ;attack square
-KnifeX:
+AttackTopLeftX:
     .res 1
-KnifeY:
+AttackTopLeftY:
     .res 1
-KnifeBRX:
+AttackBottomRightX:
     .res 1
-KnifeBRY:
+AttackBottomRightY:
     .res 1
 ;--
 FireFrame:  ;an animation frame of fire in the fireplace
@@ -1519,6 +1519,7 @@ UpdateSpear:
 
 @disable:
     lda #0
+    sta EquipedItem
     sta SpearActive
 
 
@@ -2701,6 +2702,7 @@ ResetEntityVariables:
     sta BaseMenuIndex
     sta InHouse
     sta LocationIndex
+    sta SpearActive
     lda #PLAYER_START_X
     sta PlayerX
     lda #PLAYER_START_Y
@@ -3018,6 +3020,9 @@ CheckB:
     bne @exit
 
 @useForAttack:
+
+    lda SpearActive
+    bne @exit
 
     lda AttackTimer
     bne @exit
@@ -3960,13 +3965,13 @@ PrepareKnifeSprite:
     clc
     adc TempPointY
     sta TempPointY
-    sta KnifeY
+    sta AttackTopLeftY
 
     lda PlayerX
     clc
     adc TempPointX
     sta TempPointX
-    sta KnifeX
+    sta AttackTopLeftX
 
 @exit:
     rts
