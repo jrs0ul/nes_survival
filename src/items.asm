@@ -277,6 +277,8 @@ AddAndDeactivateItems:
 @addItem:
     sty Temp  ; store empty inventory slot
 
+    ldy #6
+    jsr bankswitch_y
     lda #0
     ldx #FAMISTUDIO_SFX_CH1
     jsr famistudio_sfx_play

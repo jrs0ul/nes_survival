@@ -65,6 +65,13 @@ main_tiles_chr2: .incbin "main.chr"
 .include "data/collision_data2.asm"
 
 ;=============================================================
+.segment "ROM6"
+
+.include "data/music.s"
+.include "data/sfx.s"
+
+.include "famistudio_ca65.asm"
+;=============================================================
 
 .segment "RODATA" ; ROM7
 
@@ -72,8 +79,6 @@ banktable:              ; Write to this table to switch banks.
     .byte $00, $01, $02, $03, $04, $05, $06
     .byte $07, $08, $09, $0A, $0B, $0C, $0D, $0E
 
-.include "data/music.s"
-.include "data/sfx.s"
 .include "data/item_data.asm"
 .include "data/npc_data.asm"
 
@@ -908,7 +913,8 @@ clrmem:
     inx
     bne clrmem
 
-
+    ldy #6
+    jsr bankswitch_y
     ldx #<sounds
     ldy #>sounds
     jsr famistudio_sfx_init
@@ -1063,7 +1069,9 @@ nextIteration:
     
     lda NMIActive
     beq ne
-    jsr famistudio_update
+
+    jsr FamistudioUpdate
+
     lda #0
     sta NMIActive
 ne:
@@ -1192,7 +1200,6 @@ endOfNmi:
     rti        ; return from interrupt
 
 ;#############################| Subroutines |#############################################
-.include "famistudio_ca65.asm"
 .include "graphics.asm"
 .include "collision.asm"
 .include "items.asm"
@@ -1200,6 +1207,47 @@ endOfNmi:
 .include "LoadOutsideMap.asm"
 .include "random.asm"
 .include "menu.asm"
+
+
+;----------------------------------
+FamistudioUpdate:
+
+    ldy #6
+    jsr bankswitch_y
+
+    jsr famistudio_update
+
+
+    lda GameState
+    cmp #STATE_MENU
+    bne @check_others
+
+    ldy #1
+    jmp @switch
+
+@check_others:
+
+    cmp #STATE_GAME
+    beq @onGame
+
+    ldy #2
+    jmp @switch
+
+@onGame:
+    lda LocationIndex
+    beq @firstLoc
+    ldy #4
+    jmp @switch
+@firstLoc:
+    ldy #0
+
+
+@switch:
+    jsr bankswitch_y
+
+
+    rts
+
 
 ;--------------------------------------------
 ;copy chr tiles from ROM bank to a CHR RAM
@@ -2559,6 +2607,12 @@ LoadGameOver:
     lda MustLoadGameOver
     beq @exit
 
+    ldy #6
+    jsr bankswitch_y
+    lda #2
+    jsr famistudio_music_play
+
+
     ldy #2
     jsr bankswitch_y
 
@@ -2572,8 +2626,6 @@ LoadGameOver:
     sta pointer + 1
     jsr CopyCHRTiles
 
-    lda #2
-    jsr famistudio_music_play
 
     lda #<title_palette
     sta pointer
@@ -2602,6 +2654,18 @@ LoadGameOver:
     jsr LoadNametable
 
 
+    jsr SetDaysInGameOver
+
+
+    lda #0
+    sta MustLoadGameOver
+    sta MustLoadSomething
+
+
+@exit:
+    rts
+;------------------------------------
+SetDaysInGameOver:
     lda $2002
     lda NametableAddress
     clc
@@ -2622,13 +2686,8 @@ LoadGameOver:
 
 
 
-    lda #0
-    sta MustLoadGameOver
-    sta MustLoadSomething
-
-
-@exit:
     rts
+
 ;-------------------------------------
 ResetEntityVariables:
 
@@ -3043,6 +3102,8 @@ CheckB:
     lda #0
     sta PlayerDidDmg
 
+    ldy #6
+    jsr bankswitch_y
     lda #1
     ldx #FAMISTUDIO_SFX_CH0
     jsr famistudio_sfx_play
@@ -3510,7 +3571,12 @@ LoadTheHouseInterior:
 
     lda MustRestartIndoorsMusic
     beq @loadHouseStuff
+    ldy #6
+    jsr bankswitch_y
+    lda #1
     jsr famistudio_music_play
+    ldy #3
+    jsr bankswitch_y
     lda #0
     sta MustRestartIndoorsMusic
 

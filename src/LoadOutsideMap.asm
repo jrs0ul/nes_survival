@@ -23,8 +23,12 @@ LoadOutsideMap:
     lda #0
     sta MustCopyMainChr
 
+    ldy #6
+    jsr bankswitch_y
     lda #0
     jsr famistudio_music_play
+    ldy #0
+    jsr bankswitch_y
     
 
 @continueLoad:
@@ -150,6 +154,8 @@ LoadOutsideMap:
     cpy #32
     bne @paletteCopy
 
+    lda #255
+    sta CurrentPaletteDecrementValue
     jsr AdaptBackgroundPaletteByTime
     lda #32
     sta PaletteUpdateSize
@@ -240,6 +246,7 @@ ReloadLowerColumnRange_movingLeft:
     sta pointer + 1
 
     lda #32
+
     sec
     sbc BgColumnIdxToUpload
     sta TempZ

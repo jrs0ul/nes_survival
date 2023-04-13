@@ -84,7 +84,7 @@
 
 .define FAMISTUDIO_CA65_ZP_SEGMENT   ZEROPAGE
 .define FAMISTUDIO_CA65_RAM_SEGMENT  BSS
-.define FAMISTUDIO_CA65_CODE_SEGMENT CODE
+.define FAMISTUDIO_CA65_CODE_SEGMENT ROM6
 
 ;======================================================================================================================
 ; 2) AUDIO EXPANSION CONFIGURATION
