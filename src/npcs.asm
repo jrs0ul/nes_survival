@@ -422,6 +422,9 @@ OnCollisionWithAttackRect:
     bne @doneDoingDmg
 
 @instaKill:
+
+    jsr PlayDamageSfx
+
     lda #0
     sta Npcs, y
 
@@ -443,24 +446,8 @@ OnCollisionWithAttackRect:
 
 @doneDoingDmg:
 
-    sty TempY
-    stx TempRegX
-
-    ldy current_bank
-    sty oldbank
-    ldy #6
-    jsr bankswitch_y
-
-    lda #2
-    ldx #FAMISTUDIO_SFX_CH1
-    jsr famistudio_sfx_play
-    ldy oldbank
-    jsr bankswitch_y
-
-
-    ldy TempY
-    ldx TempRegX
-
+    jsr PlayDamageSfx
+   
     tya
     sec
     sbc #7  ;5
@@ -493,7 +480,28 @@ OnCollisionWithAttackRect:
 @exit:
 
     rts
+;------------------------------------
+PlayDamageSfx:
+    sty TempY
+    stx TempRegX
 
+    ldy current_bank
+    sty oldbank
+    ldy #6
+    jsr bankswitch_y
+
+    lda #2
+    ldx #FAMISTUDIO_SFX_CH1
+    jsr famistudio_sfx_play
+    ldy oldbank
+    jsr bankswitch_y
+
+
+    ldy TempY
+    ldx TempRegX
+
+
+    rts
 
 ;-------------------------------------
 DropItemAfterDeath:
@@ -818,44 +826,16 @@ UpdateSingleNpcSprites:
     asl
     asl ; a * 8
     tay
+
     lda Npcs, y ; index + alive
 
     and #%00000011
     cmp #0
     beq @nextNpc ;npc not active
 
-    lda Npcs, y
-    lsr
-    lsr
+   
+    jsr CollectSingleNpcData
 
-    sty Temp; store Npcs index
-    asl
-    asl
-    asl
-    tay
-    lda npc_data, y ; first tile index
-    sta TempZ ;save tile
-    iny
-    lda npc_data, y ; tile rows for the npc
-    ldy Temp; restore Npcs index
-    sta Temp; store tile rows
-
-    iny
-    iny
-    iny
-    lda Npcs, y ; screen index where npc resides
-    jsr CalcItemMapScreenIndexes
-    iny
-    lda Npcs, y ; direction
-    sta TempDir
-    iny
-    lda Npcs, y ; frame
-    jsr NpcCalcAnimationFrame
-    sta TempFrame
-    dey
-    dey
-    dey
-    dey
 
     lda ItemMapScreenIndex
     beq @skipPrevScreen
@@ -892,6 +872,56 @@ UpdateSingleNpcSprites:
     bne @rowloop
 @nextNpc:
     rts
+
+;-----------------------------------
+CollectSingleNpcData:
+
+    
+    cmp #NPC_STATE_DAMAGED
+    bne @cont
+
+    lda #1
+    sta DamagedPaletteMask
+    jmp @cont1
+@cont:
+    lda #0
+    sta DamagedPaletteMask
+@cont1:
+    lda Npcs, y
+    lsr
+    lsr
+
+    sty Temp; store Npcs index
+    asl
+    asl
+    asl
+    tay
+    lda npc_data, y ; first tile index
+    sta TempZ ;save tile
+    iny
+    lda npc_data, y ; tile rows for the npc
+    ldy Temp; restore Npcs index
+    sta Temp; store tile rows
+
+    iny
+    iny
+    iny
+    lda Npcs, y ; screen index where npc resides
+    jsr CalcItemMapScreenIndexes
+    iny
+    lda Npcs, y ; direction
+    sta TempDir
+    iny
+    lda Npcs, y ; frame
+    jsr NpcCalcAnimationFrame
+    sta TempFrame
+    dey
+    dey
+    dey
+    dey
+
+    rts
+
 ;------------------------------------
 NpcCalcAnimationFrame:
     lsr
@@ -973,11 +1003,12 @@ UpdateNpcRow:
     lda TempDir
     cmp #1
     beq @flip1
-    lda #0
+    lda #%00000000
     jmp @saveattr1
 @flip1:
     lda #%01000000
 @saveattr1:
+    eor DamagedPaletteMask
     sta FIRST_SPRITE, x
     inx
     ;X
@@ -1047,6 +1078,7 @@ UpdateNpcRow:
 @flip2:
     lda #%01000000
 @saveattr2:
+    eor DamagedPaletteMask
     sta FIRST_SPRITE, x
     inx
     ;X

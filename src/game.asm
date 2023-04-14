@@ -382,6 +382,8 @@ npc_anim_row_sequence:
     NPC_DELAY_ATTACK           = 64
     NPC_DELAY_DAMAGED          = 32
 
+    NPC_STATE_DAMAGED          = 3
+
     RECIPES_SIZE               = 12
 
 ;===================================================================
@@ -759,6 +761,9 @@ ItemMapScreenIndex:
     .res 1
 
 LocationIndex:
+    .res 1
+
+DamagedPaletteMask:
     .res 1
 
 Temp:
