@@ -11,6 +11,7 @@ sounds:
 @ntsc:
 	.word @sfx_ntsc_pickup
 	.word @sfx_ntsc_knife
+	.word @sfx_ntsc_damage
 
 @sfx_ntsc_pickup:
 	.byte $82,$01,$81,$a2,$80,$3f,$89,$f0,$01,$81,$80,$01,$81,$5e,$01,$81
@@ -21,5 +22,7 @@ sounds:
 @sfx_ntsc_knife:
 	.byte $8a,$0a,$89,$3f,$01,$8a,$09,$01,$8a,$08,$01,$8a,$07,$01,$8a,$06
 	.byte $01,$00
+@sfx_ntsc_damage:
+	.byte $8a,$0d,$89,$3f,$01,$8a,$0e,$02,$8a,$0f,$02,$00
 
 .export sounds

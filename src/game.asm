@@ -379,6 +379,9 @@ npc_anim_row_sequence:
 
     NPC_STEPS_BEFORE_REDIRECT  = 16
 
+    NPC_DELAY_ATTACK           = 64
+    NPC_DELAY_DAMAGED          = 32
+
     RECIPES_SIZE               = 12
 
 ;===================================================================
@@ -859,7 +862,7 @@ Item_Location2_Collection_times:
 
 Npcs:   ;animals and stuff
     .res 64 ; max 8 npcs * 8 bytes:
-            ;   (npc type(6 bits) + state(2 bit, 0 - dead, 1 - alive, 2 - attacks),
+            ;   (npc type(6 bits) + state(2 bit, 0 - dead, 1 - alive, 2 - attacks, 3 - damaged),
             ;   x,
             ;   y,
             ;   screen_index
