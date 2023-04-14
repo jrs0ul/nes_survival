@@ -383,7 +383,9 @@ npc_anim_row_sequence:
 
 ;===================================================================
 .segment "ZEROPAGE"
-current_bank: 
+current_bank:
+    .res 1
+oldbank:
     .res 1
 pointer:
     .res 2
@@ -1212,37 +1214,16 @@ endOfNmi:
 ;----------------------------------
 FamistudioUpdate:
 
+    ldy current_bank
+    sty oldbank
+
     ldy #6
     jsr bankswitch_y
 
     jsr famistudio_update
 
+    ldy oldbank
 
-    lda GameState
-    cmp #STATE_MENU
-    bne @check_others
-
-    ldy #1
-    jmp @switch
-
-@check_others:
-
-    cmp #STATE_GAME
-    beq @onGame
-
-    ldy #2
-    jmp @switch
-
-@onGame:
-    lda LocationIndex
-    beq @firstLoc
-    ldy #4
-    jmp @switch
-@firstLoc:
-    ldy #0
-
-
-@switch:
     jsr bankswitch_y
 
 
@@ -1782,6 +1763,7 @@ DoSleepPaletteFades:
     sta SleepPaletteAnimationState
     lda #SLEEP_FADE_MAX_ITERATION
     sta FadeIdx
+    jmp @exit
 @doFade:
 
     ldy #0
@@ -3102,11 +3084,17 @@ CheckB:
     lda #0
     sta PlayerDidDmg
 
+    ldy current_bank
+    sty oldbank
     ldy #6
     jsr bankswitch_y
+
     lda #1
     ldx #FAMISTUDIO_SFX_CH0
     jsr famistudio_sfx_play
+
+    ldy oldbank
+    jsr bankswitch_y
 
 
 @exit:

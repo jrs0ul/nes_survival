@@ -1636,8 +1636,8 @@ OnCollisionWithPlayer:
     dex
     dex
     dex
-    
-    jsr DecreaseLife
+
+    jsr DamagePlayer
 
 
     lda #0
@@ -1645,3 +1645,23 @@ OnCollisionWithPlayer:
 @exit:
     lda #1
     rts
+;---------------------
+DamagePlayer:
+
+
+    lda #<HP
+    sta DigitPtr
+    lda #>HP
+    sta DigitPtr + 1
+    lda #9
+    sta DigitChangeSize
+    jsr DecreaseDigits
+    lda #1
+    sta HpUpdated
+
+    rts
+
+
+
+
+
