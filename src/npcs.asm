@@ -1694,15 +1694,15 @@ OnCollisionWithPlayer:
     dex
     lda Npcs, x
     and #%11111100
-    clc
-    adc #2 ;set the attack state
+    eor #%00000010;set the attack state
     sta Npcs, x
-    inx
-    inx
-    inx
-    inx
-    inx
-    lda #128
+
+    txa
+    clc
+    adc #5 ;move from "state" to "frame"
+    tax 
+
+    lda #NPC_ATTACK_FRAME
     sta Npcs, x ;attack frame
     inx ; timer
     lda #0
@@ -1722,6 +1722,7 @@ OnCollisionWithPlayer:
 ;---------------------
 DamagePlayer:
 
+    jsr PlayDamageSfx
 
     lda #<HP
     sta DigitPtr

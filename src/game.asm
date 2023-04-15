@@ -382,6 +382,8 @@ npc_anim_row_sequence:
     NPC_DELAY_ATTACK           = 64
     NPC_DELAY_DAMAGED          = 32
 
+    NPC_ATTACK_FRAME           = 128
+
     NPC_STATE_DAMAGED          = 3
 
     RECIPES_SIZE               = 12
@@ -1032,8 +1034,8 @@ endlessLoop:
 
 checkItems:
     lda GameState
-    cmp #STATE_MENU
-    beq nextIteration
+    cmp #STATE_GAME
+    bne nextIteration
 
     dec ItemUpdateDelay
     bne npcAI
