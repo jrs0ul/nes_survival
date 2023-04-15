@@ -48,6 +48,14 @@ title_palette:
     .byte $0F,$07,$05,$26, $0F,$01,$26,$07, $0F,$26,$26,$35, $0F,$07,$26,$35    ;background
     .byte $0F,$0f,$17,$20, $0F,$06,$26,$39, $0F,$17,$21,$31, $0F,$0f,$37,$26    ;OAM sprites
 
+game_over_palette:
+
+    .byte $0f,$10,$20,$30,$0f,$0c,$35,$21,$0f,$0c,$16,$21,$0f,$01,$07,$21
+    .byte $0f,$10,$20,$30,$0f,$0c,$35,$21,$0f,$0c,$16,$21,$0f,$01,$07,$21
+
+
+
+
 .include "data/title.asm"
 .include "data/game_over.asm"
 
@@ -2571,6 +2579,15 @@ LoadTitle:
     lda MustLoadTitle
     beq @exit
 
+    lda #<title_palette
+    sta pointer
+    lda #>title_palette
+    sta pointer + 1
+    lda #32
+    sta Temp
+    jsr LoadPalette
+
+
 
     lda #STATE_TITLE
     sta GameState
@@ -2612,6 +2629,9 @@ LoadGameOver:
     sta $2000
     sta $2001
 
+    lda #%10000000
+    sta PPUCTRL
+
     lda #<title_tiles_chr
     sta pointer
     lda #>title_tiles_chr
@@ -2619,9 +2639,9 @@ LoadGameOver:
     jsr CopyCHRTiles
 
 
-    lda #<title_palette
+    lda #<game_over_palette
     sta pointer
-    lda #>title_palette
+    lda #>game_over_palette
     sta pointer + 1
     lda #32
     sta Temp
@@ -2661,9 +2681,9 @@ SetDaysInGameOver:
     lda $2002
     lda NametableAddress
     clc
-    adc #1
+    adc #3
     sta $2006
-    lda #$D1
+    lda #$11
     sta $2006
 
     ldy #0
@@ -2952,6 +2972,10 @@ CheckStartButton:
     lda #1
     sta MustLoadSomething
     sta MustLoadTitle
+
+    lda #%10010000
+    sta PPUCTRL
+
     jmp @exit
 @CheckOnGame:
     cmp #STATE_GAME
