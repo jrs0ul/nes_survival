@@ -402,11 +402,12 @@ AttackBoxNpcsCollision:
     rts
 ;-----------------------------------
 OnCollisionWithAttackRect:
-    iny
-    iny
-    iny
-    iny
-    iny
+    
+    tya 
+    clc 
+    adc #5
+    tay 
+
     inc PlayerDidDmg
 
     jsr CalcPlayerDmg
@@ -421,6 +422,9 @@ OnCollisionWithAttackRect:
     bne @doneDoingDmg
 
 @instaKill:
+
+    jsr PlayDamageSfx
+
     lda #0
     sta Npcs, y
 
@@ -428,6 +432,7 @@ OnCollisionWithAttackRect:
     sec
     sbc #7 ; go to status
     tay
+
     lda Npcs, y
     and #%11111100; drop two last bits that stand for status
     sta Npcs, y
@@ -440,11 +445,19 @@ OnCollisionWithAttackRect:
     jmp @wearWeapon
 
 @doneDoingDmg:
-    dey
-    dey
-    dey
-    dey
-    dey
+
+    jsr PlayDamageSfx
+   
+    tya
+    sec
+    sbc #7  ;5
+    tay
+    lda Npcs, y
+    and #%11111100
+    eor #%00000011 ;set damaged state
+    sta Npcs, y
+    iny
+    iny
 
 @wearWeapon:
 
@@ -467,7 +480,28 @@ OnCollisionWithAttackRect:
 @exit:
 
     rts
+;------------------------------------
+PlayDamageSfx:
+    sty TempY
+    stx TempRegX
 
+    ldy current_bank
+    sty oldbank
+    ldy #6
+    jsr bankswitch_y
+
+    lda #2
+    ldx #FAMISTUDIO_SFX_CH1
+    jsr famistudio_sfx_play
+    ldy oldbank
+    jsr bankswitch_y
+
+
+    ldy TempY
+    ldx TempRegX
+
+
+    rts
 
 ;-------------------------------------
 DropItemAfterDeath:
@@ -792,44 +826,16 @@ UpdateSingleNpcSprites:
     asl
     asl ; a * 8
     tay
+
     lda Npcs, y ; index + alive
 
     and #%00000011
     cmp #0
     beq @nextNpc ;npc not active
 
-    lda Npcs, y
-    lsr
-    lsr
+   
+    jsr CollectSingleNpcData
 
-    sty Temp; store Npcs index
-    asl
-    asl
-    asl
-    tay
-    lda npc_data, y ; first tile index
-    sta TempZ ;save tile
-    iny
-    lda npc_data, y ; tile rows for the npc
-    ldy Temp; restore Npcs index
-    sta Temp; store tile rows
-
-    iny
-    iny
-    iny
-    lda Npcs, y ; screen index where npc resides
-    jsr CalcItemMapScreenIndexes
-    iny
-    lda Npcs, y ; direction
-    sta TempDir
-    iny
-    lda Npcs, y ; frame
-    jsr NpcCalcAnimationFrame
-    sta TempFrame
-    dey
-    dey
-    dey
-    dey
 
     lda ItemMapScreenIndex
     beq @skipPrevScreen
@@ -866,6 +872,56 @@ UpdateSingleNpcSprites:
     bne @rowloop
 @nextNpc:
     rts
+
+;-----------------------------------
+CollectSingleNpcData:
+
+    
+    cmp #NPC_STATE_DAMAGED
+    bne @cont
+
+    lda #1
+    sta DamagedPaletteMask
+    jmp @cont1
+@cont:
+    lda #0
+    sta DamagedPaletteMask
+@cont1:
+    lda Npcs, y
+    lsr
+    lsr
+
+    sty Temp; store Npcs index
+    asl
+    asl
+    asl
+    tay
+    lda npc_data, y ; first tile index
+    sta TempZ ;save tile
+    iny
+    lda npc_data, y ; tile rows for the npc
+    ldy Temp; restore Npcs index
+    sta Temp; store tile rows
+
+    iny
+    iny
+    iny
+    lda Npcs, y ; screen index where npc resides
+    jsr CalcItemMapScreenIndexes
+    iny
+    lda Npcs, y ; direction
+    sta TempDir
+    iny
+    lda Npcs, y ; frame
+    jsr NpcCalcAnimationFrame
+    sta TempFrame
+    dey
+    dey
+    dey
+    dey
+
+    rts
+
 ;------------------------------------
 NpcCalcAnimationFrame:
     lsr
@@ -947,11 +1003,12 @@ UpdateNpcRow:
     lda TempDir
     cmp #1
     beq @flip1
-    lda #0
+    lda #%00000000
     jmp @saveattr1
 @flip1:
     lda #%01000000
 @saveattr1:
+    eor DamagedPaletteMask
     sta FIRST_SPRITE, x
     inx
     ;X
@@ -1021,6 +1078,7 @@ UpdateNpcRow:
 @flip2:
     lda #%01000000
 @saveattr2:
+    eor DamagedPaletteMask
     sta FIRST_SPRITE, x
     inx
     ;X
@@ -1149,10 +1207,25 @@ SingleNpcAI:
     lda TempNpcState
     cmp #2 ;is attack?
     beq @attackState
+    cmp #3 ;is damaged?
+    beq @damagedState
 
 @idleState:
     jsr NpcMovement
     jmp @nextNpc
+@damagedState:
+    inx ; dir 
+    inx ; frame
+    inx ; timer
+    lda Npcs, x
+    clc
+    adc #1
+    cmp #NPC_DELAY_DAMAGED
+    bcs @resetState
+    sta Npcs, x
+
+    jmp @nextNpc
+
 @attackState:
     inx ; dir 
     inx ; frame
@@ -1160,8 +1233,8 @@ SingleNpcAI:
     lda Npcs, x
     clc
     adc #1
-    cmp #64
-    bcs @exitAttackState
+    cmp #NPC_DELAY_ATTACK
+    bcs @resetState
     sta Npcs, x
     cmp #32
     bcc @nextNpc
@@ -1170,19 +1243,20 @@ SingleNpcAI:
     lda #32
     sta Npcs, x
     jmp @nextNpc
-@exitAttackState:
+
+@resetState:
     lda #0
     sta Npcs, x ;reset timer
-    dex ;frame
-    dex ;dir
-    dex ;screen
-    dex ;y
-    dex ;x
-    dex ; state
+
+    ;return x from "timer" back to "state"
+    txa
+    sec
+    sbc #6
+    tax
+
     lda Npcs, x
-    and #%11111100
-    clc
-    adc #1
+    and #%11111100 ;clear state
+    eor #000000001 ;idle state
     sta Npcs, x
 
 @nextNpc:
