@@ -369,6 +369,8 @@ npc_anim_row_sequence:
     ITEM_KNIFE                 = 8
     ITEM_SPEAR                 = 7
 
+    SPEAR_SPEED                = 3
+
     ITEM_COUNT_LOC1            = 6
     ITEM_COUNT_LOC2            = 3
 
@@ -1504,29 +1506,32 @@ UpdateSpear:
     beq @moveLeft
 
     lda SpearX
-    clc
-    adc #3
-    sta SpearX
-    cmp #252
-    bcc @exit
+    cmp #255 - SPEAR_SPEED
+    bcs @more
 
-    lda #0
+    clc
+    adc #SPEAR_SPEED
     sta SpearX
+
+    jmp @filter
+
+
+@more:
     inc SpearScreen
+    lda #255
+    sec
+    sbc SpearX
+    sta Temp
+    lda #SPEAR_SPEED
+    sec
+    sbc Temp
+    sta SpearX
 
     jmp @filter
 
 @moveLeft:
-    lda SpearX
-    sec
-    sbc #3
-    sta SpearX
-    cmp #3
-    bcs @exit
 
-    lda #252
-    sta SpearX
-    dec SpearScreen
+    jsr MoveSpearLeft
 
 
 @filter:
@@ -1559,11 +1564,10 @@ UpdateSpear:
 
 @otherDir:
 
-   
     jsr MoveSpearVerticaly
     cmp #1
     beq @disable
-    
+
     jmp @exit
 
 @disable:
@@ -1576,13 +1580,38 @@ UpdateSpear:
 
     rts
 ;------------------------------
+MoveSpearLeft:
+    lda SpearX
+    cmp #SPEAR_SPEED
+    bcc @less
+
+    sec
+    sbc #SPEAR_SPEED
+    sta SpearX
+    jmp @exit
+
+@less:
+    dec SpearScreen
+    lda #SPEAR_SPEED
+    sec
+    sbc SpearX
+    sta Temp
+    lda #255
+    sec
+    sbc Temp
+    sta SpearX
+
+@exit:
+
+    rts
+;------------------------------
 MoveSpearVerticaly:
     cmp #PROJECTILE_DIR_DOWN
     bne @checkUp
 
     lda SpearY
     clc
-    adc #3
+    adc #SPEAR_SPEED
     sta SpearY
     cmp #252
     bcs @return_disable
@@ -1595,10 +1624,10 @@ MoveSpearVerticaly:
     lda SpearY
 
     sec
-    sbc #3
+    sbc #SPEAR_SPEED
     sta SpearY
 
-    cmp #3
+    cmp #SPEAR_SPEED
     bcc @return_disable
 
 
@@ -2783,7 +2812,7 @@ ResetEntityVariables:
     lda #1
     sta PlayerAlive
 
-    lda #ITEM_SPEAR
+    lda #ITEM_KNIFE
     sta EquipedItem
     lda #ITEM_MAX_HP
     sta EquipedItem + 1
