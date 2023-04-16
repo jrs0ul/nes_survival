@@ -283,6 +283,8 @@ npc_anim_row_sequence:
 
     MAX_V_SCROLL               = 255
 
+    ANIM_FRAME_BLOODSTAIN      = 174
+
 
     HOURS_MAX                  = 240
     MINUTES_MAX                = 60

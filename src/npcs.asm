@@ -264,9 +264,9 @@ CheckSingleNpcAgainstPlayerHit:
 
     lda Npcs, y; let's get the state
     and #%00000011
+    sta TempNpcState
     cmp #0
     beq @exit ; it's dead
-    sta TempNpcState
 
     lda Npcs, y ; let's get DB index
     lsr
@@ -427,10 +427,13 @@ OnCollisionWithAttackRect:
 
     lda #0
     sta Npcs, y
+    dey
+    lda #32
+    sta Npcs, y
 
     tya
     sec
-    sbc #7 ; go to status
+    sbc #6 ; go to status
     tay
 
     lda Npcs, y
@@ -830,13 +833,16 @@ UpdateSingleNpcSprites:
     lda Npcs, y ; index + alive
 
     and #%00000011
-    cmp #0
-    beq @nextNpc ;npc not active
+    sta TempNpcState
 
-   
     jsr CollectSingleNpcData
 
+    lda TempNpcState
+    bne @skipDeadCheck
+    lda TempNpcTimer
+    beq @nextNpc ; timer ran out, don't show blood splat
 
+@skipDeadCheck:
     lda ItemMapScreenIndex
     beq @skipPrevScreen
     lda CurrentMapSegmentIndex
@@ -901,8 +907,10 @@ CollectSingleNpcData:
     iny
     lda npc_data, y ; tile rows for the npc
     ldy Temp; restore Npcs index
+
     sta Temp; store tile rows
 
+   
     iny
     iny
     iny
@@ -915,10 +923,30 @@ CollectSingleNpcData:
     lda Npcs, y ; frame
     jsr NpcCalcAnimationFrame
     sta TempFrame
-    dey
-    dey
-    dey
-    dey
+    iny
+    lda Npcs, y ;timer
+    sta TempNpcTimer
+
+    tya
+    sec
+    sbc #5
+    tay
+
+    ;force to use 2 tile rows if dead
+    lda TempNpcState
+    bne @exit
+
+    lda #2
+    sta Temp
+    lda #0
+    sta TempIndex
+    sta TempFrame
+    sta TempFrameOffset
+    lda #ANIM_FRAME_BLOODSTAIN
+    sta TempZ
+@exit:
+
+
 
     rts
 
@@ -964,12 +992,16 @@ UpdateNpcRow:
     cmp #3
     bcc @contFirstSprite
 ;--
+    lda TempNpcState
+    beq @skipDirFrames ; don't animate direction if dead
+
     lda TempDir
     lsr
     lsr
     asl ;extract Y dir and multiply by 2
     sta TempFrameOffset
 
+@skipDirFrames:
 
     lda TempZ
     clc
@@ -1122,8 +1154,24 @@ doNpcAI:
     and #%00000011
     sta TempNpcState
     cmp #0
-    beq @nextNpc ; not active
+    bne @cont ; not dead
 
+;deadState
+    
+    txa
+    clc
+    adc #6 ;timer
+    tax
+
+    lda Npcs, x
+    beq @nextNpc ;ok it's dead-dead
+    sec
+    sbc #1
+    sta Npcs, x
+
+    jmp @nextNpc
+
+@cont:
     jsr FetchNpcVars
     
     inx
