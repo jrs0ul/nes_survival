@@ -1,4 +1,3 @@
-
 .include "house_collision.asm"
 .include "field_bg_collision.asm"
 .include "field_bg_collision1.asm"

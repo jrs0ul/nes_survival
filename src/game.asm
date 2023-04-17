@@ -64,6 +64,7 @@ game_over_palette:
 
 house_tiles_chr: .incbin "house.chr"
 .include "data/house.asm"
+.include "data/villager_hut.asm"
 ;============================================================
 .segment "ROM4" ; other location
 
@@ -631,6 +632,9 @@ MenuButtons:
 InHouse:    ;is the player inside his hut?
     .res 1
 
+InVillagerHut:
+    .res 1
+
 CollisionMap:
     .res COLLISION_MAP_SIZE
 
@@ -660,6 +664,8 @@ MustCopyMainChr:
 MustLoadSomething:
     .res 1
 MustLoadHouseInterior:
+    .res 1
+MustLoadVillagerHut:
     .res 1
 MustLoadOutside:
     .res 1
@@ -1148,6 +1154,7 @@ ReadControllerLoop:
     jsr LoadGameOver
     jsr LoadMenu
     jsr LoadTheHouseInterior
+    jsr LoadVillagerHut
     lda MustLoadOutside
     beq DoneLoadingMaps
     jsr LoadOutsideMap
@@ -1485,8 +1492,10 @@ Logics:
 @noAttack:
 
     jsr CheckIfEnteredHouse
+    jsr CheckIfEnteredVillagerHut
     jsr CheckIfEnteredSecondLocation
     jsr CheckIfExitedSecondLocation
+    jsr CheckIfExitedVillagerHut
     jsr CheckIfExitedHouse
 
 
@@ -2068,6 +2077,8 @@ RunTime:
 AdaptBackgroundPaletteByTime:
     lda InHouse
     bne @exit
+    lda InVillagerHut
+    bne @exit
 
     ldy #$01 ;keeps the outline for the background objects
     lda Hours
@@ -2111,6 +2122,8 @@ WarmthLogics:
     lda #MAX_WARMTH_DELAY
     sta WarmthDelay
     lda InHouse
+    bne @increaseWarmth
+    lda InVillagerHut
     bne @increaseWarmth
     jmp @decreaseWarmth
 @increaseWarmth:
@@ -2803,6 +2816,7 @@ ResetEntityVariables:
     sta TimesShiftedRight
     sta BaseMenuIndex
     sta InHouse
+    sta InVillagerHut
     sta LocationIndex
     sta SpearActive
     lda #PLAYER_START_X
@@ -3395,6 +3409,59 @@ UpdateFireplace:
 
 @exit:
     rts
+;-----------------------------------
+CheckIfEnteredVillagerHut:
+
+    lda LocationIndex
+    beq @nope
+
+
+    lda PlayerX
+    cmp #$76
+    bcc @nope
+    cmp #$79
+    bcs @nope
+
+    lda GlobalScroll
+    cmp #$B8
+    bcc @nope
+
+    lda PlayerY
+    cmp #$6A
+    bcc @nope
+    cmp #$73
+    bcs @nope
+
+    ldx #0
+@copyCollisionMapLoop:
+    lda villager_hut_collision, x
+    sta CollisionMap, x
+    inx
+    cpx #COLLISION_MAP_SIZE
+    bne @copyCollisionMapLoop
+
+
+    lda #1
+    sta MustLoadVillagerHut
+    sta MustRestartIndoorsMusic
+    sta MustLoadSomething
+
+
+    lda #0
+    sta GlobalScroll
+    sta TilesScroll
+    lda #128
+    sta PlayerX
+    lda #136
+    sta PlayerY
+
+
+
+
+@nope:
+    rts
+
+
 
 ;-----------------------------------
 CheckIfEnteredHouse:
@@ -3552,6 +3619,31 @@ CheckToolTable:
     rts
 
 ;-----------------------------------
+CheckIfExitedVillagerHut:
+
+    lda InVillagerHut
+    beq @nope
+
+    lda PlayerY
+    cmp #HOUSE_EXIT_Y
+    bcc @nope
+
+
+    lda #0
+    sta InVillagerHut
+
+
+    lda #1
+    sta MustLoadOutside
+    sta MustCopyMainChr
+    sta MustLoadSomething
+
+
+@nope:
+    rts
+
+
+;-----------------------------------
 CheckIfExitedHouse:
 
     lda InHouse
@@ -3599,6 +3691,80 @@ CheckIfExitedHouse:
 
 @nope:
     rts
+;-------------------------------------
+LoadVillagerHut:
+
+    lda MustLoadVillagerHut
+    beq @nope
+
+
+    ldy #3
+    jsr bankswitch_y
+
+    lda #$00
+    sta $2000
+    sta $2001
+
+    lda #<house_tiles_chr
+    sta pointer
+    lda #>house_tiles_chr
+    sta pointer + 1
+    jsr CopyCHRTiles
+
+
+
+    lda MustRestartIndoorsMusic
+    beq @loadHouseStuff
+    ldy #6
+    jsr bankswitch_y
+    lda #1
+    jsr famistudio_music_play
+    ldy #3
+    jsr bankswitch_y
+    lda #0
+    sta MustRestartIndoorsMusic
+
+@loadHouseStuff:
+    lda #<villager_hut
+    sta pointer
+    lda #>villager_hut
+    sta pointer + 1
+    lda #$20    ; $20000
+    sta NametableAddress
+
+    jsr LoadNametable
+    jsr LoadStatusBar
+    
+
+    lda #<house_palette
+    sta pointer
+    lda #>house_palette
+    sta pointer + 1
+    lda #32
+    sta Temp
+    jsr LoadPalette
+
+    lda #0
+    sta ItemCount
+    sta NpcCount
+
+
+    lda #1
+    sta InVillagerHut
+
+
+
+    lda #0
+    sta MustLoadVillagerHut
+    sta MustLoadSomething
+    lda #1
+    sta ScreenCount
+
+
+
+@nope:
+    rts
+
 
 ;-------------------------------------
 LoadTheHouseInterior:
