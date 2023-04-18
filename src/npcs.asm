@@ -28,8 +28,11 @@ LoadNpcs:
     lda #1
     sta Npcs, x ; dir
     inx
+    ;frame
     inx
+    ;timer
     inx
+    ;hp
     inx
 
     dec TempNpcCnt
@@ -402,11 +405,15 @@ AttackBoxNpcsCollision:
     rts
 ;-----------------------------------
 OnCollisionWithAttackRect:
-    
-    tya 
-    clc 
+
+    tya
+    clc
     adc #5
-    tay 
+    tay
+
+    lda TempNpcType
+    cmp #NPC_TYPE_VILLAGER
+    beq @doneDoingDmg
 
     inc PlayerDidDmg
 
@@ -1253,12 +1260,18 @@ FetchNpcVars:
 SingleNpcAI:
 
     lda TempNpcState
-    cmp #2 ;is attack?
+    cmp #NPC_STATE_ATTACK  ;is attack?
     beq @attackState
-    cmp #3 ;is damaged?
+    cmp #NPC_STATE_DAMAGED ;is damaged?
     beq @damagedState
 
 @idleState:
+    lda TempNpcType
+    cmp #NPC_TYPE_VILLAGER
+    bne @moveNpc
+    jsr ChangeNpcDirection
+    jmp @nextNpc
+@moveNpc:
     jsr NpcMovement
     jmp @nextNpc
 @damagedState:
@@ -1495,6 +1508,11 @@ ChangeNpcDirection:
     lda #0
     sta MustRedir
     ;x at the npc screen index
+
+    lda TempNpcType
+    cmp #NPC_TYPE_VILLAGER
+    beq @predator
+
     lda TempNpcTimer
     bne @randomDir
     lda TempNpcType
@@ -1510,6 +1528,10 @@ ChangeNpcDirection:
     tax
     lda npc_direction_list, x
     ldx TempX
+    sta TempDir
+    jmp @storeDirection
+@villager:
+    lda #0
     sta TempDir
     jmp @storeDirection
 @predator:

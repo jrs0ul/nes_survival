@@ -1,6 +1,10 @@
 House_npcs:
     .byte 0
 
+Hut_npcs:
+    .byte 1
+    .byte %00001001, 100, 100, 0
+
 Outside1_npcs:
     .byte 6
     .byte %00000011, 100, 80, 4

@@ -2047,11 +2047,20 @@ ExitMenuState:
     sta StashActivated
 
     lda InHouse
-    beq @loadOutside ;InHouse = 0
+    beq @loadOther ;InHouse = 0
     lda #1
     sta MustLoadHouseInterior
     sta MustLoadSomething
     jmp @exit
+@loadOther:
+    lda InVillagerHut
+    beq @loadOutside
+
+    lda #1
+    sta MustLoadVillagerHut
+    sta MustLoadSomething
+    jmp @exit
+
 @loadOutside:
     lda #1
     sta MustLoadOutside

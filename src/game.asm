@@ -284,7 +284,7 @@ npc_anim_row_sequence:
 
     MAX_V_SCROLL               = 255
 
-    ANIM_FRAME_BLOODSTAIN      = 174
+    ANIM_FRAME_BLOODSTAIN      = 110
 
 
     HOURS_MAX                  = 240
@@ -398,6 +398,9 @@ npc_anim_row_sequence:
     NPC_ATTACK_FRAME           = 128
 
     NPC_STATE_DAMAGED          = 3
+    NPC_STATE_ATTACK           = 2
+    
+    NPC_TYPE_VILLAGER          = 2
 
     RECIPES_SIZE               = 12
 
@@ -3432,15 +3435,15 @@ CheckIfEnteredVillagerHut:
     bcs @nope
 
     lda GlobalScroll
-    cmp #$B8
+    cmp #$B6
     bcc @nope
     cmp #$BE
     bcs @nope
 
     lda PlayerY
-    cmp #$6A
+    cmp #$68
     bcc @nope
-    cmp #$73
+    cmp #$6F
     bcs @nope
 
     ldx #0
@@ -3688,6 +3691,8 @@ CheckIfExitedVillagerHut:
 
     jsr PrepareCollisionAfterHutExit
 
+    lda #0
+    sta NpcCount
 
 
     lda #<Outside2_items
@@ -3823,7 +3828,12 @@ LoadVillagerHut:
 
     lda #0
     sta ItemCount
-    sta NpcCount
+    lda #<Hut_npcs
+    sta pointer
+    lda #>Hut_npcs
+    sta pointer + 1
+    jsr LoadNpcs
+    
 
 
     lda #1
