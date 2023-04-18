@@ -1295,6 +1295,9 @@ UpdateMenuState:
 ;Check and upload background columns from rom map to the PPU
 UploadBgColumns:
 
+    lda ScreenCount
+    cmp #2
+    bcc @exit
 
     ldy SourceMapIdx
     cpy ScreenCount
@@ -1672,6 +1675,9 @@ CheckIfExitedSecondLocation:
 
     lda #0
     sta LocationIndex
+    sta TimesShiftedLeft
+    sta TimesShiftedRight
+    sta TilesScroll
 
     lda #4
     sta CurrentMapSegmentIndex
@@ -1776,6 +1782,9 @@ CheckIfEnteredSecondLocation:
     lda #0
     sta GlobalScroll
     sta TilesScroll
+    sta TimesShiftedLeft
+    sta TimesShiftedRight
+
 
 @exit:
     rts
@@ -3425,6 +3434,8 @@ CheckIfEnteredVillagerHut:
     lda GlobalScroll
     cmp #$B8
     bcc @nope
+    cmp #$BE
+    bcs @nope
 
     lda PlayerY
     cmp #$6A
@@ -3454,6 +3465,7 @@ CheckIfEnteredVillagerHut:
     sta PlayerX
     lda #136
     sta PlayerY
+    sta ScrollDirection
 
 
 
@@ -3632,15 +3644,80 @@ CheckIfExitedVillagerHut:
     lda #0
     sta InVillagerHut
 
+    lda #OUTDOORS_LOC2_SCREEN_COUNT
+    sta ScreenCount
+
+    lda #$80
+    sta PlayerY
+    lda #$76
+    sta PlayerX
+
+
+    lda #$B8
+    sta GlobalScroll
+    lda #0
+    sta TilesScroll
+
+
+    ldy #4
+    jsr bankswitch_y
+
+    ldx #0
+@copyCollisionMapLoop:
+
+    lda bg2_collision1, x
+    sta CollisionMap, x
+    inx
+    cpx #COLLISION_MAP_SIZE
+    bne @copyCollisionMapLoop
+
+
+    lda #0
+    sta TimesShiftedLeft
+    sta TimesShiftedRight
+    sta LeftCollisionMapIdx
+    lda #3
+    sta LeftCollisionColumnIndex
+    jsr LoadLeftCollisionColumn
+    lda #2
+    sta RightCollisonMapIdx
+    lda #0
+    sta RightCollisionColumnIndex
+    jsr LoadRightCollisionColumn
+
+
+    jsr PrepareCollisionAfterHutExit
+
+
+
+    lda #<Outside2_items
+    sta pointer
+    lda #>Outside2_items
+    sta pointer + 1
+    jsr LoadItems
 
     lda #1
     sta MustLoadOutside
     sta MustCopyMainChr
     sta MustLoadSomething
 
-
 @nope:
     rts
+;-----------------------------------
+PrepareCollisionAfterHutExit:
+
+    jsr PushCollisionMapRight
+    jsr PushCollisionMapRight
+    jsr PushCollisionMapRight
+    jsr PushCollisionMapRight
+    jsr PushCollisionMapRight
+    jsr PushCollisionMapRight
+    jsr PushCollisionMapRight
+    jsr PushCollisionMapRight
+    jsr PushCollisionMapRight
+
+    rts
+
 
 
 ;-----------------------------------

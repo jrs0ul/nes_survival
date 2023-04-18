@@ -2,7 +2,8 @@ LoadOutsideMap:
 
     lda LocationIndex
     beq @startLoad
-    
+   
+    ;supposed location 2
     ldy #4
     jsr bankswitch_y
 
@@ -23,13 +24,15 @@ LoadOutsideMap:
     lda #0
     sta MustCopyMainChr
 
+    ldy current_bank
+    sty oldbank
     ldy #6
     jsr bankswitch_y
     lda #0
     jsr famistudio_music_play
-    ldy #0
+    ldy oldbank
     jsr bankswitch_y
-    
+
 
 @continueLoad:
 
