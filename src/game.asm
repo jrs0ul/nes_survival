@@ -2136,7 +2136,7 @@ WarmthLogics:
     lda InHouse
     bne @increaseWarmth
     lda InVillagerHut
-    bne @increaseWarmth
+    bne @ignoreFuel
     jmp @decreaseWarmth
 @increaseWarmth:
     lda Fuel
@@ -2145,7 +2145,7 @@ WarmthLogics:
     adc Fuel + 2
     cmp #0
     beq @decreaseWarmth
-
+@ignoreFuel: ; for other places than player's hut
     jsr IncreaseWarmth
     jmp @exit
 @decreaseWarmth:
