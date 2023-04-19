@@ -1,5 +1,7 @@
 LoadOutsideMap:
 
+    lda #0
+    sta MustUpdateTextBaloon
     lda LocationIndex
     beq @startLoad
    

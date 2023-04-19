@@ -65,6 +65,8 @@ game_over_palette:
 house_tiles_chr: .incbin "house.chr"
 .include "data/house.asm"
 .include "data/villager_hut.asm"
+
+
 ;============================================================
 .segment "ROM4" ; other location
 
@@ -93,6 +95,14 @@ banktable:              ; Write to this table to switch banks.
 
 .include "data/item_list.asm" ;items in maps
 .include "data/npc_list.asm"  ;npcs in maps
+
+dialog_jam:
+    .byte $00,$00,$00,$00,$42,$00,$45,$48,$4f,$3e,$00,$43,$3a,$46,$59,$00
+    .byte $3c,$3a,$47,$54,$52,$48,$4e,$00,$00,$00,$00,$00,$00,$00,$00,$00
+    .byte $3b,$4b,$42,$47,$40,$00,$46,$3e,$00,$4c,$48,$46,$3e,$5a,$00,$4d
+    .byte $48,$54,$40,$3e,$4d,$00,$43,$3a,$46,$00,$00,$00,$00,$00,$00,$00
+    .byte $00,$00,$00,$00,$3c,$48,$46,$3b,$42,$47,$3e,$00,$7c,$7d,$00,$5b,$00,$7c,$7d
+
 
 zerosprite:
     .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
@@ -658,6 +668,11 @@ TimesShiftedRight:
     .res 1
 
 
+MustUpdateTextBaloon:
+    .res 1
+TextBaloonIndex:
+    .res 1
+
 MustUpdatePalette: ;flag that signals the palette update
     .res 1
 
@@ -849,6 +864,11 @@ TempPointY2:
 TempHp:
     .res 1
 TempSpearX:
+    .res 1
+
+TempTextAddress:
+    .res 1
+TempTextAddressLow:
     .res 1
 
 TempPlayerAttk:
@@ -1179,6 +1199,7 @@ doneUpdatingPalette:
     jsr UpdateFireplace
     jsr UploadBgColumns
     jsr UpdateStatusDigits
+    jsr UpdateTextBaloon
 
 nmicont2:
 
@@ -2499,6 +2520,52 @@ storeIdx:
 
     rts
 ;--------------------------------
+UpdateTextBaloon:
+
+    lda MustUpdateTextBaloon
+    beq @exit
+
+    lda #$22
+    sta TempTextAddress
+
+
+    lda #$E3
+    clc
+    adc TextBaloonIndex
+    bcc @continue
+
+    inc TempTextAddress
+
+@continue:
+    sta TempTextAddressLow
+    lda $2002
+    lda TempTextAddress
+    sta $2006
+    lda TempTextAddressLow
+    sta $2006
+
+    ldy TextBaloonIndex
+
+    lda dialog_jam, y
+    sta $2007
+
+
+    inc TextBaloonIndex
+    lda TextBaloonIndex
+    cmp #83
+    bcs @done
+    jmp @exit
+
+@done:
+    lda #0
+    sta MustUpdateTextBaloon
+
+
+@exit:
+    rts
+
+
+;--------------------------------
 UpdateStatusDigits:
 
     lda GameState
@@ -3694,7 +3761,6 @@ CheckIfExitedVillagerHut:
     lda #0
     sta NpcCount
 
-
     lda #<Outside2_items
     sta pointer
     lda #>Outside2_items
@@ -3794,7 +3860,6 @@ LoadVillagerHut:
     jsr CopyCHRTiles
 
 
-
     lda MustRestartIndoorsMusic
     beq @loadHouseStuff
     ldy #6
@@ -3833,21 +3898,20 @@ LoadVillagerHut:
     lda #>Hut_npcs
     sta pointer + 1
     jsr LoadNpcs
-    
 
 
     lda #1
     sta InVillagerHut
 
+    sta MustUpdateTextBaloon
 
 
     lda #0
+    sta TextBaloonIndex
     sta MustLoadVillagerHut
     sta MustLoadSomething
     lda #1
     sta ScreenCount
-
-
 
 @nope:
     rts
