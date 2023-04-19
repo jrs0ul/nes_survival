@@ -1,5 +1,5 @@
 .segment "HEADER"
- 
+
   .byte 'N', 'E', 'S', $1A   ; these bytes always start off an ines file
   .byte 8                    ; 8 Banks x16KB
   .byte $00                  ; CHR RAM

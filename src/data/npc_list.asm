@@ -3,7 +3,7 @@ House_npcs:
 
 Hut_npcs:
     .byte 1
-    .byte %00001001, 100, 100, 0
+    .byte %00001001, 104, 94, 0
 
 Outside1_npcs:
     .byte 6
