@@ -484,41 +484,50 @@ RotFood:
 
     ldy #0
 @loop:
+    sty TempInventoryItemIndex
+    tya
+    asl ; y * 2
+    tay
+
     lda (pointer), y
-    beq @nextItem
-    cmp #2
+    beq @nextItem       ;if empty
+
+    cmp #ITEM_RAW_MEAT
     bne @checkCooked
 
-    lda #9
-    sta (pointer), y
-    jmp @nextItem
+    lda #ROT_AMOUNT_RAW_MEAT
+    sta RotAmount
+    jmp @rot
 
 @checkCooked:
-    cmp #3
+    cmp #ITEM_COOKED_MEAT
     bne @nextItem
 
+    lda #ROT_AMOUNT_COOKED_MEAT
+    sta RotAmount
+@rot:
     iny
     lda (pointer), y
-    cmp #50
+    cmp RotAmount
     bcc @turnToPoop
     beq @turnToPoop
 
     sec
-    sbc #50
+    sbc RotAmount
     sta (pointer), y
-    dey
     jmp @nextItem
+
 
 @turnToPoop:
     dey
-    lda #9
+    lda #ITEM_POOP
     sta (pointer), y
 
-
+    
 @nextItem:
+    ldy TempInventoryItemIndex ; stored item index
     iny
-    iny
-    cmp #INVENTORY_MAX_SIZE
+    cpy #INVENTORY_MAX_ITEMS
     bcc @loop
 
     rts

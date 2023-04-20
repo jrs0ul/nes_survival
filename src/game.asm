@@ -377,8 +377,11 @@ npc_anim_row_sequence:
     ITEM_TYPE_MATERIAL         = 4
     ITEM_TYPE_TOOL             = 5
 
-    ITEM_KNIFE                 = 8
+    ITEM_RAW_MEAT              = 2
+    ITEM_COOKED_MEAT           = 3
     ITEM_SPEAR                 = 7
+    ITEM_KNIFE                 = 8
+    ITEM_POOP                  = 9
 
     SPEAR_SPEED                = 3
 
@@ -413,6 +416,9 @@ npc_anim_row_sequence:
     NPC_TYPE_VILLAGER          = 2
 
     RECIPES_SIZE               = 12
+
+    ROT_AMOUNT_RAW_MEAT        = 50
+    ROT_AMOUNT_COOKED_MEAT     = 25
 
 ;===================================================================
 .segment "ZEROPAGE"
@@ -866,6 +872,11 @@ TempHp:
 TempSpearX:
     .res 1
 
+TempInventoryItemIndex: ; used by "RotFood"
+    .res 1
+RotAmount:
+    .res 1          ;         "RotFood"
+
 TempTextAddress:
     .res 1
 TempTextAddressLow:
@@ -1123,6 +1134,7 @@ nextIteration:
     lda NMIActive
     beq ne
 
+    jsr UpdateRandomNumber
     jsr FamistudioUpdate
 
     lda #0
@@ -1470,7 +1482,6 @@ Logics:
     lda NMIActive
     beq @exit
 
-    jsr UpdateRandomNumber
 
     lda PlayerAlive
     bne @cont
@@ -3729,6 +3740,29 @@ CheckIfExitedVillagerHut:
     sta TilesScroll
 
 
+
+
+    jsr PrepareCollisionAfterHutExit
+
+    lda #0
+    sta NpcCount
+
+    lda #<Outside2_items
+    sta pointer
+    lda #>Outside2_items
+    sta pointer + 1
+    jsr LoadItems
+
+    lda #1
+    sta MustLoadOutside
+    sta MustCopyMainChr
+    sta MustLoadSomething
+
+@nope:
+    rts
+;-----------------------------------
+PrepareCollisionAfterHutExit:
+
     ldy #4
     jsr bankswitch_y
 
@@ -3756,26 +3790,6 @@ CheckIfExitedVillagerHut:
     jsr LoadRightCollisionColumn
 
 
-    jsr PrepareCollisionAfterHutExit
-
-    lda #0
-    sta NpcCount
-
-    lda #<Outside2_items
-    sta pointer
-    lda #>Outside2_items
-    sta pointer + 1
-    jsr LoadItems
-
-    lda #1
-    sta MustLoadOutside
-    sta MustCopyMainChr
-    sta MustLoadSomething
-
-@nope:
-    rts
-;-----------------------------------
-PrepareCollisionAfterHutExit:
 
     jsr PushCollisionMapRight
     jsr PushCollisionMapRight
