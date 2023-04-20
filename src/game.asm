@@ -1135,7 +1135,6 @@ nextIteration:
     beq ne
 
     jsr UpdateRandomNumber
-    jsr FamistudioUpdate
 
     lda #0
     sta NMIActive
@@ -1257,6 +1256,8 @@ WaitScanline:
 endOfNmi:
     lda PPUCTRL
     sta $2000
+    
+    jsr FamistudioUpdate
 
     pla
     tax
@@ -3738,9 +3739,6 @@ CheckIfExitedVillagerHut:
     sta GlobalScroll
     lda #0
     sta TilesScroll
-
-
-
 
     jsr PrepareCollisionAfterHutExit
 
