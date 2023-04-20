@@ -103,6 +103,10 @@ dialog_jam:
     .byte $48,$54,$40,$3e,$4d,$00,$43,$3a,$46,$00,$00,$00,$00,$00,$00,$00
     .byte $00,$00,$00,$00,$3c,$48,$46,$3b,$42,$47,$3e,$00,$7c,$7d,$00,$5b,$00,$7c,$7d
 
+dialog_thanks:
+    .byte $00,$00,$00,$00,$4e,$41,$41,$54,$4d,$41,$3a,$47,$44,$4c,$59
+
+
 
 zerosprite:
     .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
@@ -428,6 +432,8 @@ oldbank:
     .res 1
 pointer:
     .res 2
+TextPtr:
+    .res 2
 DigitPtr:
     .res 2
 pointer2:
@@ -604,6 +610,9 @@ Hours:
 EquipedItem:
     .res 2   ;item index + hp
 
+ItemIGave:
+    .res 1  ;item index i gave to villager
+
 Inventory:
     .res INVENTORY_MAX_SIZE
 
@@ -677,6 +686,11 @@ TimesShiftedRight:
 MustUpdateTextBaloon:
     .res 1
 TextBaloonIndex:
+    .res 1
+TextLength:
+    .res 1
+
+MustClearVillagerItems:
     .res 1
 
 MustUpdatePalette: ;flag that signals the palette update
@@ -2558,13 +2572,13 @@ UpdateTextBaloon:
 
     ldy TextBaloonIndex
 
-    lda dialog_jam, y
+    lda (TextPtr), y
     sta $2007
 
 
     inc TextBaloonIndex
     lda TextBaloonIndex
-    cmp #83
+    cmp TextLength;#83
     bcs @done
     jmp @exit
 
@@ -2898,6 +2912,7 @@ ResetEntityVariables:
     sta FireFrameDelay
 
     lda #0
+    sta ItemIGave
     sta SleepPaletteAnimationState
     sta FadeIdx
     sta SleepFadeTimer
@@ -3536,6 +3551,7 @@ CheckIfEnteredVillagerHut:
 
     lda #1
     sta MustLoadVillagerHut
+    sta MustClearVillagerItems
     sta MustRestartIndoorsMusic
     sta MustLoadSomething
 
@@ -3725,6 +3741,7 @@ CheckIfExitedVillagerHut:
 
     lda #0
     sta InVillagerHut
+    sta ItemIGave
 
     lda #OUTDOORS_LOC2_SCREEN_COUNT
     sta ScreenCount
@@ -3903,29 +3920,69 @@ LoadVillagerHut:
     sta Temp
     jsr LoadPalette
 
+
+    jsr VillagerItemsAndNpcs
+
+    lda #1
+    sta InVillagerHut
+
+    lda #0
+    sta MustLoadVillagerHut
+    sta MustLoadSomething
+    lda #1
+    sta ScreenCount
+
+    jsr SetupVillagerText
+
+@nope:
+    rts
+;-----------------------------------
+VillagerItemsAndNpcs:
+    lda MustClearVillagerItems
+    bne @npcs
     lda #0
     sta ItemCount
+    sta MustClearVillagerItems
+@npcs:
     lda #<Hut_npcs
     sta pointer
     lda #>Hut_npcs
     sta pointer + 1
     jsr LoadNpcs
 
-
+    rts
+;-----------------------------------
+SetupVillagerText:
     lda #1
-    sta InVillagerHut
-
     sta MustUpdateTextBaloon
-
-
     lda #0
     sta TextBaloonIndex
-    sta MustLoadVillagerHut
-    sta MustLoadSomething
-    lda #1
-    sta ScreenCount
 
-@nope:
+    lda ItemIGave
+    bne @thanks
+
+    lda #<dialog_jam
+    sta TextPtr
+    lda #>dialog_jam
+    sta TextPtr + 1
+    lda #83
+    sta TextLength
+
+
+    jmp @exit
+
+@thanks:
+
+    lda #<dialog_thanks
+    sta TextPtr
+    lda #>dialog_thanks
+    sta TextPtr + 1
+    lda #15
+    sta TextLength
+
+
+
+@exit:
     rts
 
 

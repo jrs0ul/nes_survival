@@ -224,13 +224,37 @@ DrawFoodMenu:
 
     lda #9
     sta TempPointX
+
+    lda InVillagerHut
+    bne @smallmenu
+
     lda #11
+    jmp @storeY
+
+@smallmenu:
+
+    lda #9
+@storeY:
     sta TempPointY
 
-    lda #<FoodMenu
+
+    lda InVillagerHut
+    bne @villagerMenu
+
+    lda #<FoodMenuAtHome
     sta pointer
-    lda #>FoodMenu
+    lda #>FoodMenuAtHome
     sta pointer + 1
+    jmp @startTransfer
+
+@villagerMenu:
+    lda #<FoodMenuVillager
+    sta pointer
+    lda #>FoodMenuVillager
+    sta pointer + 1
+
+
+@startTransfer:
     jsr TransferTiles
 
     lda #0
@@ -1022,7 +1046,14 @@ ActivateSubmenu:
 FoodMenuInput:
     lda #16
     sta MenuStep
+
+    lda InVillagerHut
+    bne @smallerMenu
     lda #144
+    jmp @saveLimit
+@smallerMenu:
+    lda #128
+@saveLimit:
     sta MenuLowerLimit
     lda #96
     sta MenuUpperLimit
@@ -1030,8 +1061,18 @@ FoodMenuInput:
     sta pointer
     lda #>FoodMenuIndex
     sta pointer + 1
+
+    lda InVillagerHut
+    bne @villagerMenuHeight
+
     lda #4
+    jmp @maxItem
+
+@villagerMenuHeight:
+    lda #3
+@maxItem:
     sta MenuMaxItem
+
     jsr MenuInputUpDownCheck
 
 @CheckB:
@@ -1042,6 +1083,38 @@ FoodMenuInput:
     jsr LoadSelectedItemStuff
     beq @exit
 
+    lda InVillagerHut
+    bne @villagerInput
+
+    jsr FoodMenuInputAtHome
+    beq @exit
+    jmp @hidemenu
+
+@villagerInput:
+
+    jsr FoodMenuInputVillager
+    beq @exit
+
+@hidemenu:
+    lda #0
+    sta StashFoodMenuActivated
+    sta FoodMenuActivated
+    jsr ExitSubmenu
+    jmp @exit
+
+@CheckA:
+    lda Buttons
+    and #BUTTON_A_MASK
+    beq @exit
+
+    lda #0
+    sta StashFoodMenuActivated
+    sta FoodMenuActivated
+    jsr ExitSubmenu
+@exit:
+    rts
+;------------------------------
+FoodMenuInputAtHome:
     lda FoodMenuIndex
     bne @otherOptions
     ;cook
@@ -1071,24 +1144,61 @@ FoodMenuInput:
 
 @clearItem:
     jsr ClearThatItem
-@hidemenu:
-    lda #0
-    sta StashFoodMenuActivated
-    sta FoodMenuActivated
-    jsr ExitSubmenu
-    jmp @exit
 
-@CheckA:
-    lda Buttons
-    and #BUTTON_A_MASK
-    beq @exit
+    lda #1
+    jmp @end
 
-    lda #0
-    sta StashFoodMenuActivated
-    sta FoodMenuActivated
-    jsr ExitSubmenu
+
 @exit:
+    lda #0
+
+
+@end:
     rts
+;------------------------------------
+FoodMenuInputVillager:
+
+    lda FoodMenuIndex
+    bne @otherOptions
+    ;eat
+
+    jsr UseFood
+    jmp @clear
+
+@otherOptions:
+
+    cmp #1
+    bne @clear ; drop
+
+    lda Inventory, x
+    sta ItemIGave
+    lda #1
+    sta ItemCount
+    lda #%00010011
+    sta Items
+    lda #120
+    sta Items + 1
+    lda #108
+    sta Items + 2
+    lda #0
+    sta Items + 3
+    
+
+@clear:
+    jsr ClearThatItem
+
+
+    lda #1
+    jmp @end
+
+@exit:
+    lda #0
+
+@end:
+    rts
+
+
+
 ;-------------------------------------
 ClearThatItem:
     lda StashActivated
