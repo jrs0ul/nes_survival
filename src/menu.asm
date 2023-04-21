@@ -1156,6 +1156,7 @@ FoodMenuInputAtHome:
 @end:
     rts
 ;------------------------------------
+;food menu while visiting a villager
 FoodMenuInputVillager:
 
     lda FoodMenuIndex
@@ -1171,6 +1172,9 @@ FoodMenuInputVillager:
     bne @clear ; drop
 
     lda Inventory, x
+    cmp #ITEM_JAM
+    bne @exit
+
     sta ItemIGave
     lda #1
     sta ItemCount
@@ -1182,7 +1186,10 @@ FoodMenuInputVillager:
     sta Items + 2
     lda #0
     sta Items + 3
-    
+
+    lda #1
+    sta MustExitMenuState
+
 
 @clear:
     jsr ClearThatItem

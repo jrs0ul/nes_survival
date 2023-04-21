@@ -104,7 +104,9 @@ dialog_jam:
     .byte $00,$00,$00,$00,$3c,$48,$46,$3b,$42,$47,$3e,$00,$7c,$7d,$00,$5b,$00,$7c,$7d
 
 dialog_thanks:
-    .byte $00,$00,$00,$00,$4e,$41,$41,$54,$4d,$41,$3a,$47,$44,$4c,$59
+    .byte $00,$00,$48,$48,$49,$4c,$82,$82,$82,$00,$4c,$48,$4b,$4b,$52,$82,$82,$82,$00,$00,$00,$00,$00,$00,$00
+    .byte $00,$00,$00,$00,$00,$00,$00,$00
+    .byte $4d,$41,$3a,$47,$44,$4c,$00,$3f,$48,$4b,$00,$4d,$41,$3e,$00,$43,$3a,$46,$00,$4d,$41,$48,$59
 
 
 
@@ -383,6 +385,7 @@ npc_anim_row_sequence:
 
     ITEM_RAW_MEAT              = 2
     ITEM_COOKED_MEAT           = 3
+    ITEM_JAM                   = 5
     ITEM_SPEAR                 = 7
     ITEM_KNIFE                 = 8
     ITEM_POOP                  = 9
@@ -3939,7 +3942,7 @@ LoadVillagerHut:
 ;-----------------------------------
 VillagerItemsAndNpcs:
     lda MustClearVillagerItems
-    bne @npcs
+    beq @npcs
     lda #0
     sta ItemCount
     sta MustClearVillagerItems
@@ -3977,7 +3980,7 @@ SetupVillagerText:
     sta TextPtr
     lda #>dialog_thanks
     sta TextPtr + 1
-    lda #15
+    lda #56
     sta TextLength
 
 
