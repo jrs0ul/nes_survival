@@ -228,12 +228,20 @@ DrawFoodMenu:
     lda InVillagerHut
     bne @smallmenu
 
+    lda InHouse
+    beq @smallestmenu
+
     lda #11
     jmp @storeY
 
 @smallmenu:
 
     lda #9
+    jmp @storeY
+
+@smallestmenu:
+    lda #7
+
 @storeY:
     sta TempPointY
 
@@ -241,10 +249,21 @@ DrawFoodMenu:
     lda InVillagerHut
     bne @villagerMenu
 
+    lda InHouse
+    beq @outdoorsMenu
+
     lda #<FoodMenuAtHome
     sta pointer
     lda #>FoodMenuAtHome
     sta pointer + 1
+    jmp @startTransfer
+
+@outdoorsMenu:
+    lda #<FoodMenuOutdoors
+    sta pointer
+    lda #>FoodMenuOutdoors
+    sta pointer + 1
+
     jmp @startTransfer
 
 @villagerMenu:
@@ -1049,8 +1068,16 @@ FoodMenuInput:
 
     lda InVillagerHut
     bne @smallerMenu
+    lda InHouse
+    beq @smallestMenu
+
     lda #144
     jmp @saveLimit
+
+@smallestMenu:
+    lda #112
+    jmp @saveLimit
+
 @smallerMenu:
     lda #128
 @saveLimit:
@@ -1065,7 +1092,14 @@ FoodMenuInput:
     lda InVillagerHut
     bne @villagerMenuHeight
 
+    lda InHouse
+    beq @OutdoorMenuHeight
+
     lda #4
+    jmp @maxItem
+
+@OutdoorMenuHeight:
+    lda #2
     jmp @maxItem
 
 @villagerMenuHeight:
@@ -1086,7 +1120,14 @@ FoodMenuInput:
     lda InVillagerHut
     bne @villagerInput
 
+    lda InHouse
+    beq @outdoorInput
+
     jsr FoodMenuInputAtHome
+    beq @exit
+    jmp @hidemenu
+@outdoorInput:
+    jsr FoodMenuInputOutdoors
     beq @exit
     jmp @hidemenu
 
@@ -1113,6 +1154,32 @@ FoodMenuInput:
     jsr ExitSubmenu
 @exit:
     rts
+;------------------------------
+FoodMenuInputOutdoors:
+
+    lda FoodMenuIndex
+    bne @otherOptions
+    ;eat
+
+    jsr UseFood
+    jmp @clear
+
+@otherOptions:
+@clear:
+    jsr ClearThatItem
+
+
+    lda #1
+    jmp @end
+
+@exit:
+    lda #0
+
+@end:
+
+
+    rts
+
 ;------------------------------
 FoodMenuInputAtHome:
     lda FoodMenuIndex
