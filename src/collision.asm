@@ -327,7 +327,7 @@ CanPlayerGo:
     rts
 ;----------------------------------
 ;Checks 2 points against the collision map
-CanPlayerGo2:
+CanPlayerGoWithOldY:
 
     lda PlayerX
     clc
@@ -361,7 +361,7 @@ CanPlayerGo2:
     rts
 ;----------------------------------
 ;Checks 2 points against the collision map
-CanPlayerGo3:
+CanPlayerGoWithOldX:
 
     lda OldPlayerX
     clc

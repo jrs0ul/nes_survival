@@ -2413,7 +2413,7 @@ HandleInput:
     lda ScrollDirection
     sta OldScrollDirection
 
-    ;move the player
+    ;gamepad button processing, the player could be moved here
     jsr ProcessButtons
 
     ;first general check of newX and newY
@@ -2422,20 +2422,31 @@ HandleInput:
 
     ;there might be some obstacles
     ;let's check with oldY instead
-    jsr CanPlayerGo2
+    lda DirectionY
+    beq @thirdcheck
+
+    jsr CanPlayerGoWithOldY
     bne @thirdcheck
 
     ;the obstacles are on the Y axis
 
+    lda DirectionX
+    beq @resetJustY
+
+    lda #0
+    sta PlayerFrame
+@resetJustY:
     lda OldPlayerY
     sta PlayerY
 
     jmp @contInput
 
 @thirdcheck:
+    lda DirectionX
+    beq @resetStuff
 
     ;let's check with oldX now
-    jsr CanPlayerGo3
+    jsr CanPlayerGoWithOldX
     bne @resetStuff
 
     ;the obstacles are on X axis
