@@ -292,7 +292,7 @@ PushCollisionMapLeft:
 @exit:
     rts
 ;----------------------------------
-;Checks 4 points against the collision map
+;Checks 2 points against the collision map
 CanPlayerGo:
 
     lda PlayerX
@@ -325,6 +325,76 @@ CanPlayerGo:
     lda #1
 @end:
     rts
+;----------------------------------
+;Checks 2 points against the collision map
+CanPlayerGo2:
+
+    lda PlayerX
+    clc
+    adc #PLAYER_COLLISION_BOX_X1
+    adc TilesScroll
+    sta TempPointX
+
+    lda OldPlayerY
+    clc
+    adc #8
+    sta TempPointY
+
+    jsr TestPointAgainstCollisionMap
+    bne @collides
+
+    lda PlayerX
+    clc
+    adc #PLAYER_COLLISION_BOX_X2
+    adc TilesScroll
+    sta TempPointX
+
+    jsr TestPointAgainstCollisionMap
+    bne @collides
+
+    lda #0
+    jmp @end
+
+@collides:
+    lda #1
+@end:
+    rts
+;----------------------------------
+;Checks 2 points against the collision map
+CanPlayerGo3:
+
+    lda OldPlayerX
+    clc
+    adc #PLAYER_COLLISION_BOX_X1
+    adc OldTileScroll
+    sta TempPointX
+
+    lda PlayerY
+    clc
+    adc #8
+    sta TempPointY
+
+    jsr TestPointAgainstCollisionMap
+    bne @collides
+
+    lda OldPlayerX
+    clc
+    adc #PLAYER_COLLISION_BOX_X2
+    adc OldTileScroll
+    sta TempPointX
+
+    jsr TestPointAgainstCollisionMap
+    bne @collides
+
+    lda #0
+    jmp @end
+
+@collides:
+    lda #1
+@end:
+    rts
+
+
 ;----------------------------------
 ;Set TempPointX and TempPointY as point to be tested
 ;sets A=1 if point collides

@@ -2397,38 +2397,58 @@ HandleInput:
 
 @continueInput:
 
+    ;save the movement before collision check
     lda PlayerX
     sta OldPlayerX
+
     lda PlayerY
     sta OldPlayerY
+
     lda GlobalScroll
     sta OldGlobalScroll
+
     lda TilesScroll
     sta OldTileScroll
+
     lda ScrollDirection
     sta OldScrollDirection
-    
+
+    ;move the player
     jsr ProcessButtons
 
+    ;first general check of newX and newY
     jsr CanPlayerGo
     beq @contInput; all good, no obstacles
 
-    ;obstacle ahead, restore previous position
-    lda OldPlayerX
-    sta PlayerX
+    ;there might be some obstacles
+    ;let's check with oldY instead
+    jsr CanPlayerGo2
+    bne @thirdcheck
+
+    ;the obstacles are on the Y axis
+
     lda OldPlayerY
     sta PlayerY
-    lda OldGlobalScroll
-    sta GlobalScroll
-    lda OldTileScroll
-    sta TilesScroll
-    lda OldScrollDirection
-    sta ScrollDirection
-    lda #0
-    sta MustIncrementScreenIndex
-    sta MustDecrementScreenIndex
 
-    
+    jmp @contInput
+
+@thirdcheck:
+
+    ;let's check with oldX now
+    jsr CanPlayerGo3
+    bne @resetStuff
+
+    ;the obstacles are on X axis
+    jsr ResetPlayerXMovement
+
+    jmp @contInput
+
+@resetStuff:
+    ;obstacle ahead, restore previous position
+    jsr ResetPlayerXMovement
+    lda OldPlayerY
+    sta PlayerY
+
     jmp @finishInput
 
 @contInput:
@@ -2465,6 +2485,24 @@ SwitchScreenIdxIfNeeded:
 
 @exit:
     rts
+;--------------------------------
+ResetPlayerXMovement:
+
+    lda OldPlayerX
+    sta PlayerX
+    lda OldGlobalScroll
+    sta GlobalScroll
+    lda OldTileScroll
+    sta TilesScroll
+    lda OldScrollDirection
+    sta ScrollDirection
+    lda #0
+    sta MustIncrementScreenIndex
+    sta MustDecrementScreenIndex
+
+    rts
+
+
 ;--------------------------------
 PushCollisionMapIfNeeded:
     lda TilesScroll
