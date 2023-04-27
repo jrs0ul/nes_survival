@@ -1515,8 +1515,16 @@ ChangeNpcDirection:
 
     lda TempNpcTimer
     bne @randomDir
+
     lda TempNpcType
+    cmp #NPC_TYPE_TIMID
     bne @predator
+
+@timid:
+
+    jsr SetDirectionForTimidNpc
+    jmp @storeDirection
+
 @randomDir:
     inx ; increase to direction
     ;just random movement
@@ -1528,10 +1536,6 @@ ChangeNpcDirection:
     tax
     lda npc_direction_list, x
     ldx TempX
-    sta TempDir
-    jmp @storeDirection
-@villager:
-    lda #0
     sta TempDir
     jmp @storeDirection
 @predator:
@@ -1561,11 +1565,11 @@ ChangeNpcDirection:
     sec
     sbc GlobalScroll
     cmp PlayerX
-    bcc @goRight1
+    bcc @goRight
     cmp Temp
     bcc @compareY
     bcs @goLeft
-@goRight1:
+@goRight:
     lda # 1
     sta TempDir
     jmp @compareY
@@ -1594,7 +1598,6 @@ ChangeNpcDirection:
     lda TempDir
     ora #%00000100
     sta TempDir
-    jmp @storeDirection
 
 @storeDirection:
     lda TempDir
@@ -1602,6 +1605,75 @@ ChangeNpcDirection:
 @exit:
 
     rts
+;----------------------
+SetDirectionForTimidNpc:
+
+    dex ; npc y
+    lda Npcs, x; y
+    clc
+    adc #8
+    sta TempPointY
+
+    dex ;npc x
+    lda Npcs, x; x
+    clc
+    adc #8
+    sta TempPointX
+    inx ;y
+    inx ;screen
+    inx ;direction
+
+    lda PlayerX
+    clc
+    adc #16
+    sta Temp
+
+    lda #0
+    sta TempDir
+
+    lda TempPointX
+    sec
+    sbc GlobalScroll
+    cmp PlayerX
+    bcc @goLeft
+    cmp Temp
+    bcc @compareY
+    bcs @goRight
+@goRight:
+    lda #1
+    sta TempDir
+    jmp @compareY
+@goLeft:
+    lda #2
+    sta TempDir
+
+@compareY:
+    lda PlayerY
+    clc
+    adc #16
+    sta Temp
+
+    lda TempPointY
+    cmp PlayerY
+    bcc @goUp
+    cmp Temp
+    bcs @goDown
+    bcc @goUp
+@goDown:
+    lda TempDir
+    ora #%00001000
+    sta TempDir
+    jmp @exit
+@goUp:
+    lda TempDir
+    ora #%00000100
+    sta TempDir
+
+
+@exit:
+
+    rts
+
 ;----------------------
 TestCollisionGoingRight:
     sta TempX ; save modified x

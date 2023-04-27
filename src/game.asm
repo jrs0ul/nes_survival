@@ -420,7 +420,9 @@ npc_anim_row_sequence:
 
     NPC_STATE_DAMAGED          = 3
     NPC_STATE_ATTACK           = 2
-    
+
+    NPC_TYPE_TIMID             = 0
+    NPC_TYPE_PREDATOR          = 1
     NPC_TYPE_VILLAGER          = 2
 
     RECIPES_SIZE               = 12
