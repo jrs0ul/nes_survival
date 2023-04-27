@@ -297,13 +297,13 @@ CanPlayerGo:
 
     lda PlayerX
     clc
-    adc #PLAYER_COLLISION_BOX_X1
+    adc #PLAYER_COLLISION_LINE_X1
     adc TilesScroll
     sta TempPointX
 
     lda PlayerY
     clc
-    adc #8
+    adc #PLAYER_COLLISION_LINE_Y1
     sta TempPointY
 
     jsr TestPointAgainstCollisionMap
@@ -311,7 +311,7 @@ CanPlayerGo:
 
     lda PlayerX
     clc
-    adc #PLAYER_COLLISION_BOX_X2
+    adc #PLAYER_COLLISION_LINE_X2
     adc TilesScroll
     sta TempPointX
 
@@ -331,13 +331,13 @@ CanPlayerGoWithOldY:
 
     lda PlayerX
     clc
-    adc #PLAYER_COLLISION_BOX_X1
+    adc #PLAYER_COLLISION_LINE_X1
     adc TilesScroll
     sta TempPointX
 
     lda OldPlayerY
     clc
-    adc #8
+    adc #PLAYER_COLLISION_LINE_Y1
     sta TempPointY
 
     jsr TestPointAgainstCollisionMap
@@ -345,7 +345,7 @@ CanPlayerGoWithOldY:
 
     lda PlayerX
     clc
-    adc #PLAYER_COLLISION_BOX_X2
+    adc #PLAYER_COLLISION_LINE_X2
     adc TilesScroll
     sta TempPointX
 
@@ -365,13 +365,13 @@ CanPlayerGoWithOldX:
 
     lda OldPlayerX
     clc
-    adc #PLAYER_COLLISION_BOX_X1
+    adc #PLAYER_COLLISION_LINE_X1
     adc OldTileScroll
     sta TempPointX
 
     lda PlayerY
     clc
-    adc #8
+    adc #PLAYER_COLLISION_LINE_Y1
     sta TempPointY
 
     jsr TestPointAgainstCollisionMap
@@ -379,7 +379,7 @@ CanPlayerGoWithOldX:
 
     lda OldPlayerX
     clc
-    adc #PLAYER_COLLISION_BOX_X2
+    adc #PLAYER_COLLISION_LINE_X2
     adc OldTileScroll
     sta TempPointX
 
