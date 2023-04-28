@@ -1213,21 +1213,14 @@ ReadControllerLoop:
     lda $4016
     lsr
     rol Buttons
+    lsr             ;next bit from famicom's expansion port
+    rol ButtonsP3
     dex
     bne ReadControllerLoop
 
-    ldx #8                  ;2
-ReadControllerLoop2:
-    lda $4016               ;2
-    lsr                     ;2
-    rol ButtonsP3           ;5
-    dex                     ;2
-    bne ReadControllerLoop2 ;2
-;----------------------------4 + 11 * 8 = 92
-    lda Buttons             ;3
-    eor ButtonsP3           ;3
-    sta Buttons             ;3
-;----------------------------101
+    lda Buttons
+    eor ButtonsP3
+    sta Buttons
 
 
     lda #0
