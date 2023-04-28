@@ -72,28 +72,6 @@ LoadPalette:
 
 
     rts
-;---------------------------------------
-;updates palette with data from RAM
-UpdatePalette:
-    lda #0
-    sta $2001
-    lda $2002    ; read PPU status to reset the high/low latch
-    lda #$3F
-    sta $2006    ; write the high byte of $3F00 address
-    lda #$00
-    sta $2006    ; write the low byte of $3F00 address
-
-    ; Set x to 0 to get ready to load relative addresses from x
-    ldy #0
-@LoadPalettesLoop:
-    lda RamPalette, y      ;load palette byte
-    sta $2007             ;write to PPU
-    iny                   ;set index to next byte
-    cpy PaletteUpdateSize
-    bne @LoadPalettesLoop  
-
-
-    rts
 
 ;----------------------------------------
 ; Feeds stuff that the pointer points to, to PPU

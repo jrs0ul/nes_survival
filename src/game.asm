@@ -467,6 +467,44 @@ LastDigit:
     .res 1
 TempDigit:
     .res 1
+
+
+Buttons:
+    .res 1
+ButtonsP3:
+    .res 1
+OldButtons:
+    .res 1
+MenuButtons:
+    .res 1
+PPUCTRL: ;PPU control settings
+    .res 1
+GameState:
+    .res 1
+InputProcessed:
+    .res 1
+NMIActive:
+    .res 1
+MustUpdatePalette: ;flag that signals the palette update
+    .res 1
+
+
+HP:
+    .res 3
+HpUpdated:
+    .res 1
+
+Food:
+    .res 3
+FoodUpdated:
+    .res 1
+
+Warmth:
+    .res 3
+WarmthUpdated:
+    .res 1
+MustLoadSomething:
+    .res 1
 ;--------------
 .segment "BSS" ; variables in ram
 
@@ -509,8 +547,7 @@ RightCollisonMapIdx:
     .res 1
 
 
-PPUCTRL: ;PPU control settings
-    .res 1
+
 
 TilesScroll:
     .res 1
@@ -553,8 +590,7 @@ DirectionX:
 DirectionY:
     .res 1
 
-InputProcessed:
-    .res 1
+
 
 RandomNumber:
     .res 1
@@ -585,28 +621,13 @@ FireFrame:  ;an animation frame of fire in the fireplace
 FireFrameDelay:
     .res 1
 
-HP:
-    .res 3
-HpUpdated:
-    .res 1
 
-Food:
-    .res 3
-FoodUpdated:
-    .res 1
-
-Warmth:
-    .res 3
-WarmthUpdated:
-    .res 1
 
 Fuel:       ;how much fuel you have at home in the fireplace
     .res 3
 
 Days:
     .res 3
-DaysUpdated:
-    .res 1
 Minutes:
     .res 1
 Hours:
@@ -648,19 +669,11 @@ FoodDelay:
 FuelDelay:
     .res 1
 
-NMIActive:
-    .res 1
 
 
-GameState:
-    .res 1
+
+
 PlayerAlive:
-    .res 1
-Buttons:
-    .res 1
-OldButtons:
-    .res 1
-MenuButtons:
     .res 1
 
 InHouse:    ;is the player inside his hut?
@@ -699,14 +712,12 @@ TextLength:
 MustClearVillagerItems:
     .res 1
 
-MustUpdatePalette: ;flag that signals the palette update
-    .res 1
+
 
 MustCopyMainChr:
     .res 1
 
-MustLoadSomething:
-    .res 1
+
 MustLoadHouseInterior:
     .res 1
 MustLoadVillagerHut:
@@ -958,6 +969,14 @@ SourceMapIdx:
     .res 1
 
 ;====================================================================================
+
+.macro bankswitch
+    sty current_bank      ; save the current bank in RAM so the NMI handler can restore it
+    lda banktable, y      ; read a byte from the banktable
+    sta banktable, y      ; and write it back, switching banks
+.endmacro
+
+
 .segment "CODE"
 
 bankswitch_y:
@@ -1189,13 +1208,27 @@ startNMI:
     sta $4016
     lda #$00
     sta $4016
-    ldx #$08
+    ldx #8
 ReadControllerLoop:
     lda $4016
     lsr
     rol Buttons
     dex
     bne ReadControllerLoop
+
+    ldx #8                  ;2
+ReadControllerLoop2:
+    lda $4016               ;2
+    lsr                     ;2
+    rol ButtonsP3           ;5
+    dex                     ;2
+    bne ReadControllerLoop2 ;2
+;----------------------------4 + 11 * 8 = 92
+    lda Buttons             ;3
+    eor ButtonsP3           ;3
+    sta Buttons             ;3
+;----------------------------101
+
 
     lda #0
     sta InputProcessed
@@ -1218,7 +1251,24 @@ DoneLoadingMaps:
     lda MustUpdatePalette
     beq doneUpdatingPalette
 
-    jsr UpdatePalette
+    lda #0
+    sta $2001
+    lda $2002    ; read PPU status to reset the high/low latch
+    lda #$3F
+    sta $2006    ; write the high byte of $3F00 address
+    lda #$00
+    sta $2006    ; write the low byte of $3F00 address
+
+    ; Set x to 0 to get ready to load relative addresses from x
+    ldy #0
+LoadPalettesLoop:
+    lda RamPalette, y      ;load palette byte
+    sta $2007             ;write to PPU
+    iny                   ;set index to next byte
+    cpy PaletteUpdateSize
+    bne LoadPalettesLoop
+
+
     lda #0
     sta MustUpdatePalette
 
@@ -1227,10 +1277,11 @@ doneUpdatingPalette:
     lda GameState
     cmp #STATE_GAME
     bne nmicont2
+
     jsr UpdateFireplace
     jsr UploadBgColumns
-    jsr UpdateStatusDigits
     jsr UpdateTextBaloon
+    jsr UpdateStatusDigits
 
 nmicont2:
 
@@ -1276,8 +1327,20 @@ WaitScanline:
 endOfNmi:
     lda PPUCTRL
     sta $2000
-    
-    jsr FamistudioUpdate
+
+    ;famistudio update
+    ldy current_bank
+    sty oldbank
+
+    ldy #6
+    bankswitch ; macro
+
+    jsr famistudio_update
+
+    ldy oldbank
+
+    bankswitch
+    ;-------------
 
     pla
     tax
@@ -1295,25 +1358,6 @@ endOfNmi:
 .include "LoadOutsideMap.asm"
 .include "random.asm"
 .include "menu.asm"
-
-
-;----------------------------------
-FamistudioUpdate:
-
-    ldy current_bank
-    sty oldbank
-
-    ldy #6
-    jsr bankswitch_y
-
-    jsr famistudio_update
-
-    ldy oldbank
-
-    jsr bankswitch_y
-
-
-    rts
 
 
 ;--------------------------------------------
@@ -1347,6 +1391,41 @@ UpdateMenuState:
 @exit:
     rts
 
+;----------------------------------
+UpdateFireplace:
+
+    lda InHouse
+    beq @exit
+
+    lda $2002
+    lda #$21
+    sta $2006
+    lda #$0E
+    sta $2006
+
+    lda Fuel
+    clc
+    adc Fuel + 1
+    adc Fuel + 2
+    cmp #0
+    beq @putFireOut
+    lda FireFrame
+    asl
+    sta Temp
+    lda #$5C
+    clc
+    adc Temp
+    sta $2007
+    adc #1
+    sta $2007
+    jmp @exit
+@putFireOut:
+    lda #0
+    sta $2007
+    sta $2007
+
+@exit:
+    rts
 
 ;--------------------------------------------
 ;Check and upload background columns from rom map to the PPU
@@ -1391,6 +1470,8 @@ UploadBgColumns:
     sta pointer2 + 1
     
 
+    lda #0
+    sta $2001
     lda PPUCTRL
     eor #%00000100 ; add 32 to next ppu address mode
     sta $2000
@@ -2316,8 +2397,6 @@ IncreaseDays:
     lda #1
     sta DigitChangeSize
     jsr IncreaseDigits
-    lda #1
-    sta DaysUpdated
     rts
 ;-------------------------------
 DecreaseWarmth:
@@ -2649,9 +2728,8 @@ UpdateTextBaloon:
 ;--------------------------------
 UpdateStatusDigits:
 
-    lda GameState
-    cmp #STATE_GAME
-    bne @exit
+    lda #0
+    sta $2001
 
 
     lda HpUpdated
@@ -2667,7 +2745,7 @@ UpdateStatusDigits:
     sty HpUpdated
 @HpLoop:
     lda #CHARACTER_ZERO
-    clc 
+    clc
     adc HP, y
     sta $2007
     iny
@@ -2699,7 +2777,7 @@ UpdateStatusDigits:
 
 @food:
     lda FoodUpdated
-    beq @days
+    beq @exit
 
     lda $2002
     lda #$20
@@ -2717,11 +2795,6 @@ UpdateStatusDigits:
     iny
     cpy #3
     bcc @FoodLoop
-
-@days:
-    lda DaysUpdated
-    beq @exit
-
 
 @exit:
     rts
@@ -2751,7 +2824,6 @@ InitializeStatusBarLoop:     ; copy status bar to first nametable
     sta HpUpdated
     sta FoodUpdated
     sta WarmthUpdated
-    sta DaysUpdated
     rts
 
 ;--------------------------------------------
@@ -2915,7 +2987,6 @@ ResetEntityVariables:
     sta HpUpdated
     sta WarmthUpdated
     sta FoodUpdated
-    sta DaysUpdated
 
     lda #0
     sta HP + 1
@@ -3533,42 +3604,6 @@ FlipStartingNametable:
 
     sta PPUCTRL
 
-    rts
-;----------------------------------
-
-UpdateFireplace:
-
-    lda InHouse
-    beq @exit
-
-    lda $2002
-    lda #$21
-    sta $2006
-    lda #$0E
-    sta $2006
-
-    lda Fuel
-    clc
-    adc Fuel + 1
-    adc Fuel + 2
-    cmp #0
-    beq @putFireOut
-    lda FireFrame
-    asl
-    sta Temp
-    lda #$5C
-    clc
-    adc Temp
-    sta $2007
-    adc #1
-    sta $2007
-    jmp @exit
-@putFireOut:
-    lda #0
-    sta $2007
-    sta $2007
-
-@exit:
     rts
 ;-----------------------------------
 CheckIfEnteredVillagerHut:
