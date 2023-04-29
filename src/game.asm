@@ -425,7 +425,7 @@ npc_anim_row_sequence:
     NPC_TYPE_PREDATOR          = 1
     NPC_TYPE_VILLAGER          = 2
 
-    RECIPES_SIZE               = 12
+    RECIPES_SIZE               = 24
 
     ROT_AMOUNT_RAW_MEAT        = 50
     ROT_AMOUNT_COOKED_MEAT     = 25
