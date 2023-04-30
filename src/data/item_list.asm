@@ -2,7 +2,7 @@ House_items:
     .byte 0
 
 Outside1_items:
-    .byte 7
+    .byte ITEM_COUNT_LOC1
     .byte %00000011, 50, 170, 4
     .byte %00001001, 0, 66, 4
     .byte %00000011, 220, 100, 4
@@ -13,7 +13,7 @@ Outside1_items:
 
 
 Outside2_items:
-    .byte 8
+    .byte ITEM_COUNT_LOC2
     .byte %00000011, 50, 130, 0
     .byte %00001101, 100, 164, 1
     .byte %00000011, 100, 64, 1
@@ -21,6 +21,6 @@ Outside2_items:
 
     .byte %00010101, 150, 100, 0
     .byte %00011101, 180, 100, 0
-    .byte %00100001, 90, 100, 0
+    .byte %00100001, 90, 110, 0
     .byte %00100011, 90, 100, 1
 

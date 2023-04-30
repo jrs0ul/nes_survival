@@ -237,7 +237,7 @@ PlayerHitsNpcs:
     bne @ignoreTimer ;ignore attack timer and hit multiple npcs
     lda AttackTimer
     beq @exit
-    lda PlayerDidDmg
+    lda NpcsHitByPlayer
     bne @exit
 
 @ignoreTimer:
@@ -415,7 +415,7 @@ OnCollisionWithAttackRect:
     cmp #NPC_TYPE_VILLAGER
     beq @doneDoingDmg
 
-    inc PlayerDidDmg
+    inc NpcsHitByPlayer
 
     jsr CalcPlayerDmg
 
@@ -474,11 +474,11 @@ OnCollisionWithAttackRect:
     lda EquipedItem
     beq @exit
     lda EquipedItem + 1
-    cmp #10
+    cmp #TOOL_WEAR
     bcc @removeWeapon
     beq @removeWeapon
     sec
-    sbc #10
+    sbc #TOOL_WEAR
     sta EquipedItem + 1
     jmp @exit
 
@@ -524,7 +524,22 @@ DropItemAfterDeath:
     asl
     asl
     tay
+    lda NpcsHitByPlayer
+    cmp #2
+    bcs @specialRewardItem
+
     lda #%00000101
+    jmp @storeItem
+@specialRewardItem:
+    jsr UpdateRandomNumber
+    and #3
+    cmp #2
+    bcs @spawnHide
+    lda #%00011001
+    jmp @storeItem
+@spawnHide:
+    lda #%00010101
+@storeItem:
     sta Items, y
     iny
     lda DropedItemX

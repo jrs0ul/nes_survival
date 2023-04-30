@@ -393,8 +393,8 @@ npc_anim_row_sequence:
 
     SPEAR_SPEED                = 3
 
-    ITEM_COUNT_LOC1            = 6
-    ITEM_COUNT_LOC2            = 3
+    ITEM_COUNT_LOC1            = 7
+    ITEM_COUNT_LOC2            = 8
 
     ITEM_NEVER_BEEN_PICKED     = 255
 
@@ -410,6 +410,8 @@ npc_anim_row_sequence:
     PROJECTILE_DIR_DOWN        = 2
     PROJECTILE_DIR_LEFT        = 3
     PROJECTILE_DIR_RIGHT       = 4
+
+    TOOL_WEAR                  = 10
 
     NPC_STEPS_BEFORE_REDIRECT  = 16
 
@@ -578,7 +580,7 @@ WalkTimer:
     .res 1
 AttackTimer:
     .res 1
-PlayerDidDmg:
+NpcsHitByPlayer:
     .res 1
 PlayerFrame:
     .res 1
@@ -3386,7 +3388,7 @@ CheckB:
     lda #PLAYER_ATTACK_DELAY
     sta AttackTimer
     lda #0
-    sta PlayerDidDmg
+    sta NpcsHitByPlayer
 
     ldy current_bank
     sty oldbank
