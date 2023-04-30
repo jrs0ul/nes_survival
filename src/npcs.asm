@@ -447,10 +447,6 @@ OnCollisionWithAttackRect:
     and #%11111100; drop two last bits that stand for status
     sta Npcs, y
 
-
-    lda TempNpcType
-    bne @wearWeapon ; predators don't drop anything
-
     jsr DropItemAfterDeath
     jmp @wearWeapon
 
@@ -515,6 +511,17 @@ PlayDamageSfx:
 
 ;-------------------------------------
 DropItemAfterDeath:
+    
+    lda TempNpcType
+    cmp #NPC_TYPE_PREDATOR
+    bne @continueDrop
+
+    lda NpcsHitByPlayer
+    cmp #2
+    bcs @continueDrop
+    jmp @exit ;don't drop anything for the first hostile
+
+@continueDrop:
     ;drop item
     inc ItemCount
     lda ItemCount
@@ -524,6 +531,12 @@ DropItemAfterDeath:
     asl
     asl
     tay
+
+    lda TempNpcType
+    cmp #NPC_TYPE_PREDATOR
+    beq @spawnHide
+
+
     lda NpcsHitByPlayer
     cmp #2
     bcs @specialRewardItem
@@ -562,7 +575,7 @@ DropItemAfterDeath:
     clc
     adc TempItemScreen
     sta Items, y
-
+@exit:
     rts
 ;-------------------------------------
 CalcPlayerDmg:
