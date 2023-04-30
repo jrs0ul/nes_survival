@@ -1876,9 +1876,16 @@ CookMeat:
     beq @cantcook
 
     lda TempItemIndex
-    cmp #2
-    bne @cantcook
+    cmp #ITEM_RAW_MEAT
+    beq @startCooking
+    cmp #ITEM_RAW_JUMBO_MEAT
+    beq @startCooking
+    cmp #ITEM_RAW_FISH
+    beq @startCooking
 
+    jmp @cantcook
+
+@startCooking:
     lda Fuel
     clc
     adc Fuel + 1
@@ -1903,15 +1910,33 @@ CookMeat:
     jsr DecreaseDigits
     ldx TempPush
 
+   
+    lda TempItemIndex
+    cmp #ITEM_RAW_MEAT
+    bne @checkNextItem
+    lda #ITEM_COOKED_MEAT
+    jmp @storeResult
+@checkNextItem:
+    cmp #ITEM_RAW_JUMBO_MEAT
+    bne @checkNextItem2
+    lda #ITEM_COOKED_JUMBO_MEAT
+    jmp @storeResult
+@checkNextItem2:
+    lda #ITEM_COOKED_FISH
+
+@storeResult:
+    sta Temp
     lda StashActivated
     bne @putToStash
-    lda #3
+
+    lda Temp
     sta Inventory, x ; put cooked meat
     jmp @cantcook
 @putToStash:
-    lda #3
+    lda Temp
     sta Storage, x
 @cantcook:
+
     rts
 ;--------------------------------------
 LoadSelectedItemStuff:

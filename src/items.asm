@@ -493,16 +493,29 @@ RotFood:
     beq @nextItem       ;if empty
 
     cmp #ITEM_RAW_MEAT
-    bne @checkCooked
+    beq @setRaw
+    cmp #ITEM_RAW_JUMBO_MEAT
+    beq @setRaw
+    cmp #ITEM_RAW_FISH
+    beq @setRaw
+    jmp @checkCooked
 
+@setRaw:
     lda #ROT_AMOUNT_RAW_MEAT
     sta RotAmount
     jmp @rot
 
 @checkCooked:
     cmp #ITEM_COOKED_MEAT
-    bne @nextItem
+    beq @setCooked
+    cmp #ITEM_COOKED_JUMBO_MEAT
+    beq @setCooked
+    cmp #ITEM_COOKED_FISH
+    beq @setCooked
 
+    jmp @nextItem
+
+@setCooked:
     lda #ROT_AMOUNT_COOKED_MEAT
     sta RotAmount
 @rot:

@@ -390,6 +390,10 @@ npc_anim_row_sequence:
     ITEM_SPEAR                 = 7
     ITEM_KNIFE                 = 8
     ITEM_POOP                  = 9
+    ITEM_RAW_JUMBO_MEAT        = 12
+    ITEM_COOKED_JUMBO_MEAT     = 13
+    ITEM_RAW_FISH              = 17
+    ITEM_COOKED_FISH           = 18
 
     SPEAR_SPEED                = 3
 
