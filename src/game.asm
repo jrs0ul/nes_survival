@@ -398,7 +398,7 @@ npc_anim_row_sequence:
     SPEAR_SPEED                = 3
 
     ITEM_COUNT_LOC1            = 7
-    ITEM_COUNT_LOC2            = 8
+    ITEM_COUNT_LOC2            = 7
 
     ITEM_NEVER_BEEN_PICKED     = 255
 
