@@ -161,6 +161,12 @@ spearSprites:
     .byte 252, $E0, %00000000, 248, 252, $E1, %00000000, 0 ;left
     .byte 252, $E1, %01000000, 248, 252, $E0, %01000000, 0 ;right
 
+fishingRodSprites:
+    .byte   8, 232, %00000000, 0,   8, 233, %00000000, 248 ;left
+    .byte   8, 232, %01000000, 8,   8, 233, %01000000, 16 ;right
+    .byte   8, $C9, %00000000, 0,  16, $D9, %00000000, 0  ;down
+    .byte   0, $C9, %10000000, 0,  248, $D9, %10000000, 0 ;up
+
 
 house_palette:
     .byte $0C,$16,$27,$37, $0C,$07,$00,$31, $0C,$17,$27,$31, $0C,$20,$37,$16    ;background
@@ -392,6 +398,7 @@ npc_anim_row_sequence:
     ITEM_POOP                  = 9
     ITEM_RAW_JUMBO_MEAT        = 12
     ITEM_COOKED_JUMBO_MEAT     = 13
+    ITEM_FISHING_ROD           = 15
     ITEM_RAW_FISH              = 17
     ITEM_COOKED_FISH           = 18
 
@@ -599,6 +606,9 @@ DirectionY:
 
 
 RandomNumber:
+    .res 1
+
+FishingRodActive:
     .res 1
 
 SpearActive:
@@ -2464,7 +2474,6 @@ HandleInput:
     lda Buttons
     beq @finishInput ; no input
 
-   
     lda AttackTimer
     bne @finishInput
 
@@ -3303,6 +3312,10 @@ ProcessButtons:
 
     jsr CheckB
 
+
+    lda FishingRodActive
+    bne @exit
+
 ;Check if LEFT is pressed
     jsr CheckLeft
 ;-----
@@ -3312,7 +3325,6 @@ ProcessButtons:
 ;--------
 ;Check if UP is pressed
 @CheckUp:
-go_Up:
     lda Buttons
     and #BUTTON_UP_MASK
     beq @CheckDown
@@ -3346,6 +3358,7 @@ go_Up:
 @exit:
     lda #1
     sta InputProcessed
+
     rts
 ;----------------------------------
 CheckB:
@@ -3383,9 +3396,15 @@ CheckB:
 
     lda EquipedItem
     cmp #ITEM_SPEAR
-    bne @regularAttack
+    bne @checkNext
 
     jsr LaunchSpear
+    jmp @regularAttack
+@checkNext:
+    cmp #ITEM_FISHING_ROD
+    bne @regularAttack
+
+    jsr ActivateFishingRod
 
 @regularAttack:
 
@@ -3410,6 +3429,50 @@ CheckB:
 @exit:
 
     rts
+;----------------------------------
+ActivateFishingRod:
+
+
+    lda FishingRodActive
+    bne @pullout
+
+    lda #1
+    sta FishingRodActive
+    jmp @exit
+
+@pullout:
+
+
+    lda #0
+    sta FishingRodActive
+
+    inc ItemCount
+    lda ItemCount
+    sec
+    sbc #1
+    asl
+    asl
+    tay
+
+    lda #%00100011
+    sta Items, y
+    lda PlayerX
+    iny
+    sta Items, y
+    iny
+    lda PlayerY
+    clc
+    adc #18
+    sta Items, y
+    iny
+    lda #0
+    sta Items, y
+    
+
+@exit:
+    rts
+
+
 ;----------------------------------
 LaunchSpear:
 
@@ -4297,6 +4360,8 @@ UpdateSprites:
 @noKnife:
 
     jsr UpdateSpearSprite
+
+    jsr UpdateFishingRodSprites
 ;---
     inx; next sprite byte
 ;------sun-moon indicator
@@ -4481,6 +4546,83 @@ SetTwoSpearSprites:
     adc spearSprites, y
     sta FIRST_SPRITE, x
 
+
+    rts
+;---------------------------------
+UpdateFishingRodSprites:
+
+    lda FishingRodActive
+    beq @exit
+
+    lda PlayerFrame
+    beq @horizontal
+
+    cmp #1
+    beq @down
+    ldy #16
+    jmp @update
+@down:
+    ldy #24
+    jmp @update
+
+@horizontal:
+    lda PlayerFlip
+    bne @flipIndex
+
+    ldy #0
+    jmp @update
+
+@flipIndex:
+
+    ldy #8
+@update:
+    inx
+    lda PlayerY
+    clc
+    adc fishingRodSprites, y
+    sta FIRST_SPRITE, x ;y
+    iny
+    inx
+    lda fishingRodSprites, y
+    sta FIRST_SPRITE, x ;frame
+    inx
+    iny
+    lda fishingRodSprites, y
+    sta FIRST_SPRITE, x ;attr
+    inx
+    iny
+    lda PlayerX
+    clc
+    adc fishingRodSprites, y
+    sta FIRST_SPRITE, x ;x
+
+    inx
+    iny
+    lda PlayerY
+    clc
+    adc fishingRodSprites, y
+    sta FIRST_SPRITE, x ;y
+    inx
+    iny
+    lda fishingRodSprites, y
+    sta FIRST_SPRITE, x ;frame
+    inx
+    iny
+    lda fishingRodSprites, y
+    sta FIRST_SPRITE, x ;attr
+    inx
+    iny
+    lda PlayerX
+    clc
+    adc fishingRodSprites, y
+    sta FIRST_SPRITE, x ;x
+
+    lda TempSpriteCount
+    clc
+    adc #2
+    sta TempSpriteCount
+
+@exit:
 
     rts
 
