@@ -10,7 +10,7 @@ item_data:
     .byte 102, 2, 1, 3  ; 5  jam
     .byte 54,  3, 4, 0  ; 6  rock
     .byte 224, 2, 5, 9  ; 7  spear
-    .byte 86,  0, 5, 2  ; 8  knife
+    .byte 86,  2, 5, 2  ; 8  knife
     .byte 118, 0, 2, 1  ; 9  poop
     .byte 134, 0, 4, 0  ; 10 hide
     .byte 150, 0, 5, 2  ; 11 coat

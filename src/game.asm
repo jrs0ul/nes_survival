@@ -443,6 +443,8 @@ npc_anim_row_sequence:
     ROT_AMOUNT_RAW_MEAT        = 50
     ROT_AMOUNT_COOKED_MEAT     = 25
 
+    FISHING_CATCH_OFFSET_Y     = 18
+
 ;===================================================================
 .segment "ZEROPAGE"
 current_bank:
@@ -3432,15 +3434,96 @@ CheckB:
 ;----------------------------------
 ActivateFishingRod:
 
-
     lda FishingRodActive
     bne @pullout
 
+    ;let's check if I can throw there
+    ;TODO: use player directions
+
+    lda PlayerX
+
+    clc
+    adc GlobalScroll
+    sta TempX
+    bcs @mustIncrementScreen
+
+    lda CurrentMapSegmentIndex
+    tay ;store screen index to Y register
+    jmp @continueCalc
+
+@mustIncrementScreen:
+
+    lda CurrentMapSegmentIndex
+    clc
+    adc #1
+    tay; screen index goes to Y register
+
+@continueCalc:
+
+    lda TempX ; x / 8
+    lsr
+    lsr
+    lsr
+    sta TempX
+
+    lda PlayerY ; y / 8
+    lsr
+    lsr
+    lsr
+    sta TempY
+
+
+@activateRod:
+
+    lda LocationIndex
+    beq @location0
+
+    lda map_list_low2, y
+    sta pointer
+    lda map_list_high2, y
+    sta pointer + 1
+    jmp @calcaddress
+
+@location0:
+
+    lda map_list_low, y
+    sta pointer
+    lda map_list_high, y
+    sta pointer + 1
+
+
+@calcaddress:
+    ldy TempY
+    beq @skip
+@addressLoop:
+
+    lda pointer
+    clc
+    adc #32
+    sta pointer
+    bcs @incrementUpper
+    jmp @nextRow
+@incrementUpper:
+    inc pointer + 1
+@nextRow:
+    dey
+    bne @addressLoop
+@skip:
+    lda TempX
+    tay
+
+    lda (pointer), y
+    cmp #$F0
+    beq @throwThere
+    cmp #$F1
+    bne @exit
+
+@throwThere:
     lda #1
     sta FishingRodActive
     jmp @exit
 
-@pullout:
+@pullout: ;-----pull the rod out---
 
 
     lda #0
@@ -3456,18 +3539,33 @@ ActivateFishingRod:
 
     lda #%00100011
     sta Items, y
-    lda PlayerX
     iny
+    lda PlayerX
+    adc GlobalScroll
+    bcs @incrementScreen
     sta Items, y
     iny
     lda PlayerY
     clc
-    adc #18
+    adc #FISHING_CATCH_OFFSET_Y
     sta Items, y
     iny
-    lda #0
+    lda CurrentMapSegmentIndex
     sta Items, y
-    
+    jmp @exit
+@incrementScreen:
+    sta Items, y
+    iny
+    lda PlayerY
+    clc
+    adc #FISHING_CATCH_OFFSET_Y
+    sta Items, y
+    iny
+    lda CurrentMapSegmentIndex
+    clc
+    adc #1
+    sta Items, y
+
 
 @exit:
     rts
