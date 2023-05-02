@@ -468,21 +468,10 @@ OnCollisionWithAttackRect:
 @wearWeapon:
 
     lda EquipedItem
+    cmp #ITEM_FISHING_ROD
     beq @exit
-    lda EquipedItem + 1
-    cmp #TOOL_WEAR
-    bcc @removeWeapon
-    beq @removeWeapon
-    sec
-    sbc #TOOL_WEAR
-    sta EquipedItem + 1
-    jmp @exit
 
-@removeWeapon:
-    lda #0
-    sta EquipedItem
-    sta EquipedItem + 1
-
+    jsr WearWeapon
 @exit:
 
     rts
@@ -582,6 +571,8 @@ CalcPlayerDmg:
     lda #1
     sta TempPlayerAttk
     lda EquipedItem
+    beq @exit
+    cmp #ITEM_FISHING_ROD ; fishing rod is not a weapon
     beq @exit
 
     asl

@@ -162,10 +162,10 @@ spearSprites:
     .byte 252, $E1, %01000000, 248, 252, $E0, %01000000, 0 ;right
 
 fishingRodSprites:
-    .byte   8, 232, %00000000, 0,   8, 233, %00000000, 248 ;left
-    .byte   8, 232, %01000000, 8,   8, 233, %01000000, 16 ;right
-    .byte   8, $C9, %00000000, 0,  16, $D9, %00000000, 0  ;down
-    .byte   0, $C9, %10000000, 0,  248, $D9, %10000000, 0 ;up
+    .byte   8, $E7, %00000000, 0,   8, $E8, %00000000, 248 ;left
+    .byte   8, $E7, %01000000, 8,   8, $E8, %01000000, 16 ;right
+    .byte   8, $E6, %00000000, 0,  16, $D8, %00000000, 0  ;down
+    .byte   0, $E6, %10000000, 0,  248, $D8, %10000000, 0 ;up
 
 
 house_palette:
@@ -319,6 +319,7 @@ npc_anim_row_sequence:
     ITEM_DELAY                 = 66
     NPC_AI_DELAY               = 128
     NPC_COLLISION_DELAY        = 250
+    FISHING_DELAY              = 2
 
     COLLISION_MAP_SIZE         = 120 ; 4 columns * 30 rows
     COLLISION_MAP_COLUMN_COUNT = 4
@@ -405,7 +406,7 @@ npc_anim_row_sequence:
     SPEAR_SPEED                = 3
 
     ITEM_COUNT_LOC1            = 7
-    ITEM_COUNT_LOC2            = 7
+    ITEM_COUNT_LOC2            = 6
 
     ITEM_NEVER_BEEN_PICKED     = 255
 
@@ -444,6 +445,7 @@ npc_anim_row_sequence:
     ROT_AMOUNT_COOKED_MEAT     = 25
 
     FISHING_CATCH_OFFSET_Y     = 18
+    FISHING_BITE_TIMER_MAX     = 15
 
 ;===================================================================
 .segment "ZEROPAGE"
@@ -611,6 +613,12 @@ RandomNumber:
     .res 1
 
 FishingRodActive:
+    .res 1
+FishBiteTimer:
+    .res 1
+FishingWaitTimer:
+    .res 1
+FishingDelay:
     .res 1
 
 SpearActive:
@@ -1630,6 +1638,7 @@ Logics:
 @doneLogics:
    
     jsr UpdateSpear
+    jsr UpdateFishingRod
 
     lda AttackTimer
     beq @noAttack
@@ -1653,6 +1662,43 @@ Logics:
 @exit:
 
     rts
+;-------------------------------
+UpdateFishingRod:
+    lda FishingRodActive
+    beq @exit
+
+    lda FishingDelay
+    beq @runtimer
+
+    dec FishingDelay
+    bne @exit
+
+
+@runtimer:
+    lda #FISHING_DELAY
+    sta FishingDelay
+    lda FishingWaitTimer
+    beq @animateBiting
+
+    dec FishingWaitTimer
+    bne @exit
+
+@animateBiting:
+    inc FishBiteTimer
+    lda FishBiteTimer
+    cmp #FISHING_BITE_TIMER_MAX
+    bcs @reset
+    jmp @exit
+
+@reset:
+    lda #0
+    sta FishBiteTimer
+
+
+
+@exit:
+    rts
+
 ;-------------------------------
 UpdateSpear:
 
@@ -3061,6 +3107,8 @@ ResetEntityVariables:
     sta InVillagerHut
     sta LocationIndex
     sta SpearActive
+    sta FishBiteTimer
+    sta FishingRodActive
     lda #PLAYER_START_X
     sta PlayerX
     lda #PLAYER_START_Y
@@ -3432,11 +3480,63 @@ CheckB:
 
     rts
 ;----------------------------------
+WearWeapon:
+
+    lda EquipedItem
+    beq @exit
+    lda EquipedItem + 1
+    cmp #TOOL_WEAR
+    bcc @removeWeapon
+    beq @removeWeapon
+    sec
+    sbc #TOOL_WEAR
+    sta EquipedItem + 1
+    jmp @exit
+
+@removeWeapon:
+    lda #0
+    sta EquipedItem
+    sta EquipedItem + 1
+@exit:
+    rts
+
+
+;----------------------------------
 ActivateFishingRod:
 
     lda FishingRodActive
     bne @pullout
 
+    jsr CanCastRodHere
+    bne @exit
+
+@throwThere:
+
+    jsr UpdateRandomNumber
+    and #%00111111; 64
+    clc
+    adc #32
+
+    sta FishingWaitTimer
+    lda #FISHING_DELAY
+    sta FishingDelay
+    lda #0
+    sta FishBiteTimer
+
+    lda #1
+    sta FishingRodActive
+    jmp @exit
+
+@pullout: ;-----pull the rod out---
+
+    jsr PullOutRod
+
+@exit:
+    rts
+
+;----------------------------------
+;A -> 0 = can, 1 = can't
+CanCastRodHere:
     ;let's check if I can throw there
     ;TODO: use player directions
 
@@ -3519,15 +3619,26 @@ ActivateFishingRod:
     bne @exit
 
 @throwThere:
+
+    lda #0
+    jmp @end
+@exit:
     lda #1
-    sta FishingRodActive
-    jmp @exit
 
-@pullout: ;-----pull the rod out---
+@end:
 
+    rts
+
+;----------------------------------
+PullOutRod:
 
     lda #0
     sta FishingRodActive
+
+    lda FishingWaitTimer
+    bne @exit
+
+    jsr WearWeapon
 
     inc ItemCount
     lda ItemCount
@@ -3571,7 +3682,7 @@ ActivateFishingRod:
     rts
 
 
-;----------------------------------
+;-----------------------------------
 LaunchSpear:
 
     ;throw a spear
@@ -4674,6 +4785,19 @@ UpdateFishingRodSprites:
 
     ldy #8
 @update:
+
+   jsr UpdateTwoRodSprites
+@exit:
+
+    rts
+;---------------------------------
+UpdateTwoRodSprites:
+    lda FishBiteTimer ; / 8
+    lsr
+    lsr
+    lsr
+    sta Temp
+
     inx
     lda PlayerY
     clc
@@ -4703,6 +4827,9 @@ UpdateFishingRodSprites:
     inx
     iny
     lda fishingRodSprites, y
+    clc
+    adc Temp
+
     sta FIRST_SPRITE, x ;frame
     inx
     iny
@@ -4720,10 +4847,8 @@ UpdateFishingRodSprites:
     adc #2
     sta TempSpriteCount
 
-@exit:
 
     rts
-
 ;----------------------------------
 SetKnifeSprite:
 
