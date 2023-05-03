@@ -823,10 +823,28 @@ CraftFromSelectedComponents:
 ;--------------------------------------
 EquipmentInput:
 
+    lda #12
+    sta MenuStep
+    lda #INVENTORY_SPRITE_MIN_Y
+    sta MenuUpperLimit
+    lda #INVENTORY_SPRITE_MIN_Y + 12
+    sta MenuLowerLimit
+    lda #<InventoryItemIndex
+    sta pointer
+    lda #>InventoryItemIndex
+    sta pointer + 1
+    lda #2
+    sta MenuMaxItem
+    jsr MenuInputUpDownCheck
+
+
 @CheckB:
     lda Buttons
     and #BUTTON_B_MASK
     beq @CheckA
+
+    lda InventoryItemIndex
+    bne @unequipCloth
 
     lda EquipedItem
     beq @exit ; no item equiped
@@ -835,25 +853,20 @@ EquipmentInput:
     bne @exit ; you've launched a spear can't unequip it now
 
     ;let's simply unequip
-    ldx #254
-@loop:
-    inx
-    inx
-    cpx #INVENTORY_MAX_SIZE
-    bcs @exit ; no place for an unequiped item
-    lda Inventory, x
-    bne @loop
 
-    lda EquipedItem
-    sta Inventory, x
-    inx
-    lda EquipedItem + 1
-    sta Inventory, x ; item's hp
+    lda #<EquipedItem
+    sta pointer
+    lda #>EquipedItem
+    sta pointer + 1
+    jsr UnequipItem
+    jmp @exit
 
-    lda #0
-    sta EquipedItem
-    sta EquipedItem + 1
-
+@unequipCloth:
+    lda #<EquipedClothing
+    sta pointer
+    lda #>EquipedClothing
+    sta pointer + 1
+    jsr UnequipItem
     jmp @exit
 
 @CheckA:
@@ -868,6 +881,33 @@ EquipmentInput:
     sta MustLoadMenu
 
 
+@exit:
+    rts
+;--------------------------------------
+;pointer - EquipedItem or EquipedClothing
+UnequipItem:
+    ldx #254 ;-2
+@loop:
+    inx
+    inx
+    cpx #INVENTORY_MAX_SIZE
+    bcs @exit ; no place for an unequiped item
+    lda Inventory, x
+    bne @loop
+
+    ldy #0
+    lda (pointer), y
+    sta Inventory, x
+    inx
+    iny
+    lda (pointer), y
+    sta Inventory, x ; item's hp
+
+    lda #0
+    tay
+    sta (pointer), y
+    iny
+    sta (pointer), y
 @exit:
     rts
 
@@ -924,6 +964,8 @@ OnItemClicked:
     beq @material
 
     cmp #ITEM_TYPE_TOOL
+    beq @tool
+    cmp #ITEM_TYPE_CLOTHING
     beq @tool
 
     ;regular item
@@ -1245,7 +1287,7 @@ FoodMenuInputVillager:
     sta ItemIGave
     lda #1
     sta ItemCount
-    lda #%00010011
+    lda #%00011111 ; fishing rod
     sta Items
     lda #120
     sta Items + 1
@@ -1388,10 +1430,28 @@ ToolInput:
     lda ItemMenuIndex
     bne @checkIfStash
 
+    lda TempIndex
+    cmp #ITEM_TYPE_CLOTHING
+    beq @equipClothes
+
+    lda #<EquipedItem
+    sta pointer
+    lda #>EquipedItem
+    sta pointer + 1
     jsr EquipItem
     beq @hidemenu ;return 0
     jmp @clearItem ;return 1
-   
+
+@equipClothes:
+    lda #<EquipedClothing
+    sta pointer
+    lda #>EquipedClothing
+    sta pointer + 1
+    jsr EquipItem
+    beq @hidemenu ;return 0
+    jmp @clearItem ;return 1
+
+
 @checkIfStash:
     cmp #1
     bne @clearItem ; DROP
@@ -1420,28 +1480,33 @@ ToolInput:
 
 
 ;-------------------------------------
+;pointer - EquipedItem or EquipedClothing
 EquipItem:
 
-
-    lda EquipedItem
+    ldy #0
+    lda (pointer), y
     sta Temp
-    lda EquipedItem + 1 ;item's hp
+    ldy #1
+    lda (pointer), y ;item's hp
     sta TempHp
     ;--
     lda StashActivated
     beq @inventory
     lda Storage, x
-    sta EquipedItem
+    ldy #0
+    sta (pointer), y
     inx
     lda Storage, x
     jmp @equip_hp
 @inventory:
     lda Inventory, x
-    sta EquipedItem
+    ldy #0
+    sta (pointer), y
     inx
     lda Inventory, x
 @equip_hp:
-    sta EquipedItem + 1
+    ldy #1
+    sta (pointer), y
     dex
     ;--
     lda Temp
@@ -2083,7 +2148,7 @@ UpdateInventorySprites:
 @itemLoop:
     lda EquipmentActivated
     beq @checkIfStash
-    lda EquipedItem
+    lda EquipedItem, x
     jmp @cnt
 
 @checkIfStash:
@@ -2116,7 +2181,13 @@ UpdateInventorySprites:
     ldx TempInventoryIndex ;restore x index
 @next:
     lda EquipmentActivated
-    bne @ThePointer
+    beq @invenotryprobably
+    inx
+    inx
+    cpx #4 ;both EquipedItem and EquipedClothing plus their hps
+    bcc @itemLoop
+    jmp @ThePointer
+@invenotryprobably:
     inx ;item hp
     inx
     cpx #INVENTORY_MAX_SIZE

@@ -157,7 +157,7 @@ x_collision_pattern:
 spearSprites:
           ;+Y,frame,attributes,+X
     .byte 248, $E2, %00000000, 252, 0, $E3, %00000000, 252 ;up
-    .byte 248, $E5, %00000000, 252, 0, $E4, %00000000, 252 ;down
+    .byte 248, $E3, %10000000, 252, 0, $E2, %10000000, 252 ;down
     .byte 252, $E0, %00000000, 248, 252, $E1, %00000000, 0 ;left
     .byte 252, $E1, %01000000, 248, 252, $E0, %01000000, 0 ;right
 
@@ -349,6 +349,9 @@ npc_anim_row_sequence:
     SLEEP_SUB_HP_HUNGER_TT     = 5
     SLEEP_SUB_HP_COLD_TT       = 5
 
+    WARMTH_NIGHT_DECREASE      = 5
+    WARMTH_DAY_DECREASE        = 1
+
 
     PALETTE_SIZE_MAX           = 32
 
@@ -390,6 +393,7 @@ npc_anim_row_sequence:
     ITEM_TYPE_MEDICINE         = 3
     ITEM_TYPE_MATERIAL         = 4
     ITEM_TYPE_TOOL             = 5
+    ITEM_TYPE_CLOTHING         = 6
 
     ITEM_RAW_MEAT              = 2
     ITEM_COOKED_MEAT           = 3
@@ -522,6 +526,10 @@ WarmthUpdated:
     .res 1
 MustLoadSomething:
     .res 1
+
+ZPBuffer:
+    .res 174  ; I want to be aware of free memory
+
 ;--------------
 .segment "BSS" ; variables in ram
 
@@ -664,6 +672,8 @@ Hours:
 
 EquipedItem:
     .res 2   ;item index + hp
+EquipedClothing:
+    .res 2
 
 ItemIGave:
     .res 1  ;item index i gave to villager
@@ -995,6 +1005,9 @@ AttribHighAddress:
     .res 1
 SourceMapIdx:
     .res 1
+
+Buffer:
+    .res 529 ;must see how much is still available
 
 ;====================================================================================
 
@@ -2364,12 +2377,24 @@ WarmthLogics:
     lda palette_fade_for_periods, x
     cmp #$40
     beq @nightFreeze
-    lda #1
+    lda #WARMTH_DAY_DECREASE
     jmp @saveTempDecrease
 @nightFreeze:
-    lda #5
+    lda #WARMTH_NIGHT_DECREASE
 @saveTempDecrease:
     sta DigitChangeSize
+    lda EquipedClothing
+    beq @cont
+    lda DigitChangeSize
+    cmp #1
+    beq @makezero
+    sec
+    sbc #1
+    jmp @cont
+@makezero:
+    lda #0
+    sta DigitChangeSize
+@cont:
     jsr DecreaseWarmth
     lda Warmth
     clc

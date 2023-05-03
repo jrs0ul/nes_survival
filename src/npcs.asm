@@ -1885,12 +1885,27 @@ DamagePlayer:
 
     jsr PlayDamageSfx
 
+    lda #9
+    sta DigitChangeSize
+
+
+    lda EquipedClothing
+    beq @noclothing
+
+    lda #5
+    sta DigitChangeSize
+    dec EquipedClothing + 1
+    bne @noclothing
+
+    lda #0
+    sta EquipedClothing
+
+
+@noclothing:
     lda #<HP
     sta DigitPtr
     lda #>HP
     sta DigitPtr + 1
-    lda #9
-    sta DigitChangeSize
     jsr DecreaseDigits
     lda #1
     sta HpUpdated
