@@ -3513,9 +3513,9 @@ ActivateFishingRod:
 @throwThere:
 
     jsr UpdateRandomNumber
-    and #%00111111; 64
+    and #%01111111; 128
     clc
-    adc #32
+    adc #48
 
     sta FishingWaitTimer
     lda #FISHING_DELAY
@@ -3538,10 +3538,30 @@ ActivateFishingRod:
 ;A -> 0 = can, 1 = can't
 CanCastRodHere:
     ;let's check if I can throw there
-    ;TODO: use player directions
+
+    lda PlayerFrame
+    beq @horizontal ;player is facing left or right
 
     lda PlayerX
+    clc
+    adc #4
+    jmp @cont
 
+@horizontal:
+    lda PlayerFlip
+    beq @left
+    ;right
+    lda PlayerX
+    clc
+    adc #20 ;two tiles and a half
+    jmp @cont
+@left:
+    lda PlayerX
+    sec
+    sbc #4
+
+
+@cont:
     clc
     adc GlobalScroll
     sta TempX
@@ -3566,7 +3586,31 @@ CanCastRodHere:
     lsr
     sta TempX
 
-    lda PlayerY ; y / 8
+    lda PlayerFrame
+    bne @vertical
+    ;horizontal
+    lda PlayerY
+    clc
+    adc #8
+    jmp @divide
+@vertical:
+    cmp #1
+    bne @down
+
+    ;up
+    lda PlayerY
+    sec
+    sbc #4
+    jmp @divide
+
+@down:
+
+    lda PlayerY
+    clc
+    adc #20
+
+@divide:
+    ; y / 8
     lsr
     lsr
     lsr
