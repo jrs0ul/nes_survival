@@ -406,7 +406,7 @@ npc_anim_row_sequence:
     SPEAR_SPEED                = 3
 
     ITEM_COUNT_LOC1            = 7
-    ITEM_COUNT_LOC2            = 6
+    ITEM_COUNT_LOC2            = 5
 
     ITEM_NEVER_BEEN_PICKED     = 255
 
@@ -619,6 +619,8 @@ FishBiteTimer:
 FishingWaitTimer:
     .res 1
 FishingDelay:
+    .res 1
+FishBiteDuration:   ;for how long a fish will bite
     .res 1
 
 SpearActive:
@@ -1683,7 +1685,20 @@ UpdateFishingRod:
     dec FishingWaitTimer
     bne @exit
 
+   
 @animateBiting:
+
+    lda FishBiteDuration
+    beq @exit
+
+    dec FishBiteDuration
+    bne @continueBiting
+
+    lda #0
+    sta FishBiteTimer
+    jmp @exit
+
+@continueBiting:
     inc FishBiteTimer
     lda FishBiteTimer
     cmp #FISHING_BITE_TIMER_MAX
@@ -3484,12 +3499,15 @@ WearWeapon:
 
     lda EquipedItem
     beq @exit
+
+    tay
+
     lda EquipedItem + 1
-    cmp #TOOL_WEAR
+    cmp item_wear, y
     bcc @removeWeapon
     beq @removeWeapon
     sec
-    sbc #TOOL_WEAR
+    sbc item_wear, y
     sta EquipedItem + 1
     jmp @exit
 
@@ -3520,6 +3538,13 @@ ActivateFishingRod:
     sta FishingWaitTimer
     lda #FISHING_DELAY
     sta FishingDelay
+
+    jsr UpdateRandomNumber
+    and #%00001111 ; 16
+    clc
+    adc #18
+    sta FishBiteDuration
+
     lda #0
     sta FishBiteTimer
 
@@ -3682,6 +3707,13 @@ PullOutRod:
     lda FishingWaitTimer
     bne @exit
 
+    lda FishBiteDuration
+    bne @cont ; duration is not over, you can still catch the fish
+
+    jsr WearWeapon
+    jmp @exit
+
+@cont:
     jsr WearWeapon
 
     inc ItemCount

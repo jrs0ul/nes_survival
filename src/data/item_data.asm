@@ -22,3 +22,23 @@ item_data:
     .byte 214, 1, 1, 1  ; 17 fish
     .byte 214, 0, 1, 3  ; 18 cooked fish
 
+item_wear:
+    .byte 0 ;empty
+    .byte 0 ;stick
+    .byte 0 ;raw meat
+    .byte 0 ;cooked meat
+    .byte 0 ;rowan berries
+    .byte 0 ;jam
+    .byte 0 ;rock
+    .byte 0 ;spear
+    .byte 10 ;knife
+    .byte 0  ;poop
+    .byte 0  ;hide
+    .byte 5  ;coat
+    .byte 0  ;jumbo meat
+    .byte 0  ;cooked jumbo meat
+    .byte 0  ;rope
+    .byte 15  ;fishing rod
+    .byte 0   ;reeds
+    .byte 0   ;fish
+    .byte 0   ;cooked fish
