@@ -1216,6 +1216,20 @@ nextIteration:
 
     jsr UpdateRandomNumber
 
+    ;famistudio update
+    ldy current_bank
+    sty oldbank
+
+    ldy #6
+    bankswitch ; macro
+
+    jsr famistudio_update
+
+    ldy oldbank
+
+    bankswitch
+
+
     lda #0
     sta NMIActive
 ne:
@@ -1361,20 +1375,6 @@ WaitScanline:
 endOfNmi:
     lda PPUCTRL
     sta $2000
-
-    ;famistudio update
-    ldy current_bank
-    sty oldbank
-
-    ldy #6
-    bankswitch ; macro
-
-    jsr famistudio_update
-
-    ldy oldbank
-
-    bankswitch
-    ;-------------
 
     pla
     tax
