@@ -1316,10 +1316,17 @@ SingleNpcAI:
     cmp #NPC_DELAY_ATTACK
     bcs @resetState
     sta Npcs, x
+    cmp #15; delay between the npc being agitated and actualy attacking player
+    beq @damage
     cmp #32
     bcc @nextNpc
 @resetAttackFrame:
+
     dex
+    lda Npcs, x
+    cmp #32
+    beq @nextNpc
+
     lda #32
     sta Npcs, x
     jmp @nextNpc
@@ -1339,10 +1346,310 @@ SingleNpcAI:
     eor #000000001 ;idle state
     sta Npcs, x
 
+    jmp @nextNpc
+
+@damage:
+
+    jsr CheckNpcAttackBoxWithPlayer
+
 @nextNpc:
 
     rts
 ;--------------------------
+CheckNpcAttackBoxWithPlayer:
+
+    stx TempRegX
+    sty TempY
+
+    dex
+    dex
+    jsr CalcNPCXYOnScreen
+    bne @fail
+
+    lda TempDir
+    and #%00000011
+    cmp #0
+    beq @verticalDir
+    ;horizontal direction
+
+    cmp #1
+    bne @facesLeft
+@facesRight:
+
+    jsr CanNpcFacingRightHitPlayer
+    bne @fail
+
+    jmp @doDmg
+
+@facesLeft:
+
+    jsr CanNpcFacingLeftHitPlayer
+    bne @fail
+
+    jmp @doDmg
+
+@verticalDir:
+    lda TempDir
+    lsr
+    lsr
+    cmp #1
+    bne @facesDown
+@facesUp:
+
+    jsr CanNpcFacingUpHitPlayer
+    bne @fail
+
+    jmp @doDmg
+
+@facesDown:
+
+    jsr CanNpcFacingDownHitPlayer
+    bne @fail
+
+    jmp @doDmg
+
+@doDmg:
+    ldy TempY
+    ldx TempRegX
+
+    jsr DamagePlayer
+    jmp @exit
+
+@fail:
+    ldy TempY
+    ldx TempRegX
+
+@exit:
+
+    rts
+;-------------------------
+;A = 1 -> FAIL
+CalcNPCXYOnScreen:
+    lda Npcs, x
+    sta TempDir ; fetch npc's direction
+    dex
+    lda Npcs, x ; screen index where npc resides
+    jsr CalcItemMapScreenIndexes
+    dex
+    dex
+
+    lda ItemMapScreenIndex
+    beq @skipPrevScreen
+    lda CurrentMapSegmentIndex
+    cmp PrevItemMapScreenIndex
+    bcc @fail
+@skipPrevScreen:
+    lda CurrentMapSegmentIndex
+    cmp NextItemMapScreenIndex
+    bcs @fail
+
+    lda CurrentMapSegmentIndex
+    cmp ItemMapScreenIndex
+    beq @NpcMatchesScreen
+    
+    ;X1
+    lda Npcs, x ; x
+    sec 
+    sbc GlobalScroll
+    bcs @fail
+    sta TempPointX
+    jmp @calcY
+@NpcMatchesScreen:
+    lda Npcs, x ; x
+    cmp GlobalScroll
+    bcc @fail
+    sec
+    sbc GlobalScroll
+    sta TempPointX
+
+@calcY: ; Y1
+    inx
+    lda Npcs, x ; y
+    sta TempPointY
+
+
+    lda #0
+    jmp @exit
+
+@fail:
+    lda #1
+
+@exit:
+    rts
+;---------------------------
+;A=1 -> fail
+CanNpcFacingRightHitPlayer:
+
+    ;playerX < NpcX + 24 AND playerX + 16 > NpcX
+    ;playerY < NpcY + 24 AND playerY + 16 > NpcY
+
+    lda TempPointX
+    clc
+    adc #24
+    cmp PlayerX
+    bcc @fail
+
+    lda PlayerX
+    clc
+    adc #16
+    cmp TempPointX
+    bcc @fail
+
+    lda TempPointY
+    clc
+    adc #24
+    cmp PlayerY
+    bcc @fail
+
+    lda PlayerY
+    clc
+    adc #16
+    cmp TempPointY
+    bcc @fail
+
+
+    lda #0
+    jmp @exit
+
+@fail:
+    lda #1
+
+@exit:
+
+    rts
+;--------------------------
+CanNpcFacingLeftHitPlayer:
+    ;playerX + 16 > NpcX - 8 AND playerX < NpcX + 16
+    ;playerY < NpcY + 24 AND playerY + 16 > NpcY
+
+    lda TempPointX
+    sec
+    sbc #8
+    sta TempPointX2
+    lda PlayerX
+    clc
+    adc #16
+    cmp TempPointX2
+    bcc @fail
+
+    lda TempPointX
+    clc
+    adc #16
+    cmp PlayerX
+    bcc @fail
+
+    lda TempPointY
+    clc
+    adc #24
+    cmp PlayerY
+    bcc @fail
+
+    lda PlayerY
+    clc
+    adc #16
+    cmp TempPointY
+    bcc @fail
+
+    lda #0
+    jmp @exit
+
+@fail:
+    lda #1
+
+@exit:
+
+    rts
+;---------------------------
+CanNpcFacingUpHitPlayer:
+
+
+    ;playerX + 16 > NpcX AND playerX < NpcX + 16
+    ;playerY + 16 > NpcY - 8 AND playerY  < NpcY + 24
+
+    lda PlayerX
+    clc
+    adc #16
+    cmp TempPointX
+    bcc @fail
+
+    lda TempPointX
+    clc
+    adc #16
+    cmp PlayerX
+    bcc @fail
+
+    lda TempPointY
+    sec
+    sbc #8
+    sta TempPointY2
+    lda PlayerY
+    clc
+    adc #16
+    cmp TempPointY2
+    bcc @fail
+
+    lda TempPointY
+    clc
+    adc #24
+    cmp PlayerY
+    bcc @fail
+
+
+
+    lda #0
+    jmp @exit
+
+@fail:
+    lda #1
+
+@exit:
+
+    rts
+
+;---------------------------
+CanNpcFacingDownHitPlayer:
+    ;playerX + 16 > NpcX AND playerX < NpcX + 16
+    ;playerY + 16 > NpcY AND playerY < NpcY + 32
+
+    lda PlayerX
+    clc
+    adc #16
+    cmp TempPointX
+    bcc @fail
+
+    lda TempPointX
+    clc
+    adc #16
+    cmp PlayerX
+    bcc @fail
+
+    lda PlayerY
+    clc
+    adc #16
+    cmp TempPointY
+    bcc @fail
+
+    lda TempPointY
+    clc
+    adc #32
+    cmp PlayerY
+    bcc @fail
+
+
+    lda #0
+    jmp @exit
+
+@fail:
+    lda #1
+
+@exit:
+
+    rts
+
+;---------------------------
+
+
+
 NpcMovement:
     inx
     lda Npcs, x ; load dir
@@ -1872,8 +2179,6 @@ OnCollisionWithPlayer:
     dex
     dex
 
-    jsr DamagePlayer
-
 
     lda #0
 
@@ -1894,9 +2199,18 @@ DamagePlayer:
 
     lda #5
     sta DigitChangeSize
-    dec EquipedClothing + 1
-    bne @noclothing
+    lda EquipedClothing + 1
+    cmp #CLOTHING_DAMAGE_BY_NPC
+    bcc @removeClothing
+    beq @removeClothing
 
+    sec
+    sbc #CLOTHING_DAMAGE_BY_NPC
+    sta EquipedClothing + 1
+    jmp @noclothing
+
+
+@removeClothing:
     lda #0
     sta EquipedClothing
 
@@ -1909,6 +2223,7 @@ DamagePlayer:
     jsr DecreaseDigits
     lda #1
     sta HpUpdated
+@exit:
 
     rts
 

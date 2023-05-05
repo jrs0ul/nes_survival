@@ -451,6 +451,8 @@ npc_anim_row_sequence:
     FISHING_CATCH_OFFSET_Y     = 18
     FISHING_BITE_TIMER_MAX     = 15
 
+    CLOTHING_DAMAGE_BY_NPC     = 10
+
 ;===================================================================
 .segment "ZEROPAGE"
 current_bank:
