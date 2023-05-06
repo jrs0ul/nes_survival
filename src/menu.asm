@@ -1928,9 +1928,18 @@ StartSleep:
 
     lda #1
     sta MustExitMenuState
-    sta SleepPaletteAnimationState ; set fade-out
+    sta PaletteFadeAnimationState ; set fade-out
+    lda #SLEEP_FADE_DELAY
+    sta PaletteAnimDelay
+    sta MustSleepAfterFadeOut
+
+    lda #<house_palette
+    sta PalettePtr
+    lda #>house_palette
+    sta PalettePtr + 1
+
     lda #0
-    sta SleepFadeTimer
+    sta PaletteFadeTimer
     sta FadeIdx
 
 

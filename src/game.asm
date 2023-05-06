@@ -48,10 +48,7 @@ title_palette:
     .byte $0F,$07,$05,$26, $0F,$01,$26,$07, $0F,$26,$26,$35, $0F,$07,$26,$35    ;background
     .byte $0F,$0f,$17,$20, $0F,$06,$26,$39, $0F,$17,$21,$31, $0F,$0f,$37,$26    ;OAM sprites
 
-game_over_palette:
 
-    .byte $0f,$10,$20,$30,$0f,$0c,$35,$21,$0f,$0c,$16,$21,$0f,$01,$07,$21
-    .byte $0f,$10,$20,$30,$0f,$0c,$35,$21,$0f,$0c,$16,$21,$0f,$01,$07,$21
 
 
 
@@ -104,9 +101,6 @@ dialog_jam:
     .byte $00,$00,$00,$00,$3c,$48,$46,$3b,$42,$47,$3e,$00,$7c,$7d,$00,$5b,$00,$7c,$7d
 
 dialog_thanks:
-    ;.byte $00,$00,$48,$48,$49,$4c,$82,$82,$82,$00,$4c,$48,$4b,$4b,$52,$82,$82,$82,$00,$00,$00,$00,$00,$00,$00
-    ;.byte $00,$00,$00,$00,$00,$00,$00,$00
-    ;.byte $4d,$41,$3a,$47,$44,$4c,$00,$3f,$48,$4b,$00,$4d,$41,$3e,$00,$43,$3a,$46,$00,$4d,$41,$48,$59
 
     .byte $00,$00,$00,$00,$00,$00,$00,$00,$4d,$3a,$44,$3e,$00,$4d,$41,$42,$4c,$59,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
     .byte $46,$3a,$52,$3b,$3e,$00,$52,$48,$4e,$00,$50,$42,$45,$45,$00
@@ -182,6 +176,10 @@ main_palette:
     .byte $0C,$00,$21,$31, $0C,$1B,$21,$31, $0C,$18,$21,$31, $0C,$20,$37,$16    ;background
     .byte $0C,$0f,$17,$20, $0C,$06,$16,$39, $0C,$0f,$16,$39, $0C,$0f,$37,$16    ;OAM sprites
 
+game_over_palette:
+    .byte $0f,$10,$20,$30,$0f,$0c,$35,$21,$0f,$0c,$16,$21,$0f,$01,$07,$21
+    .byte $0f,$10,$20,$30,$0f,$0c,$35,$21,$0f,$0c,$16,$21,$0f,$01,$07,$21
+
 sprites:
     .byte $11, $FF, $00000011, $08   ; sprite 0 
     .byte $00, $00, %00000011, $00
@@ -228,7 +226,7 @@ npc_direction_list:
     .byte %00001000
     .byte %00000010
 
-SleepPaletteTransitions:
+PaletteTransitions:
     .byte $00
     .byte $10
     .byte $20
@@ -345,12 +343,12 @@ npc_anim_row_sequence:
 
     HOUSE_EXIT_Y               = 168
 
+   
     SLEEP_POS_X                = 100
     SLEEP_POS_Y                = 72
-    SLEEP_FADE_DELAY           = 10
-    SLEEP_STATE_FADE_IN        = 2
-    SLEEP_FADE_MAX_ITERATION   = 5
 
+    SLEEP_FADE_DELAY           = 10
+    
     SLEEP_ADD_HP_TIMES_TEN     = 3
     SLEEP_SUB_HP_HUNGER_TT     = 5
     SLEEP_SUB_HP_COLD_TT       = 5
@@ -358,8 +356,12 @@ npc_anim_row_sequence:
     WARMTH_NIGHT_DECREASE      = 5
     WARMTH_DAY_DECREASE        = 1
 
-
+    PALETTE_STATE_FADE_OUT     = 1
+    PALETTE_STATE_FADE_IN      = 2
+    PALETTE_STEP               = $10
     PALETTE_SIZE_MAX           = 32
+    PALETTE_FADE_MAX_ITERATION = 5
+
 
     OUTDOORS_LOC1_SCREEN_COUNT = 5
     OUTDOORS_LOC2_SCREEN_COUNT = 2
@@ -459,6 +461,8 @@ npc_anim_row_sequence:
 
     CLOTHING_DAMAGE_BY_NPC     = 10
 
+    GAME_OVER_FADE_DELAY       = 3
+
 ;===================================================================
 .segment "ZEROPAGE"
 current_bank:
@@ -472,6 +476,8 @@ TextPtr:
 DigitPtr:
     .res 2
 pointer2:
+    .res 2
+PalettePtr:
     .res 2
 collisionMapPtr:
     .res 2
@@ -490,6 +496,8 @@ PaletteUpdateSize:
     .res 1
 RamPalette:
     .res 32
+PaletteAnimDelay:
+    .res 1
 DigitChangeSize: ;dedicated byte for Decrease/IncreaseDigits, because I can
     .res 1
 LastDigit:
@@ -536,7 +544,7 @@ MustLoadSomething:
     .res 1
 
 ZPBuffer:
-    .res 174  ; I want to be aware of free memory
+    .res 171  ; I want to be aware of free memory
 
 ;--------------
 .segment "BSS" ; variables in ram
@@ -748,6 +756,9 @@ TimesShiftedRight:
     .res 1
 
 
+MustSleepAfterFadeOut:
+    .res 1
+
 MustUpdateTextBaloon:
     .res 1
 TextBaloonIndex:
@@ -777,6 +788,9 @@ MustLoadTitle:
 MustLoadGameOver:
     .res 1
 MustDrawMenuTitle:
+    .res 1
+
+MustLoadGameOverAfterFadeOut:
     .res 1
 
 MustDrawInventoryGrid:
@@ -860,9 +874,9 @@ CurrentCraftingComponent:
     .res 1
 
 
-SleepPaletteAnimationState:
+PaletteFadeAnimationState:
     .res 1; 0 - nothing, 1 - fade-out, 2 - fade-in
-SleepFadeTimer:
+PaletteFadeTimer:
     .res 1
 FadeIdx:
     .res 1
@@ -1015,7 +1029,7 @@ SourceMapIdx:
     .res 1
 
 Buffer:
-    .res 529 ;must see how much is still available
+    .res 527 ;must see how much is still available
 
 ;====================================================================================
 
@@ -1159,10 +1173,11 @@ endlessLoop:
     dec InputUpdateDelay
     bne checkItems
 
-    lda SleepPaletteAnimationState ; don't do input while sleeping
-    bne update_game_sprites
+    lda PaletteFadeAnimationState ; don't do input while fading
+    bne skipInput
 
     jsr HandleInput
+skipInput:
     lda GameState
     cmp #STATE_GAME
     beq update_game_sprites
@@ -1330,6 +1345,8 @@ LoadPalettesLoop:
 
 
 doneUpdatingPalette:
+
+    
     lda GameState
     cmp #STATE_GAME
     bne nmicont2
@@ -1619,19 +1636,33 @@ UpdateAttributeColumn:
 ;-----------------------------------
 Logics:
 
+    lda NMIActive
+    beq @exit
+
+    jsr DoPaletteFades
+    
     lda GameState
     cmp #STATE_GAME
     bne @exit
 
-    lda NMIActive
-    beq @exit
 
 
     lda PlayerAlive
     bne @cont
+;----activate fading out for the game over
+    lda MustLoadGameOver
+    bne @doneLogics
+    lda PaletteFadeAnimationState
+    bne @cont
     lda #1
-    sta MustLoadSomething
-    sta MustLoadGameOver
+    sta PaletteFadeAnimationState
+    sta MustLoadGameOverAfterFadeOut
+    lda #0
+    sta PaletteFadeTimer
+    sta FadeIdx
+    lda #GAME_OVER_FADE_DELAY
+    sta PaletteAnimDelay
+;---
 @cont:
     jsr AnimateFire
 
@@ -1656,7 +1687,6 @@ Logics:
 
     jsr RunTime
 
-    jsr DoSleepPaletteFades
 
 @doneLogics:
    
@@ -1706,7 +1736,6 @@ UpdateFishingRod:
     dec FishingWaitTimer
     bne @exit
 
-   
 @animateBiting:
 
     lda FishBiteDuration
@@ -2021,21 +2050,21 @@ CheckIfEnteredSecondLocation:
 
 
 ;-------------------------------
-DoSleepPaletteFades:
+DoPaletteFades:
 
-    lda SleepPaletteAnimationState
+    lda PaletteFadeAnimationState
     beq @exit
 
-    inc SleepFadeTimer
-    lda SleepFadeTimer
-    cmp #SLEEP_FADE_DELAY
+    inc PaletteFadeTimer
+    lda PaletteFadeTimer
+    cmp PaletteAnimDelay
     bcc @exit
 
     lda #0
-    sta SleepFadeTimer
+    sta PaletteFadeTimer
 
-    lda SleepPaletteAnimationState
-    cmp #SLEEP_STATE_FADE_IN
+    lda PaletteFadeAnimationState
+    cmp #PALETTE_STATE_FADE_IN
     bne @incIndex
 
     dec FadeIdx
@@ -2044,38 +2073,48 @@ DoSleepPaletteFades:
     jmp @doFade
 @resetFadeIn: ;finished fading in after sleep
     lda #0
-    sta SleepPaletteAnimationState
-    jsr AdaptBackgroundPaletteByTime
+    sta PaletteFadeAnimationState
     jmp @doFade
 
 @incIndex:
     inc FadeIdx
     ldx FadeIdx
-    cpx #SLEEP_FADE_MAX_ITERATION
+    cpx #PALETTE_FADE_MAX_ITERATION
     bcs @resetFadeState
     jmp @doFade
 @resetFadeState:    ;finished fading out, let's sleep
-    jsr DoSleep
-    lda #SLEEP_STATE_FADE_IN
-    sta SleepPaletteAnimationState
-    lda #SLEEP_FADE_MAX_ITERATION
-    sta FadeIdx
+
+    jsr RoutinesAfterFadeOut
+
     jmp @exit
 @doFade:
 
     ldy #0
 @paletteLoop:
 
-    lda house_palette, y
+    lda PaletteFadeAnimationState
+    cmp #PALETTE_STATE_FADE_OUT
+    beq @OnFadeOut
+
+    lda (PalettePtr), y
     sec
-    sbc SleepPaletteTransitions, x
+    sbc PaletteTransitions, x
+    bcs @saveColor
+    lda #$0F
+    jmp @saveColor
+
+@OnFadeOut:
+
+    lda RamPalette, y
+    sec
+    sbc #PALETTE_STEP
     bcs @saveColor
     lda #$0F
 
 @saveColor:
     sta RamPalette, y
     iny
-    cpy #PALETTE_SIZE_MAX 
+    cpy #PALETTE_SIZE_MAX
     bne @paletteLoop
 
 
@@ -2088,6 +2127,30 @@ DoSleepPaletteFades:
 
 
     rts
+;------------------------------
+RoutinesAfterFadeOut:
+
+    lda MustSleepAfterFadeOut
+    beq @next
+    jsr DoSleep
+    lda #0
+    sta MustSleepAfterFadeOut
+    lda #PALETTE_STATE_FADE_IN
+    sta PaletteFadeAnimationState
+    lda #PALETTE_FADE_MAX_ITERATION
+    sta FadeIdx
+@next:
+    lda MustLoadGameOverAfterFadeOut
+    beq @next1
+    lda #1
+    sta MustLoadSomething
+    sta MustLoadGameOver
+    lda #0
+    sta PaletteFadeAnimationState
+@next1:
+
+    rts
+
 
 ;-------------------------------
 DoSleep:
@@ -3019,20 +3082,8 @@ LoadGameOver:
     jsr CopyCHRTiles
 
 
-    lda #<game_over_palette
-    sta pointer
-    lda #>game_over_palette
-    sta pointer + 1
-    lda #32
-    sta Temp
-    jsr LoadPalette
-
     lda #STATE_GAME_OVER
     sta GameState
-
-    lda #0
-    sta MustUpdatePalette
-    sta SleepPaletteAnimationState
 
     lda #<game_over
     sta pointer
@@ -3047,6 +3098,16 @@ LoadGameOver:
 
 
     jsr SetDaysInGameOver
+
+    lda #<game_over_palette
+    sta PalettePtr
+    lda #>game_over_palette
+    sta PalettePtr + 1
+
+    lda #PALETTE_STATE_FADE_IN
+    sta PaletteFadeAnimationState
+    lda #PALETTE_FADE_MAX_ITERATION
+    sta FadeIdx
 
 
     lda #0
@@ -3143,9 +3204,9 @@ ResetEntityVariables:
 
     lda #0
     sta ItemIGave
-    sta SleepPaletteAnimationState
+    sta PaletteFadeAnimationState
     sta FadeIdx
-    sta SleepFadeTimer
+    sta PaletteFadeTimer
     sta GlobalScroll
     sta TilesScroll
     sta TimesShiftedLeft
@@ -3157,6 +3218,7 @@ ResetEntityVariables:
     sta SpearActive
     sta FishBiteTimer
     sta FishingRodActive
+    sta MustLoadGameOverAfterFadeOut
     lda #PLAYER_START_X
     sta PlayerX
     lda #PLAYER_START_Y

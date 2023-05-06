@@ -65,6 +65,7 @@ LoadPalette:
     ldy #0
 @LoadPalettesLoop:
     lda (pointer), y      ;load palette byte
+    sta RamPalette, y
     sta $2007             ;write to PPU
     iny                   ;set index to next byte
     cpy Temp
