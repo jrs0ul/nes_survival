@@ -758,6 +758,10 @@ TimesShiftedRight:
 
 MustSleepAfterFadeOut:
     .res 1
+MustLoadVillagerHutAfterFadeout:
+    .res 1
+MustLoadOutsideVillagerHutAfterFadeout:
+    .res 1
 
 MustUpdateTextBaloon:
     .res 1
@@ -1029,7 +1033,7 @@ SourceMapIdx:
     .res 1
 
 Buffer:
-    .res 527 ;must see how much is still available
+    .res 525 ;must see how much is still available
 
 ;====================================================================================
 
@@ -2148,6 +2152,84 @@ RoutinesAfterFadeOut:
     lda #0
     sta PaletteFadeAnimationState
 @next1:
+
+    lda MustLoadVillagerHutAfterFadeout
+    beq @next2
+
+    ldx #0
+@copyCollisionMapLoop:
+
+    lda villager_hut_collision, x
+    sta CollisionMap, x
+    inx
+    cpx #COLLISION_MAP_SIZE
+    bne @copyCollisionMapLoop
+
+
+    lda #1
+    sta MustLoadVillagerHut
+    sta MustClearVillagerItems
+    sta MustRestartIndoorsMusic
+    sta MustLoadSomething
+
+
+    lda #0
+    sta GlobalScroll
+    sta TilesScroll
+    lda #128
+    sta PlayerX
+    lda #136
+    sta PlayerY
+    sta ScrollDirection
+
+    lda #0
+    sta PaletteFadeAnimationState
+    sta MustLoadVillagerHutAfterFadeout
+
+
+@next2:
+    lda MustLoadOutsideVillagerHutAfterFadeout
+    beq @next3
+
+    lda #0
+    sta InVillagerHut
+    sta ItemIGave
+
+    lda #OUTDOORS_LOC2_SCREEN_COUNT
+    sta ScreenCount
+
+    lda #$80
+    sta PlayerY
+    lda #$76
+    sta PlayerX
+
+
+    lda #$B8
+    sta GlobalScroll
+    lda #0
+    sta TilesScroll
+
+    jsr PrepareCollisionAfterHutExit
+
+    lda #0
+    sta NpcCount
+    sta MustLoadOutsideVillagerHutAfterFadeout
+    sta PaletteFadeAnimationState
+
+    lda #<Outside2_items
+    sta pointer
+    lda #>Outside2_items
+    sta pointer + 1
+    jsr LoadItems
+
+    lda #1
+    sta MustLoadOutside
+    sta MustCopyMainChr
+    sta MustLoadSomething
+
+
+@next3:
+
 
     rts
 
@@ -4072,33 +4154,17 @@ CheckIfEnteredVillagerHut:
     cmp #$6F
     bcs @nope
 
-    ldx #0
-@copyCollisionMapLoop:
-    lda villager_hut_collision, x
-    sta CollisionMap, x
-    inx
-    cpx #COLLISION_MAP_SIZE
-    bne @copyCollisionMapLoop
 
-
+    lda PaletteFadeAnimationState
+    bne @nope
     lda #1
-    sta MustLoadVillagerHut
-    sta MustClearVillagerItems
-    sta MustRestartIndoorsMusic
-    sta MustLoadSomething
-
-
+    sta PaletteFadeAnimationState
+    sta MustLoadVillagerHutAfterFadeout
+    lda #3
+    sta PaletteAnimDelay
     lda #0
-    sta GlobalScroll
-    sta TilesScroll
-    lda #128
-    sta PlayerX
-    lda #136
-    sta PlayerY
-    sta ScrollDirection
-
-
-
+    sta PaletteFadeTimer
+    sta FadeIdx
 
 @nope:
     rts
@@ -4271,39 +4337,17 @@ CheckIfExitedVillagerHut:
     bcc @nope
 
 
-    lda #0
-    sta InVillagerHut
-    sta ItemIGave
-
-    lda #OUTDOORS_LOC2_SCREEN_COUNT
-    sta ScreenCount
-
-    lda #$80
-    sta PlayerY
-    lda #$76
-    sta PlayerX
-
-
-    lda #$B8
-    sta GlobalScroll
-    lda #0
-    sta TilesScroll
-
-    jsr PrepareCollisionAfterHutExit
-
-    lda #0
-    sta NpcCount
-
-    lda #<Outside2_items
-    sta pointer
-    lda #>Outside2_items
-    sta pointer + 1
-    jsr LoadItems
-
+    lda PaletteFadeAnimationState
+    bne @nope
     lda #1
-    sta MustLoadOutside
-    sta MustCopyMainChr
-    sta MustLoadSomething
+    sta PaletteFadeAnimationState
+    sta MustLoadOutsideVillagerHutAfterFadeout
+    lda #3
+    sta PaletteAnimDelay
+    lda #0
+    sta PaletteFadeTimer
+    sta FadeIdx
+
 
 @nope:
     rts
