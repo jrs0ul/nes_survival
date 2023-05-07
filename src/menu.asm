@@ -2334,18 +2334,8 @@ ExitMenuState:
     
     lda #0
     sta StashActivated
-
-@paletteCopy:
-    lda #$0F
-    sta RamPalette, y
-    iny
-    cpy #32
-    bne @paletteCopy
-    lda #1
-    sta MustUpdatePalette
-    lda #32
-    sta PaletteUpdateSize
-
+    
+    jsr ClearPalette
 
     lda InHouse
     beq @loadOther ;InHouse = 0

@@ -1330,7 +1330,19 @@ ReadControllerLoop:
     jsr LoadOutsideMap
 
 DoneLoadingMaps:
+    lda GameState
+    cmp #STATE_GAME
+    bne UpdatePalette
 
+    jsr UpdateTextBaloon
+    lda MustUpdatePalette
+    bne UpdatePalette
+    
+    jsr UpdateFireplace
+    jsr UploadBgColumns
+    jsr UpdateStatusDigits
+
+UpdatePalette:
     lda MustUpdatePalette
     beq doneUpdatingPalette
 
@@ -1357,18 +1369,6 @@ LoadPalettesLoop:
 
 
 doneUpdatingPalette:
-
-    
-    lda GameState
-    cmp #STATE_GAME
-    bne nmicont2
-
-    jsr UpdateFireplace
-    jsr UploadBgColumns
-    jsr UpdateTextBaloon
-    jsr UpdateStatusDigits
-
-nmicont2:
 
     ;This is the PPU clean up section, so rendering the next frame starts properly.
     lda PPUCTRL
@@ -1501,7 +1501,7 @@ UpdateFireplace:
 ;--------------------------------------------
 ;Check and upload background columns from rom map to the PPU
 UploadBgColumns:
-
+    
     lda ScreenCount
     cmp #2
     bcc @exit
@@ -2588,6 +2588,12 @@ RunTime:
     jsr IncreaseDays
 
 @adaptPalette:
+    lda PaletteFadeAnimationState
+    bne @exit
+    lda #<RamPalette
+    sta PalettePtr
+    lda #>RamPalette
+    sta PalettePtr + 1
     jsr AdaptBackgroundPaletteByTime
 
 @exit:
@@ -3583,6 +3589,22 @@ IncreaseDigits:
 
 @exit:
     rts
+;------------------------------------
+ClearPalette:
+
+    ldy #0
+@paletteCopy:
+    lda #$0F
+    sta RamPalette, y
+    iny
+    cpy #32
+    bne @paletteCopy
+    lda #1
+    sta MustUpdatePalette
+    lda #32
+    sta PaletteUpdateSize
+
+    rts
 
 ;-------------------------------------
 CheckStartButton:
@@ -3602,6 +3624,9 @@ CheckStartButton:
     bne @someOtherState
 
     ;On title state------
+
+    jsr ClearPalette
+   
 
     lda #STATE_GAME
     sta GameState
