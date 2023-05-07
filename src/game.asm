@@ -50,9 +50,6 @@ title_palette:
 
 
 
-
-
-
 .include "data/title.asm"
 .include "data/game_over.asm"
 
@@ -762,6 +759,15 @@ MustLoadVillagerHutAfterFadeout:
     .res 1
 MustLoadOutsideVillagerHutAfterFadeout:
     .res 1
+MustLoadSecondLocationAfterFadeout:
+    .res 1
+MustLoadIndoorsAfterFadeout:
+    .res 1
+MustLoadOutsideHouseAfterFadeout:
+    .res 1
+MustLoadFirstLocationAfterFadeout:
+    .res 1
+
 
 MustUpdateTextBaloon:
     .res 1
@@ -1033,7 +1039,7 @@ SourceMapIdx:
     .res 1
 
 Buffer:
-    .res 525 ;must see how much is still available
+    .res 521 ;must see how much is still available
 
 ;====================================================================================
 
@@ -1932,59 +1938,16 @@ CheckIfExitedSecondLocation:
     bcc @exit
 
 
+    lda PaletteFadeAnimationState
+    bne @exit
     lda #1
-    sta MustLoadSomething
-    sta MustLoadOutside
-
-    lda #0
-    sta LocationIndex
-    sta TimesShiftedLeft
-    sta TimesShiftedRight
-    sta TilesScroll
-
-    lda #4
-    sta CurrentMapSegmentIndex
-
-    lda #OUTDOORS_LOC1_SCREEN_COUNT
-    sta ScreenCount
-
-    ldy #0
-    jsr bankswitch_y
-
-    ldx #0
-@copyCollisionMapLoop:
-
-    lda bg_collision4, x
-@start:
-    sta CollisionMap, x
-    inx
-    cpx #COLLISION_MAP_SIZE
-    bne @copyCollisionMapLoop
-
-
-    lda #32
-    sta PlayerY
-    lda #128
-    sta PlayerX
-    lda #5
-    sta RightCollisonMapIdx
-    lda #0
-    sta RightCollisionColumnIndex
-
+    sta PaletteFadeAnimationState
+    sta MustLoadFirstLocationAfterFadeout
     lda #3
-    sta LeftCollisionMapIdx
-    sta LeftCollisionColumnIndex
-    jsr LoadLeftCollisionColumn
-
-
-    jsr GenerateNpcs
-    lda #<Outside1_items
-    sta pointer
-    lda #>Outside1_items
-    sta pointer + 1
-
-    jsr LoadItems
-
+    sta PaletteAnimDelay
+    lda #0
+    sta PaletteFadeTimer
+    sta FadeIdx
 
 @exit:
     rts
@@ -2000,53 +1963,16 @@ CheckIfEnteredSecondLocation:
     bcc @Entered
     jmp @exit
 @Entered:
+    lda PaletteFadeAnimationState
+    bne @exit
     lda #1
-    sta MustLoadSomething
-    sta MustLoadOutside
-    sta LocationIndex
+    sta PaletteFadeAnimationState
+    sta MustLoadSecondLocationAfterFadeout
+    lda #3
+    sta PaletteAnimDelay
     lda #0
-    sta CurrentMapSegmentIndex
-    sta NpcCount
-    sta ItemCount
-    lda #OUTDOORS_LOC2_SCREEN_COUNT
-    sta ScreenCount
-
-    ldy #4
-    jsr bankswitch_y
-
-    ldx #0
-@copyCollisionMapLoop:
-    lda bg2_collision, x
-    sta CollisionMap, x
-    inx
-    cpx #COLLISION_MAP_SIZE
-    bne @copyCollisionMapLoop
-
-    lda #1
-    sta RightCollisonMapIdx
-    lda #0      ;load the first column
-    sta RightCollisionColumnIndex
-    jsr LoadRightCollisionColumn
-    lda #255
-    sta LeftCollisionColumnIndex
-
-    lda #<Outside2_items
-    sta pointer
-    lda #>Outside2_items
-    sta pointer + 1
-    jsr LoadItems
-
-    lda #208
-    sta PlayerY
-    lda #80
-    sta PlayerX
-    lda #0
-    sta LeftCollisionMapIdx
-    lda #0
-    sta GlobalScroll
-    sta TilesScroll
-    sta TimesShiftedLeft
-    sta TimesShiftedRight
+    sta PaletteFadeTimer
+    sta FadeIdx
 
 
 @exit:
@@ -2230,6 +2156,213 @@ RoutinesAfterFadeOut:
 
 @next3:
 
+    lda MustLoadSecondLocationAfterFadeout
+    beq @next4
+
+    lda #1
+    sta MustLoadSomething
+    sta MustLoadOutside
+    sta LocationIndex
+    lda #0
+    sta CurrentMapSegmentIndex
+    sta NpcCount
+    sta ItemCount
+    lda #OUTDOORS_LOC2_SCREEN_COUNT
+    sta ScreenCount
+
+    ldy #4
+    jsr bankswitch_y
+
+    ldx #0
+@copyCollisionMapLoop1:
+    lda bg2_collision, x
+    sta CollisionMap, x
+    inx
+    cpx #COLLISION_MAP_SIZE
+    bne @copyCollisionMapLoop1
+
+    lda #1
+    sta RightCollisonMapIdx
+    lda #0      ;load the first column
+    sta RightCollisionColumnIndex
+    jsr LoadRightCollisionColumn
+    lda #255
+    sta LeftCollisionColumnIndex
+
+    lda #<Outside2_items
+    sta pointer
+    lda #>Outside2_items
+    sta pointer + 1
+    jsr LoadItems
+
+    lda #208
+    sta PlayerY
+    lda #80
+    sta PlayerX
+    lda #0
+    sta LeftCollisionMapIdx
+    lda #0
+    sta GlobalScroll
+    sta TilesScroll
+    sta TimesShiftedLeft
+    sta TimesShiftedRight
+    sta MustLoadSecondLocationAfterFadeout
+    sta PaletteFadeAnimationState
+
+
+@next4:
+
+    lda MustLoadIndoorsAfterFadeout
+    beq @next5
+
+    lda #<House_items
+    sta pointer
+    lda #>House_items
+    sta pointer + 1
+    jsr LoadItems
+
+    lda #<House_npcs
+    sta pointer
+    lda #>House_npcs
+    sta pointer + 1
+    jsr LoadNpcs
+
+    ldx #0
+@copyCollisionMapLoop2:
+    lda hut_collision, x
+    sta CollisionMap, x
+    inx
+    cpx #COLLISION_MAP_SIZE
+    bne @copyCollisionMapLoop2
+
+    lda #1
+    sta MustLoadHouseInterior
+    sta MustRestartIndoorsMusic
+    sta MustLoadSomething
+    lda #HOUSE_ENTRY_POINT_X
+    sta PlayerX
+    lda #HOUSE_ENTRY_POINT_Y
+    sta PlayerY
+
+
+    lda #0
+    sta MustLoadIndoorsAfterFadeout
+    sta PaletteFadeAnimationState
+
+@next5:
+
+
+    lda MustLoadFirstLocationAfterFadeout
+    beq @next6
+
+    lda #1
+    sta MustLoadSomething
+    sta MustLoadOutside
+
+    lda #0
+    sta LocationIndex
+    sta TimesShiftedLeft
+    sta TimesShiftedRight
+    sta TilesScroll
+
+    lda #4
+    sta CurrentMapSegmentIndex
+
+    lda #OUTDOORS_LOC1_SCREEN_COUNT
+    sta ScreenCount
+
+    ldy #0
+    jsr bankswitch_y
+
+    ldx #0
+@copyCollisionMapLoop3:
+
+    lda bg_collision4, x
+@start:
+    sta CollisionMap, x
+    inx
+    cpx #COLLISION_MAP_SIZE
+    bne @copyCollisionMapLoop3
+
+
+    lda #32
+    sta PlayerY
+    lda #128
+    sta PlayerX
+    lda #5
+    sta RightCollisonMapIdx
+    lda #0
+    sta RightCollisionColumnIndex
+
+    lda #3
+    sta LeftCollisionMapIdx
+    sta LeftCollisionColumnIndex
+    jsr LoadLeftCollisionColumn
+
+
+    jsr GenerateNpcs
+    lda #<Outside1_items
+    sta pointer
+    lda #>Outside1_items
+    sta pointer + 1
+
+    jsr LoadItems
+
+    
+    
+    lda #0
+    sta MustLoadFirstLocationAfterFadeout
+    sta PaletteFadeAnimationState
+
+@next6:
+
+    lda MustLoadOutsideHouseAfterFadeout
+    beq @next7
+
+    ldx #0
+@copyCollisionMapLoop4:
+    lda bg_collision, x
+    sta CollisionMap, x
+    inx
+    cpx #COLLISION_MAP_SIZE
+    bne @copyCollisionMapLoop4
+
+    lda #0
+    sta InHouse
+    
+    lda #OUTDOORS_LOC1_SCREEN_COUNT
+    sta ScreenCount
+    
+    lda #<Outside1_items
+    sta pointer
+    lda #>Outside1_items
+    sta pointer + 1
+    jsr LoadItems
+
+    jsr GenerateNpcs
+
+
+    lda #OUTSIDE_ENTRY_FROM_HOUSE_X
+    sta PlayerX
+    lda #OUTSIDE_ENTRY_FROM_HOUSE_Y
+    sta PlayerY
+
+
+
+    lda #1
+    sta MustLoadOutside
+    sta MustCopyMainChr
+    sta MustLoadSomething
+
+
+
+
+    lda #0
+    sta MustLoadOutsideHouseAfterFadeout
+    sta PaletteFadeAnimationState
+
+
+@next7:
 
     rts
 
@@ -4196,34 +4329,17 @@ CheckIfEnteredHouse:
     bcs @nope
 
 
-    lda #<House_items
-    sta pointer
-    lda #>House_items
-    sta pointer + 1
-    jsr LoadItems
-
-    lda #<House_npcs
-    sta pointer
-    lda #>House_npcs
-    sta pointer + 1
-    jsr LoadNpcs
-
-    ldx #0
-@copyCollisionMapLoop:
-    lda hut_collision, x
-    sta CollisionMap, x
-    inx
-    cpx #COLLISION_MAP_SIZE
-    bne @copyCollisionMapLoop
-
+    lda PaletteFadeAnimationState
+    bne @nope
     lda #1
-    sta MustLoadHouseInterior
-    sta MustRestartIndoorsMusic
-    sta MustLoadSomething
-    lda #HOUSE_ENTRY_POINT_X
-    sta PlayerX
-    lda #HOUSE_ENTRY_POINT_Y
-    sta PlayerY
+    sta PaletteFadeAnimationState
+    sta MustLoadIndoorsAfterFadeout
+    lda #3
+    sta PaletteAnimDelay
+    lda #0
+    sta PaletteFadeTimer
+    sta FadeIdx
+
 
 @nope:
     rts
@@ -4381,7 +4497,7 @@ PrepareCollisionAfterHutExit:
     jsr LoadRightCollisionColumn
 
 
-
+    ;TODO: rework this
     jsr PushCollisionMapRight
     jsr PushCollisionMapRight
     jsr PushCollisionMapRight
@@ -4407,40 +4523,16 @@ CheckIfExitedHouse:
     cmp #HOUSE_EXIT_Y
     bcc @nope
 
-    ldx #0
-@copyCollisionMapLoop:
-    lda bg_collision, x
-    sta CollisionMap, x
-    inx
-    cpx #COLLISION_MAP_SIZE
-    bne @copyCollisionMapLoop
-
-    lda #0
-    sta InHouse
-    
-    lda #OUTDOORS_LOC1_SCREEN_COUNT
-    sta ScreenCount
-    
-    lda #<Outside1_items
-    sta pointer
-    lda #>Outside1_items
-    sta pointer + 1
-    jsr LoadItems
-
-    jsr GenerateNpcs
-
-
-    lda #OUTSIDE_ENTRY_FROM_HOUSE_X
-    sta PlayerX
-    lda #OUTSIDE_ENTRY_FROM_HOUSE_Y
-    sta PlayerY
-
-
-
+    lda PaletteFadeAnimationState
+    bne @nope
     lda #1
-    sta MustLoadOutside
-    sta MustCopyMainChr
-    sta MustLoadSomething
+    sta PaletteFadeAnimationState
+    sta MustLoadOutsideHouseAfterFadeout
+    lda #3
+    sta PaletteAnimDelay
+    lda #0
+    sta PaletteFadeTimer
+    sta FadeIdx
 
 @nope:
     rts
