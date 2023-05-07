@@ -493,6 +493,8 @@ PaletteUpdateSize:
     .res 1
 RamPalette:
     .res 32
+TempPalette: ;to store the modified outdoors palette
+    .res 32
 PaletteAnimDelay:
     .res 1
 DigitChangeSize: ;dedicated byte for Decrease/IncreaseDigits, because I can
@@ -541,7 +543,7 @@ MustLoadSomething:
     .res 1
 
 ZPBuffer:
-    .res 171  ; I want to be aware of free memory
+    .res 139  ; I want to be aware of free memory
 
 ;--------------
 .segment "BSS" ; variables in ram
@@ -2591,6 +2593,7 @@ RunTime:
 @exit:
     rts
 ;-------------------------------
+;PalettePtr - where to store the modified palette
 AdaptBackgroundPaletteByTime:
     lda InHouse
     bne @exit
@@ -2616,7 +2619,7 @@ AdaptBackgroundPaletteByTime:
     bcs @saveColor
     lda #$0F
 @saveColor:
-    sta RamPalette, y
+    sta (PalettePtr), y
     iny
     cpy #12 ;skip the last palette that's used for UI
     bne @paletteLoop
@@ -4581,12 +4584,9 @@ LoadVillagerHut:
     
 
     lda #<house_palette
-    sta pointer
+    sta PalettePtr
     lda #>house_palette
-    sta pointer + 1
-    lda #32
-    sta Temp
-    jsr LoadPalette
+    sta PalettePtr + 1
 
 
     jsr VillagerItemsAndNpcs
@@ -4599,6 +4599,12 @@ LoadVillagerHut:
     sta MustLoadSomething
     lda #1
     sta ScreenCount
+
+    lda #PALETTE_STATE_FADE_IN
+    sta PaletteFadeAnimationState
+    lda #PALETTE_FADE_MAX_ITERATION
+    sta FadeIdx
+
 
     jsr SetupVillagerText
 
@@ -4697,15 +4703,12 @@ LoadTheHouseInterior:
 
     jsr LoadNametable
     jsr LoadStatusBar
-    
 
     lda #<house_palette
-    sta pointer
+    sta PalettePtr
     lda #>house_palette
-    sta pointer + 1
-    lda #32
-    sta Temp
-    jsr LoadPalette
+    sta PalettePtr + 1
+
 
     ldy #0
     jsr bankswitch_y
@@ -4716,6 +4719,10 @@ LoadTheHouseInterior:
     lda #1
     sta ScreenCount
 
+    lda #PALETTE_STATE_FADE_IN
+    sta PaletteFadeAnimationState
+    lda #PALETTE_FADE_MAX_ITERATION
+    sta FadeIdx
 
 
 @nope:

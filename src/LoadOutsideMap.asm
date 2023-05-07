@@ -154,13 +154,19 @@ LoadOutsideMap:
     ldy #0
 @paletteCopy:
     lda main_palette, y
-    sta RamPalette, y
+    sta TempPalette, y
     iny
     cpy #32
     bne @paletteCopy
 
     lda #255
     sta CurrentPaletteDecrementValue
+
+    lda #<TempPalette
+    sta PalettePtr
+    lda #>TempPalette
+    sta PalettePtr + 1
+
     jsr AdaptBackgroundPaletteByTime
     lda #32
     sta PaletteUpdateSize
@@ -178,6 +184,10 @@ LoadOutsideMap:
 @saveScreenCount:
     sta ScreenCount
 
+    lda #PALETTE_STATE_FADE_IN
+    sta PaletteFadeAnimationState
+    lda #PALETTE_FADE_MAX_ITERATION
+    sta FadeIdx
 
     rts
 ;-----------------------------------
