@@ -69,7 +69,7 @@ GenerateNpcs:
     beq @makeWolf
     lda TempNpcCnt;if it's a last npc, let's make it hostile
     cmp #1
-    beq @makeWolf
+    beq @makeCanid
 
     ldy #9
     lda npc_data, y
@@ -87,6 +87,15 @@ GenerateNpcs:
     lda npc_data, y
     sta TempHp
     lda #%00000001
+    jmp @storeType
+@makeCanid:
+    ldy #25
+    lda npc_data, y
+    sta TempNpcRows
+    ldy #28
+    lda npc_data, y
+    sta TempHp
+    lda #%00001101
 @storeType:
     sta Npcs, x
     inx

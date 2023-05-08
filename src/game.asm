@@ -307,7 +307,7 @@ npc_anim_row_sequence:
 
     MAX_V_SCROLL               = 255
 
-    ANIM_FRAME_BLOODSTAIN      = 110
+    ANIM_FRAME_BLOODSTAIN      = $B8
 
 
     HOURS_MAX                  = 240
