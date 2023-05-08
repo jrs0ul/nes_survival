@@ -344,7 +344,6 @@ npc_anim_row_sequence:
     SLEEP_POS_X                = 100
     SLEEP_POS_Y                = 72
 
-    SLEEP_FADE_DELAY           = 10
     
     SLEEP_ADD_HP_TIMES_TEN     = 3
     SLEEP_SUB_HP_HUNGER_TT     = 5
@@ -458,7 +457,9 @@ npc_anim_row_sequence:
 
     CLOTHING_DAMAGE_BY_NPC     = 10
 
-    GAME_OVER_FADE_DELAY       = 3
+    FADE_DELAY_GAME_OVER       = 3
+    FADE_DELAY_GENERIC         = 2
+    FADE_DELAY_SLEEP           = 10
 
 ;===================================================================
 .segment "ZEROPAGE"
@@ -1672,7 +1673,7 @@ Logics:
     lda #0
     sta PaletteFadeTimer
     sta FadeIdx
-    lda #GAME_OVER_FADE_DELAY
+    lda #FADE_DELAY_GAME_OVER
     sta PaletteAnimDelay
 ;---
 @cont:
@@ -1945,7 +1946,7 @@ CheckIfExitedSecondLocation:
     lda #1
     sta PaletteFadeAnimationState
     sta MustLoadFirstLocationAfterFadeout
-    lda #3
+    lda #FADE_DELAY_GENERIC
     sta PaletteAnimDelay
     lda #0
     sta PaletteFadeTimer
@@ -1970,7 +1971,7 @@ CheckIfEnteredSecondLocation:
     lda #1
     sta PaletteFadeAnimationState
     sta MustLoadSecondLocationAfterFadeout
-    lda #3
+    lda #FADE_DELAY_GENERIC
     sta PaletteAnimDelay
     lda #0
     sta PaletteFadeTimer
@@ -3332,6 +3333,8 @@ LoadGameOver:
     sta PaletteFadeAnimationState
     lda #PALETTE_FADE_MAX_ITERATION
     sta FadeIdx
+    lda #FADE_DELAY_GAME_OVER
+    sta PaletteAnimDelay
 
 
     lda #0
@@ -4321,7 +4324,7 @@ CheckIfEnteredVillagerHut:
     lda #1
     sta PaletteFadeAnimationState
     sta MustLoadVillagerHutAfterFadeout
-    lda #3
+    lda #FADE_DELAY_GENERIC
     sta PaletteAnimDelay
     lda #0
     sta PaletteFadeTimer
@@ -4362,7 +4365,7 @@ CheckIfEnteredHouse:
     lda #1
     sta PaletteFadeAnimationState
     sta MustLoadIndoorsAfterFadeout
-    lda #3
+    lda #FADE_DELAY_GENERIC
     sta PaletteAnimDelay
     lda #0
     sta PaletteFadeTimer
@@ -4486,7 +4489,7 @@ CheckIfExitedVillagerHut:
     lda #1
     sta PaletteFadeAnimationState
     sta MustLoadOutsideVillagerHutAfterFadeout
-    lda #3
+    lda #FADE_DELAY_GENERIC
     sta PaletteAnimDelay
     lda #0
     sta PaletteFadeTimer
@@ -4556,7 +4559,7 @@ CheckIfExitedHouse:
     lda #1
     sta PaletteFadeAnimationState
     sta MustLoadOutsideHouseAfterFadeout
-    lda #3
+    lda #FADE_DELAY_GENERIC
     sta PaletteAnimDelay
     lda #0
     sta PaletteFadeTimer
@@ -4744,10 +4747,15 @@ LoadTheHouseInterior:
     lda #1
     sta ScreenCount
 
+
+    lda MustSleepAfterFadeOut
+    bne @nope
     lda #PALETTE_STATE_FADE_IN
     sta PaletteFadeAnimationState
     lda #PALETTE_FADE_MAX_ITERATION
     sta FadeIdx
+    lda #FADE_DELAY_GENERIC
+    sta PaletteAnimDelay
 
 
 @nope:

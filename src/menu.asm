@@ -1929,7 +1929,7 @@ StartSleep:
     lda #1
     sta MustExitMenuState
     sta PaletteFadeAnimationState ; set fade-out
-    lda #SLEEP_FADE_DELAY
+    lda #FADE_DELAY_SLEEP
     sta PaletteAnimDelay
     sta MustSleepAfterFadeOut
 
@@ -2328,15 +2328,30 @@ ExitMenuState:
     lda OldInventoryPointerY
     sta InventoryPointerY
 
-    
-
 @ignorethis:
-    
+
     lda #0
     sta StashActivated
-    
-    jsr ClearPalette
 
+    lda MustSleepAfterFadeOut ;little hack
+    bne @loadHousePalette
+    jsr ClearPalette
+    jmp @cont
+@loadHousePalette:
+
+    ldy #0
+@paletteCopy:
+    lda house_palette, y
+    sta RamPalette, y
+    iny
+    cpy #PALETTE_SIZE_MAX
+    bne @paletteCopy
+    lda #1
+    sta MustUpdatePalette
+    lda #PALETTE_SIZE_MAX
+    sta PaletteUpdateSize
+
+@cont:
     lda InHouse
     beq @loadOther ;InHouse = 0
     lda #1

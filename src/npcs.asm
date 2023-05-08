@@ -67,6 +67,10 @@ GenerateNpcs:
     lda TempFrame
     cmp #$40    ;check if it's night
     beq @makeWolf
+    lda TempNpcCnt;if it's a last npc, let's make it hostile
+    cmp #1
+    beq @makeWolf
+
     ldy #9
     lda npc_data, y
     sta TempNpcRows
@@ -108,15 +112,12 @@ GenerateNpcs:
 
     jsr TestGeneratedNpcCollision
     bne @generateCoords
-    
 
    jsr StoreGeneratedNpc
 
-    
 
     dec TempNpcCnt
     bne @npcLoop
-    
 
     rts
 ;------------------------------------
