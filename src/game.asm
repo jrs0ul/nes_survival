@@ -959,6 +959,8 @@ TempYOffset:
     .res 1
 TempNpcType: ;temp value of an npc, if it's a predator or not
     .res 1
+TempNpcDataIndex: ;to look it up in npc_data
+    .res 1
 TempNpcState: ;attacking or idle
     .res 1
 TempNpcTimer:
@@ -1042,7 +1044,7 @@ SourceMapIdx:
     .res 1
 
 Buffer:
-    .res 521 ;must see how much is still available
+    .res 520 ;must see how much is still available
 
 ;====================================================================================
 
@@ -3446,6 +3448,9 @@ ResetEntityVariables:
     sta FishBiteTimer
     sta FishingRodActive
     sta MustLoadGameOverAfterFadeOut
+    sta EquipedClothing
+    sta EquipedClothing + 1
+
     lda #PLAYER_START_X
     sta PlayerX
     lda #PLAYER_START_Y

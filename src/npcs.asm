@@ -1271,6 +1271,7 @@ FetchNpcVars:
     asl
     asl
     tax
+    stx TempNpcDataIndex
     inx
     lda npc_data, x; rows
     sta TempNpcRows
@@ -2200,14 +2201,20 @@ DamagePlayer:
 
     jsr PlayDamageSfx
 
-    lda #9
+    lda TempNpcDataIndex
+    clc
+    adc #5  ;where the attack value is
+    tay
+
+    lda npc_data, y
     sta DigitChangeSize
 
 
     lda EquipedClothing
     beq @noclothing
 
-    lda #5
+    lda DigitChangeSize
+    lsr
     sta DigitChangeSize
     lda EquipedClothing + 1
     cmp #CLOTHING_DAMAGE_BY_NPC
