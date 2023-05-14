@@ -2164,7 +2164,7 @@ OnCollisionWithPlayer:
     dex
     bne @addRowsLoop
     ldx Temp
-    cmp TempY
+    cmp PlayerY
     bcc @exit
     ;---
 

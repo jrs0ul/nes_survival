@@ -542,9 +542,13 @@ WarmthUpdated:
     .res 1
 MustLoadSomething:
     .res 1
+MustPlayNewSong:
+    .res 1
+SongName:
+    .res 1
 
 ZPBuffer:
-    .res 139  ; I want to be aware of free memory
+    .res 137  ; I want to be aware of free memory
 
 ;--------------
 .segment "BSS" ; variables in ram
@@ -1261,6 +1265,15 @@ nextIteration:
     ldy #6
     bankswitch ; macro
 
+    lda MustPlayNewSong
+    beq doSoundUpdate
+
+    lda SongName
+    jsr famistudio_music_play
+    lda #0
+    sta MustPlayNewSong
+
+doSoundUpdate:
     jsr famistudio_update
 
     ldy oldbank
@@ -3286,11 +3299,10 @@ LoadGameOver:
     lda MustLoadGameOver
     beq @exit
 
-    ldy #6
-    jsr bankswitch_y
     lda #2
-    jsr famistudio_music_play
-
+    sta SongName
+    lda #1
+    sta MustPlayNewSong
 
     ldy #2
     jsr bankswitch_y
@@ -4595,12 +4607,11 @@ LoadVillagerHut:
 
     lda MustRestartIndoorsMusic
     beq @loadHouseStuff
-    ldy #6
-    jsr bankswitch_y
+
     lda #1
-    jsr famistudio_music_play
-    ldy #3
-    jsr bankswitch_y
+    sta SongName
+    sta MustPlayNewSong
+
     lda #0
     sta MustRestartIndoorsMusic
 
@@ -4717,12 +4728,9 @@ LoadTheHouseInterior:
 
     lda MustRestartIndoorsMusic
     beq @loadHouseStuff
-    ldy #6
-    jsr bankswitch_y
     lda #1
-    jsr famistudio_music_play
-    ldy #3
-    jsr bankswitch_y
+    sta SongName
+    sta MustPlayNewSong
     lda #0
     sta MustRestartIndoorsMusic
 

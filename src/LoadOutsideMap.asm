@@ -25,16 +25,9 @@ LoadOutsideMap:
     jsr CopyCHRTiles
     lda #0
     sta MustCopyMainChr
-
-    ldy current_bank
-    sty oldbank
-    ldy #6
-    jsr bankswitch_y
-    lda #0
-    jsr famistudio_music_play
-    ldy oldbank
-    jsr bankswitch_y
-
+    sta SongName; let's play song 0
+    lda #1
+    sta MustPlayNewSong
 
 @continueLoad:
 
