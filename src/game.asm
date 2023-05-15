@@ -359,7 +359,7 @@ npc_anim_row_sequence:
     PALETTE_FADE_MAX_ITERATION = 5
 
 
-    OUTDOORS_LOC1_SCREEN_COUNT = 5
+    OUTDOORS_LOC1_SCREEN_COUNT = 4
     OUTDOORS_LOC2_SCREEN_COUNT = 2
     PLAYER_START_X             = $50
     PLAYER_START_Y             = $90
@@ -463,9 +463,11 @@ npc_anim_row_sequence:
 
 ;===================================================================
 .segment "ZEROPAGE"
-current_bank:
+current_bank: ;active bank
     .res 1
 oldbank:
+    .res 1
+bankBeforeNMI: ;bank that was active before NMI, so it could be set back
     .res 1
 pointer:
     .res 2
@@ -548,7 +550,7 @@ SongName:
     .res 1
 
 ZPBuffer:
-    .res 137  ; I want to be aware of free memory
+    .res 136  ; I want to be aware of free memory
 
 ;--------------
 .segment "BSS" ; variables in ram
@@ -1296,6 +1298,8 @@ nmi:
     txa
     pha
     ;---
+    lda current_bank
+    sta bankBeforeNMI
 
     ;copy sprite data
     ;lda SpritesUpdated
@@ -1429,6 +1433,14 @@ endOfNmi:
     lda PPUCTRL
     sta $2000
 
+    lda current_bank
+    cmp bankBeforeNMI
+    beq noBankSwitch
+
+    ldy bankBeforeNMI
+    bankswitch
+
+noBankSwitch:
     pla
     tax
     pla
@@ -1974,7 +1986,7 @@ CheckIfExitedSecondLocation:
 CheckIfEnteredSecondLocation:
 
     lda CurrentMapSegmentIndex
-    cmp #4
+    cmp #OUTDOORS_LOC1_SCREEN_COUNT - 1
     bne @exit
     lda PlayerY
     cmp #32
@@ -2283,7 +2295,7 @@ RoutinesAfterFadeOut:
     sta TimesShiftedRight
     sta TilesScroll
 
-    lda #4
+    lda #OUTDOORS_LOC1_SCREEN_COUNT - 1
     sta CurrentMapSegmentIndex
 
     lda #OUTDOORS_LOC1_SCREEN_COUNT
@@ -2307,13 +2319,14 @@ RoutinesAfterFadeOut:
     sta PlayerY
     lda #128
     sta PlayerX
-    lda #5
+    lda #4
     sta RightCollisonMapIdx
     lda #0
     sta RightCollisionColumnIndex
 
-    lda #3
+    lda #2
     sta LeftCollisionMapIdx
+    lda #3
     sta LeftCollisionColumnIndex
     jsr LoadLeftCollisionColumn
 
@@ -2326,8 +2339,7 @@ RoutinesAfterFadeOut:
 
     jsr LoadItems
 
-    
-    
+
     lda #0
     sta MustLoadFirstLocationAfterFadeout
     sta PaletteFadeAnimationState
@@ -3092,7 +3104,7 @@ UpdateTextBaloon:
     lda MustUpdateTextBaloon
     beq @exit
 
-    lda #$22
+    lda #$26
     sta TempTextAddress
 
 
@@ -3261,6 +3273,9 @@ LoadTitle:
 
     lda MustLoadTitle
     beq @exit
+
+    ldy #2
+    jsr bankswitch_y
 
     lda #<title_palette
     sta pointer
@@ -3697,6 +3712,9 @@ CheckStartButton:
     lda #1
     sta MustLoadMenu
     sta MustLoadSomething
+    ldy #1
+    jsr bankswitch_y
+
 
 @exit:
     rts
@@ -4410,6 +4428,8 @@ CheckBed:
     sta MustLoadSomething
     sta MustLoadMenu
     sta PlayerInteractedWithBed
+    ldy #1
+    jsr bankswitch_y
 
     lda #1
     jmp @exit
@@ -4435,6 +4455,9 @@ CheckFireplace:
     sta MustLoadSomething
     sta MustLoadMenu
     sta PlayerInteractedWithFireplace
+    ldy #1
+    jsr bankswitch_y
+
 
     jmp @exit
 
@@ -4458,7 +4481,9 @@ CheckStashBox:
     sta MustLoadSomething
     sta MustLoadMenu
     sta PlayerInteractedWithStorage
-    
+    ldy #1
+    jsr bankswitch_y
+
 
     jmp @exit
 @nope:
@@ -4483,6 +4508,9 @@ CheckToolTable:
     sta MustLoadSomething
     sta MustLoadMenu
     sta PlayerInteractedWithTooltable
+    ldy #1
+    jsr bankswitch_y
+
 
     jmp @exit
 @nope:
@@ -4620,7 +4648,7 @@ LoadVillagerHut:
     sta pointer
     lda #>villager_hut
     sta pointer + 1
-    lda #$20    ; $20000
+    lda #$24    ; $24000
     sta NametableAddress
 
     jsr LoadNametable

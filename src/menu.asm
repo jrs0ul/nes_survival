@@ -3,9 +3,7 @@ LoadMenu:
     lda MustLoadMenu
     beq @exit
     
-    ldy #1
-    jsr bankswitch_y
-
+    
     lda #$00
     sta $2000
     sta $2001

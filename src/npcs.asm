@@ -114,7 +114,7 @@ GenerateNpcs:
     sta TempPointY
     ;screen idx
     jsr UpdateRandomNumber
-    and #%00000011 ; 3
+    and #%00000010 ; 2
     clc
     adc #1
     sta TempIndex
