@@ -302,7 +302,7 @@ npc_anim_row_sequence:
     BUTTON_B_MASK               = %01000000
     BUTTON_A_MASK               = %10000000
 
-    PLAYER_SPEED               = 2
+    PLAYER_SPEED               = 1
     NPC_SPEED                  = 1
 
     MAX_V_SCROLL               = 255
@@ -316,9 +316,9 @@ npc_anim_row_sequence:
 
     PLAYER_ATTACK_DELAY        = 16
 
-    INPUT_DELAY                = 130
+    INPUT_DELAY                = 100
     ITEM_DELAY                 = 66
-    NPC_AI_DELAY               = 128
+    NPC_AI_DELAY               = 133
     NPC_COLLISION_DELAY        = 250
     FISHING_DELAY              = 2
 
