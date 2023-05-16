@@ -42,12 +42,14 @@ LoadNpcs:
 
     rts
 ;-------------------------------------
+;Parameters: TempNpcCnt - max npc number used with and instruction
+
 ;Generate random npcs
 GenerateNpcs:
     jsr UpdateRandomNumber
-    and #%00000111 ; 7
+    and TempNpcCnt ; maximum npcs
     clc
-    adc #1
+    adc #1         ; you don't want 0 so add at least 1
     sta NpcCount
     sta TempNpcCnt
 
@@ -102,6 +104,21 @@ GenerateNpcs:
     stx TempZ
 
 @generateCoords:
+   jsr GenerateNPCCoords
+
+@testCollision:
+    jsr TestGeneratedNpcCollision
+    bne @generateCoords
+
+   jsr StoreGeneratedNpc
+
+
+    dec TempNpcCnt
+    bne @npcLoop
+
+    rts
+;------------------------------------
+GenerateNPCCoords:
     ;x
     jsr UpdateRandomNumber
     and #%00011111 ; 32
@@ -112,21 +129,43 @@ GenerateNpcs:
     clc
     adc #4
     sta TempPointY
-    ;screen idx
+
+    ;screen idx-------------
+    lda LocationIndex
+    beq @location0
+
+    jsr UpdateRandomNumber
+    and #%00000001 ; just two screens
+    sta TempIndex
+    lda #<collision_list_low2
+    sta pointer
+    lda #>collision_list_low2
+    sta pointer + 1
+    lda #<collision_list_high2
+    sta pointer2
+    lda #>collision_list_high2
+    sta pointer2 + 1
+
+
+    jmp @exit
+
+@location0:
     jsr UpdateRandomNumber
     and #%00000010 ; 2
     clc
     adc #1
     sta TempIndex
+    lda #<collision_list_low
+    sta pointer
+    lda #>collision_list_low
+    sta pointer + 1
+    lda #<collision_list_high
+    sta pointer2
+    lda #>collision_list_high
+    sta pointer2 + 1
 
-    jsr TestGeneratedNpcCollision
-    bne @generateCoords
 
-   jsr StoreGeneratedNpc
-
-
-    dec TempNpcCnt
-    bne @npcLoop
+@exit:
 
     rts
 ;------------------------------------
@@ -166,16 +205,18 @@ StoreGeneratedNpc:
     rts
 
 ;------------------------------------
-;x - TempPointX, y - TempPointY, screen - TempIndex
+;npc x - TempPointX, npc y - TempPointY, screen - TempIndex
+;pointer - collision list low
+;pointer2 - collision list high
 TestGeneratedNpcCollision:
 
     lda TempIndex
     cmp ScreenCount
     bcs @collisionDetected
-    tax
-    lda collision_list_low, x
-    sta pointer
-    lda collision_list_high, x
+    tay
+    lda (pointer), y
+    sta pointer ; reuse the pointer :)
+    lda (pointer2), y
     sta pointer + 1
 
 

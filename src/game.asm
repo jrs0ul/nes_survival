@@ -2142,6 +2142,7 @@ RoutinesAfterFadeOut:
     sta PaletteFadeAnimationState
     sta MustLoadVillagerHutAfterFadeout
 
+;------------------------------------
 
 @next2:
     lda MustLoadOutsideVillagerHutAfterFadeout
@@ -2172,6 +2173,11 @@ RoutinesAfterFadeOut:
     sta MustLoadOutsideVillagerHutAfterFadeout
     sta PaletteFadeAnimationState
 
+
+    lda #3
+    sta TempNpcCnt
+    jsr GenerateNpcs
+
     lda #<Outside2_items
     sta pointer
     lda #>Outside2_items
@@ -2185,6 +2191,7 @@ RoutinesAfterFadeOut:
 
 
 @next3:
+;--------------------------Second location
 
     lda MustLoadSecondLocationAfterFadeout
     beq @next4
@@ -2195,8 +2202,6 @@ RoutinesAfterFadeOut:
     sta LocationIndex
     lda #0
     sta CurrentMapSegmentIndex
-    sta NpcCount
-    sta ItemCount
     lda #OUTDOORS_LOC2_SCREEN_COUNT
     sta ScreenCount
 
@@ -2219,6 +2224,10 @@ RoutinesAfterFadeOut:
     lda #255
     sta LeftCollisionColumnIndex
 
+    lda #%00000011
+    sta TempNpcCnt
+    jsr GenerateNpcs
+
     lda #<Outside2_items
     sta pointer
     lda #>Outside2_items
@@ -2239,7 +2248,7 @@ RoutinesAfterFadeOut:
     sta MustLoadSecondLocationAfterFadeout
     sta PaletteFadeAnimationState
 
-
+;-----------------------------------------
 @next4:
 
     lda MustLoadIndoorsAfterFadeout
@@ -2279,8 +2288,9 @@ RoutinesAfterFadeOut:
     sta MustLoadIndoorsAfterFadeout
     sta PaletteFadeAnimationState
 
+;---------------------------------------------
 @next5:
-
+;----------------Entering first location from second
 
     lda MustLoadFirstLocationAfterFadeout
     beq @next6
@@ -2331,6 +2341,8 @@ RoutinesAfterFadeOut:
     jsr LoadLeftCollisionColumn
 
 
+    lda #7
+    sta TempNpcCnt
     jsr GenerateNpcs
     lda #<Outside1_items
     sta pointer
@@ -2343,7 +2355,7 @@ RoutinesAfterFadeOut:
     lda #0
     sta MustLoadFirstLocationAfterFadeout
     sta PaletteFadeAnimationState
-
+;------------------------------------------------
 @next6:
 
     lda MustLoadOutsideHouseAfterFadeout
@@ -2369,6 +2381,8 @@ RoutinesAfterFadeOut:
     sta pointer + 1
     jsr LoadItems
 
+    lda #7
+    sta TempNpcCnt
     jsr GenerateNpcs
 
 
@@ -3681,6 +3695,8 @@ CheckStartButton:
     sta pointer + 1
     jsr LoadItems
 
+    lda #7
+    sta TempNpcCnt
     jsr GenerateNpcs
     
     ldx #0

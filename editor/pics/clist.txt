@@ -1,6 +1,6 @@
 pics/chars.tga
 16 16 1 0
-../src/house.chr
+../src/main.chr
 8 8 0 1
 pics/buttons.tga
 32 32 0 0
