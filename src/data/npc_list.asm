@@ -5,6 +5,10 @@ Hut_npcs:
     .byte 1
     .byte %00001001, 104, 94, 0
 
+Hut_npcs_night:
+    .byte 1
+    .byte %00001001, 152, 77, 0
+
 Outside1_npcs:
     .byte 6
     .byte %00000011, 100, 80, 4

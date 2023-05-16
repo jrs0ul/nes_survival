@@ -1266,6 +1266,7 @@ FoodMenuInputAtHome:
 ;food menu while visiting a villager
 FoodMenuInputVillager:
 
+    stx TempRegX
     lda FoodMenuIndex
     bne @otherOptions
     ;eat
@@ -1277,6 +1278,13 @@ FoodMenuInputVillager:
 
     cmp #1
     bne @clear ; drop
+
+    ;give item
+
+    jsr GetPaletteFadeValueForHour
+    cmp #$40
+    beq @exit
+
 
     lda Inventory, x
     cmp #ITEM_JAM
@@ -1309,6 +1317,7 @@ FoodMenuInputVillager:
     lda #0
 
 @end:
+    ldx TempRegX
     rts
 
 

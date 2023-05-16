@@ -53,13 +53,7 @@ GenerateNpcs:
     sta NpcCount
     sta TempNpcCnt
 
-    lda Hours
-    lsr
-    lsr
-    lsr
-    lsr
-    tax
-    lda palette_fade_for_periods, x
+    jsr GetPaletteFadeValueForHour
     sta TempFrame
 
 

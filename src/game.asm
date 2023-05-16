@@ -2107,10 +2107,18 @@ RoutinesAfterFadeOut:
     sta MustLoadGameOver
     lda #0
     sta PaletteFadeAnimationState
+    ;---------------------------------------
 @next1:
+    ;Entered bear's hut
 
     lda MustLoadVillagerHutAfterFadeout
     beq @next2
+
+
+    jsr GetPaletteFadeValueForHour
+    cmp #$40 ; is it night?
+    beq @copyNightCollisionMap
+
 
     ldx #0
 @copyCollisionMapLoop:
@@ -2120,6 +2128,20 @@ RoutinesAfterFadeOut:
     inx
     cpx #COLLISION_MAP_SIZE
     bne @copyCollisionMapLoop
+    jmp @finishUp
+
+@copyNightCollisionMap:
+
+    ldx #0
+@copyCollisionMapLoopNight:
+
+    lda villager_hut_collision_at_night, x
+    sta CollisionMap, x
+    inx
+    cpx #COLLISION_MAP_SIZE
+    bne @copyCollisionMapLoopNight
+
+@finishUp:
 
 
     lda #1
@@ -2649,17 +2671,13 @@ AdaptBackgroundPaletteByTime:
     bne @exit
 
     ldy #$01 ;keeps the outline for the background objects
-    lda Hours
-    lsr
-    lsr
-    lsr
-    lsr
-    tax
-    lda palette_fade_for_periods, x
+
+    jsr GetPaletteFadeValueForHour
+
     cmp CurrentPaletteDecrementValue
     beq @exit
     sta CurrentPaletteDecrementValue
-   
+
 @paletteLoop:
     lda main_palette, y ;palette from ROM
     sec
@@ -2679,6 +2697,19 @@ AdaptBackgroundPaletteByTime:
 @exit:
     rts
 
+;-------------------------------
+;loads palette fade value int A
+GetPaletteFadeValueForHour:
+
+    lda Hours
+    lsr
+    lsr
+    lsr
+    lsr
+    tax
+    lda palette_fade_for_periods, x
+
+    rts
 ;-------------------------------
 WarmthLogics:
     dec WarmthDelay
@@ -2705,14 +2736,8 @@ WarmthLogics:
     jsr IncreaseWarmth
     jmp @exit
 @decreaseWarmth:
-    lda Hours
-    lsr
-    lsr
-    lsr
-    lsr
-    tax
-    lda palette_fade_for_periods, x
-    cmp #$40
+    jsr GetPaletteFadeValueForHour
+    cmp #$40    ; is it night ?
     beq @nightFreeze
     lda #WARMTH_DAY_DECREASE
     jmp @saveTempDecrease
@@ -4706,15 +4731,33 @@ VillagerItemsAndNpcs:
     sta ItemCount
     sta MustClearVillagerItems
 @npcs:
+    jsr GetPaletteFadeValueForHour
+    cmp #$40
+    beq @night_npcs
+
     lda #<Hut_npcs
     sta pointer
     lda #>Hut_npcs
     sta pointer + 1
+    jmp @load
+
+@night_npcs:
+    lda #<Hut_npcs_night
+    sta pointer
+    lda #>Hut_npcs_night
+    sta pointer + 1
+
+@load:
     jsr LoadNpcs
 
     rts
 ;-----------------------------------
 SetupVillagerText:
+
+   jsr GetPaletteFadeValueForHour
+   cmp #$40
+   beq @exit
+
     lda #1
     sta MustUpdateTextBaloon
     lda #0
