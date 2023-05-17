@@ -302,7 +302,6 @@ npc_anim_row_sequence:
     BUTTON_B_MASK               = %01000000
     BUTTON_A_MASK               = %10000000
 
-    PLAYER_SPEED               = 1
     NPC_SPEED                  = 1
 
     MAX_V_SCROLL               = 255
@@ -618,6 +617,9 @@ OldPlayerY:
 PlayerX:
     .res 1
 PlayerY:
+    .res 1
+
+PlayerSpeed:
     .res 1
 
 PlayerAnimationRowIndex: ;which animation row to use for player sprites at the moment
@@ -1051,7 +1053,7 @@ SourceMapIdx:
     .res 1
 
 Buffer:
-    .res 520 ;must see how much is still available
+    .res 519 ;must see how much is still available
 
 ;====================================================================================
 
@@ -3441,6 +3443,7 @@ SetDaysInGameOver:
 ResetEntityVariables:
 
     lda #1
+    sta PlayerSpeed
     sta HP
     sta Warmth
     sta Food
@@ -3820,7 +3823,7 @@ ProcessButtons:
 
     lda PlayerY
     sec
-    sbc #PLAYER_SPEED
+    sbc PlayerSpeed
     sta PlayerY
 
 @CheckDown:
@@ -3836,7 +3839,7 @@ ProcessButtons:
 
     lda PlayerY
     clc
-    adc #PLAYER_SPEED
+    adc PlayerSpeed
     sta PlayerY
 @exit:
     lda #1
@@ -4256,16 +4259,16 @@ CheckLeft:
 @skipScroll:
     lda TilesScroll
     sec
-    sbc #PLAYER_SPEED
+    sbc PlayerSpeed
     sta TilesScroll
 ;--
 @ScrollGlobalyLeft:
     lda GlobalScroll
-    cmp #PLAYER_SPEED
+    cmp PlayerSpeed
     bcc @clamp
 
     sec
-    sbc #PLAYER_SPEED
+    sbc PlayerSpeed
     jmp @save
 @clamp:
     lda #1
@@ -4273,7 +4276,7 @@ CheckLeft:
 
     lda GlobalScroll
     sec
-    sbc #PLAYER_SPEED
+    sbc PlayerSpeed
     jmp @save
 @save:
     sta GlobalScroll
@@ -4284,7 +4287,7 @@ CheckLeft:
     lda PlayerX
     beq @exit ; already x=0
     sec
-    sbc #PLAYER_SPEED
+    sbc PlayerSpeed
     sta PlayerX
 
 @exit:
@@ -4321,7 +4324,7 @@ CheckRight:
 ;--
     lda TilesScroll
     clc
-    adc #PLAYER_SPEED
+    adc PlayerSpeed
     sta TilesScroll
 ;--
 
@@ -4330,11 +4333,19 @@ CheckRight:
     bcs @ScrollGlobalyRight
 
 @ScrollGlobalyRight:
-    lda GlobalScroll
-    cmp #MAX_V_SCROLL - PLAYER_SPEED + 1
-    bcs @clamp
+
+    lda #MAX_V_SCROLL
+    sec
+    sbc PlayerSpeed
     clc
-    adc #PLAYER_SPEED
+    adc #1
+    cmp GlobalScroll
+    bcc @clamp
+    beq @clamp
+
+    lda GlobalScroll
+    clc
+    adc PlayerSpeed
     jmp @save
 @clamp:
     lda #1
@@ -4342,7 +4353,7 @@ CheckRight:
 
     lda GlobalScroll
     clc
-    adc #PLAYER_SPEED
+    adc PlayerSpeed
 @save:
     sta GlobalScroll
 
@@ -4351,7 +4362,7 @@ CheckRight:
 @moveRight:
     lda #0
     sec
-    sbc #PLAYER_SPEED
+    sbc PlayerSpeed
     sec 
     sbc #PLAYER_WIDTH
     cmp PlayerX
@@ -4359,7 +4370,7 @@ CheckRight:
     beq @exit
     lda PlayerX
     clc
-    adc #PLAYER_SPEED
+    adc PlayerSpeed
     sta PlayerX
 @exit:
 
