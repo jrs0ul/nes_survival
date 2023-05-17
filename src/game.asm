@@ -329,6 +329,7 @@ npc_anim_row_sequence:
     PLAYER_COLLISION_LINE_X1    = 3
     PLAYER_COLLISION_LINE_X2    = 13 ;16 - 3
     PLAYER_COLLISION_LINE_Y1    = 8
+    PLAYER_WIDTH                = 16
 
     MAX_TILE_SCROLL_LEFT       = 248; -8
     MAX_TILE_SCROLL_RIGHT      = 8
@@ -4317,15 +4318,17 @@ CheckRight:
     cmp ScreenCount
     beq @moveRight
 
-    lda GlobalScroll
-    cmp #255
-    bcs @ScrollGlobalyRight
 ;--
     lda TilesScroll
     clc
     adc #PLAYER_SPEED
     sta TilesScroll
 ;--
+
+    lda GlobalScroll
+    cmp #MAX_V_SCROLL
+    bcs @ScrollGlobalyRight
+
 @ScrollGlobalyRight:
     lda GlobalScroll
     cmp #MAX_V_SCROLL - PLAYER_SPEED + 1
@@ -4346,9 +4349,15 @@ CheckRight:
     jmp @exit
 
 @moveRight:
-    lda PlayerX
-    cmp #238 ;254 - 16
+    lda #0
+    sec
+    sbc #PLAYER_SPEED
+    sec 
+    sbc #PLAYER_WIDTH
+    cmp PlayerX
+
     beq @exit
+    lda PlayerX
     clc
     adc #PLAYER_SPEED
     sta PlayerX
