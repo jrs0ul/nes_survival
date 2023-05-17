@@ -3797,6 +3797,7 @@ ProcessButtons:
     sta DirectionY
 
     jsr CheckB
+    jsr CheckA
 
 
     lda FishingRodActive
@@ -3846,6 +3847,22 @@ ProcessButtons:
     sta InputProcessed
 
     rts
+;----------------------------------
+CheckA:
+    lda Buttons
+    and #BUTTON_A_MASK
+    beq @exit
+
+    lda #2
+    jmp @end
+
+@exit:
+    lda #1
+@end:
+    sta PlayerSpeed
+    rts
+
+
 ;----------------------------------
 CheckB:
     lda Buttons
@@ -4248,15 +4265,9 @@ CheckLeft:
     bcs @moveLeft
 
     lda CurrentMapSegmentIndex ; CurrentMapSegment < 1 -> do not scroll
-    cmp #1
-    bcc @checkScroll
-    jmp @skipScroll
-;-
-@checkScroll:
-    lda GlobalScroll
-    beq @moveLeft   ;hack
-;--
-@skipScroll:
+    beq @firstScreen
+
+
     lda TilesScroll
     sec
     sbc PlayerSpeed
@@ -4278,6 +4289,34 @@ CheckLeft:
     sec
     sbc PlayerSpeed
     jmp @save
+
+
+@firstScreen:
+
+    lda GlobalScroll
+    beq @moveLeft
+
+
+    cmp PlayerSpeed
+    bcc @clamp1
+
+    lda TilesScroll
+    sec
+    sbc PlayerSpeed
+    sta TilesScroll
+
+
+
+    lda GlobalScroll
+    sec
+    sbc PlayerSpeed
+    jmp @save
+
+@clamp1:
+
+    lda #0
+    sta TilesScroll
+
 @save:
     sta GlobalScroll
 
