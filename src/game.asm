@@ -3059,21 +3059,28 @@ ResetPlayerXMovement:
 
 ;--------------------------------
 PushCollisionMapIfNeeded:
-    lda TilesScroll
-    cmp #MAX_TILE_SCROLL_RIGHT
-    bne @checkAnother
+
     lda DirectionX
     cmp #2
     bne @checkAnother
+
+    lda TilesScroll
+    cmp #MAX_TILE_SCROLL_RIGHT
+    bcc @checkAnother
+    cmp #240
+    bcs @checkAnother
     jsr PushCollisionMapLeft
     jmp @finishInput
 @checkAnother:
-    lda TilesScroll
-    cmp #MAX_TILE_SCROLL_LEFT
-    bne @finishInput
     lda DirectionX
     cmp #1
     bne @finishInput
+
+    lda TilesScroll
+    cmp #10
+    bcc @finishInput
+    cmp #MAX_TILE_SCROLL_LEFT + 1
+    bcs @finishInput
     jsr PushCollisionMapRight
 @finishInput:
 
@@ -4244,12 +4251,8 @@ LaunchSpear:
 
     rts
 
-
-;----------------------------------
-CheckLeft:
-    lda Buttons
-    and #BUTTON_LEFT_MASK
-    beq @exit
+;-------------------------------
+SetupCheckLeft:
 
     lda #1
     sta DirectionX
@@ -4258,6 +4261,17 @@ CheckLeft:
     sta PlayerFrame
     sta PlayerFlip
 
+    rts
+
+
+;----------------------------------
+CheckLeft:
+    lda Buttons
+    and #BUTTON_LEFT_MASK
+    beq @exit
+
+    jsr SetupCheckLeft
+   
     lda PlayerX
     clc
     adc #8
@@ -4314,8 +4328,13 @@ CheckLeft:
 
 @clamp1:
 
-    lda #0
+    lda TilesScroll
+    sec
+    sbc PlayerSpeed
     sta TilesScroll
+
+    lda #0
+    ;sta TilesScroll
 
 @save:
     sta GlobalScroll
@@ -4332,13 +4351,9 @@ CheckLeft:
 @exit:
 
     rts
-;----------------------------------
-;Right on dpad is pressed
-CheckRight:
-    lda Buttons
-    and #BUTTON_RIGHT_MASK
-    beq @exit
 
+;---------------------------------
+SetupCheckRight:
     lda #2
     sta DirectionX
     sta ScrollDirection
@@ -4347,6 +4362,16 @@ CheckRight:
     lda #1
     sta PlayerFlip
 
+    rts
+
+;----------------------------------
+;Right on dpad is pressed
+CheckRight:
+    lda Buttons
+    and #BUTTON_RIGHT_MASK
+    beq @exit
+
+    jsr SetupCheckRight
 
     lda PlayerX
     clc
@@ -4390,9 +4415,20 @@ CheckRight:
     lda #1
     sta MustIncrementScreenIndex
 
+    lda CurrentMapSegmentIndex
+    clc
+    adc #2
+    cmp ScreenCount
+    beq @preLastScreen
+
     lda GlobalScroll
     clc
     adc PlayerSpeed
+    jmp @save
+@preLastScreen:
+    lda #0          ;finshed to the last screen, set globalscroll to zero
+
+
 @save:
     sta GlobalScroll
 
@@ -4673,6 +4709,9 @@ PrepareCollisionAfterHutExit:
     jsr LoadRightCollisionColumn
 
 
+    lda #0
+    sta CurrentMapSegmentIndex
+
     ;TODO: rework this
     jsr PushCollisionMapRight
     jsr PushCollisionMapRight
@@ -4683,6 +4722,7 @@ PrepareCollisionAfterHutExit:
     jsr PushCollisionMapRight
     jsr PushCollisionMapRight
     jsr PushCollisionMapRight
+
 
     rts
 

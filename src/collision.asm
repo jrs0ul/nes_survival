@@ -150,10 +150,23 @@ PushCollisionMapRight:
     inx
     cpx #COLLISION_MAP_SIZE
     bcc @loop
-    ;--
 
-    lda #0
+;----- reset tilescroll var
+    lda CurrentMapSegmentIndex
+    beq @firstScreen
+    lda #MAX_TILE_SCROLL_LEFT
+    sec
+    sbc TilesScroll
     sta TilesScroll
+    lda #0
+    sec
+    sbc TilesScroll
+    jmp @saveTileScroll
+@firstScreen:
+    lda #0
+@saveTileScroll:
+    sta TilesScroll
+;-----
 
     lda TimesShiftedLeft
     bne @revert         ;TimesShiftedLeft > 0
@@ -243,8 +256,22 @@ PushCollisionMapLeft:
     dex
     bpl @loop
 
+;-------------------reset tilescroll
+    lda CurrentMapSegmentIndex
+    clc
+    adc #1
+    cmp ScreenCount
+    beq @atLastScreen
+
+    lda TilesScroll
+    sec
+    sbc #MAX_TILE_SCROLL_RIGHT
+    jmp @saveTileScroll
+@atLastScreen:
     lda #0
+@saveTileScroll:
     sta TilesScroll
+;-----------------
 
     lda TimesShiftedRight
     bne @revert
