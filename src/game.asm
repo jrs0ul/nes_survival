@@ -2912,9 +2912,9 @@ AnimateFire:
 ;----------------------------------
 HandleInput:
 
-    
+
     jsr CheckStartButton
-    
+
     lda GameState
     cmp #STATE_MENU
     bne @checkIfGame
@@ -4271,10 +4271,9 @@ CheckLeft:
     beq @exit
 
     jsr SetupCheckLeft
-   
+
     lda PlayerX
-    cmp #120
-    beq @cont
+    cmp #120    ;check if player is in the left side of the screen
     bcs @moveLeft
 
 @cont:
@@ -4311,15 +4310,15 @@ CheckLeft:
     beq @moveLeft
 
 
-    cmp PlayerSpeed
-    bcc @clamp1
-
     lda TilesScroll
     sec
     sbc PlayerSpeed
     sta TilesScroll
 
 
+    lda GlobalScroll
+    cmp PlayerSpeed
+    bcc @clamp1
 
     lda GlobalScroll
     sec
@@ -4327,11 +4326,6 @@ CheckLeft:
     jmp @save
 
 @clamp1:
-
-    lda TilesScroll
-    sec
-    sbc PlayerSpeed
-    sta TilesScroll
 
     lda #0
 
@@ -4709,6 +4703,9 @@ PrepareCollisionAfterHutExit:
     lda #0
     sta CurrentMapSegmentIndex
 
+    lda #0 ;hack
+    sta GlobalScroll
+
     ;TODO: rework this
     jsr PushCollisionMapRight
     jsr PushCollisionMapRight
@@ -4719,6 +4716,9 @@ PrepareCollisionAfterHutExit:
     jsr PushCollisionMapRight
     jsr PushCollisionMapRight
     jsr PushCollisionMapRight
+
+    lda #$B8 ;hack
+    sta GlobalScroll
 
 
     rts

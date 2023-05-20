@@ -154,9 +154,8 @@ PushCollisionMapRight:
 ;----- reset tilescroll var
     lda CurrentMapSegmentIndex
     bne @regularReset
-    lda PlayerX
-    cmp #120
-    bcc @firstScreen
+    lda GlobalScroll
+    beq @firstScreen
 
 @regularReset:
     lda #MAX_TILE_SCROLL_LEFT
