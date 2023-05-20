@@ -4273,11 +4273,11 @@ CheckLeft:
     jsr SetupCheckLeft
    
     lda PlayerX
-    clc
-    adc #8
-    cmp #128
+    cmp #120
+    beq @cont
     bcs @moveLeft
 
+@cont:
     lda CurrentMapSegmentIndex ; CurrentMapSegment < 1 -> do not scroll
     beq @firstScreen
 
@@ -4334,7 +4334,6 @@ CheckLeft:
     sta TilesScroll
 
     lda #0
-    ;sta TilesScroll
 
 @save:
     sta GlobalScroll
@@ -4374,10 +4373,8 @@ CheckRight:
     jsr SetupCheckRight
 
     lda PlayerX
-    clc
-    adc #8
-    cmp #128
-    bcc @moveRight  ;not gonna scroll until playerx >= 128
+    cmp #120
+    bcc @moveRight  ;not gonna scroll until playerx + 8 >= 128
 
     lda CurrentMapSegmentIndex ; CurrentMapSegment + 1 == ScreenCount -> do not scroll
     clc
