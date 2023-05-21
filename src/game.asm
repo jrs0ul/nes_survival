@@ -2925,37 +2925,31 @@ HandleInput:
     bne @finishInput
 
     lda Buttons
-    beq @finishInput ; no input
+    beq @finishInput ; no input at all
 
     lda AttackTimer
-    bne @finishInput
+    bne @finishInput ; attack pause
 
     lda InputProcessed
     bne @finishInput
 
+    jsr CheckB
+    jsr CheckA
+
     lda Buttons
     and #%00001111
-    beq @continueInput
+    beq @finishInput ; dpad is not being used
+
+    lda FishingRodActive
+    bne @continueInput ; don't animate walk while fishing
+
     jsr AnimateWalk
 
 @continueInput:
 
     ;save the movement before collision check
-    lda PlayerX
-    sta OldPlayerX
-
-    lda PlayerY
-    sta OldPlayerY
-
-    lda GlobalScroll
-    sta OldGlobalScroll
-
-    lda TilesScroll
-    sta OldTileScroll
-
-    lda ScrollDirection
-    sta OldScrollDirection
-
+    jsr BackupMovement
+    
     ;gamepad button processing, the player could be moved here
     jsr ProcessButtons
 
@@ -3018,6 +3012,25 @@ HandleInput:
 
     lda #INPUT_DELAY
     sta InputUpdateDelay
+    rts
+;--------------------------------
+BackupMovement:
+
+    lda PlayerX
+    sta OldPlayerX
+
+    lda PlayerY
+    sta OldPlayerY
+
+    lda GlobalScroll
+    sta OldGlobalScroll
+
+    lda TilesScroll
+    sta OldTileScroll
+
+    lda ScrollDirection
+    sta OldScrollDirection
+
     rts
 ;--------------------------------
 SwitchScreenIdxIfNeeded:
@@ -3803,10 +3816,6 @@ ProcessButtons:
     sta DirectionX
     sta DirectionY
 
-    jsr CheckB
-    jsr CheckA
-
-
     lda FishingRodActive
     bne @exit
 
@@ -3859,6 +3868,13 @@ CheckA:
     lda Buttons
     and #BUTTON_A_MASK
     beq @exit
+
+    lda Food
+    clc
+    adc Food + 1
+    adc Food + 2
+    cmp #0
+    beq @exit ; can't sprint on empty stomach
 
     lda #2
     jmp @end
