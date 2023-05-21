@@ -329,6 +329,7 @@ npc_anim_row_sequence:
     PLAYER_COLLISION_LINE_X2    = 13 ;16 - 3
     PLAYER_COLLISION_LINE_Y1    = 8
     PLAYER_WIDTH                = 16
+    PLAYER_STAMINA_SIZE         = 64
 
     MAX_TILE_SCROLL_LEFT       = 248; -8
     MAX_TILE_SCROLL_RIGHT      = 8
@@ -633,6 +634,9 @@ NpcsHitByPlayer:
 PlayerFrame:
     .res 1
 PlayerFlip:
+    .res 1
+
+Stamina:
     .res 1
 
 DirectionX:
@@ -1053,7 +1057,7 @@ SourceMapIdx:
     .res 1
 
 Buffer:
-    .res 519 ;must see how much is still available
+    .res 518 ;must see how much is still available
 
 ;====================================================================================
 
@@ -2934,7 +2938,6 @@ HandleInput:
     bne @finishInput
 
     jsr CheckB
-    jsr CheckA
 
     lda Buttons
     and #%00001111
@@ -3483,6 +3486,7 @@ ResetEntityVariables:
     sta Food + 2
     sta Fuel + 1
     sta Fuel + 2
+    sta Stamina
 
     lda #120
     sta Hours
@@ -3819,6 +3823,8 @@ ProcessButtons:
     lda FishingRodActive
     bne @exit
 
+    jsr CheckA ; speed up only active if dpad is used
+
 ;Check if LEFT is pressed
     jsr CheckLeft
 ;-----
@@ -3869,13 +3875,32 @@ CheckA:
     and #BUTTON_A_MASK
     beq @exit
 
+    lda Stamina
+    bne @speedup ; we have some stamina
+
+    ;let's refill stamina
     lda Food
     clc
     adc Food + 1
     adc Food + 2
     cmp #0
-    beq @exit ; can't sprint on empty stomach
+    beq @exit ; can't refill stamina
 
+
+    lda #<Food
+    sta DigitPtr
+    lda #>Food
+    sta DigitPtr + 1
+    lda #1
+    sta DigitChangeSize
+    jsr DecreaseDigits
+    lda #1
+    sta FoodUpdated
+    lda #PLAYER_STAMINA_SIZE
+    sta Stamina
+
+@speedup:
+    dec Stamina
     lda #2
     jmp @end
 
