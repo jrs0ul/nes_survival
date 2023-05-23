@@ -468,9 +468,13 @@ TestPointAgainstCollisionMap:
     adc TempY
     tax
 
+    cpx #COLLISION_MAP_SIZE
+    bcs @colliding
+
     lda CollisionMap, x
     and Temp
     beq @not_Colliding
+@colliding:
     lda #1
     jmp @exit_collision_check
 

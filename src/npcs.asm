@@ -28,9 +28,10 @@ LoadNpcs:
     lda #1
     sta Npcs, x ; dir
     inx
-    ;frame
+    lda #0
+    sta Npcs, x ;frame
     inx
-    ;timer
+    sta Npcs, x ;timer
     inx
     ;hp
     inx
@@ -189,7 +190,7 @@ StoreGeneratedNpc:
     inx
     ;frame
     inx
-    ;timer
+    sta Npcs, x;timer
     inx
     lda TempHp
     sta Npcs, x
@@ -2050,7 +2051,7 @@ SetDirectionForTimidNpc:
 TestCollisionGoingRight:
     sta TempX ; save modified x
     clc
-    adc #14
+    adc #16
     sec
     sbc GlobalScroll
     sta TempPointX

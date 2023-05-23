@@ -525,6 +525,8 @@ InputProcessed:
     .res 1
 NMIActive:
     .res 1
+NMINotFinished: ;to figure if another nmi called during nmi :/
+    .res 1
 MustUpdatePalette: ;flag that signals the palette update
     .res 1
 
@@ -545,13 +547,15 @@ WarmthUpdated:
     .res 1
 MustLoadSomething:
     .res 1
+MustLoadOutside:
+    .res 1
 MustPlayNewSong:
     .res 1
 SongName:
     .res 1
 
 ZPBuffer:
-    .res 136  ; I want to be aware of free memory
+    .res 134  ; I want to be aware of free memory
 
 ;--------------
 .segment "BSS" ; variables in ram
@@ -805,8 +809,7 @@ MustLoadHouseInterior:
     .res 1
 MustLoadVillagerHut:
     .res 1
-MustLoadOutside:
-    .res 1
+
 MustLoadMenu:
     .res 1
 MustLoadTitle:
@@ -1057,7 +1060,7 @@ SourceMapIdx:
     .res 1
 
 Buffer:
-    .res 518 ;must see how much is still available
+    .res 519 ;must see how much is still available
 
 ;====================================================================================
 
@@ -1106,6 +1109,10 @@ clrmem:
     sta $0200, x
     inx
     bne clrmem
+
+    lda #0
+    sta NMINotFinished
+
 
     ldy #6
     jsr bankswitch_y
@@ -1305,9 +1312,13 @@ nmi:
     txa
     pha
     ;---
+    lda NMINotFinished
+    bne transferOAM
     lda current_bank
     sta bankBeforeNMI
-
+    lda #1
+    sta NMINotFinished
+transferOAM:
     ;copy sprite data
     ;lda SpritesUpdated
     ;beq startNMI
@@ -1336,7 +1347,7 @@ ReadControllerLoop:
     bne ReadControllerLoop
 
     lda Buttons
-    eor ButtonsP3
+    eor ButtonsP3 ;combine player3 input with player1
     sta Buttons
 
 
@@ -1364,7 +1375,7 @@ DoneLoadingMaps:
     jsr UpdateTextBaloon
     lda MustUpdatePalette
     bne UpdatePalette
-    
+
     jsr UpdateFireplace
     jsr UploadBgColumns
     jsr UpdateStatusDigits
@@ -1448,6 +1459,8 @@ endOfNmi:
     bankswitch
 
 noBankSwitch:
+    lda #0
+    sta NMINotFinished
     pla
     tax
     pla
