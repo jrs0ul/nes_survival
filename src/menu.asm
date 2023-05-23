@@ -356,10 +356,23 @@ DrawToolMenu:
     lda #9
     sta TempPointY
 
+    lda InVillagerHut
+    beq @regularMenu
+
+    lda #<ToolMenuVillager
+    sta pointer
+    lda #>ToolMenuVillager
+    sta pointer + 1
+    jmp @startTransfer
+
+
+@regularMenu:
     lda #<ToolMenu
     sta pointer
     lda #>ToolMenu
     sta pointer + 1
+
+@startTransfer:
     jsr TransferTiles
 
     lda #0
@@ -1283,28 +1296,18 @@ FoodMenuInputVillager:
 
     jsr GetPaletteFadeValueForHour
     cmp #$40
-    beq @exit
+    beq @exit ; can't give items at night
 
+    lda ItemIGave
+    bne @exit ; already gave an item
 
+    ldx TempRegX
+    ldy ActiveVillagerQuest
     lda Inventory, x
-    cmp #ITEM_JAM
+    cmp goal_items_list, y
     bne @exit
 
-    sta ItemIGave
-    lda #1
-    sta ItemCount
-    lda #%00011111 ; fishing rod
-    sta Items
-    lda #120
-    sta Items + 1
-    lda #108
-    sta Items + 2
-    lda #0
-    sta Items + 3
-
-    lda #1
-    sta MustExitMenuState
-
+    jsr SpawnRewardItem
 
 @clear:
     jsr ClearThatItem
@@ -1434,6 +1437,26 @@ ToolInput:
     jsr LoadSelectedItemStuff
     beq @exit
 
+    lda InVillagerHut
+    beq @inputAtHome
+
+    jsr ToolMenuInputVillager
+
+@inputAtHome:
+    jsr ToolMenuInputAtHome
+    jmp @exit
+
+@CheckA:
+    lda Buttons
+    and #BUTTON_A_MASK
+    beq @exit
+
+    jsr HideToolMenu
+@exit:
+    rts
+;-------------------------------------
+ToolMenuInputAtHome:
+
     lda ItemMenuIndex
     bne @checkIfStash
 
@@ -1473,18 +1496,98 @@ ToolInput:
 
 @clearItem:
     jsr ClearThatItem
+
+
 @hidemenu:
     jsr HideToolMenu
-    jmp @exit
-@CheckA:
-    lda Buttons
-    and #BUTTON_A_MASK
-    beq @exit
 
-    jsr HideToolMenu
 @exit:
-    rts
 
+    rts
+;-------------------------------------
+ToolMenuInputVillager:
+
+    lda ItemMenuIndex
+    bne @checkIfGive
+
+    lda TempIndex
+    cmp #ITEM_TYPE_CLOTHING
+    beq @equipClothes
+
+    lda #<EquipedItem
+    sta pointer
+    lda #>EquipedItem
+    sta pointer + 1
+    jsr EquipItem
+    beq @hidemenu ;return 0
+    jmp @clearItem ;return 1
+
+@equipClothes:
+    lda #<EquipedClothing
+    sta pointer
+    lda #>EquipedClothing
+    sta pointer + 1
+    jsr EquipItem
+    beq @hidemenu ;return 0
+    jmp @clearItem ;return 1
+
+
+@checkIfGive:
+    cmp #1
+    bne @clearItem ; DROP
+
+
+    stx TempRegX
+    jsr GetPaletteFadeValueForHour
+    cmp #$40
+    beq @exit ; no giving at night
+
+    lda ItemIGave
+    bne @exit ; already gave item
+
+    ldx TempRegX
+    ldy ActiveVillagerQuest
+    lda Inventory, x
+    cmp goal_items_list, y
+    bne @exit
+
+
+    jsr SpawnRewardItem
+
+
+@clearItem:
+    jsr ClearThatItem
+
+
+@hidemenu:
+    jsr HideToolMenu
+
+@exit:
+
+    rts
+;-------------------------------------
+;active quest index is in y register
+;a register contains the quest item id
+SpawnRewardItem:
+
+    sta ItemIGave
+    lda #1
+
+    sta ItemCount
+    lda reward_items_list, y
+    sta Items
+    lda #120
+    sta Items + 1
+    lda #108
+    sta Items + 2
+    lda #0
+    sta Items + 3
+
+    lda #1
+    sta MustExitMenuState
+
+
+    rts
 
 ;-------------------------------------
 ;pointer - EquipedItem or EquipedClothing

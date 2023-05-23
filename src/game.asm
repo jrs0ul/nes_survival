@@ -90,20 +90,8 @@ banktable:              ; Write to this table to switch banks.
 .include "data/item_list.asm" ;items in maps
 .include "data/npc_list.asm"  ;npcs in maps
 
-dialog_jam:
-    .byte $00,$00,$00,$00,$42,$00,$45,$48,$4f,$3e,$00,$43,$3a,$46,$59,$00
-    .byte $3c,$3a,$47,$54,$52,$48,$4e,$00,$00,$00,$00,$00,$00,$00,$00,$00
-    .byte $3b,$4b,$42,$47,$40,$00,$46,$3e,$00,$4c,$48,$46,$3e,$5a,$00,$4d
-    .byte $48,$54,$40,$3e,$4d,$00,$43,$3a,$46,$00,$00,$00,$00,$00,$00,$00
-    .byte $00,$00,$00,$00,$3c,$48,$46,$3b,$42,$47,$3e,$00,$7c,$7d,$00,$5b,$00,$7c,$7d
 
-dialog_thanks:
-
-    .byte $00,$00,$00,$00,$00,$00,$00,$00,$4d,$3a,$44,$3e,$00,$4d,$41,$42,$4c,$59,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
-    .byte $46,$3a,$52,$3b,$3e,$00,$52,$48,$4e,$00,$50,$42,$45,$45,$00
-    .byte $3c,$3a,$4d,$3c,$41,$00,$4c,$48,$46,$3e,$4d,$41,$42,$47,$40,$00,$00,$00,$00,$00
-    .byte $42,$47,$00,$4d,$41,$3e,$00,$3f,$4b,$48,$53,$3e,$47,$00,$49,$48,$47,$3d,$82
-
+.include "data/villager_quests.asm"
 
 
 
@@ -308,6 +296,8 @@ npc_anim_row_sequence:
 
     ANIM_FRAME_BLOODSTAIN      = $B8
 
+    MAX_QUEST                  = 2
+
 
     HOURS_MAX                  = 240
     MINUTES_MAX                = 60
@@ -406,6 +396,7 @@ npc_anim_row_sequence:
     ITEM_SPEAR                 = 7
     ITEM_KNIFE                 = 8
     ITEM_POOP                  = 9
+    ITEM_COAT                  = 11
     ITEM_RAW_JUMBO_MEAT        = 12
     ITEM_COOKED_JUMBO_MEAT     = 13
     ITEM_FISHING_ROD           = 15
@@ -448,6 +439,8 @@ npc_anim_row_sequence:
     NPC_TYPE_PREDATOR          = 1
     NPC_TYPE_VILLAGER          = 2
 
+    DIALOG_TEXT_LENGTH         = 96
+
     RECIPES_SIZE               = 24
 
     ROT_AMOUNT_RAW_MEAT        = 50
@@ -461,6 +454,8 @@ npc_anim_row_sequence:
     FADE_DELAY_GAME_OVER       = 3
     FADE_DELAY_GENERIC         = 2
     FADE_DELAY_SLEEP           = 10
+
+
 
 ;===================================================================
 .segment "ZEROPAGE"
@@ -796,6 +791,10 @@ TextBaloonIndex:
 TextLength:
     .res 1
 
+
+ActiveVillagerQuest:
+    .res 1
+
 MustClearVillagerItems:
     .res 1
 
@@ -1060,7 +1059,7 @@ SourceMapIdx:
     .res 1
 
 Buffer:
-    .res 519 ;must see how much is still available
+    .res 518 ;must see how much is still available
 
 ;====================================================================================
 
@@ -3489,6 +3488,7 @@ ResetEntityVariables:
     sta FoodUpdated
 
     lda #0
+    sta ActiveVillagerQuest
     sta HP + 1
     sta HP + 2
     ;sta Warmth
@@ -4721,6 +4721,21 @@ CheckIfExitedVillagerHut:
     sta PaletteFadeTimer
     sta FadeIdx
 
+    lda ItemIGave
+    beq @nope
+
+@incrementQuest:
+
+    lda ActiveVillagerQuest
+    clc
+    adc #1
+    cmp #MAX_QUEST
+    bcc @saveQuestIndex
+
+    lda #0
+@saveQuestIndex:
+    sta ActiveVillagerQuest
+
 
 @nope:
     rts
@@ -4904,9 +4919,9 @@ VillagerItemsAndNpcs:
 ;-----------------------------------
 SetupVillagerText:
 
-   jsr GetPaletteFadeValueForHour
-   cmp #$40
-   beq @exit
+    jsr GetPaletteFadeValueForHour
+    cmp #$40
+    beq @exit
 
     lda #1
     sta MustUpdateTextBaloon
@@ -4916,11 +4931,13 @@ SetupVillagerText:
     lda ItemIGave
     bne @thanks
 
-    lda #<dialog_jam
+    ldx ActiveVillagerQuest
+
+    lda quest_list_low, x
     sta TextPtr
-    lda #>dialog_jam
+    lda quest_list_high, x
     sta TextPtr + 1
-    lda #83
+    lda #DIALOG_TEXT_LENGTH
     sta TextLength
 
 
@@ -4928,11 +4945,13 @@ SetupVillagerText:
 
 @thanks:
 
-    lda #<dialog_thanks
+    ldx ActiveVillagerQuest
+
+    lda thanks_list_low, x
     sta TextPtr
-    lda #>dialog_thanks
+    lda thanks_list_high, x
     sta TextPtr + 1
-    lda #84
+    lda #DIALOG_TEXT_LENGTH
     sta TextLength
 
 
