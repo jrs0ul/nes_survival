@@ -1575,6 +1575,8 @@ SpawnRewardItem:
 
     sta ItemCount
     lda reward_items_list, y
+    asl
+    ora #%00000001
     sta Items
     lda #120
     sta Items + 1

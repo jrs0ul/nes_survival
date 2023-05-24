@@ -292,6 +292,8 @@ npc_anim_row_sequence:
 
     NPC_SPEED                  = 1
 
+    MAX_SPRITE_COUNT           = 64
+
     MAX_V_SCROLL               = 255
 
     ANIM_FRAME_BLOODSTAIN      = $B8
@@ -3208,7 +3210,7 @@ UpdateTextBaloon:
 
     inc TextBaloonIndex
     lda TextBaloonIndex
-    cmp TextLength;#83
+    cmp TextLength
     bcs @done
     jmp @exit
 
@@ -5032,7 +5034,7 @@ LoadTheHouseInterior:
 
 ;-----------------------------------
 UpdateSprites:
-    
+
     lda #0
     sta SpritesUpdated
 
@@ -5242,8 +5244,10 @@ UpdateSprites:
     jsr UpdateNpcSpritesInWorld
     jsr UpdateItemSpritesInWorld
 
+    jsr UpdateTextDialogSprites
+
 @hidesprites:
-    lda #64
+    lda #MAX_SPRITE_COUNT
 
     cmp TempSpriteCount
     bcc @done
@@ -5267,6 +5271,69 @@ UpdateSprites:
     sta SpritesUpdated
 
     rts
+;----------------------------------
+UpdateTextDialogSprites:
+
+    lda InVillagerHut
+    beq @exit
+
+    lda ItemIGave
+    bne @exit ;works for the quest dialogs so far
+
+    lda MustUpdateTextBaloon
+    bne @exit
+
+    stx TempRegX
+    jsr GetPaletteFadeValueForHour
+    cmp #$40
+    beq @restoreXAndExit
+    ldx TempRegX
+    jmp @updateSprites
+@restoreXAndExit:
+    ldx TempRegX
+    jmp @exit
+
+@updateSprites:
+    ldy ActiveVillagerQuest
+    lda QuestSpritesCount, y
+    sta TempFrame
+
+    tya
+    asl
+    asl
+    asl
+    asl
+    tay
+
+@spriteLoop:
+
+    lda QuestSprites, y
+    sta FIRST_SPRITE, x
+    inx
+    iny
+    lda QuestSprites, y
+    sta FIRST_SPRITE, x
+    inx
+    iny
+    lda QuestSprites, y
+    sta FIRST_SPRITE, x
+    inx
+    iny
+    lda QuestSprites, y
+    sta FIRST_SPRITE, x
+    inx
+    iny
+
+
+    inc TempSpriteCount
+
+    dec TempFrame
+    bne @spriteLoop
+
+
+@exit:
+    rts
+
 ;----------------------------------
 UpdateSpearSprite:
 
