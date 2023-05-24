@@ -4,6 +4,8 @@
 .include "field_bg_collision2.asm"
 .include "field_bg_collision4.asm"
 
+.include "LOC3_collision0.asm"
+
 
 collision_list_low:
     .byte <bg_collision

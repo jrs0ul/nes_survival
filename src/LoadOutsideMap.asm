@@ -3,8 +3,9 @@ LoadOutsideMap:
     lda #0
     sta MustUpdateTextBaloon
     lda LocationIndex
-    beq @startLoad
-   
+    cmp #1
+    bne @startLoad
+
     ;supposed location 2
     ldy #4
     jsr bankswitch_y
@@ -34,13 +35,25 @@ LoadOutsideMap:
     ldy CurrentMapSegmentIndex
     lda LocationIndex
     beq @grabFirstLocationMap1
-    
+
+    cmp #2
+    beq @thirdlocation
+
     lda map_list_low2, y
     sta pointer
     lda map_list_high2, y
     sta pointer + 1
 
     jmp @loadMap1
+
+@thirdlocation:
+
+    lda map_list_3_low, y
+    sta pointer
+    lda map_list_3_high, y
+    sta pointer + 1
+    jmp @loadMap1
+
 
 @grabFirstLocationMap1:
     lda map_list_low, y
@@ -170,6 +183,12 @@ LoadOutsideMap:
 
     lda LocationIndex
     beq @FirstLocationScreens
+
+    cmp #2
+    bne @secondLoaction
+    lda #OUTDOORS_LOC3_SCREEN_COUNT
+    jmp @saveScreenCount
+@secondLoaction:
     lda #OUTDOORS_LOC2_SCREEN_COUNT
     jmp @saveScreenCount
 @FirstLocationScreens:

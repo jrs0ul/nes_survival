@@ -354,6 +354,7 @@ npc_anim_row_sequence:
 
     OUTDOORS_LOC1_SCREEN_COUNT = 4
     OUTDOORS_LOC2_SCREEN_COUNT = 2
+    OUTDOORS_LOC3_SCREEN_COUNT = 1
     PLAYER_START_X             = $50
     PLAYER_START_Y             = $90
 
@@ -778,6 +779,8 @@ MustLoadOutsideVillagerHutAfterFadeout:
     .res 1
 MustLoadSecondLocationAfterFadeout:
     .res 1
+MustLoadThirdLocationAfterFadeout:
+    .res 1
 MustLoadIndoorsAfterFadeout:
     .res 1
 MustLoadOutsideHouseAfterFadeout:
@@ -1061,7 +1064,7 @@ SourceMapIdx:
     .res 1
 
 Buffer:
-    .res 518 ;must see how much is still available
+    .res 517  ;must see how much is still available
 
 ;====================================================================================
 
@@ -1707,7 +1710,6 @@ Logics:
     bne @exit
 
 
-
     lda PlayerAlive
     bne @cont
 ;----activate fading out for the game over
@@ -1750,7 +1752,7 @@ Logics:
 
 
 @doneLogics:
-   
+
     jsr UpdateSpear
     jsr UpdateFishingRod
 
@@ -1765,17 +1767,31 @@ Logics:
     sta PlayerAnimationRowIndex
 @noAttack:
 
-    jsr CheckIfEnteredHouse
-    jsr CheckIfEnteredVillagerHut
-    jsr CheckIfEnteredSecondLocation
-    jsr CheckIfExitedSecondLocation
-    jsr CheckIfExitedVillagerHut
-    jsr CheckIfExitedHouse
 
+    jsr CheckEntryPoints
+    
 
 @exit:
 
     rts
+;------------------------------
+CheckEntryPoints:
+
+    jsr CheckIfEnteredHouse
+    jsr CheckIfEnteredVillagerHut
+    jsr CheckIfEnteredSecondLocation
+    jsr CheckIfEnteredThirdLocation
+    jsr CheckIfExitedSecondLocation
+    jsr CheckIfExitedThirdLocation
+    jsr CheckIfExitedVillagerHut
+    jsr CheckIfExitedHouse
+
+
+
+
+    rts
+
+
 ;-------------------------------
 UpdateFishingRod:
     lda FishingRodActive
@@ -2003,6 +2019,31 @@ CheckIfExitedSecondLocation:
 @exit:
     rts
 ;------------------------------------
+CheckIfExitedThirdLocation:
+
+    lda LocationIndex
+    cmp #2
+    bne @exit
+
+    lda PlayerY
+    cmp #32
+    bcs @exit
+
+    lda PaletteFadeAnimationState
+    bne @exit
+    lda #1
+    sta PaletteFadeAnimationState
+    sta MustLoadFirstLocationAfterFadeout
+    lda #FADE_DELAY_GENERIC
+    sta PaletteAnimDelay
+    lda #0
+    sta PaletteFadeTimer
+    sta FadeIdx
+
+@exit:
+
+    rts
+;------------------------------------
 
 CheckIfEnteredSecondLocation:
 
@@ -2028,7 +2069,31 @@ CheckIfEnteredSecondLocation:
 
 @exit:
     rts
+;------------------------------------
+CheckIfEnteredThirdLocation:
 
+    lda CurrentMapSegmentIndex
+    cmp #1
+    bne @exit
+    lda PlayerY
+    cmp #225
+    bcs @Entered
+    jmp @exit
+@Entered:
+    lda PaletteFadeAnimationState
+    bne @exit
+    lda #1
+    sta PaletteFadeAnimationState
+    sta MustLoadThirdLocationAfterFadeout
+    lda #FADE_DELAY_GENERIC
+    sta PaletteAnimDelay
+    lda #0
+    sta PaletteFadeTimer
+    sta FadeIdx
+
+
+@exit:
+    rts
 
 ;-------------------------------
 DoPaletteFades:
@@ -2290,12 +2355,66 @@ RoutinesAfterFadeOut:
     sta TimesShiftedRight
     sta MustLoadSecondLocationAfterFadeout
     sta PaletteFadeAnimationState
-
-;-----------------------------------------
+;--------------------------------------------
 @next4:
 
-    lda MustLoadIndoorsAfterFadeout
+    lda MustLoadThirdLocationAfterFadeout
     beq @next5
+
+    lda #1
+    sta MustLoadSomething
+    sta MustLoadOutside
+    lda #2
+    sta LocationIndex
+    lda #0
+    sta CurrentMapSegmentIndex
+    lda #OUTDOORS_LOC3_SCREEN_COUNT
+    sta ScreenCount
+
+
+    ldx #0
+@copyCollisionMapLoop666:
+    lda LOC3_collision0, x
+    sta CollisionMap, x
+    inx
+    cpx #COLLISION_MAP_SIZE
+    bne @copyCollisionMapLoop666
+
+    lda #1
+    sta RightCollisonMapIdx
+    lda #0      ;load the first column
+    sta RightCollisionColumnIndex
+    jsr LoadRightCollisionColumn
+    lda #255
+    sta LeftCollisionColumnIndex
+
+    lda #0
+    sta NpcCount
+    sta ItemCount
+
+
+    lda #48
+    sta PlayerY
+    lda #100
+    sta PlayerX
+
+
+
+    lda #0
+    sta GlobalScroll
+    sta TilesScroll
+    sta TimesShiftedLeft
+    sta TimesShiftedRight
+    sta MustLoadThirdLocationAfterFadeout
+    sta PaletteFadeAnimationState
+
+
+
+;-----------------------------------------
+@next5:
+
+    lda MustLoadIndoorsAfterFadeout
+    beq @next6
 
     lda #<House_items
     sta pointer
@@ -2332,11 +2451,11 @@ RoutinesAfterFadeOut:
     sta PaletteFadeAnimationState
 
 ;---------------------------------------------
-@next5:
+@next6:
 ;----------------Entering first location from second
 
     lda MustLoadFirstLocationAfterFadeout
-    beq @next6
+    beq @next7
 
     lda #1
     sta MustLoadSomething
@@ -2399,10 +2518,10 @@ RoutinesAfterFadeOut:
     sta MustLoadFirstLocationAfterFadeout
     sta PaletteFadeAnimationState
 ;------------------------------------------------
-@next6:
+@next7:
 
     lda MustLoadOutsideHouseAfterFadeout
-    beq @next7
+    beq @next8
 
     ldx #0
 @copyCollisionMapLoop4:
@@ -2449,7 +2568,7 @@ RoutinesAfterFadeOut:
     sta PaletteFadeAnimationState
 
 
-@next7:
+@next8:
 
     rts
 
