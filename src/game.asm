@@ -93,6 +93,7 @@ banktable:              ; Write to this table to switch banks.
 
 .include "data/villager_quests.asm"
 
+.include "data/MapEntryPoints.asm"
 
 
 zerosprite:
@@ -326,10 +327,10 @@ npc_anim_row_sequence:
     MAX_TILE_SCROLL_LEFT       = 248; -8
     MAX_TILE_SCROLL_RIGHT      = 8
 
-    HOUSE_DOOR_X1              = 72
-    HOUSE_DOOR_Y1              = 112
-    HOUSE_DOOR_X2              = 96
-    HOUSE_DOOR_Y2              = 120
+    HOUSE_DOOR_X1              = 64
+    HOUSE_DOOR_Y1              = 102
+    HOUSE_DOOR_X2              = 88
+    HOUSE_DOOR_Y2              = 110
 
     HOUSE_EXIT_Y               = 168
 
@@ -787,6 +788,8 @@ MustLoadOutsideHouseAfterFadeout:
     .res 1
 MustLoadFirstLocationAfterFadeout:
     .res 1
+MustLoadFirstLocationFromThirdAfterFadeout:
+    .res 1
 
 
 MustUpdateTextBaloon:
@@ -1064,7 +1067,7 @@ SourceMapIdx:
     .res 1
 
 Buffer:
-    .res 517  ;must see how much is still available
+    .res 516  ;must see how much is still available
 
 ;====================================================================================
 
@@ -2033,7 +2036,7 @@ CheckIfExitedThirdLocation:
     bne @exit
     lda #1
     sta PaletteFadeAnimationState
-    sta MustLoadFirstLocationAfterFadeout
+    sta MustLoadFirstLocationFromThirdAfterFadeout
     lda #FADE_DELAY_GENERIC
     sta PaletteAnimDelay
     lda #0
@@ -2567,11 +2570,97 @@ RoutinesAfterFadeOut:
     sta MustLoadOutsideHouseAfterFadeout
     sta PaletteFadeAnimationState
 
+;-----------------------------------------
+@next8: ;third location exit
 
-@next8:
+    lda MustLoadFirstLocationFromThirdAfterFadeout
+    beq @next9
+
+    lda #0
+    sta LocationIndex
+
+    jsr FixCollisionAfterGoingBackFromThirdLocation
+
+    lda #OUTDOORS_LOC1_SCREEN_COUNT
+    sta ScreenCount
+
+    lda #<Outside1_items
+    sta pointer
+    lda #>Outside1_items
+    sta pointer + 1
+    jsr LoadItems
+
+    lda #7
+    sta TempNpcCnt
+    jsr GenerateNpcs
+
+    lda #7
+    sta TilesScroll
+
+    lda #103
+    sta GlobalScroll
+    lda #120
+    sta PlayerX
+    lda #209
+    sta PlayerY
+
+    lda #1
+    sta CurrentMapSegmentIndex
+    sta MustLoadSomething
+    sta MustLoadOutside
+
+
+    lda #0
+    sta MustLoadFirstLocationFromThirdAfterFadeout
+    sta PaletteFadeAnimationState
+
+
+@next9:
+    rts
+;-------------------------------
+FixCollisionAfterGoingBackFromThirdLocation:
+
+    ldx #0
+@copyCollisionMapLoop44:
+    lda bg_collision1, x
+    sta CollisionMap, x
+    inx
+    cpx #COLLISION_MAP_SIZE
+    bne @copyCollisionMapLoop44
+
+    lda #0
+    sta TimesShiftedLeft
+    sta TimesShiftedRight
+    sta LeftCollisionMapIdx
+    lda #3
+    sta LeftCollisionColumnIndex
+    jsr LoadLeftCollisionColumn
+    lda #2
+    sta RightCollisonMapIdx
+    lda #0
+    sta RightCollisionColumnIndex
+    jsr LoadRightCollisionColumn
+
+
+    lda #3
+    sta CurrentMapSegmentIndex
+
+    jsr PushCollisionMapLeft
+    jsr PushCollisionMapLeft
+    jsr PushCollisionMapLeft
+    jsr PushCollisionMapLeft
+    jsr PushCollisionMapLeft
+    jsr PushCollisionMapLeft
+    jsr PushCollisionMapLeft
+    jsr PushCollisionMapLeft
+    jsr PushCollisionMapLeft
+    jsr PushCollisionMapLeft
+    jsr PushCollisionMapLeft
+    jsr PushCollisionMapLeft
+
+
 
     rts
-
 
 ;-------------------------------
 DoSleep:
@@ -4681,16 +4770,17 @@ CheckIfEnteredHouse:
     bne @nope ; already in
 
     lda PlayerX
-    clc
-    adc #8
+    ;clc
+    ;adc #8
 
     cmp #HOUSE_DOOR_X1
     bcc @nope
     cmp #HOUSE_DOOR_X2
     bcs @nope
+
     lda PlayerY
-    clc
-    adc #10
+    ;clc
+    ;adc #10
     cmp #HOUSE_DOOR_Y1
     bcc @nope
     cmp #HOUSE_DOOR_Y2
