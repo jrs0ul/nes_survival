@@ -1,3 +1,4 @@
+;where you enter a new location
 ;location index,
 ;CurrentMapSegmentIndex value,
 ;MinX,
@@ -27,3 +28,23 @@ MapEntryPoints:
     .byte 3, 0, 0, 255, 0, 255, 168, 255, <MustLoadOutsideVillagerHutAfterFadeout, >MustLoadOutsideVillagerHutAfterFadeout, 0, 0, 0, 0, 0, 0
     ;Player's house exit
     .byte 4, 0, 0, 255, 0, 255, 168, 255, <MustLoadOutsideHouseAfterFadeout, >MustLoadOutsideHouseAfterFadeout, 0, 0, 0, 0, 0, 0
+;-----------------------------------------------------
+;player's new position when entry point is activated
+;PlayerX, PlayerY
+MapSpawnPoint:
+    ;Entry to player's house from outside
+    .byte 128, 152
+    ;Bear's house entrance
+    .byte 128, 136
+    ;Second location entry point
+    .byte 80, 208
+    ;Third location entry point
+    .byte 100, 48
+    ;Exit point of second location
+    .byte 128, 32
+    ;Exit point of third location
+    .byte 120, 209
+    ;Bear's house exit
+    .byte $76, $80
+    ;Player's house exit
+    .byte 72, 120

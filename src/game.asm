@@ -354,11 +354,6 @@ npc_anim_row_sequence:
     PLAYER_START_X             = $50
     PLAYER_START_Y             = $90
 
-    HOUSE_ENTRY_POINT_X        = 128
-    HOUSE_ENTRY_POINT_Y        = 152
-
-    OUTSIDE_ENTRY_FROM_HOUSE_X = 72
-    OUTSIDE_ENTRY_FROM_HOUSE_Y = 120
 
     SCREEN_ROW_COUNT           = 30
 
@@ -546,9 +541,13 @@ MustPlayNewSong:
     .res 1
 SongName:
     .res 1
+IsLocationRoutine:
+    .res 1
+ActiveMapEntryIndex:
+    .res 1
 
 ZPBuffer:
-    .res 134  ; I want to be aware of free memory
+    .res 132  ; I want to be aware of the free memory
 
 ;--------------
 .segment "BSS" ; variables in ram
@@ -1845,8 +1844,12 @@ CheckEntryPoints:
 
     ldy #0
 
+    stx ActiveMapEntryIndex
+
     lda #1
     sta PaletteFadeAnimationState
+    sta IsLocationRoutine
+
     sta (pointer), y
     lda #FADE_DELAY_GENERIC
     sta PaletteAnimDelay
@@ -2097,7 +2100,7 @@ DoPaletteFades:
     cpx #PALETTE_FADE_MAX_ITERATION
     bcs @resetFadeState
     jmp @doFade
-@resetFadeState:    ;finished fading out, let's sleep
+@resetFadeState:    ;finished fading out, let's call routines
 
     jsr RoutinesAfterFadeOut
 
@@ -2145,6 +2148,10 @@ DoPaletteFades:
 
 ;------------------------------
 RoutinesAfterFadeOut:
+
+    lda IsLocationRoutine
+    bne @locationRoutines
+
     ;fade in after sleep
     lda MustSleepAfterFadeOut
     beq @next
@@ -2164,9 +2171,22 @@ RoutinesAfterFadeOut:
     lda #0
     sta PaletteFadeAnimationState
     ;---------------------------------------
+@locationRoutines: ;location routines start here
+    ;--some general location code----
+    lda #0
+    sta IsLocationRoutine
+    sta PaletteFadeAnimationState
+    lda ActiveMapEntryIndex
+    asl
+    tax
+    lda MapSpawnPoint, x
+    sta PlayerX
+    inx
+    lda MapSpawnPoint, x
+    sta PlayerY
+    ;-----------------------------
     ;Entered bear's hut
 @next1:
-
     lda MustLoadVillagerHutAfterFadeout
     beq @next2
 
@@ -2174,7 +2194,6 @@ RoutinesAfterFadeOut:
     jsr GetPaletteFadeValueForHour
     cmp #$40 ; is it night?
     beq @copyNightCollisionMap
-
 
     ldx #0
 @copyCollisionMapLoop:
@@ -2199,7 +2218,6 @@ RoutinesAfterFadeOut:
 
 @finishUp:
 
-
     lda #1
     sta MustLoadVillagerHut
     sta MustClearVillagerItems
@@ -2211,18 +2229,10 @@ RoutinesAfterFadeOut:
 
     jsr ResetNameTableAdresses
 
-
     lda #0
     sta GlobalScroll
     sta TilesScroll
-    lda #128
-    sta PlayerX
-    lda #136
-    sta PlayerY
     sta ScrollDirection
-
-    lda #0
-    sta PaletteFadeAnimationState
     sta MustLoadVillagerHutAfterFadeout
 
 ;------------------------------------
@@ -2237,12 +2247,6 @@ RoutinesAfterFadeOut:
     lda #OUTDOORS_LOC2_SCREEN_COUNT
     sta ScreenCount
 
-    lda #$80
-    sta PlayerY
-    lda #$76
-    sta PlayerX
-
-
     lda #$B8
     sta GlobalScroll
     lda #0
@@ -2253,9 +2257,6 @@ RoutinesAfterFadeOut:
     lda #0
     sta NpcCount
     sta MustLoadOutsideVillagerHutAfterFadeout
-    sta PaletteFadeAnimationState
-
-
 
     lda #3
     sta TempNpcCnt
@@ -2289,13 +2290,11 @@ RoutinesAfterFadeOut:
     sta ActiveVillagerQuest
 
 
-
 @next3:
 ;--------------------------Second location
 
     lda MustLoadSecondLocationAfterFadeout
     beq @next4
-
 
     jsr ResetNameTableAdresses
 
@@ -2337,10 +2336,6 @@ RoutinesAfterFadeOut:
     sta pointer + 1
     jsr LoadItems
 
-    lda #208
-    sta PlayerY
-    lda #80
-    sta PlayerX
     lda #0
     sta LeftCollisionMapIdx
     lda #0
@@ -2349,7 +2344,6 @@ RoutinesAfterFadeOut:
     sta TimesShiftedLeft
     sta TimesShiftedRight
     sta MustLoadSecondLocationAfterFadeout
-    sta PaletteFadeAnimationState
 ;--------------------------------------------
 ;Third location
 @next4:
@@ -2388,13 +2382,6 @@ RoutinesAfterFadeOut:
     sta NpcCount
     sta ItemCount
 
-
-    lda #48
-    sta PlayerY
-    lda #100
-    sta PlayerX
-
-
     jsr ResetNameTableAdresses
 
     lda #0
@@ -2403,8 +2390,6 @@ RoutinesAfterFadeOut:
     sta TimesShiftedLeft
     sta TimesShiftedRight
     sta MustLoadThirdLocationAfterFadeout
-    sta PaletteFadeAnimationState
-
 ;-----------------------------------------
 ;entered player's house
 @next5:
@@ -2438,18 +2423,12 @@ RoutinesAfterFadeOut:
     sta MustLoadHouseInterior
     sta MustRestartIndoorsMusic
     sta MustLoadSomething
-    lda #HOUSE_ENTRY_POINT_X
-    sta PlayerX
-    lda #HOUSE_ENTRY_POINT_Y
-    sta PlayerY
 
     lda #4
     sta LocationIndex
 
-
     lda #0
     sta MustLoadIndoorsAfterFadeout
-    sta PaletteFadeAnimationState
 
 ;---------------------------------------------
 ;Entering first location from second
@@ -2489,11 +2468,6 @@ RoutinesAfterFadeOut:
     cpx #COLLISION_MAP_SIZE
     bne @copyCollisionMapLoop3
 
-
-    lda #32
-    sta PlayerY
-    lda #128
-    sta PlayerX
     lda #4
     sta RightCollisonMapIdx
     lda #0
@@ -2505,7 +2479,6 @@ RoutinesAfterFadeOut:
     sta LeftCollisionColumnIndex
     jsr LoadLeftCollisionColumn
 
-
     lda #7
     sta TempNpcCnt
     jsr GenerateNpcs
@@ -2516,10 +2489,8 @@ RoutinesAfterFadeOut:
 
     jsr LoadItems
 
-
     lda #0
     sta MustLoadFirstLocationAfterFadeout
-    sta PaletteFadeAnimationState
 ;------------------------------------------------
 ;Outside of player's house
 @next7:
@@ -2552,23 +2523,13 @@ RoutinesAfterFadeOut:
     sta TempNpcCnt
     jsr GenerateNpcs
 
-
-    lda #OUTSIDE_ENTRY_FROM_HOUSE_X
-    sta PlayerX
-    lda #OUTSIDE_ENTRY_FROM_HOUSE_Y
-    sta PlayerY
-
-
-
     lda #1
     sta MustLoadOutside
     sta MustCopyMainChr
     sta MustLoadSomething
 
-
     lda #0
     sta MustLoadOutsideHouseAfterFadeout
-    sta PaletteFadeAnimationState
 
 ;-----------------------------------------
 @next8: ;third location exit to the 0
@@ -2599,10 +2560,6 @@ RoutinesAfterFadeOut:
 
     lda #103
     sta GlobalScroll
-    lda #120
-    sta PlayerX
-    lda #209
-    sta PlayerY
 
     lda #1
     sta CurrentMapSegmentIndex
@@ -2616,13 +2573,11 @@ RoutinesAfterFadeOut:
     lda #2
     sta ScrollDirection
 
-
     lda #0
     sta MustLoadFirstLocationFromThirdAfterFadeout
-    sta PaletteFadeAnimationState
-
 
 @next9:
+
     rts
 ;-------------------------------
 FixCollisionAfterGoingBackFromThirdLocation:
@@ -2711,7 +2666,6 @@ DoSleep:
 
 
 @adaptPalette:
-      
 
     lda Food
     clc
@@ -2847,7 +2801,6 @@ DoSleep:
     sta Food
     sta Food + 1
     sta Food + 2
-
 
 @exit:
     rts
