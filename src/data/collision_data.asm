@@ -1,10 +1,10 @@
-.include "house_collision.asm"
-.include "field_bg_collision.asm"
-.include "field_bg_collision1.asm"
-.include "field_bg_collision2.asm"
-.include "field_bg_collision4.asm"
+.include "maps/house_collision.asm"
+.include "maps/field_bg_collision.asm"
+.include "maps/field_bg_collision1.asm"
+.include "maps/field_bg_collision2.asm"
+.include "maps/field_bg_collision4.asm"
 
-.include "LOC3_collision0.asm"
+.include "maps/LOC3_collision0.asm"
 
 
 collision_list_low:

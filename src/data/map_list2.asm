@@ -1,5 +1,5 @@
-.include "data/field2_bg.asm"
-.include "data/field2_bg1.asm"
+.include "data/maps/field2_bg.asm"
+.include "data/maps/field2_bg1.asm"
 
 map_list_low2:
     .byte <field2_bg

@@ -1,9 +1,9 @@
-.include "data/field_bg.asm"
-.include "data/field_bg1.asm"
-.include "data/field_bg2.asm"
-.include "data/field_bg4.asm"
+.include "data/maps/field_bg.asm"
+.include "data/maps/field_bg1.asm"
+.include "data/maps/field_bg2.asm"
+.include "data/maps/field_bg4.asm"
 
-.include "data/LOC3_bg0.asm"
+.include "data/maps/LOC3_bg0.asm"
 
 map_list_low:
     .byte <field_bg

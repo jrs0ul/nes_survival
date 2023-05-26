@@ -57,8 +57,8 @@ title_palette:
 .segment "ROM3" ; indoors
 
 house_tiles_chr: .incbin "house.chr"
-.include "data/house.asm"
-.include "data/villager_hut.asm"
+.include "data/maps/house.asm"
+.include "data/maps/villager_hut.asm"
 
 
 ;============================================================
