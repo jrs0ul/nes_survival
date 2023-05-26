@@ -30,21 +30,21 @@ MapEntryPoints:
     .byte 4, 0, 0, 255, 0, 255, 168, 255, <MustLoadOutsideHouseAfterFadeout, >MustLoadOutsideHouseAfterFadeout, 0, 0, 0, 0, 0, 0
 ;-----------------------------------------------------
 ;player's new position when entry point is activated
-;PlayerX, PlayerY
+;PlayerX, PlayerY, LocationIndex, ScreenCount
 MapSpawnPoint:
     ;Entry to player's house from outside
-    .byte 128, 152
+    .byte 128, 152, 4, 1
     ;Bear's house entrance
-    .byte 128, 136
+    .byte 128, 136, 3, 1
     ;Second location entry point
-    .byte 80, 208
+    .byte 80, 208, 1, OUTDOORS_LOC2_SCREEN_COUNT
     ;Third location entry point
-    .byte 100, 48
+    .byte 100, 48, 2, OUTDOORS_LOC3_SCREEN_COUNT
     ;Exit point of second location
-    .byte 128, 32
+    .byte 128, 32, 0, OUTDOORS_LOC1_SCREEN_COUNT
     ;Exit point of third location
-    .byte 120, 209
+    .byte 120, 209, 0, OUTDOORS_LOC1_SCREEN_COUNT
     ;Bear's house exit
-    .byte $76, $80
+    .byte $76, $80, 1, OUTDOORS_LOC2_SCREEN_COUNT
     ;Player's house exit
-    .byte 72, 120
+    .byte 72, 120, 0, OUTDOORS_LOC1_SCREEN_COUNT

@@ -2178,18 +2178,24 @@ RoutinesAfterFadeOut:
     sta PaletteFadeAnimationState
     lda ActiveMapEntryIndex
     asl
+    asl
     tax
     lda MapSpawnPoint, x
     sta PlayerX
     inx
     lda MapSpawnPoint, x
     sta PlayerY
+    inx
+    lda MapSpawnPoint, x
+    sta LocationIndex
+    inx
+    lda MapSpawnPoint, x
+    sta ScreenCount
     ;-----------------------------
     ;Entered bear's hut
 @next1:
     lda MustLoadVillagerHutAfterFadeout
     beq @next2
-
 
     jsr GetPaletteFadeValueForHour
     cmp #$40 ; is it night?
@@ -2224,9 +2230,6 @@ RoutinesAfterFadeOut:
     sta MustRestartIndoorsMusic
     sta MustLoadSomething
 
-    lda #3
-    sta LocationIndex
-
     jsr ResetNameTableAdresses
 
     lda #0
@@ -2243,9 +2246,6 @@ RoutinesAfterFadeOut:
 
     lda #0
     sta InVillagerHut
-
-    lda #OUTDOORS_LOC2_SCREEN_COUNT
-    sta ScreenCount
 
     lda #$B8
     sta GlobalScroll
@@ -2269,7 +2269,6 @@ RoutinesAfterFadeOut:
     jsr LoadItems
 
     lda #1
-    sta LocationIndex
     sta MustLoadOutside
     sta MustCopyMainChr
     sta MustLoadSomething
@@ -2289,9 +2288,8 @@ RoutinesAfterFadeOut:
 @saveQuestIndex:
     sta ActiveVillagerQuest
 
-
-@next3:
 ;--------------------------Second location
+@next3:
 
     lda MustLoadSecondLocationAfterFadeout
     beq @next4
@@ -2301,11 +2299,8 @@ RoutinesAfterFadeOut:
     lda #1
     sta MustLoadSomething
     sta MustLoadOutside
-    sta LocationIndex
     lda #0
     sta CurrentMapSegmentIndex
-    lda #OUTDOORS_LOC2_SCREEN_COUNT
-    sta ScreenCount
 
     ldy #4
     jsr bankswitch_y
@@ -2354,13 +2349,8 @@ RoutinesAfterFadeOut:
     lda #1
     sta MustLoadSomething
     sta MustLoadOutside
-    lda #2
-    sta LocationIndex
     lda #0
     sta CurrentMapSegmentIndex
-    lda #OUTDOORS_LOC3_SCREEN_COUNT
-    sta ScreenCount
-
 
     ldx #0
 @copyCollisionMapLoop666:
@@ -2424,14 +2414,11 @@ RoutinesAfterFadeOut:
     sta MustRestartIndoorsMusic
     sta MustLoadSomething
 
-    lda #4
-    sta LocationIndex
-
     lda #0
     sta MustLoadIndoorsAfterFadeout
 
-;---------------------------------------------
-;Entering first location from second
+    ;---------------------------------------------
+    ;Entering first location from second
 @next6:
 
     lda MustLoadFirstLocationAfterFadeout
@@ -2444,16 +2431,12 @@ RoutinesAfterFadeOut:
     sta MustLoadOutside
 
     lda #0
-    sta LocationIndex
     sta TimesShiftedLeft
     sta TimesShiftedRight
     sta TilesScroll
 
     lda #OUTDOORS_LOC1_SCREEN_COUNT - 1
     sta CurrentMapSegmentIndex
-
-    lda #OUTDOORS_LOC1_SCREEN_COUNT
-    sta ScreenCount
 
     ldy #0
     jsr bankswitch_y
@@ -2491,8 +2474,8 @@ RoutinesAfterFadeOut:
 
     lda #0
     sta MustLoadFirstLocationAfterFadeout
-;------------------------------------------------
-;Outside of player's house
+    ;------------------------------------------------
+    ;Outside of player's house
 @next7:
 
     lda MustLoadOutsideHouseAfterFadeout
@@ -2508,11 +2491,7 @@ RoutinesAfterFadeOut:
 
     lda #0
     sta InHouse
-    sta LocationIndex
-    
-    lda #OUTDOORS_LOC1_SCREEN_COUNT
-    sta ScreenCount
-    
+
     lda #<Outside1_items
     sta pointer
     lda #>Outside1_items
@@ -2537,13 +2516,7 @@ RoutinesAfterFadeOut:
     lda MustLoadFirstLocationFromThirdAfterFadeout
     beq @next9
 
-    lda #0
-    sta LocationIndex
-
     jsr FixCollisionAfterGoingBackFromThirdLocation
-
-    lda #OUTDOORS_LOC1_SCREEN_COUNT
-    sta ScreenCount
 
     lda #<Outside1_items
     sta pointer
@@ -4845,7 +4818,6 @@ LoadVillagerHut:
     lda MustLoadVillagerHut
     beq @nope
 
-
     ldy #3
     jsr bankswitch_y
 
@@ -4896,14 +4868,11 @@ LoadVillagerHut:
     lda #0
     sta MustLoadVillagerHut
     sta MustLoadSomething
-    lda #1
-    sta ScreenCount
 
     lda #PALETTE_STATE_FADE_IN
     sta PaletteFadeAnimationState
     lda #PALETTE_FADE_MAX_ITERATION
     sta FadeIdx
-
 
     jsr SetupVillagerText
 
@@ -5034,9 +5003,6 @@ LoadTheHouseInterior:
     lda #0
     sta MustLoadHouseInterior
     sta MustLoadSomething
-    lda #1
-    sta ScreenCount
-
 
     lda MustSleepAfterFadeOut
     bne @nope
@@ -5046,7 +5012,6 @@ LoadTheHouseInterior:
     sta FadeIdx
     lda #FADE_DELAY_GENERIC
     sta PaletteAnimDelay
-
 
 @nope:
     rts
@@ -5636,7 +5601,6 @@ PrepareKnifeSprite:
 
 @exit:
     rts
-
 
 ;----------------------------------
 loadSprites:
