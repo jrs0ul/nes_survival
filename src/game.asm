@@ -30,7 +30,6 @@ main_tiles_chr: .incbin "main.chr"
 .include "data/map_list.asm"
 .include "data/collision_data.asm"
 
-
 ;===========================================================
 .segment "ROM1"
 
@@ -47,7 +46,6 @@ title_palette:
 
     .byte $0F,$07,$05,$26, $0F,$01,$26,$07, $0F,$26,$26,$35, $0F,$07,$26,$35    ;background
     .byte $0F,$0f,$17,$20, $0F,$06,$26,$39, $0F,$17,$21,$31, $0F,$0f,$37,$26    ;OAM sprites
-
 
 
 .include "data/title.asm"
@@ -92,7 +90,6 @@ banktable:              ; Write to this table to switch banks.
 
 
 .include "data/villager_quests.asm"
-
 .include "data/MapEntryPoints.asm"
 
 
@@ -328,7 +325,6 @@ npc_anim_row_sequence:
     MAX_TILE_SCROLL_RIGHT      = 8
 
 
-
     ENTRY_POINT_COUNT          = 8
 
     SLEEP_POS_X                = 100
@@ -447,7 +443,6 @@ npc_anim_row_sequence:
     FADE_DELAY_GAME_OVER       = 3
     FADE_DELAY_GENERIC         = 2
     FADE_DELAY_SLEEP           = 10
-
 
 
 ;===================================================================
@@ -796,10 +791,6 @@ TextLength:
 ActiveVillagerQuest:
     .res 1
 
-MustClearVillagerItems:
-    .res 1
-
-
 
 MustCopyMainChr:
     .res 1
@@ -1060,7 +1051,7 @@ SourceMapIdx:
     .res 1
 
 Buffer:
-    .res 516  ;must see how much is still available
+    .res 517  ;must see how much is still available
 
 ;====================================================================================
 
@@ -2179,6 +2170,7 @@ RoutinesAfterFadeOut:
     lda ActiveMapEntryIndex
     asl
     asl
+    asl
     tax
     lda MapSpawnPoint, x
     sta PlayerX
@@ -2191,6 +2183,13 @@ RoutinesAfterFadeOut:
     inx
     lda MapSpawnPoint, x
     sta ScreenCount
+    inx
+    lda MapSpawnPoint, x
+    sta pointer
+    inx
+    lda MapSpawnPoint, x
+    sta pointer + 1
+    jsr LoadItems
     ;-----------------------------
     ;Entered bear's hut
 @next1:
@@ -2224,9 +2223,10 @@ RoutinesAfterFadeOut:
 
 @finishUp:
 
+    jsr VillagerNpcs
+
     lda #1
     sta MustLoadVillagerHut
-    sta MustClearVillagerItems
     sta MustRestartIndoorsMusic
     sta MustLoadSomething
 
@@ -2238,8 +2238,8 @@ RoutinesAfterFadeOut:
     sta ScrollDirection
     sta MustLoadVillagerHutAfterFadeout
 
-;------------------------------------
-; load the outdoors of villager's hut
+    ;------------------------------------
+    ; load the outdoors of villager's hut
 @next2:
     lda MustLoadOutsideVillagerHutAfterFadeout
     beq @next3
@@ -2255,18 +2255,11 @@ RoutinesAfterFadeOut:
     jsr PrepareCollisionAfterHutExit
 
     lda #0
-    sta NpcCount
     sta MustLoadOutsideVillagerHutAfterFadeout
 
     lda #3
     sta TempNpcCnt
     jsr GenerateNpcs
-
-    lda #<Outside2_items
-    sta pointer
-    lda #>Outside2_items
-    sta pointer + 1
-    jsr LoadItems
 
     lda #1
     sta MustLoadOutside
@@ -2325,12 +2318,6 @@ RoutinesAfterFadeOut:
     sta TempNpcCnt
     jsr GenerateNpcs
 
-    lda #<Outside2_items
-    sta pointer
-    lda #>Outside2_items
-    sta pointer + 1
-    jsr LoadItems
-
     lda #0
     sta LeftCollisionMapIdx
     lda #0
@@ -2370,7 +2357,6 @@ RoutinesAfterFadeOut:
 
     lda #0
     sta NpcCount
-    sta ItemCount
 
     jsr ResetNameTableAdresses
 
@@ -2386,12 +2372,6 @@ RoutinesAfterFadeOut:
 
     lda MustLoadIndoorsAfterFadeout
     beq @next6
-
-    lda #<House_items
-    sta pointer
-    lda #>House_items
-    sta pointer + 1
-    jsr LoadItems
 
     lda #<House_npcs
     sta pointer
@@ -2465,12 +2445,6 @@ RoutinesAfterFadeOut:
     lda #7
     sta TempNpcCnt
     jsr GenerateNpcs
-    lda #<Outside1_items
-    sta pointer
-    lda #>Outside1_items
-    sta pointer + 1
-
-    jsr LoadItems
 
     lda #0
     sta MustLoadFirstLocationAfterFadeout
@@ -2492,12 +2466,6 @@ RoutinesAfterFadeOut:
     lda #0
     sta InHouse
 
-    lda #<Outside1_items
-    sta pointer
-    lda #>Outside1_items
-    sta pointer + 1
-    jsr LoadItems
-
     lda #7
     sta TempNpcCnt
     jsr GenerateNpcs
@@ -2510,19 +2478,13 @@ RoutinesAfterFadeOut:
     lda #0
     sta MustLoadOutsideHouseAfterFadeout
 
-;-----------------------------------------
+    ;-----------------------------------------
 @next8: ;third location exit to the 0
 
     lda MustLoadFirstLocationFromThirdAfterFadeout
     beq @next9
 
     jsr FixCollisionAfterGoingBackFromThirdLocation
-
-    lda #<Outside1_items
-    sta pointer
-    lda #>Outside1_items
-    sta pointer + 1
-    jsr LoadItems
 
     lda #7
     sta TempNpcCnt
@@ -4852,7 +4814,6 @@ LoadVillagerHut:
 
     jsr LoadNametable
     jsr LoadStatusBar
-    
 
     lda #<house_palette
     sta PalettePtr
@@ -4860,7 +4821,6 @@ LoadVillagerHut:
     sta PalettePtr + 1
 
 
-    jsr VillagerItemsAndNpcs
 
     lda #1
     sta InVillagerHut
@@ -4879,13 +4839,8 @@ LoadVillagerHut:
 @nope:
     rts
 ;-----------------------------------
-VillagerItemsAndNpcs:
-    lda MustClearVillagerItems
-    beq @npcs
-    lda #0
-    sta ItemCount
-    sta MustClearVillagerItems
-@npcs:
+VillagerNpcs:
+    
     jsr GetPaletteFadeValueForHour
     cmp #$40
     beq @night_npcs

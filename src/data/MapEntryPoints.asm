@@ -28,23 +28,32 @@ MapEntryPoints:
     .byte 3, 0, 0, 255, 0, 255, 168, 255, <MustLoadOutsideVillagerHutAfterFadeout, >MustLoadOutsideVillagerHutAfterFadeout, 0, 0, 0, 0, 0, 0
     ;Player's house exit
     .byte 4, 0, 0, 255, 0, 255, 168, 255, <MustLoadOutsideHouseAfterFadeout, >MustLoadOutsideHouseAfterFadeout, 0, 0, 0, 0, 0, 0
+
+
 ;-----------------------------------------------------
-;player's new position when entry point is activated
-;PlayerX, PlayerY, LocationIndex, ScreenCount
+;The data of the new location the player has entered 
+;PlayerX,
+;PlayerY,
+;LocationIndex,
+;ScreenCount,
+;ItemListLow,
+;ItemListHigh
+;<unused bytes>
+
 MapSpawnPoint:
     ;Entry to player's house from outside
-    .byte 128, 152, 4, 1
+    .byte 128, 152, 4, 1, <House_items, >House_items, 0, 0
     ;Bear's house entrance
-    .byte 128, 136, 3, 1
+    .byte 128, 136, 3, 1, <House_items, >House_items, 0, 0
     ;Second location entry point
-    .byte 80, 208, 1, OUTDOORS_LOC2_SCREEN_COUNT
+    .byte 80, 208, 1, OUTDOORS_LOC2_SCREEN_COUNT, <Outside2_items, >Outside2_items, 0, 0
     ;Third location entry point
-    .byte 100, 48, 2, OUTDOORS_LOC3_SCREEN_COUNT
+    .byte 100, 48, 2, OUTDOORS_LOC3_SCREEN_COUNT, <House_items, >House_items, 0, 0
     ;Exit point of second location
-    .byte 128, 32, 0, OUTDOORS_LOC1_SCREEN_COUNT
+    .byte 128, 32, 0, OUTDOORS_LOC1_SCREEN_COUNT, <Outside1_items, >Outside1_items, 0, 0
     ;Exit point of third location
-    .byte 120, 209, 0, OUTDOORS_LOC1_SCREEN_COUNT
+    .byte 120, 209, 0, OUTDOORS_LOC1_SCREEN_COUNT, <Outside1_items, >Outside1_items, 0, 0
     ;Bear's house exit
-    .byte $76, $80, 1, OUTDOORS_LOC2_SCREEN_COUNT
+    .byte $76, $80, 1, OUTDOORS_LOC2_SCREEN_COUNT, <Outside2_items, >Outside2_items, 0, 0
     ;Player's house exit
-    .byte 72, 120, 0, OUTDOORS_LOC1_SCREEN_COUNT
+    .byte 72, 120, 0, OUTDOORS_LOC1_SCREEN_COUNT, <Outside1_items, >Outside1_items, 0, 0
