@@ -327,18 +327,13 @@ npc_anim_row_sequence:
     MAX_TILE_SCROLL_LEFT       = 248; -8
     MAX_TILE_SCROLL_RIGHT      = 8
 
-    HOUSE_DOOR_X1              = 64
-    HOUSE_DOOR_Y1              = 102
-    HOUSE_DOOR_X2              = 88
-    HOUSE_DOOR_Y2              = 110
 
-    HOUSE_EXIT_Y               = 168
 
-   
+    ENTRY_POINT_COUNT          = 8
+
     SLEEP_POS_X                = 100
     SLEEP_POS_Y                = 72
 
-    
     SLEEP_ADD_HP_TIMES_TEN     = 3
     SLEEP_SUB_HP_HUNGER_TT     = 5
     SLEEP_SUB_HP_COLD_TT       = 5
@@ -421,7 +416,6 @@ npc_anim_row_sequence:
     INVENTORY_MAX_ITEMS        = 10
     INVENTORY_MAX_SIZE         = INVENTORY_MAX_ITEMS * 2
 
-    
     PROJECTILE_DIR_UP          = 1
     PROJECTILE_DIR_DOWN        = 2
     PROJECTILE_DIR_LEFT        = 3
@@ -1780,18 +1774,78 @@ Logics:
 ;------------------------------
 CheckEntryPoints:
 
-    jsr CheckIfEnteredHouse
-    jsr CheckIfEnteredVillagerHut
-    jsr CheckIfEnteredSecondLocation
-    jsr CheckIfEnteredThirdLocation
-    jsr CheckIfExitedSecondLocation
-    jsr CheckIfExitedThirdLocation
-    jsr CheckIfExitedVillagerHut
-    jsr CheckIfExitedHouse
+    ldx #ENTRY_POINT_COUNT - 1
+@entryPointLoop:
 
 
+    txa
+    asl
+    asl
+    asl
+    asl
+    tay
+
+    lda MapEntryPoints, y ; location index
+    cmp LocationIndex
+    bne @nextEntry
+    iny
+    lda MapEntryPoints, y ; CurrentMapSegmentIndex
+    cmp CurrentMapSegmentIndex
+    bne @nextEntry
+    iny             ;minX
+    lda PlayerX
+    cmp MapEntryPoints, y
+    bcc @nextEntry
+    iny             ;maxX
+    cmp MapEntryPoints, y
+    bcs @nextEntry
+    lda GlobalScroll
+    iny
+    cmp MapEntryPoints, y
+    bcc @nextEntry
+    iny
+    cmp MapEntryPoints, y
+    bcs @nextEntry
+    lda PlayerY
+    iny             ;minY
+    cmp MapEntryPoints, y
+    bcc @nextEntry
+    iny
+    cmp MapEntryPoints, y
+    bcs @nextEntry
 
 
+    lda PaletteFadeAnimationState
+    bne @exit
+
+
+    iny
+    lda MapEntryPoints, y
+    sta pointer
+    iny
+    lda MapEntryPoints, y
+    sta pointer + 1
+
+    ldy #0
+
+    lda #1
+    sta PaletteFadeAnimationState
+    sta (pointer), y
+    lda #FADE_DELAY_GENERIC
+    sta PaletteAnimDelay
+    lda #0
+    sta PaletteFadeTimer
+    sta FadeIdx
+
+    jmp @exit
+
+
+@nextEntry:
+    dex
+    bpl @entryPointLoop
+
+
+@exit:
     rts
 
 
@@ -1993,111 +2047,6 @@ MoveSpearVerticaly:
 
     rts
 
-
-;-------------------------------
-CheckIfExitedSecondLocation:
-
-    lda LocationIndex
-    beq @exit
-
-    lda CurrentMapSegmentIndex
-    cmp #0
-
-    lda PlayerY
-    cmp #230
-    bcc @exit
-
-
-    lda PaletteFadeAnimationState
-    bne @exit
-    lda #1
-    sta PaletteFadeAnimationState
-    sta MustLoadFirstLocationAfterFadeout
-    lda #FADE_DELAY_GENERIC
-    sta PaletteAnimDelay
-    lda #0
-    sta PaletteFadeTimer
-    sta FadeIdx
-
-@exit:
-    rts
-;------------------------------------
-CheckIfExitedThirdLocation:
-
-    lda LocationIndex
-    cmp #2
-    bne @exit
-
-    lda PlayerY
-    cmp #32
-    bcs @exit
-
-    lda PaletteFadeAnimationState
-    bne @exit
-    lda #1
-    sta PaletteFadeAnimationState
-    sta MustLoadFirstLocationFromThirdAfterFadeout
-    lda #FADE_DELAY_GENERIC
-    sta PaletteAnimDelay
-    lda #0
-    sta PaletteFadeTimer
-    sta FadeIdx
-
-@exit:
-
-    rts
-;------------------------------------
-
-CheckIfEnteredSecondLocation:
-
-    lda CurrentMapSegmentIndex
-    cmp #OUTDOORS_LOC1_SCREEN_COUNT - 1
-    bne @exit
-    lda PlayerY
-    cmp #32
-    bcc @Entered
-    jmp @exit
-@Entered:
-    lda PaletteFadeAnimationState
-    bne @exit
-    lda #1
-    sta PaletteFadeAnimationState
-    sta MustLoadSecondLocationAfterFadeout
-    lda #FADE_DELAY_GENERIC
-    sta PaletteAnimDelay
-    lda #0
-    sta PaletteFadeTimer
-    sta FadeIdx
-
-
-@exit:
-    rts
-;------------------------------------
-CheckIfEnteredThirdLocation:
-
-    lda CurrentMapSegmentIndex
-    cmp #1
-    bne @exit
-    lda PlayerY
-    cmp #225
-    bcs @Entered
-    jmp @exit
-@Entered:
-    lda PaletteFadeAnimationState
-    bne @exit
-    lda #1
-    sta PaletteFadeAnimationState
-    sta MustLoadThirdLocationAfterFadeout
-    lda #FADE_DELAY_GENERIC
-    sta PaletteAnimDelay
-    lda #0
-    sta PaletteFadeTimer
-    sta FadeIdx
-
-
-@exit:
-    rts
-
 ;-------------------------------
 DoPaletteFades:
 
@@ -2239,6 +2188,9 @@ RoutinesAfterFadeOut:
     sta MustRestartIndoorsMusic
     sta MustLoadSomething
 
+    lda #3
+    sta LocationIndex
+
 
     lda #0
     sta GlobalScroll
@@ -2261,7 +2213,6 @@ RoutinesAfterFadeOut:
 
     lda #0
     sta InVillagerHut
-    sta ItemIGave
 
     lda #OUTDOORS_LOC2_SCREEN_COUNT
     sta ScreenCount
@@ -2285,6 +2236,7 @@ RoutinesAfterFadeOut:
     sta PaletteFadeAnimationState
 
 
+
     lda #3
     sta TempNpcCnt
     jsr GenerateNpcs
@@ -2296,9 +2248,26 @@ RoutinesAfterFadeOut:
     jsr LoadItems
 
     lda #1
+    sta LocationIndex
     sta MustLoadOutside
     sta MustCopyMainChr
     sta MustLoadSomething
+
+    lda ItemIGave
+    beq @next3
+    lda #0
+    sta ItemIGave
+@incrementQuest:
+    lda ActiveVillagerQuest
+    clc
+    adc #1
+    cmp #MAX_QUEST
+    bcc @saveQuestIndex
+
+    lda #0
+@saveQuestIndex:
+    sta ActiveVillagerQuest
+
 
 
 @next3:
@@ -2448,6 +2417,9 @@ RoutinesAfterFadeOut:
     lda #HOUSE_ENTRY_POINT_Y
     sta PlayerY
 
+    lda #4
+    sta LocationIndex
+
 
     lda #0
     sta MustLoadIndoorsAfterFadeout
@@ -2536,6 +2508,7 @@ RoutinesAfterFadeOut:
 
     lda #0
     sta InHouse
+    sta LocationIndex
     
     lda #OUTDOORS_LOC1_SCREEN_COUNT
     sta ScreenCount
@@ -4719,90 +4692,6 @@ FlipStartingNametable:
     sta PPUCTRL
 
     rts
-;-----------------------------------
-CheckIfEnteredVillagerHut:
-
-    lda LocationIndex
-    beq @nope
-
-
-    lda PlayerX
-    cmp #$76
-    bcc @nope
-    cmp #$79
-    bcs @nope
-
-    lda GlobalScroll
-    cmp #$B6
-    bcc @nope
-    cmp #$BE
-    bcs @nope
-
-    lda PlayerY
-    cmp #$68
-    bcc @nope
-    cmp #$6F
-    bcs @nope
-
-
-    lda PaletteFadeAnimationState
-    bne @nope
-    lda #1
-    sta PaletteFadeAnimationState
-    sta MustLoadVillagerHutAfterFadeout
-    lda #FADE_DELAY_GENERIC
-    sta PaletteAnimDelay
-    lda #0
-    sta PaletteFadeTimer
-    sta FadeIdx
-
-@nope:
-    rts
-
-
-
-;-----------------------------------
-CheckIfEnteredHouse:
-
-    lda LocationIndex
-    bne @nope ;only in location 1
-    lda InHouse
-    bne @nope ; already in
-
-    lda PlayerX
-    ;clc
-    ;adc #8
-
-    cmp #HOUSE_DOOR_X1
-    bcc @nope
-    cmp #HOUSE_DOOR_X2
-    bcs @nope
-
-    lda PlayerY
-    ;clc
-    ;adc #10
-    cmp #HOUSE_DOOR_Y1
-    bcc @nope
-    cmp #HOUSE_DOOR_Y2
-    bcs @nope
-
-
-    lda PaletteFadeAnimationState
-    bne @nope
-    lda #1
-    sta PaletteFadeAnimationState
-    sta MustLoadIndoorsAfterFadeout
-    lda #FADE_DELAY_GENERIC
-    sta PaletteAnimDelay
-    lda #0
-    sta PaletteFadeTimer
-    sta FadeIdx
-
-
-@nope:
-    rts
-
-
 ;----------------------------------
 CheckBed:
     lda PlayerX
@@ -4911,46 +4800,6 @@ CheckToolTable:
     rts
 
 ;-----------------------------------
-CheckIfExitedVillagerHut:
-
-    lda InVillagerHut
-    beq @nope
-
-    lda PlayerY
-    cmp #HOUSE_EXIT_Y
-    bcc @nope
-
-
-    lda PaletteFadeAnimationState
-    bne @nope
-    lda #1
-    sta PaletteFadeAnimationState
-    sta MustLoadOutsideVillagerHutAfterFadeout
-    lda #FADE_DELAY_GENERIC
-    sta PaletteAnimDelay
-    lda #0
-    sta PaletteFadeTimer
-    sta FadeIdx
-
-    lda ItemIGave
-    beq @nope
-
-@incrementQuest:
-
-    lda ActiveVillagerQuest
-    clc
-    adc #1
-    cmp #MAX_QUEST
-    bcc @saveQuestIndex
-
-    lda #0
-@saveQuestIndex:
-    sta ActiveVillagerQuest
-
-
-@nope:
-    rts
-;-----------------------------------
 PrepareCollisionAfterHutExit:
 
     ldy #4
@@ -5003,32 +4852,6 @@ PrepareCollisionAfterHutExit:
 
     rts
 
-
-
-;-----------------------------------
-CheckIfExitedHouse:
-
-    lda InHouse
-    beq @nope
-
-@checkExit:
-    lda PlayerY
-    cmp #HOUSE_EXIT_Y
-    bcc @nope
-
-    lda PaletteFadeAnimationState
-    bne @nope
-    lda #1
-    sta PaletteFadeAnimationState
-    sta MustLoadOutsideHouseAfterFadeout
-    lda #FADE_DELAY_GENERIC
-    sta PaletteAnimDelay
-    lda #0
-    sta PaletteFadeTimer
-    sta FadeIdx
-
-@nope:
-    rts
 ;-------------------------------------
 LoadVillagerHut:
 
