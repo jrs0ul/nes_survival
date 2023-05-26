@@ -1511,6 +1511,23 @@ UpdateMenuState:
 @exit:
     rts
 
+;---------------------------------
+ResetNameTableAdresses:
+
+    lda #$20
+    sta FirstNametableAddr
+    lda #$24
+    sta SecondNametableAddr
+
+    lda PPUCTRL
+    and #%11111110
+
+    sta PPUCTRL
+
+
+    rts
+
+
 ;----------------------------------
 UpdateFireplace:
 
@@ -2123,11 +2140,12 @@ DoPaletteFades:
 
 @exit:
 
-
     rts
+
+
 ;------------------------------
 RoutinesAfterFadeOut:
-
+    ;fade in after sleep
     lda MustSleepAfterFadeOut
     beq @next
     jsr DoSleep
@@ -2137,7 +2155,7 @@ RoutinesAfterFadeOut:
     sta PaletteFadeAnimationState
     lda #PALETTE_FADE_MAX_ITERATION
     sta FadeIdx
-@next:
+@next: ;game over
     lda MustLoadGameOverAfterFadeOut
     beq @next1
     lda #1
@@ -2146,8 +2164,8 @@ RoutinesAfterFadeOut:
     lda #0
     sta PaletteFadeAnimationState
     ;---------------------------------------
-@next1:
     ;Entered bear's hut
+@next1:
 
     lda MustLoadVillagerHutAfterFadeout
     beq @next2
@@ -2191,6 +2209,8 @@ RoutinesAfterFadeOut:
     lda #3
     sta LocationIndex
 
+    jsr ResetNameTableAdresses
+
 
     lda #0
     sta GlobalScroll
@@ -2206,7 +2226,7 @@ RoutinesAfterFadeOut:
     sta MustLoadVillagerHutAfterFadeout
 
 ;------------------------------------
-
+; load the outdoors of villager's hut
 @next2:
     lda MustLoadOutsideVillagerHutAfterFadeout
     beq @next3
@@ -2276,6 +2296,9 @@ RoutinesAfterFadeOut:
     lda MustLoadSecondLocationAfterFadeout
     beq @next4
 
+
+    jsr ResetNameTableAdresses
+
     lda #1
     sta MustLoadSomething
     sta MustLoadOutside
@@ -2328,6 +2351,7 @@ RoutinesAfterFadeOut:
     sta MustLoadSecondLocationAfterFadeout
     sta PaletteFadeAnimationState
 ;--------------------------------------------
+;Third location
 @next4:
 
     lda MustLoadThirdLocationAfterFadeout
@@ -2371,6 +2395,7 @@ RoutinesAfterFadeOut:
     sta PlayerX
 
 
+    jsr ResetNameTableAdresses
 
     lda #0
     sta GlobalScroll
@@ -2380,9 +2405,8 @@ RoutinesAfterFadeOut:
     sta MustLoadThirdLocationAfterFadeout
     sta PaletteFadeAnimationState
 
-
-
 ;-----------------------------------------
+;entered player's house
 @next5:
 
     lda MustLoadIndoorsAfterFadeout
@@ -2408,6 +2432,8 @@ RoutinesAfterFadeOut:
     cpx #COLLISION_MAP_SIZE
     bne @copyCollisionMapLoop2
 
+    jsr ResetNameTableAdresses
+
     lda #1
     sta MustLoadHouseInterior
     sta MustRestartIndoorsMusic
@@ -2426,11 +2452,13 @@ RoutinesAfterFadeOut:
     sta PaletteFadeAnimationState
 
 ;---------------------------------------------
+;Entering first location from second
 @next6:
-;----------------Entering first location from second
 
     lda MustLoadFirstLocationAfterFadeout
     beq @next7
+
+    ;jsr FlipStartingNametable
 
     lda #1
     sta MustLoadSomething
@@ -2493,6 +2521,7 @@ RoutinesAfterFadeOut:
     sta MustLoadFirstLocationAfterFadeout
     sta PaletteFadeAnimationState
 ;------------------------------------------------
+;Outside of player's house
 @next7:
 
     lda MustLoadOutsideHouseAfterFadeout
@@ -2537,14 +2566,12 @@ RoutinesAfterFadeOut:
     sta MustLoadSomething
 
 
-
-
     lda #0
     sta MustLoadOutsideHouseAfterFadeout
     sta PaletteFadeAnimationState
 
 ;-----------------------------------------
-@next8: ;third location exit
+@next8: ;third location exit to the 0
 
     lda MustLoadFirstLocationFromThirdAfterFadeout
     beq @next9
@@ -2581,6 +2608,13 @@ RoutinesAfterFadeOut:
     sta CurrentMapSegmentIndex
     sta MustLoadSomething
     sta MustLoadOutside
+
+    ;jsr FlipStartingNametable
+
+    lda #28
+    sta BgColumnIdxToUpload
+    lda #2
+    sta ScrollDirection
 
 
     lda #0
@@ -3364,7 +3398,7 @@ UpdateTextBaloon:
     lda MustUpdateTextBaloon
     beq @exit
 
-    lda #$26
+    lda #$22
     sta TempTextAddress
 
 
@@ -4888,7 +4922,7 @@ LoadVillagerHut:
     sta pointer
     lda #>villager_hut
     sta pointer + 1
-    lda #$24    ; $24000
+    lda #$20    ; $20000
     sta NametableAddress
 
     jsr LoadNametable
