@@ -2450,65 +2450,6 @@ RoutinesAfterFadeOut:
     cmp #5
     bne @next9
 
-    jsr FixCollisionAfterGoingBackFromThirdLocation
-
-    lda #7
-    sta TempNpcCnt
-    jsr GenerateNpcs
-
-    lda #7
-    sta TilesScroll
-
-    lda #103
-    sta GlobalScroll
-
-    lda #1
-    sta CurrentMapSegmentIndex
-    sta MustLoadOutside
-
-    ;jsr FlipStartingNametable
-
-    lda #28
-    sta BgColumnIdxToUpload
-    lda #2
-    sta ScrollDirection
-    ;------------------------------------------
-    ;second villager
-@next9:
-
-    lda ActiveMapEntryIndex
-    cmp #8
-    bne @next10
-
-    lda #1
-    sta MustRestartIndoorsMusic
-
-    jsr ResetNameTableAdresses
-
-    lda #1
-    sta MustLoadVillagerHut
-
-    ;------------------------------------------
-    ;second villager exit
-@next10:
-
-    lda ActiveMapEntryIndex
-    cmp #9
-    bne @next11
-
-    lda #0
-    sta InVillagerHut
-
-    lda #1
-    sta MustLoadOutside
-    sta MustCopyMainChr
-
-@next11:
-
-    rts
-;-------------------------------
-FixCollisionAfterGoingBackFromThirdLocation:
-
     ldx #0
 @copyCollisionMapLoop44:
     lda bg_collision1, x
@@ -2547,10 +2488,99 @@ FixCollisionAfterGoingBackFromThirdLocation:
     jsr PushCollisionMapLeft
     jsr PushCollisionMapLeft
 
+    lda #7
+    sta TempNpcCnt
+    jsr GenerateNpcs
 
+    lda #7
+    sta TilesScroll
+
+    lda #103
+    sta GlobalScroll
+
+    lda #1
+    sta CurrentMapSegmentIndex
+    sta MustLoadOutside
+
+    ;jsr FlipStartingNametable
+
+    lda #28
+    sta BgColumnIdxToUpload
+    lda #2
+    sta ScrollDirection
+    ;------------------------------------------
+    ;second villager
+@next9:
+
+    lda ActiveMapEntryIndex
+    cmp #8
+    bne @next10
+
+    lda #1
+    sta MustRestartIndoorsMusic
+
+    lda #0
+    sta CurrentMapSegmentIndex
+
+
+    ldx #0
+@copyCollisionMapLoopZ:
+    lda villager2_hut_collision, x
+    sta CollisionMap, x
+    inx
+    cpx #COLLISION_MAP_SIZE
+    bne @copyCollisionMapLoopZ
+
+    jsr ResetNameTableAdresses
+
+
+    lda #0
+    sta GlobalScroll
+    sta TilesScroll
+    sta ScrollDirection
+
+
+    lda #1
+    sta MustLoadVillagerHut
+
+    ;------------------------------------------
+    ;second villager exit
+@next10:
+
+    lda ActiveMapEntryIndex
+    cmp #9
+    bne @next11
+
+    lda #0
+    sta InVillagerHut
+
+    lda #0
+    sta CurrentMapSegmentIndex
+
+    ldx #0
+@copyCollisionMapLoop667:
+    lda LOC3_collision0, x
+    sta CollisionMap, x
+    inx
+    cpx #COLLISION_MAP_SIZE
+    bne @copyCollisionMapLoop667
+
+    lda #1
+    sta RightCollisonMapIdx
+    lda #0      ;load the first column
+    sta RightCollisionColumnIndex
+    jsr LoadRightCollisionColumn
+    lda #255
+    sta LeftCollisionColumnIndex
+
+
+    lda #1
+    sta MustLoadOutside
+    sta MustCopyMainChr
+
+@next11:
 
     rts
-
 ;-------------------------------
 DoSleep:
     lda #SLEEP_POS_X
