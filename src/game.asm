@@ -325,7 +325,7 @@ npc_anim_row_sequence:
     MAX_TILE_SCROLL_RIGHT      = 8
 
 
-    ENTRY_POINT_COUNT          = 8
+    ENTRY_POINT_COUNT          = 10
 
     SLEEP_POS_X                = 100
     SLEEP_POS_Y                = 72
@@ -762,24 +762,6 @@ TimesShiftedRight:
 
 MustSleepAfterFadeOut:
     .res 1
-MustLoadVillagerHutAfterFadeout:
-    .res 1
-MustLoadOutsideVillagerHutAfterFadeout:
-    .res 1
-MustLoadSecondLocationAfterFadeout:
-    .res 1
-MustLoadThirdLocationAfterFadeout:
-    .res 1
-MustLoadIndoorsAfterFadeout:
-    .res 1
-MustLoadOutsideHouseAfterFadeout:
-    .res 1
-MustLoadFirstLocationAfterFadeout:
-    .res 1
-MustLoadFirstLocationFromThirdAfterFadeout:
-    .res 1
-
-
 MustUpdateTextBaloon:
     .res 1
 TextBaloonIndex:
@@ -1051,7 +1033,7 @@ SourceMapIdx:
     .res 1
 
 Buffer:
-    .res 517  ;must see how much is still available
+    .res 525  ;must see how much is still available
 
 ;====================================================================================
 
@@ -1348,15 +1330,7 @@ ReadControllerLoop:
     lda MustLoadSomething
     beq DoneLoadingMaps
 
-    jsr UpdateMenuState
-    jsr LoadTitle
-    jsr LoadGameOver
-    jsr LoadMenu
-    jsr LoadTheHouseInterior
-    jsr LoadVillagerHut
-    lda MustLoadOutside
-    beq DoneLoadingMaps
-    jsr LoadOutsideMap
+    jsr LoadBackgroundsIfNeeded
 
 DoneLoadingMaps:
     lda GameState
@@ -1491,12 +1465,26 @@ CopyCHRTiles:
     rts
 
 ;--------------------------------------------
-UpdateMenuState:
+LoadBackgroundsIfNeeded:
+
     lda GameState
     cmp #STATE_MENU
-    bne @exit
+    bne @next
 
     jsr UpdateMenuGfx   ; code from ROM1
+
+@next:
+
+    jsr LoadTitle
+    jsr LoadGameOver
+    jsr LoadMenu
+
+    jsr LoadTheHouseInterior
+    jsr LoadVillagerHut
+
+    lda MustLoadOutside
+    beq @exit
+    jsr LoadOutsideMap
 
 @exit:
     rts
@@ -1826,13 +1814,6 @@ CheckEntryPoints:
     bne @exit
 
 
-    iny
-    lda MapEntryPoints, y
-    sta pointer
-    iny
-    lda MapEntryPoints, y
-    sta pointer + 1
-
     ldy #0
 
     stx ActiveMapEntryIndex
@@ -1841,7 +1822,6 @@ CheckEntryPoints:
     sta PaletteFadeAnimationState
     sta IsLocationRoutine
 
-    sta (pointer), y
     lda #FADE_DELAY_GENERIC
     sta PaletteAnimDelay
     lda #0
@@ -2136,7 +2116,6 @@ DoPaletteFades:
 
     rts
 
-
 ;------------------------------
 RoutinesAfterFadeOut:
 
@@ -2167,6 +2146,8 @@ RoutinesAfterFadeOut:
     lda #0
     sta IsLocationRoutine
     sta PaletteFadeAnimationState
+    lda #1
+    sta MustLoadSomething
     lda ActiveMapEntryIndex
     asl
     asl
@@ -2193,8 +2174,9 @@ RoutinesAfterFadeOut:
     ;-----------------------------
     ;Entered bear's hut
 @next1:
-    lda MustLoadVillagerHutAfterFadeout
-    beq @next2
+    lda ActiveMapEntryIndex
+    cmp #1
+    bne @next2
 
     jsr GetPaletteFadeValueForHour
     cmp #$40 ; is it night?
@@ -2228,7 +2210,6 @@ RoutinesAfterFadeOut:
     lda #1
     sta MustLoadVillagerHut
     sta MustRestartIndoorsMusic
-    sta MustLoadSomething
 
     jsr ResetNameTableAdresses
 
@@ -2236,13 +2217,13 @@ RoutinesAfterFadeOut:
     sta GlobalScroll
     sta TilesScroll
     sta ScrollDirection
-    sta MustLoadVillagerHutAfterFadeout
 
     ;------------------------------------
     ; load the outdoors of villager's hut
 @next2:
-    lda MustLoadOutsideVillagerHutAfterFadeout
-    beq @next3
+    lda ActiveMapEntryIndex
+    cmp #6
+    bne @next3
 
     lda #0
     sta InVillagerHut
@@ -2254,9 +2235,6 @@ RoutinesAfterFadeOut:
 
     jsr PrepareCollisionAfterHutExit
 
-    lda #0
-    sta MustLoadOutsideVillagerHutAfterFadeout
-
     lda #3
     sta TempNpcCnt
     jsr GenerateNpcs
@@ -2264,7 +2242,6 @@ RoutinesAfterFadeOut:
     lda #1
     sta MustLoadOutside
     sta MustCopyMainChr
-    sta MustLoadSomething
 
     lda ItemIGave
     beq @next3
@@ -2284,13 +2261,13 @@ RoutinesAfterFadeOut:
 ;--------------------------Second location
 @next3:
 
-    lda MustLoadSecondLocationAfterFadeout
-    beq @next4
+    lda ActiveMapEntryIndex
+    cmp #2
+    bne @next4
 
     jsr ResetNameTableAdresses
 
     lda #1
-    sta MustLoadSomething
     sta MustLoadOutside
     lda #0
     sta CurrentMapSegmentIndex
@@ -2325,16 +2302,15 @@ RoutinesAfterFadeOut:
     sta TilesScroll
     sta TimesShiftedLeft
     sta TimesShiftedRight
-    sta MustLoadSecondLocationAfterFadeout
-;--------------------------------------------
-;Third location
+    ;--------------------------------------------
+    ;Third location
 @next4:
 
-    lda MustLoadThirdLocationAfterFadeout
-    beq @next5
+    lda ActiveMapEntryIndex
+    cmp #3
+    bne @next5
 
     lda #1
-    sta MustLoadSomething
     sta MustLoadOutside
     lda #0
     sta CurrentMapSegmentIndex
@@ -2365,13 +2341,13 @@ RoutinesAfterFadeOut:
     sta TilesScroll
     sta TimesShiftedLeft
     sta TimesShiftedRight
-    sta MustLoadThirdLocationAfterFadeout
-;-----------------------------------------
-;entered player's house
+    ;-----------------------------------------
+    ;entered player's house
 @next5:
 
-    lda MustLoadIndoorsAfterFadeout
-    beq @next6
+    lda ActiveMapEntryIndex
+    cmp #0
+    bne @next6
 
     lda #<House_npcs
     sta pointer
@@ -2392,22 +2368,18 @@ RoutinesAfterFadeOut:
     lda #1
     sta MustLoadHouseInterior
     sta MustRestartIndoorsMusic
-    sta MustLoadSomething
-
-    lda #0
-    sta MustLoadIndoorsAfterFadeout
 
     ;---------------------------------------------
     ;Entering first location from second
 @next6:
 
-    lda MustLoadFirstLocationAfterFadeout
-    beq @next7
+    lda ActiveMapEntryIndex
+    cmp #4
+    bne @next7
 
     ;jsr FlipStartingNametable
 
     lda #1
-    sta MustLoadSomething
     sta MustLoadOutside
 
     lda #0
@@ -2445,15 +2417,13 @@ RoutinesAfterFadeOut:
     lda #7
     sta TempNpcCnt
     jsr GenerateNpcs
-
-    lda #0
-    sta MustLoadFirstLocationAfterFadeout
     ;------------------------------------------------
     ;Outside of player's house
 @next7:
 
-    lda MustLoadOutsideHouseAfterFadeout
-    beq @next8
+    lda ActiveMapEntryIndex
+    cmp #7
+    bne @next8
 
     ldx #0
 @copyCollisionMapLoop4:
@@ -2473,16 +2443,12 @@ RoutinesAfterFadeOut:
     lda #1
     sta MustLoadOutside
     sta MustCopyMainChr
-    sta MustLoadSomething
-
-    lda #0
-    sta MustLoadOutsideHouseAfterFadeout
-
     ;-----------------------------------------
 @next8: ;third location exit to the 0
 
-    lda MustLoadFirstLocationFromThirdAfterFadeout
-    beq @next9
+    lda ActiveMapEntryIndex
+    cmp #5
+    bne @next9
 
     jsr FixCollisionAfterGoingBackFromThirdLocation
 
@@ -2498,7 +2464,6 @@ RoutinesAfterFadeOut:
 
     lda #1
     sta CurrentMapSegmentIndex
-    sta MustLoadSomething
     sta MustLoadOutside
 
     ;jsr FlipStartingNametable
@@ -2507,11 +2472,38 @@ RoutinesAfterFadeOut:
     sta BgColumnIdxToUpload
     lda #2
     sta ScrollDirection
+    ;------------------------------------------
+    ;second villager
+@next9:
+
+    lda ActiveMapEntryIndex
+    cmp #8
+    bne @next10
+
+    lda #1
+    sta MustRestartIndoorsMusic
+
+    jsr ResetNameTableAdresses
+
+    lda #1
+    sta MustLoadVillagerHut
+
+    ;------------------------------------------
+    ;second villager exit
+@next10:
+
+    lda ActiveMapEntryIndex
+    cmp #9
+    bne @next11
 
     lda #0
-    sta MustLoadFirstLocationFromThirdAfterFadeout
+    sta InVillagerHut
 
-@next9:
+    lda #1
+    sta MustLoadOutside
+    sta MustCopyMainChr
+
+@next11:
 
     rts
 ;-------------------------------
@@ -4825,15 +4817,18 @@ LoadVillagerHut:
     lda #1
     sta InVillagerHut
 
-    lda #0
-    sta MustLoadVillagerHut
-    sta MustLoadSomething
 
     lda #PALETTE_STATE_FADE_IN
     sta PaletteFadeAnimationState
     lda #PALETTE_FADE_MAX_ITERATION
     sta FadeIdx
+    lda #FADE_DELAY_GENERIC
+    sta PaletteAnimDelay
 
+
+    lda #0
+    sta MustLoadVillagerHut
+    sta MustLoadSomething
     jsr SetupVillagerText
 
 @nope:
@@ -4952,8 +4947,6 @@ LoadTheHouseInterior:
     sta PalettePtr + 1
 
 
-    ldy #0
-    jsr bankswitch_y
 
     lda #0
     sta MustLoadHouseInterior
