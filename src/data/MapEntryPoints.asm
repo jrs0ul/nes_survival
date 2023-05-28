@@ -40,27 +40,40 @@ MapEntryPoints:
 ;ScreenCount,
 ;ItemListLow,
 ;ItemListHigh
+;collision data bank
+;CollisionMapLow
+;CollisionMapHigh
 ;<unused bytes>
 
 MapSpawnPoint:
     ;Entry to player's house from outside
-    .byte 128, 152, 4, 1, <House_items, >House_items, 0, 0
+    .byte 128, 152, 4, 1, <House_items, >House_items, 0, <hut_collision, >hut_collision
+    .byte 0, 0, 0, 0, 0, 0, 0
     ;Bear's house entrance
-    .byte 128, 136, 3, 1, <House_items, >House_items, 0, 0
+    .byte 128, 136, 3, 1, <House_items, >House_items, 4, <villager_hut_collision, >villager_hut_collision
+    .byte 0, 0, 0, 0, 0, 0, 0
     ;Second location entry point
-    .byte 80, 208, 1, OUTDOORS_LOC2_SCREEN_COUNT, <Outside2_items, >Outside2_items, 0, 0
+    .byte 80, 208, 1, OUTDOORS_LOC2_SCREEN_COUNT, <Outside2_items, >Outside2_items, 4, <bg2_collision, >bg2_collision
+    .byte 0, 0, 0, 0, 0, 0, 0
     ;Third location entry point
-    .byte 100, 48, 2, OUTDOORS_LOC3_SCREEN_COUNT, <House_items, >House_items, 0, 0
+    .byte 100, 48, 2, OUTDOORS_LOC3_SCREEN_COUNT, <House_items, >House_items, 0, <LOC3_collision0, >LOC3_collision0
+    .byte 0, 0, 0, 0, 0, 0, 0
     ;Exit point of second location
-    .byte 128, 32, 0, OUTDOORS_LOC1_SCREEN_COUNT, <Outside1_items, >Outside1_items, 0, 0
+    .byte 128, 32, 0, OUTDOORS_LOC1_SCREEN_COUNT, <Outside1_items, >Outside1_items, 0, <bg_collision4, >bg_collision4
+    .byte 0, 0, 0, 0, 0, 0, 0
     ;Exit point of third location
-    .byte 120, 209, 0, OUTDOORS_LOC1_SCREEN_COUNT, <Outside1_items, >Outside1_items, 0, 0
+    .byte 120, 209, 0, OUTDOORS_LOC1_SCREEN_COUNT, <Outside1_items, >Outside1_items, 0, <bg_collision1, >bg_collision1
+    .byte 0, 0, 0, 0, 0, 0, 0
     ;Bear's house exit
-    .byte $76, $80, 1, OUTDOORS_LOC2_SCREEN_COUNT, <Outside2_items, >Outside2_items, 0, 0
+    .byte $76, $80, 1, OUTDOORS_LOC2_SCREEN_COUNT, <Outside2_items, >Outside2_items, 4, <bg2_collision1, >bg2_collision1
+    .byte 0, 0, 0, 0, 0, 0, 0
     ;Player's house exit
-    .byte 72, 120, 0, OUTDOORS_LOC1_SCREEN_COUNT, <Outside1_items, >Outside1_items, 0, 0
+    .byte 72, 120, 0, OUTDOORS_LOC1_SCREEN_COUNT, <Outside1_items, >Outside1_items, 0, <bg_collision, >bg_collision
+    .byte 0, 0, 0, 0, 0, 0, 0
     ;Second villager's house
-    .byte 128, 136, 5, 1, <House_items, >House_items, 0, 0
+    .byte 128, 136, 5, 1, <House_items, >House_items, 0, <villager2_hut_collision, >villager2_hut_collision
+    .byte 0, 0, 0, 0, 0, 0, 0
     ;Second villager house's exit
-    .byte 176, 145, 2, OUTDOORS_LOC3_SCREEN_COUNT, <House_items, >House_items, 0, 0
+    .byte 176, 145, 2, OUTDOORS_LOC3_SCREEN_COUNT, <House_items, >House_items, 0, <LOC3_collision0, >LOC3_collision0
+    .byte 0, 0, 0, 0, 0, 0, 0
 

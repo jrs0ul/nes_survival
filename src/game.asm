@@ -2152,6 +2152,7 @@ RoutinesAfterFadeOut:
     asl
     asl
     asl
+    asl
     tax
     lda MapSpawnPoint, x
     sta PlayerX
@@ -2170,7 +2171,31 @@ RoutinesAfterFadeOut:
     inx
     lda MapSpawnPoint, x
     sta pointer + 1
+    stx TempRegX
     jsr LoadItems
+    ldx TempRegX
+    inx
+    lda MapSpawnPoint, x
+    cmp current_bank
+    beq @continue
+    tay
+    bankswitch
+@continue:
+    inx
+    lda MapSpawnPoint, x
+    sta pointer
+    inx
+    lda MapSpawnPoint, x
+    sta pointer + 1
+
+    ldy #0
+@collisionLoop:
+    lda (pointer), y
+    sta CollisionMap, y
+    iny
+    cpy #COLLISION_MAP_SIZE
+    bne @collisionLoop
+
     ;-----------------------------
     ;Entered bear's hut
 @next1:
@@ -2182,14 +2207,6 @@ RoutinesAfterFadeOut:
     cmp #$40 ; is it night?
     beq @copyNightCollisionMap
 
-    ldx #0
-@copyCollisionMapLoop:
-
-    lda villager_hut_collision, x
-    sta CollisionMap, x
-    inx
-    cpx #COLLISION_MAP_SIZE
-    bne @copyCollisionMapLoop
     jmp @finishUp
 
 @copyNightCollisionMap:
@@ -2228,12 +2245,42 @@ RoutinesAfterFadeOut:
     lda #0
     sta InVillagerHut
 
-    lda #$B8
-    sta GlobalScroll
     lda #0
     sta TilesScroll
 
-    jsr PrepareCollisionAfterHutExit
+    lda #0
+    sta TimesShiftedLeft
+    sta TimesShiftedRight
+    sta LeftCollisionMapIdx
+    lda #3
+    sta LeftCollisionColumnIndex
+    jsr LoadLeftCollisionColumn
+    lda #2
+    sta RightCollisonMapIdx
+    lda #0
+    sta RightCollisionColumnIndex
+    jsr LoadRightCollisionColumn
+
+
+    lda #0
+    sta CurrentMapSegmentIndex
+
+    lda #0 ;hack
+    sta GlobalScroll
+
+    ;TODO: rework this
+    jsr PushCollisionMapRight
+    jsr PushCollisionMapRight
+    jsr PushCollisionMapRight
+    jsr PushCollisionMapRight
+    jsr PushCollisionMapRight
+    jsr PushCollisionMapRight
+    jsr PushCollisionMapRight
+    jsr PushCollisionMapRight
+    jsr PushCollisionMapRight
+
+    lda #$B8 ;hack
+    sta GlobalScroll
 
     lda #3
     sta TempNpcCnt
@@ -2272,17 +2319,6 @@ RoutinesAfterFadeOut:
     lda #0
     sta CurrentMapSegmentIndex
 
-    ldy #4
-    jsr bankswitch_y
-
-    ldx #0
-@copyCollisionMapLoop1:
-    lda bg2_collision, x
-    sta CollisionMap, x
-    inx
-    cpx #COLLISION_MAP_SIZE
-    bne @copyCollisionMapLoop1
-
     lda #1
     sta RightCollisonMapIdx
     lda #0      ;load the first column
@@ -2314,14 +2350,6 @@ RoutinesAfterFadeOut:
     sta MustLoadOutside
     lda #0
     sta CurrentMapSegmentIndex
-
-    ldx #0
-@copyCollisionMapLoop666:
-    lda LOC3_collision0, x
-    sta CollisionMap, x
-    inx
-    cpx #COLLISION_MAP_SIZE
-    bne @copyCollisionMapLoop666
 
     lda #1
     sta RightCollisonMapIdx
@@ -2355,14 +2383,6 @@ RoutinesAfterFadeOut:
     sta pointer + 1
     jsr LoadNpcs
 
-    ldx #0
-@copyCollisionMapLoop2:
-    lda hut_collision, x
-    sta CollisionMap, x
-    inx
-    cpx #COLLISION_MAP_SIZE
-    bne @copyCollisionMapLoop2
-
     jsr ResetNameTableAdresses
 
     lda #1
@@ -2390,19 +2410,6 @@ RoutinesAfterFadeOut:
     lda #OUTDOORS_LOC1_SCREEN_COUNT - 1
     sta CurrentMapSegmentIndex
 
-    ldy #0
-    jsr bankswitch_y
-
-    ldx #0
-@copyCollisionMapLoop3:
-
-    lda bg_collision4, x
-@start:
-    sta CollisionMap, x
-    inx
-    cpx #COLLISION_MAP_SIZE
-    bne @copyCollisionMapLoop3
-
     lda #4
     sta RightCollisonMapIdx
     lda #0
@@ -2425,14 +2432,6 @@ RoutinesAfterFadeOut:
     cmp #7
     bne @next8
 
-    ldx #0
-@copyCollisionMapLoop4:
-    lda bg_collision, x
-    sta CollisionMap, x
-    inx
-    cpx #COLLISION_MAP_SIZE
-    bne @copyCollisionMapLoop4
-
     lda #0
     sta InHouse
 
@@ -2449,14 +2448,6 @@ RoutinesAfterFadeOut:
     lda ActiveMapEntryIndex
     cmp #5
     bne @next9
-
-    ldx #0
-@copyCollisionMapLoop44:
-    lda bg_collision1, x
-    sta CollisionMap, x
-    inx
-    cpx #COLLISION_MAP_SIZE
-    bne @copyCollisionMapLoop44
 
     lda #0
     sta TimesShiftedLeft
@@ -2522,23 +2513,12 @@ RoutinesAfterFadeOut:
     lda #0
     sta CurrentMapSegmentIndex
 
-
-    ldx #0
-@copyCollisionMapLoopZ:
-    lda villager2_hut_collision, x
-    sta CollisionMap, x
-    inx
-    cpx #COLLISION_MAP_SIZE
-    bne @copyCollisionMapLoopZ
-
     jsr ResetNameTableAdresses
-
 
     lda #0
     sta GlobalScroll
     sta TilesScroll
     sta ScrollDirection
-
 
     lda #1
     sta MustLoadVillagerHut
@@ -2556,14 +2536,6 @@ RoutinesAfterFadeOut:
 
     lda #0
     sta CurrentMapSegmentIndex
-
-    ldx #0
-@copyCollisionMapLoop667:
-    lda LOC3_collision0, x
-    sta CollisionMap, x
-    inx
-    cpx #COLLISION_MAP_SIZE
-    bne @copyCollisionMapLoop667
 
     lda #1
     sta RightCollisonMapIdx
@@ -4746,54 +4718,7 @@ CheckToolTable:
 ;-----------------------------------
 PrepareCollisionAfterHutExit:
 
-    ldy #4
-    jsr bankswitch_y
-
-    ldx #0
-@copyCollisionMapLoop:
-
-    lda bg2_collision1, x
-    sta CollisionMap, x
-    inx
-    cpx #COLLISION_MAP_SIZE
-    bne @copyCollisionMapLoop
-
-
-    lda #0
-    sta TimesShiftedLeft
-    sta TimesShiftedRight
-    sta LeftCollisionMapIdx
-    lda #3
-    sta LeftCollisionColumnIndex
-    jsr LoadLeftCollisionColumn
-    lda #2
-    sta RightCollisonMapIdx
-    lda #0
-    sta RightCollisionColumnIndex
-    jsr LoadRightCollisionColumn
-
-
-    lda #0
-    sta CurrentMapSegmentIndex
-
-    lda #0 ;hack
-    sta GlobalScroll
-
-    ;TODO: rework this
-    jsr PushCollisionMapRight
-    jsr PushCollisionMapRight
-    jsr PushCollisionMapRight
-    jsr PushCollisionMapRight
-    jsr PushCollisionMapRight
-    jsr PushCollisionMapRight
-    jsr PushCollisionMapRight
-    jsr PushCollisionMapRight
-    jsr PushCollisionMapRight
-
-    lda #$B8 ;hack
-    sta GlobalScroll
-
-
+    
     rts
 
 ;-------------------------------------
