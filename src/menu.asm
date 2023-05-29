@@ -2475,7 +2475,7 @@ ExitMenuState:
     beq @loadOutside
 
     lda #1
-    sta MustLoadVillagerHut
+    sta MustLoadHouseInterior
     sta MustLoadSomething
     jmp @exit
 

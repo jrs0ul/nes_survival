@@ -459,6 +459,8 @@ TextPtr:
     .res 2
 DigitPtr:
     .res 2
+MapPtr:
+    .res 2
 pointer2:
     .res 2
 PalettePtr:
@@ -542,7 +544,7 @@ ActiveMapEntryIndex:
     .res 1
 
 ZPBuffer:
-    .res 132  ; I want to be aware of the free memory
+    .res 130  ; I want to be aware of the free memory
 
 ;--------------
 .segment "BSS" ; variables in ram
@@ -779,8 +781,6 @@ MustCopyMainChr:
 
 
 MustLoadHouseInterior:
-    .res 1
-MustLoadVillagerHut:
     .res 1
 
 MustLoadMenu:
@@ -1033,7 +1033,7 @@ SourceMapIdx:
     .res 1
 
 Buffer:
-    .res 525  ;must see how much is still available
+    .res 526  ;must see how much is still available
 
 ;====================================================================================
 
@@ -1479,8 +1479,7 @@ LoadBackgroundsIfNeeded:
     jsr LoadGameOver
     jsr LoadMenu
 
-    jsr LoadTheHouseInterior
-    jsr LoadVillagerHut
+    jsr LoadInteriorMap
 
     lda MustLoadOutside
     beq @exit
@@ -2132,6 +2131,7 @@ RoutinesAfterFadeOut:
     sta PaletteFadeAnimationState
     lda #PALETTE_FADE_MAX_ITERATION
     sta FadeIdx
+    rts
 @next: ;game over
     lda MustLoadGameOverAfterFadeOut
     beq @next1
@@ -2140,62 +2140,12 @@ RoutinesAfterFadeOut:
     sta MustLoadGameOver
     lda #0
     sta PaletteFadeAnimationState
+    rts
     ;---------------------------------------
 @locationRoutines: ;location routines start here
     ;--some general location code----
-    lda #0
-    sta IsLocationRoutine
-    sta PaletteFadeAnimationState
-    lda #1
-    sta MustLoadSomething
-    lda ActiveMapEntryIndex
-    asl
-    asl
-    asl
-    asl
-    tax
-    lda MapSpawnPoint, x
-    sta PlayerX
-    inx
-    lda MapSpawnPoint, x
-    sta PlayerY
-    inx
-    lda MapSpawnPoint, x
-    sta LocationIndex
-    inx
-    lda MapSpawnPoint, x
-    sta ScreenCount
-    inx
-    lda MapSpawnPoint, x
-    sta pointer
-    inx
-    lda MapSpawnPoint, x
-    sta pointer + 1
-    stx TempRegX
-    jsr LoadItems
-    ldx TempRegX
-    inx
-    lda MapSpawnPoint, x
-    cmp current_bank
-    beq @continue
-    tay
-    bankswitch
-@continue:
-    inx
-    lda MapSpawnPoint, x
-    sta pointer
-    inx
-    lda MapSpawnPoint, x
-    sta pointer + 1
-
-    ldy #0
-@collisionLoop:
-    lda (pointer), y
-    sta CollisionMap, y
-    iny
-    cpy #COLLISION_MAP_SIZE
-    bne @collisionLoop
-
+    
+    jsr CommonLocationRoutine
     ;-----------------------------
     ;Entered bear's hut
 @next1:
@@ -2225,8 +2175,9 @@ RoutinesAfterFadeOut:
     jsr VillagerNpcs
 
     lda #1
-    sta MustLoadVillagerHut
+    sta MustLoadHouseInterior
     sta MustRestartIndoorsMusic
+    sta InVillagerHut
 
     jsr ResetNameTableAdresses
 
@@ -2388,6 +2339,7 @@ RoutinesAfterFadeOut:
     lda #1
     sta MustLoadHouseInterior
     sta MustRestartIndoorsMusic
+    sta InHouse
 
     ;---------------------------------------------
     ;Entering first location from second
@@ -2521,7 +2473,7 @@ RoutinesAfterFadeOut:
     sta ScrollDirection
 
     lda #1
-    sta MustLoadVillagerHut
+    sta MustLoadHouseInterior
 
     ;------------------------------------------
     ;second villager exit
@@ -2553,6 +2505,76 @@ RoutinesAfterFadeOut:
 @next11:
 
     rts
+;------------------------------
+CommonLocationRoutine:
+
+    lda #0
+    sta IsLocationRoutine
+    sta PaletteFadeAnimationState
+    lda #1
+    sta MustLoadSomething
+    lda ActiveMapEntryIndex
+    asl
+    asl
+    asl
+    asl
+    tax
+    lda MapSpawnPoint, x
+    sta PlayerX
+    inx
+    lda MapSpawnPoint, x
+    sta PlayerY
+    inx
+    lda MapSpawnPoint, x
+    sta LocationIndex
+    inx
+    lda MapSpawnPoint, x
+    sta ScreenCount
+    inx
+    lda MapSpawnPoint, x
+    sta pointer
+    inx
+    lda MapSpawnPoint, x
+    sta pointer + 1
+    stx TempRegX
+    jsr LoadItems
+    ldx TempRegX
+    inx
+    lda MapSpawnPoint, x
+    cmp current_bank
+    beq @continue
+    tay
+    bankswitch
+@continue:
+    inx
+    lda MapSpawnPoint, x
+    sta pointer
+    inx
+    lda MapSpawnPoint, x
+    sta pointer + 1
+    inx
+    lda MapSpawnPoint, x
+    beq @loadCollision
+
+    inx
+    lda MapSpawnPoint, x
+    sta MapPtr
+    inx
+    lda MapSpawnPoint, x
+    sta MapPtr + 1
+
+@loadCollision:
+    ldy #0
+@collisionLoop:
+    lda (pointer), y
+    sta CollisionMap, y
+    iny
+    cpy #COLLISION_MAP_SIZE
+    bne @collisionLoop
+
+
+    rts
+
 ;-------------------------------
 DoSleep:
     lda #SLEEP_POS_X
@@ -4714,80 +4736,6 @@ CheckToolTable:
     lda #0
 @exit:
     rts
-
-;-----------------------------------
-PrepareCollisionAfterHutExit:
-
-    
-    rts
-
-;-------------------------------------
-LoadVillagerHut:
-
-    lda MustLoadVillagerHut
-    beq @nope
-
-    ldy #3
-    jsr bankswitch_y
-
-    lda #$00
-    sta $2000
-    sta $2001
-
-    lda #<house_tiles_chr
-    sta pointer
-    lda #>house_tiles_chr
-    sta pointer + 1
-    jsr CopyCHRTiles
-
-
-    lda MustRestartIndoorsMusic
-    beq @loadHouseStuff
-
-    lda #1
-    sta SongName
-    sta MustPlayNewSong
-
-    lda #0
-    sta MustRestartIndoorsMusic
-
-@loadHouseStuff:
-    lda #<villager_hut
-    sta pointer
-    lda #>villager_hut
-    sta pointer + 1
-    lda #$20    ; $20000
-    sta NametableAddress
-
-    jsr LoadNametable
-    jsr LoadStatusBar
-
-    lda #<house_palette
-    sta PalettePtr
-    lda #>house_palette
-    sta PalettePtr + 1
-
-
-
-    lda #1
-    sta InVillagerHut
-
-
-    lda #PALETTE_STATE_FADE_IN
-    sta PaletteFadeAnimationState
-    lda #PALETTE_FADE_MAX_ITERATION
-    sta FadeIdx
-    lda #FADE_DELAY_GENERIC
-    sta PaletteAnimDelay
-
-
-    lda #0
-    sta MustLoadVillagerHut
-    sta MustLoadSomething
-    jsr SetupVillagerText
-
-@nope:
-    rts
 ;-----------------------------------
 VillagerNpcs:
     
@@ -4813,6 +4761,9 @@ VillagerNpcs:
     rts
 ;-----------------------------------
 SetupVillagerText:
+
+    lda InVillagerHut
+    beq @exit
 
     jsr GetPaletteFadeValueForHour
     cmp #$40
@@ -4856,7 +4807,7 @@ SetupVillagerText:
 
 
 ;-------------------------------------
-LoadTheHouseInterior:
+LoadInteriorMap:
 
     lda MustLoadHouseInterior
     beq @nope
@@ -4874,9 +4825,7 @@ LoadTheHouseInterior:
     sta pointer + 1
     jsr CopyCHRTiles
 
-    lda #1
-    sta InHouse
-
+    
     lda MustRestartIndoorsMusic
     beq @loadHouseStuff
     lda #1
@@ -4886,9 +4835,9 @@ LoadTheHouseInterior:
     sta MustRestartIndoorsMusic
 
 @loadHouseStuff:
-    lda #<house
+    lda MapPtr
     sta pointer
-    lda #>house
+    lda MapPtr + 1
     sta pointer + 1
     lda #$20    ; $20000
     sta NametableAddress
@@ -4900,7 +4849,6 @@ LoadTheHouseInterior:
     sta PalettePtr
     lda #>house_palette
     sta PalettePtr + 1
-
 
 
     lda #0
@@ -4916,6 +4864,7 @@ LoadTheHouseInterior:
     lda #FADE_DELAY_GENERIC
     sta PaletteAnimDelay
 
+    jsr SetupVillagerText
 @nope:
     rts
 

@@ -43,15 +43,18 @@ MapEntryPoints:
 ;collision data bank
 ;CollisionMapLow
 ;CollisionMapHigh
+;isInterrriorMap?
+;mapLow
+;mapHigh
 ;<unused bytes>
 
 MapSpawnPoint:
     ;Entry to player's house from outside
     .byte 128, 152, 4, 1, <House_items, >House_items, 0, <hut_collision, >hut_collision
-    .byte 0, 0, 0, 0, 0, 0, 0
+    .byte 1, <house, >house, 0, 0, 0, 0
     ;Bear's house entrance
     .byte 128, 136, 3, 1, <House_items, >House_items, 4, <villager_hut_collision, >villager_hut_collision
-    .byte 0, 0, 0, 0, 0, 0, 0
+    .byte 1, <villager_hut, >villager_hut, 0, 0, 0, 0
     ;Second location entry point
     .byte 80, 208, 1, OUTDOORS_LOC2_SCREEN_COUNT, <Outside2_items, >Outside2_items, 4, <bg2_collision, >bg2_collision
     .byte 0, 0, 0, 0, 0, 0, 0
@@ -72,7 +75,7 @@ MapSpawnPoint:
     .byte 0, 0, 0, 0, 0, 0, 0
     ;Second villager's house
     .byte 128, 136, 5, 1, <House_items, >House_items, 0, <villager2_hut_collision, >villager2_hut_collision
-    .byte 0, 0, 0, 0, 0, 0, 0
+    .byte 1, <villager_hut, >villager_hut, 0, 0, 0, 0
     ;Second villager house's exit
     .byte 176, 145, 2, OUTDOORS_LOC3_SCREEN_COUNT, <House_items, >House_items, 0, <LOC3_collision0, >LOC3_collision0
     .byte 0, 0, 0, 0, 0, 0, 0
