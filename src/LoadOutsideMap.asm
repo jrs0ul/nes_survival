@@ -77,10 +77,9 @@ LoadOutsideMap:
     iny ; map index + 1
 
 
-
     cpy ScreenCount
     bcc @setMapPointer
-    
+
     ldy CurrentMapSegmentIndex
     dey; map index - 1
 
@@ -88,7 +87,7 @@ LoadOutsideMap:
 @setMapPointer:
     lda LocationIndex
     beq @grabFirstLocationMap2
-    
+
     lda map_list_low2, y
     sta pointer
     lda map_list_high2, y
@@ -104,7 +103,6 @@ LoadOutsideMap:
     sta pointer + 1
 
 @loadMap2:
-
     lda SecondNametableAddr
     sta NametableAddress
 
@@ -182,18 +180,8 @@ LoadOutsideMap:
     sta MustLoadSomething
 
     lda LocationIndex
-    beq @FirstLocationScreens
-
-    cmp #2
-    bne @secondLoaction
-    lda #OUTDOORS_LOC3_SCREEN_COUNT
-    jmp @saveScreenCount
-@secondLoaction:
-    lda #OUTDOORS_LOC2_SCREEN_COUNT
-    jmp @saveScreenCount
-@FirstLocationScreens:
-    lda #OUTDOORS_LOC1_SCREEN_COUNT
-@saveScreenCount:
+    tay
+    lda LocationScreenCountList, y
     sta ScreenCount
 
     lda #PALETTE_STATE_FADE_IN

@@ -2484,8 +2484,9 @@ ExitMenuState:
     sta MustLoadOutside
     sta MustLoadSomething
 @exit:
-    ldy #0
-    jsr bankswitch_y
+    ldx LocationIndex
+    ldy LocationBanks, x
+    bankswitch
 
     rts
 ;-------------------------------------

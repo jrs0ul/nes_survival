@@ -83,3 +83,21 @@ MapSpawnPoint:
     .byte 176, 145, 2, OUTDOORS_LOC3_SCREEN_COUNT, <House_items, >House_items, 0, <LOC3_collision0, >LOC3_collision0
     .byte 0, 0, 0, 0, 0, 0, 0
 
+
+LocationScreenCountList:
+    .byte OUTDOORS_LOC1_SCREEN_COUNT ; 0
+    .byte OUTDOORS_LOC2_SCREEN_COUNT ; 1
+    .byte OUTDOORS_LOC3_SCREEN_COUNT ; 2
+    .byte 1                          ; 3
+    .byte 1                          ; 4
+    .byte 1                          ; 5
+
+;which location in which bank
+LocationBanks:
+    .byte 0
+    .byte 4
+    .byte 0
+    .byte 0
+    .byte 0
+    .byte 0
+

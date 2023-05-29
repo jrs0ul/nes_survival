@@ -1402,7 +1402,7 @@ WaitSprite0:
     and #%01000000
     beq WaitSprite0      ; wait until sprite 0 is hit
 
-    ldx #219
+    ldx #188
 WaitScanline:
     dex
     bne WaitScanline
@@ -2439,6 +2439,7 @@ RoutinesAfterFadeOut:
 
     lda #1
     sta MustRestartIndoorsMusic
+    sta InVillagerHut
 
     lda #0
     sta CurrentMapSegmentIndex

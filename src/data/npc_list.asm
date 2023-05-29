@@ -7,7 +7,7 @@ Hut_npcs:
 
 villager2_npcs:
     .byte 1
-    .byte %00001001, 104, 94, 0
+    .byte %00010001, 104, 94, 0
 
 Hut_npcs_night:
     .byte 1
