@@ -5,6 +5,10 @@ Hut_npcs:
     .byte 1
     .byte %00001001, 104, 94, 0
 
+villager2_npcs:
+    .byte 1
+    .byte %00001001, 104, 94, 0
+
 Hut_npcs_night:
     .byte 1
     .byte %00001001, 152, 77, 0

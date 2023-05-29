@@ -57,6 +57,7 @@ title_palette:
 house_tiles_chr: .incbin "house.chr"
 .include "data/maps/house.asm"
 .include "data/maps/villager_hut.asm"
+.include "data/maps/villager2_hut.asm"
 
 
 ;============================================================
@@ -2144,7 +2145,6 @@ RoutinesAfterFadeOut:
     ;---------------------------------------
 @locationRoutines: ;location routines start here
     ;--some general location code----
-    
     jsr CommonLocationRoutine
     ;-----------------------------
     ;Entered bear's hut
@@ -2172,7 +2172,17 @@ RoutinesAfterFadeOut:
 
 @finishUp:
 
-    jsr VillagerNpcs
+    jsr GetPaletteFadeValueForHour
+    cmp #$40
+    bne @skip_night
+
+    lda #<Hut_npcs_night
+    sta pointer
+    lda #>Hut_npcs_night
+    sta pointer + 1
+    jsr LoadNpcs
+
+@skip_night:
 
     lda #1
     sta MustLoadHouseInterior
@@ -2233,10 +2243,6 @@ RoutinesAfterFadeOut:
     lda #$B8 ;hack
     sta GlobalScroll
 
-    lda #3
-    sta TempNpcCnt
-    jsr GenerateNpcs
-
     lda #1
     sta MustLoadOutside
     sta MustCopyMainChr
@@ -2278,10 +2284,6 @@ RoutinesAfterFadeOut:
     lda #255
     sta LeftCollisionColumnIndex
 
-    lda #%00000011
-    sta TempNpcCnt
-    jsr GenerateNpcs
-
     lda #0
     sta LeftCollisionMapIdx
     lda #0
@@ -2310,9 +2312,6 @@ RoutinesAfterFadeOut:
     lda #255
     sta LeftCollisionColumnIndex
 
-    lda #0
-    sta NpcCount
-
     jsr ResetNameTableAdresses
 
     lda #0
@@ -2328,19 +2327,12 @@ RoutinesAfterFadeOut:
     cmp #0
     bne @next6
 
-    lda #<House_npcs
-    sta pointer
-    lda #>House_npcs
-    sta pointer + 1
-    jsr LoadNpcs
-
     jsr ResetNameTableAdresses
 
     lda #1
     sta MustLoadHouseInterior
     sta MustRestartIndoorsMusic
     sta InHouse
-
     ;---------------------------------------------
     ;Entering first location from second
 @next6:
@@ -2372,10 +2364,6 @@ RoutinesAfterFadeOut:
     lda #3
     sta LeftCollisionColumnIndex
     jsr LoadLeftCollisionColumn
-
-    lda #7
-    sta TempNpcCnt
-    jsr GenerateNpcs
     ;------------------------------------------------
     ;Outside of player's house
 @next7:
@@ -2386,10 +2374,6 @@ RoutinesAfterFadeOut:
 
     lda #0
     sta InHouse
-
-    lda #7
-    sta TempNpcCnt
-    jsr GenerateNpcs
 
     lda #1
     sta MustLoadOutside
@@ -2414,7 +2398,6 @@ RoutinesAfterFadeOut:
     sta RightCollisionColumnIndex
     jsr LoadRightCollisionColumn
 
-
     lda #3
     sta CurrentMapSegmentIndex
 
@@ -2432,12 +2415,7 @@ RoutinesAfterFadeOut:
     jsr PushCollisionMapLeft
 
     lda #7
-    sta TempNpcCnt
-    jsr GenerateNpcs
-
-    lda #7
     sta TilesScroll
-
     lda #103
     sta GlobalScroll
 
@@ -2474,7 +2452,6 @@ RoutinesAfterFadeOut:
 
     lda #1
     sta MustLoadHouseInterior
-
     ;------------------------------------------
     ;second villager exit
 @next10:
@@ -2496,7 +2473,6 @@ RoutinesAfterFadeOut:
     jsr LoadRightCollisionColumn
     lda #255
     sta LeftCollisionColumnIndex
-
 
     lda #1
     sta MustLoadOutside
@@ -2554,8 +2530,6 @@ CommonLocationRoutine:
     sta pointer + 1
     inx
     lda MapSpawnPoint, x
-    beq @loadCollision
-
     inx
     lda MapSpawnPoint, x
     sta MapPtr
@@ -2571,6 +2545,35 @@ CommonLocationRoutine:
     iny
     cpy #COLLISION_MAP_SIZE
     bne @collisionLoop
+
+    inx
+
+    lda #0
+    sta NpcCount
+
+    stx TempRegX
+    lda MapSpawnPoint, x ;npc count
+    beq @skipGeneration
+    sta TempNpcCnt
+    jsr GenerateNpcs
+@skipGeneration:
+    ldx TempRegX
+    inx
+    lda MapSpawnPoint, x
+    sta pointer
+    inx
+    lda MapSpawnPoint, x
+    sta pointer + 1
+    lda pointer
+    cmp #0
+    beq @checkAnother
+    jmp @loadNpcs
+@checkAnother:
+    cmp pointer + 1
+    beq @skipLoadingNpcs
+@loadNpcs:
+    jsr LoadNpcs
+@skipLoadingNpcs:
 
 
     rts
@@ -4735,29 +4738,6 @@ CheckToolTable:
 @nope:
     lda #0
 @exit:
-    rts
-;-----------------------------------
-VillagerNpcs:
-    
-    jsr GetPaletteFadeValueForHour
-    cmp #$40
-    beq @night_npcs
-
-    lda #<Hut_npcs
-    sta pointer
-    lda #>Hut_npcs
-    sta pointer + 1
-    jmp @load
-
-@night_npcs:
-    lda #<Hut_npcs_night
-    sta pointer
-    lda #>Hut_npcs_night
-    sta pointer + 1
-
-@load:
-    jsr LoadNpcs
-
     rts
 ;-----------------------------------
 SetupVillagerText:
