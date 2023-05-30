@@ -27,7 +27,13 @@
 
 main_tiles_chr: .incbin "main.chr"
 
-.include "data/map_list.asm"
+.include "data/maps/field_bg.asm"
+.include "data/maps/field_bg1.asm"
+.include "data/maps/field_bg2.asm"
+.include "data/maps/field_bg4.asm"
+
+.include "data/maps/LOC3_bg0.asm"
+
 .include "data/collision_data.asm"
 
 ;===========================================================
@@ -65,7 +71,8 @@ house_tiles_chr: .incbin "house.chr"
 
 main_tiles_chr2: .incbin "main.chr"
 
-.include "data/map_list2.asm"
+.include "data/maps/field2_bg.asm"
+.include "data/maps/field2_bg1.asm"
 .include "data/collision_data2.asm"
 
 ;=============================================================
@@ -82,6 +89,8 @@ main_tiles_chr2: .incbin "main.chr"
 banktable:              ; Write to this table to switch banks.
     .byte $00, $01, $02, $03, $04, $05, $06
     .byte $07, $08, $09, $0A, $0B, $0C, $0D, $0E
+
+.include "data/map_list.asm"
 
 .include "data/item_data.asm"
 .include "data/npc_data.asm"
@@ -1550,24 +1559,22 @@ UploadBgColumns:
     cmp #2
     bcc @exit
 
-    ldy SourceMapIdx
-    cpy ScreenCount
+    lda LocationIndex
+    asl
+    asl
+    tay
+
+    lda SourceMapIdx
+    cmp ScreenCount
     bcs @exit
+
+    tya
+    clc
+    adc SourceMapIdx
+    tay
 
     ;calculate source address
 
-    lda LocationIndex
-    beq @location0
-
-    lda map_list_low2, y
-    clc
-    adc BgColumnIdxToUpload
-    sta pointer
-    lda map_list_high2, y
-    sta pointer + 1
-
-    jmp @start
-@location0:
     lda map_list_low, y
     clc
     adc BgColumnIdxToUpload
@@ -1626,21 +1633,13 @@ UploadBgColumns:
 ;--------------------------------------------
 UpdateAttributeColumn:
 
+    lda LocationIndex
+    asl
+    asl
+    clc
+    adc SourceMapIdx
     ldy SourceMapIdx
 
-    lda LocationIndex
-    beq @location0
-
-    lda map_list_low2, y
-    clc
-    adc #$C0
-    sta pointer
-    lda map_list_high2, y
-    adc #$3
-    sta pointer + 1
-
-    jmp @start
-@location0:
     lda map_list_low, y
     clc
     adc #$C0
@@ -4216,13 +4215,22 @@ CanCastRodHere:
     sta TempX
     bcs @mustIncrementScreen
 
-    lda CurrentMapSegmentIndex
+
+    lda LocationIndex
+    asl
+    asl
+    clc
+    adc CurrentMapSegmentIndex
     tay ;store screen index to Y register
     jmp @continueCalc
 
 @mustIncrementScreen:
 
-    lda CurrentMapSegmentIndex
+    lda LocationIndex
+    asl
+    asl
+    clc
+    adc CurrentMapSegmentIndex
     clc
     adc #1
     tay; screen index goes to Y register
@@ -4265,19 +4273,7 @@ CanCastRodHere:
     lsr
     sta TempY
 
-
 @activateRod:
-
-    lda LocationIndex
-    beq @location0
-
-    lda map_list_low2, y
-    sta pointer
-    lda map_list_high2, y
-    sta pointer + 1
-    jmp @calcaddress
-
-@location0:
 
     lda map_list_low, y
     sta pointer

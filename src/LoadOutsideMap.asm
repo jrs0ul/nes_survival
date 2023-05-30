@@ -151,26 +151,16 @@ LoadOutsideMap:
 ;TempY - map segment index
 CalcMapAddress:
 
-    ldy LocationIndex
-    lda LocationMapListsLOWLow, y
-    sta pointer2
-    lda LocationMapListLOWHigh, y
-    sta pointer2 + 1
-
-    ldy TempY
-    lda (pointer2), y
+    lda LocationIndex
+    asl
+    asl
+    clc
+    adc TempY
+    tay
+    lda map_list_low, y
     sta pointer
-
-    ldy LocationIndex
-    lda LocationMapListsHIGHLow, y
-    sta pointer2
-    lda LocationMapListHIGHHigh, y
-    sta pointer2 + 1
-
-    ldy TempY
-    lda (pointer2), y
+    lda map_list_high, y
     sta pointer + 1
-
 
     rts
 
