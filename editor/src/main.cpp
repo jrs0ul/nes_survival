@@ -113,11 +113,8 @@ int charsIDs[]={1,4,7,8};
 
 CIniFile INI;
 
-char MapTilesIn[255];
-char MapCollisionIn[255];
-char MapTilesOut[255];
-char MapCollisionOut[255];
-
+char MapTiles[255];
+char MapCollision[255];
 
 //=======================================================================
 
@@ -632,7 +629,7 @@ void CheckKeys()
            
             if ( ( mygtai[BUTTON_SAVE].pointerOntop ( (int)Cross.x(),(int)Cross.z() ) ) )
             {
-                map.save (MapTilesOut, MapCollisionOut);
+                map.save (MapTiles, MapCollision);
             }
 
         }
@@ -657,24 +654,25 @@ int main ( int argc, char* argv[] )
     INI.get ( L"width",buf );
     wcstombs(abuf,buf,255);
     SCREENW = atoi ( abuf );
+
     if ( !SCREENW )
+    {
         SCREENW = 640;
+    }
+
     INI.get ( L"height",buf );
     wcstombs(abuf,buf,255);
     SCREENH = atoi ( abuf );
+
     if ( !SCREENH )
+    {
         SCREENH = 480;
-    INI.get ( L"mapTilesIN",buf );
-    wcstombs ( MapTilesIn,buf,255 );
-    INI.get ( L"mapCollisionIN",buf );
-    wcstombs ( MapCollisionIn,buf,255 );
+    }
 
-    INI.get ( L"mapTilesOUT",buf );
-    wcstombs ( MapTilesOut,buf,255 );
-    INI.get ( L"mapCollisionOUT",buf );
-    wcstombs ( MapCollisionOut,buf,255 );
-
-
+    INI.get ( L"mapTiles",buf );
+    wcstombs ( MapTiles, buf, 255 );
+    INI.get ( L"mapCollision",buf );
+    wcstombs ( MapCollision, buf, 255 );
 
 
     mygtai[0].init ( 10,20,32,32 );
@@ -778,10 +776,10 @@ int main ( int argc, char* argv[] )
 
 
 
-    if ( !map.load(MapTilesIn, MapCollisionIn) )
+    if ( !map.load(MapTiles, MapCollision) )
     {
         _QuitApp = true;
-        printf("Error loading maps %s %s !\n", MapTilesIn, MapCollisionIn);
+        printf("Error loading maps %s %s !\n", MapTiles, MapCollision);
     }
 
     printf("\nStarting loop\n");
