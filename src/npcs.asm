@@ -99,13 +99,13 @@ GenerateNpcs:
     stx TempZ
 
 @generateCoords:
-   jsr GenerateNPCCoords
+    jsr GenerateNPCCoords
 
 @testCollision:
     jsr TestGeneratedNpcCollision
     bne @generateCoords
 
-   jsr StoreGeneratedNpc
+    jsr StoreGeneratedNpc
 
 
     dec TempNpcCnt
@@ -127,38 +127,16 @@ GenerateNPCCoords:
 
     ;screen idx-------------
     lda LocationIndex
-    beq @location0
-
-    jsr UpdateRandomNumber
-    and #%00000001 ; just two screens
+    asl
+    tay
+    lda LocationPopulatedScreens, y
     sta TempIndex
-    lda #<collision_list_low2
-    sta pointer
-    lda #>collision_list_low2
-    sta pointer + 1
-    lda #<collision_list_high2
-    sta pointer2
-    lda #>collision_list_high2
-    sta pointer2 + 1
-
-
-    jmp @exit
-
-@location0:
     jsr UpdateRandomNumber
-    and #%00000010 ; 2
+    and TempIndex
+    iny
     clc
-    adc #1
+    adc LocationPopulatedScreens, y
     sta TempIndex
-    lda #<collision_list_low
-    sta pointer
-    lda #>collision_list_low
-    sta pointer + 1
-    lda #<collision_list_high
-    sta pointer2
-    lda #>collision_list_high
-    sta pointer2 + 1
-
 
 @exit:
 
@@ -208,10 +186,16 @@ TestGeneratedNpcCollision:
     lda TempIndex
     cmp ScreenCount
     bcs @collisionDetected
+
+    lda LocationIndex
+    asl
+    asl
+    clc
+    adc TempIndex
     tay
-    lda (pointer), y
+    lda collision_list_low, y
     sta pointer ; reuse the pointer :)
-    lda (pointer2), y
+    lda collision_list_high, y
     sta pointer + 1
 
 

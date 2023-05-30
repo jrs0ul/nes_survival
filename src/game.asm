@@ -91,6 +91,7 @@ banktable:              ; Write to this table to switch banks.
     .byte $07, $08, $09, $0A, $0B, $0C, $0D, $0E
 
 .include "data/map_list.asm"
+.include "data/collision_list.asm"
 
 .include "data/item_data.asm"
 .include "data/npc_data.asm"

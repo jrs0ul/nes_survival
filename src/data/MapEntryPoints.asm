@@ -100,3 +100,13 @@ LocationBanks:
     .byte 0
     .byte 0
     .byte 0
+
+;screens where npcs should appear
+LocationPopulatedScreens:
+    .byte 2, 1
+    .byte 1, 0
+    .byte 0, 0
+    .byte 0, 0
+    .byte 0, 0
+    .byte 0, 0
+
