@@ -3015,6 +3015,8 @@ DecreaseWarmth:
 
 ;---------------------------------------
 AnimateWalk:
+    lda AttackTimer
+    bne @exit
     inc WalkTimer
     lda WalkTimer
     cmp #8
@@ -3980,7 +3982,6 @@ ProcessButtons:
     sta DirectionY
     lda #1
     sta PlayerFrame
-
 
     lda PlayerY
     sec
