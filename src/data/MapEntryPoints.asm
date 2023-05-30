@@ -101,3 +101,44 @@ LocationBanks:
     .byte 0
     .byte 0
 
+LocationMapListsLOWLow:
+    .byte <map_list_low
+    .byte <map_list_low2
+    .byte <map_list_3_low
+    .byte 0 ;indoors locations
+    .byte 0
+    .byte 0
+
+LocationMapListLOWHigh:
+    .byte >map_list_low
+    .byte >map_list_low2
+    .byte >map_list_3_low
+    .byte 0 ;indoors locations
+    .byte 0
+    .byte 0
+
+LocationMapListsHIGHLow:
+    .byte <map_list_high
+    .byte <map_list_high2
+    .byte <map_list_3_high
+    .byte 0 ;indoors locations
+    .byte 0
+    .byte 0
+
+LocationMapListHIGHHigh:
+    .byte >map_list_high
+    .byte >map_list_high2
+    .byte >map_list_3_high
+    .byte 0 ;indoors locations
+    .byte 0
+    .byte 0
+
+LocationCollisionListLOWLow:
+    .byte <collision_list_low
+    .byte <collision_list_low2
+    .byte <collision_list3_low
+    .byte 0
+    .byte 0
+    .byte 0
+
+

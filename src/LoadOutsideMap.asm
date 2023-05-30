@@ -2,13 +2,13 @@ LoadOutsideMap:
 
     lda #0
     sta MustUpdateTextBaloon
-    lda LocationIndex
-    cmp #1
-    bne @startLoad
+    ldy LocationIndex
+    lda LocationBanks, y
+    cmp current_bank
+    beq @startLoad
 
-    ;supposed location 2
-    ldy #4
-    jsr bankswitch_y
+    tay ;transfer bank index to y
+    bankswitch
 
 @startLoad:
     lda #$00
@@ -31,37 +31,10 @@ LoadOutsideMap:
     sta MustPlayNewSong
 
 @continueLoad:
-
     ldy CurrentMapSegmentIndex
-    lda LocationIndex
-    beq @grabFirstLocationMap1
+    sty TempY
+    jsr CalcMapAddress
 
-    cmp #2
-    beq @thirdlocation
-
-    lda map_list_low2, y
-    sta pointer
-    lda map_list_high2, y
-    sta pointer + 1
-
-    jmp @loadMap1
-
-@thirdlocation:
-
-    lda map_list_3_low, y
-    sta pointer
-    lda map_list_3_high, y
-    sta pointer + 1
-    jmp @loadMap1
-
-
-@grabFirstLocationMap1:
-    lda map_list_low, y
-    sta pointer
-    lda map_list_high, y
-    sta pointer + 1
-
-@loadMap1:
     lda FirstNametableAddr
     sta NametableAddress
 
@@ -76,31 +49,15 @@ LoadOutsideMap:
     ldy CurrentMapSegmentIndex
     iny ; map index + 1
 
-
     cpy ScreenCount
     bcc @setMapPointer
 
     ldy CurrentMapSegmentIndex
     dey; map index - 1
 
-
 @setMapPointer:
-    lda LocationIndex
-    beq @grabFirstLocationMap2
-
-    lda map_list_low2, y
-    sta pointer
-    lda map_list_high2, y
-    sta pointer + 1
-
-    jmp @loadMap2
-
-
-@grabFirstLocationMap2:
-    lda map_list_low, y
-    sta pointer
-    lda map_list_high, y
-    sta pointer + 1
+    sty TempY
+    jsr CalcMapAddress
 
 @loadMap2:
     lda SecondNametableAddr
@@ -190,6 +147,33 @@ LoadOutsideMap:
     sta FadeIdx
 
     rts
+;-----------------------------------
+;TempY - map segment index
+CalcMapAddress:
+
+    ldy LocationIndex
+    lda LocationMapListsLOWLow, y
+    sta pointer2
+    lda LocationMapListLOWHigh, y
+    sta pointer2 + 1
+
+    ldy TempY
+    lda (pointer2), y
+    sta pointer
+
+    ldy LocationIndex
+    lda LocationMapListsHIGHLow, y
+    sta pointer2
+    lda LocationMapListHIGHHigh, y
+    sta pointer2 + 1
+
+    ldy TempY
+    lda (pointer2), y
+    sta pointer + 1
+
+
+    rts
+
 ;-----------------------------------
 ReloadLowerColumnRange_movingRight:
     ;0.. BgColumnIdxToUpload

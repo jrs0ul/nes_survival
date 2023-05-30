@@ -1402,7 +1402,7 @@ WaitSprite0:
     and #%01000000
     beq WaitSprite0      ; wait until sprite 0 is hit
 
-    ldx #188
+    ldx #219
 WaitScanline:
     dex
     bne WaitScanline
