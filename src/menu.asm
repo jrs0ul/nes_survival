@@ -1296,13 +1296,23 @@ FoodMenuInputVillager:
 
     jsr GetPaletteFadeValueForHour
     cmp #$40
-    beq @exit ; can't give items at night
+    bne @continue
 
+    lda VillagerIndex
+    beq @exit ;can't give item to a bear at night
+
+@continue:
     lda ItemIGave
     bne @exit ; already gave an item
 
     ldx TempRegX
-    ldy ActiveVillagerQuest
+
+    lda VillagerIndex
+    tay
+    asl
+    clc
+    adc ActiveVillagerQuests, y
+    tay
     lda Inventory, x
     cmp goal_items_list, y
     bne @exit
@@ -1540,13 +1550,21 @@ ToolMenuInputVillager:
     stx TempRegX
     jsr GetPaletteFadeValueForHour
     cmp #$40
-    beq @exit ; no giving at night
+    bne @continue
 
+    lda VillagerIndex
+    beq @exit  ; no giving at night to bear
+@continue:
     lda ItemIGave
     bne @exit ; already gave item
 
     ldx TempRegX
-    ldy ActiveVillagerQuest
+    lda VillagerIndex
+    tay
+    asl
+    clc
+    adc ActiveVillagerQuests, y
+    tay
     lda Inventory, x
     cmp goal_items_list, y
     bne @exit

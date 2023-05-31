@@ -393,10 +393,12 @@ npc_anim_row_sequence:
 
     ITEM_RAW_MEAT              = 2
     ITEM_COOKED_MEAT           = 3
+    ITEM_ROWAN_BERRIES         = 4
     ITEM_JAM                   = 5
     ITEM_SPEAR                 = 7
     ITEM_KNIFE                 = 8
     ITEM_POOP                  = 9
+    ITEM_HIDE                  = 10
     ITEM_COAT                  = 11
     ITEM_RAW_JUMBO_MEAT        = 12
     ITEM_COOKED_JUMBO_MEAT     = 13
@@ -454,6 +456,7 @@ npc_anim_row_sequence:
     FADE_DELAY_GAME_OVER       = 3
     FADE_DELAY_GENERIC         = 2
     FADE_DELAY_SLEEP           = 10
+    MAX_VILLAGERS              = 2
 
 
 ;===================================================================
@@ -741,9 +744,6 @@ FuelDelay:
     .res 1
 
 
-
-
-
 PlayerAlive:
     .res 1
 
@@ -752,6 +752,13 @@ InHouse:    ;is the player inside his hut?
 
 InVillagerHut:
     .res 1
+
+VillagerIndex:
+    .res 1
+
+ActiveVillagerQuests:
+    .res MAX_VILLAGERS
+
 
 CollisionMap:
     .res COLLISION_MAP_SIZE
@@ -780,10 +787,6 @@ MustUpdateTextBaloon:
 TextBaloonIndex:
     .res 1
 TextLength:
-    .res 1
-
-
-ActiveVillagerQuest:
     .res 1
 
 
@@ -1044,7 +1047,7 @@ SourceMapIdx:
     .res 1
 
 Buffer:
-    .res 526  ;must see how much is still available
+    .res 524  ;must see how much is still available
 
 ;====================================================================================
 
@@ -2192,12 +2195,13 @@ RoutinesAfterFadeOut:
     jsr ResetNameTableAdresses
 
     lda #0
+    sta VillagerIndex
     sta GlobalScroll
     sta TilesScroll
     sta ScrollDirection
 
     ;------------------------------------
-    ; load the outdoors of villager's hut
+    ; load the outdoors of bear's hut
 @next2:
     lda ActiveMapEntryIndex
     cmp #6
@@ -2246,21 +2250,7 @@ RoutinesAfterFadeOut:
     lda #1
     sta MustLoadOutside
     sta MustCopyMainChr
-
-    lda ItemIGave
-    beq @next3
-    lda #0
-    sta ItemIGave
-@incrementQuest:
-    lda ActiveVillagerQuest
-    clc
-    adc #1
-    cmp #MAX_QUEST
-    bcc @saveQuestIndex
-
-    lda #0
-@saveQuestIndex:
-    sta ActiveVillagerQuest
+    jsr OnExitVillagerHut
 
 ;--------------------------Second location
 @next3:
@@ -2440,6 +2430,7 @@ RoutinesAfterFadeOut:
     lda #1
     sta MustRestartIndoorsMusic
     sta InVillagerHut
+    sta VillagerIndex
 
     lda #0
     sta CurrentMapSegmentIndex
@@ -2478,6 +2469,7 @@ RoutinesAfterFadeOut:
     lda #1
     sta MustLoadOutside
     sta MustCopyMainChr
+    jsr OnExitVillagerHut
 
 @next11:
 
@@ -2577,6 +2569,25 @@ CommonLocationRoutine:
 @skipLoadingNpcs:
 
 
+    rts
+;-------------------------------
+OnExitVillagerHut:
+    lda ItemIGave
+    beq @exit
+    lda #0
+    sta ItemIGave
+@incrementQuest:
+    ldy VillagerIndex
+    lda ActiveVillagerQuests, y
+    clc
+    adc #1
+    cmp #MAX_QUEST
+    bcc @saveQuestIndex
+
+    lda #0
+@saveQuestIndex:
+    sta ActiveVillagerQuests, y
+@exit:
     rts
 
 ;-------------------------------
@@ -3615,7 +3626,8 @@ ResetEntityVariables:
     sta FoodUpdated
 
     lda #0
-    sta ActiveVillagerQuest
+    sta ActiveVillagerQuests
+    sta ActiveVillagerQuests + 1
     sta HP + 1
     sta HP + 2
     ;sta Warmth
@@ -4744,10 +4756,12 @@ SetupVillagerText:
     lda InVillagerHut
     beq @exit
 
+    lda VillagerIndex
+    bne @skipNightCheck
     jsr GetPaletteFadeValueForHour
     cmp #$40
     beq @exit
-
+@skipNightCheck:
     lda #1
     sta MustUpdateTextBaloon
     lda #0
@@ -4756,7 +4770,12 @@ SetupVillagerText:
     lda ItemIGave
     bne @thanks
 
-    ldx ActiveVillagerQuest
+    lda VillagerIndex
+    tay
+    asl
+    clc
+    adc ActiveVillagerQuests, y
+    tax
 
     lda quest_list_low, x
     sta TextPtr
@@ -4770,7 +4789,12 @@ SetupVillagerText:
 
 @thanks:
 
-    ldx ActiveVillagerQuest
+    lda VillagerIndex
+    tay
+    asl
+    clc
+    adc ActiveVillagerQuests, y
+    tax
 
     lda thanks_list_low, x
     sta TextPtr
@@ -5101,7 +5125,12 @@ UpdateTextDialogSprites:
     stx TempRegX
     jsr GetPaletteFadeValueForHour
     cmp #$40
+    bne @continue
+
+    lda VillagerIndex  ;don't show sprites if bear
     beq @restoreXAndExit
+
+@continue:
     ldx TempRegX
     jmp @updateSprites
 @restoreXAndExit:
@@ -5109,9 +5138,15 @@ UpdateTextDialogSprites:
     jmp @exit
 
 @updateSprites:
-    ldy ActiveVillagerQuest
+    lda VillagerIndex
+    tay
+    asl
+    clc
+    adc ActiveVillagerQuests, y
+    tay
     lda QuestSpritesCount, y
-    sta TempFrame
+    beq @exit ;no sprites
+    sta TempFrame ;store sprite count
 
     tya
     asl
