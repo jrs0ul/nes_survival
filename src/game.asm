@@ -27,12 +27,13 @@
 
 main_tiles_chr: .incbin "main.chr"
 
+.include "data/maps/LOC3_bg1.asm"
+.include "data/maps/LOC3_bg0.asm"
 .include "data/maps/field_bg.asm"
 .include "data/maps/field_bg1.asm"
 .include "data/maps/field_bg2.asm"
 .include "data/maps/field_bg4.asm"
 
-.include "data/maps/LOC3_bg0.asm"
 
 .include "data/collision_data.asm"
 
@@ -357,7 +358,7 @@ npc_anim_row_sequence:
 
     OUTDOORS_LOC1_SCREEN_COUNT = 4
     OUTDOORS_LOC2_SCREEN_COUNT = 2
-    OUTDOORS_LOC3_SCREEN_COUNT = 1
+    OUTDOORS_LOC3_SCREEN_COUNT = 2
     PLAYER_START_X             = $50
     PLAYER_START_Y             = $90
 
@@ -2305,6 +2306,7 @@ RoutinesAfterFadeOut:
     jsr ResetNameTableAdresses
 
     lda #0
+    sta LeftCollisionMapIdx
     sta GlobalScroll
     sta TilesScroll
     sta TimesShiftedLeft
@@ -2454,19 +2456,48 @@ RoutinesAfterFadeOut:
 
     lda #0
     sta InVillagerHut
-
-    lda #0
-    sta CurrentMapSegmentIndex
+    sta LeftCollisionMapIdx
 
     lda #1
     sta RightCollisonMapIdx
+
     lda #0      ;load the first column
+    sta TimesShiftedLeft
+    sta TimesShiftedRight
     sta RightCollisionColumnIndex
     jsr LoadRightCollisionColumn
     lda #255
     sta LeftCollisionColumnIndex
 
+
+    lda #0 ;hack
+    sta TilesScroll
     lda #1
+    sta CurrentMapSegmentIndex
+
+    ;TODO: rework this
+    jsr PushCollisionMapLeft
+    jsr PushCollisionMapLeft
+    jsr PushCollisionMapLeft
+    jsr PushCollisionMapLeft
+    jsr PushCollisionMapLeft
+    jsr PushCollisionMapLeft
+    jsr PushCollisionMapLeft
+
+    lda #0
+    sta CurrentMapSegmentIndex
+
+    lda #57
+    sta GlobalScroll
+
+    lda #23
+    sta BgColumnIdxToUpload
+    lda #2
+    sta ScrollDirection
+
+
+    lda #1
+    sta TilesScroll
     sta MustLoadOutside
     sta MustCopyMainChr
     jsr OnExitVillagerHut

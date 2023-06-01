@@ -1,3 +1,4 @@
+;4 screens per location max
 
 map_list_low:
     .byte <field_bg
@@ -11,7 +12,7 @@ map_list_low:
     .byte 0
 ;---
     .byte <LOC3_bg0
-    .byte 0
+    .byte <LOC3_bg1
     .byte 0
     .byte 0
 
@@ -29,6 +30,6 @@ map_list_high:
     .byte 0
 ;---
     .byte >LOC3_bg0
-    .byte 0
+    .byte >LOC3_bg1
     .byte 0
     .byte 0

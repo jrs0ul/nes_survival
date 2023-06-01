@@ -1,4 +1,5 @@
 ;where you enter a new location
+;----------------------------------
 ;location index,
 ;CurrentMapSegmentIndex value,
 ;MinX,
@@ -13,7 +14,7 @@ MapEntryPoints:
     ;Entry to player's house from outside
     .byte 0, 0, 64,  88,  0,   255,   102, 110, 0, 0, 0, 0, 0, 0, 0, 0
     ;Bear's house entrance
-    .byte 1, 0, $76, $79, $B6, $BE, $68, $6F, 0, 0, 0, 0, 0, 0, 0, 0
+    .byte 1, 0, 118, 122, 177, 190, $68, $6F, 0, 0, 0, 0, 0, 0, 0, 0
     ;Second location entry point
     .byte 0, OUTDOORS_LOC1_SCREEN_COUNT - 1, 0, 255, 0, 255, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0
     ;Third location entry point
@@ -27,13 +28,14 @@ MapEntryPoints:
     ;Player's house exit
     .byte 4, 0, 0, 255, 0, 255, 168, 255, 0, 0, 0, 0, 0, 0, 0, 0
     ;Second villager's house
-    .byte 2, 0, 171, 192, 0, 255, 136, 142, 0, 0, 0, 0, 0, 0, 0, 0
+    .byte 2, 0, 119, 121, 48, 66, 136, 142, 0, 0, 0, 0, 0, 0, 0, 0
     ;Second villager house's exit
     .byte 5, 0, 0, 255, 0, 255, 168, 255, 0, 0, 0, 0, 0, 0, 0, 0
 
 
 ;-----------------------------------------------------
 ;The data of the new location the player has entered 
+;---------------------------------------
 ;PlayerX,
 ;PlayerY,
 ;LocationIndex,
@@ -44,7 +46,7 @@ MapEntryPoints:
 ;CollisionMapLow
 ;CollisionMapHigh
 ;isInterrriorMap?
-;mapLow
+;mapLow (only interrior maps work)
 ;mapHigh
 ;generated npc count
 ;not generated Npcs Low
@@ -63,7 +65,7 @@ MapSpawnPoint:
     .byte 0, 0, 0, 3, 0, 0, 0
     ;Third location entry point
     .byte 100, 48, 2, OUTDOORS_LOC3_SCREEN_COUNT, <House_items, >House_items, 0, <LOC3_collision0, >LOC3_collision0
-    .byte 0, 0, 0, 0, 0, 0, 0
+    .byte 0, 0, 0, 2, 0, 0, 0
     ;Exit point of second location
     .byte 128, 32, 0, OUTDOORS_LOC1_SCREEN_COUNT, <Outside1_items, >Outside1_items, 0, <bg_collision4, >bg_collision4
     .byte 0, 0, 0, 7, 0, 0, 0
@@ -80,7 +82,7 @@ MapSpawnPoint:
     .byte 128, 136, 5, 1, <House_items, >House_items, 0, <villager2_hut_collision, >villager2_hut_collision
     .byte 1, <villager2_hut, >villager2_hut, 0, <villager2_npcs, >villager2_npcs, 0
     ;Second villager house's exit
-    .byte 176, 145, 2, OUTDOORS_LOC3_SCREEN_COUNT, <House_items, >House_items, 0, <LOC3_collision0, >LOC3_collision0
+    .byte 119, 151, 2, OUTDOORS_LOC3_SCREEN_COUNT, <House_items, >House_items, 0, <LOC3_collision0, >LOC3_collision0
     .byte 0, 0, 0, 0, 0, 0, 0
 
 
@@ -105,7 +107,7 @@ LocationBanks:
 LocationPopulatedScreens:
     .byte 2, 1
     .byte 1, 0
-    .byte 0, 0
+    .byte 1, 0
     .byte 0, 0
     .byte 0, 0
     .byte 0, 0

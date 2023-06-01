@@ -11,6 +11,7 @@ collision_list_low:
     .byte 0
 ;---
     .byte <LOC3_collision0
+    .byte <LOC3_collision1
 
 collision_list_high:
     .byte >bg_collision
@@ -24,3 +25,4 @@ collision_list_high:
     .byte 0
 ;---
     .byte >LOC3_collision0
+    .byte >LOC3_collision1
