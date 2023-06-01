@@ -3060,12 +3060,24 @@ AnimateWalk:
     lda AttackTimer
     bne @exit
     inc WalkTimer
+
+    lda PlayerSpeed
+    cmp #2
+    beq @fastAnimation
     lda WalkTimer
     cmp #8
-    bne @exit
+    bcc @exit
+    lda #0
+    sta WalkTimer
+    jmp @cont
+@fastAnimation:
+    lda WalkTimer
+    cmp #4
+    bcc @exit
     lda #0
     sta WalkTimer
 
+@cont:
     lda PlayerAnimationRowIndex
     clc
     adc #1
@@ -4091,7 +4103,6 @@ CheckA:
 @end:
     sta PlayerSpeed
     rts
-
 
 ;----------------------------------
 CheckB:
