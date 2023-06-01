@@ -1451,6 +1451,7 @@ ToolInput:
     beq @inputAtHome
 
     jsr ToolMenuInputVillager
+    jmp @exit
 
 @inputAtHome:
     jsr ToolMenuInputAtHome
@@ -1461,6 +1462,7 @@ ToolInput:
     and #BUTTON_A_MASK
     beq @exit
 
+@hidemenu:
     jsr HideToolMenu
 @exit:
     rts

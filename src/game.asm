@@ -1643,7 +1643,7 @@ UpdateAttributeColumn:
     asl
     clc
     adc SourceMapIdx
-    ldy SourceMapIdx
+    tay
 
     lda map_list_low, y
     clc
