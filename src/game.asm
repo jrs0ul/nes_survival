@@ -1,8 +1,7 @@
 .segment "HEADER"
-
-  .byte 'N', 'E', 'S', $1A   ; these bytes always start off an ines file
-  .byte 8                    ; 8 Banks x16KB
-  .byte $00                  ; CHR RAM
+    .byte 'N', 'E', 'S', $1A   ; these bytes always start off an ines file
+    .byte 8                    ; 8 Banks x16KB
+    .byte $00                  ; CHR RAM
 
 ;============================================================================================
 ; iNES flag 6
@@ -16,8 +15,8 @@
 ; ||||+---- 1: Ignore mirroring control or above mirroring bit; instead provide four-screen VRAM
 ; ++++----- Lower nybble of mapper number
 ;============================================================================================
-  .byte %00100001                   ; NROM mapper 0, other mappers have more complicated values here
-  .byte $0, $0, $0, $07, $0, $0
+    .byte %00100001                   ; NROM mapper 0, other mappers have more complicated values here
+    .byte $0, $0, $0, $07, $0, $0
 
 .segment "VECTORS"
     .word nmi, reset, 0
@@ -277,7 +276,6 @@ npc_anim_row_sequence:
     .byte 64
     .byte 32
     .byte 96
-
 
 
 ;--------------
