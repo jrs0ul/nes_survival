@@ -1997,6 +1997,8 @@ MenuInputUpDownCheck:
     lda MenuLowerLimit
     sta InventoryPointerY
     lda MenuMaxItem
+    sec
+    sbc #1
     ldy #0
     sta (pointer), y
 @exit:
@@ -2349,7 +2351,7 @@ UpdateInventorySprites:
     sta FIRST_SPRITE, x
     inc TempSpriteIdx
     ldx TempSpriteIdx
-    lda #%00000011
+    lda #%00000001
     sta FIRST_SPRITE, x
     inc TempSpriteIdx
     ldx TempSpriteIdx
