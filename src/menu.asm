@@ -95,10 +95,10 @@ DrawMenuTitle:
     clc
     sta Temp
 
-    lda #$40
+    lda #MENU_TITLE_ADDRESS
     sta TempX
 
-    lda #9
+    lda #8
     sta TempPointX
     lda #1
     sta TempPointY
@@ -106,7 +106,7 @@ DrawMenuTitle:
     lda EquipmentActivated
     beq @crafting
     
-    lda #11
+    lda #10
     sta TempPointX
     lda #<equipment_title
     sta pointer
@@ -134,7 +134,7 @@ DrawMenuTitle:
     sta pointer + 1
     jmp @draw
 @Inventory_title:
-    lda #11
+    lda #10
     sta TempPointX
     lda #<inventory_title
     sta pointer
@@ -157,9 +157,10 @@ DrawInventoryGrid:
 
     lda FirstNametableAddr
     clc
+    adc #1
     sta Temp
 
-    lda #$A4
+    lda #MENU_ITEM_GRID_ADDRESS
     sta TempX
 
     lda #10
@@ -185,9 +186,10 @@ DrawEquipmentGrid:
 
     lda FirstNametableAddr
     clc
+    adc #1
     sta Temp
 
-    lda #$A4
+    lda #MENU_ITEM_GRID_ADDRESS
     sta TempX
 
     lda #10
@@ -217,7 +219,7 @@ DrawFoodMenu:
     adc #1
     sta Temp
 
-    lda #$48
+    lda #MENU_SUBMENU_ADDRESS_LOW
     sta TempX
 
     lda #9
@@ -289,7 +291,7 @@ DrawStashFoodMenu:
     adc #1
     sta Temp
 
-    lda #$48
+    lda #MENU_SUBMENU_ADDRESS_LOW
     sta TempX
 
     lda #9
@@ -318,7 +320,7 @@ DrawStashItemMenu:
     adc #1
     sta Temp
 
-    lda #$48
+    lda #MENU_SUBMENU_ADDRESS_LOW
     sta TempX
 
     lda #9
@@ -348,7 +350,7 @@ DrawToolMenu:
     adc #1
     sta Temp
 
-    lda #$48
+    lda #MENU_SUBMENU_ADDRESS_LOW
     sta TempX
 
     lda #9
@@ -390,7 +392,7 @@ DrawStashToolMenu:
     adc #1
     sta Temp
 
-    lda #$48
+    lda #MENU_SUBMENU_ADDRESS_LOW
     sta TempX
 
     lda #9
@@ -420,7 +422,7 @@ DrawItemMenu:
     adc #1
     sta Temp
 
-    lda #$48
+    lda #MENU_SUBMENU_ADDRESS_LOW
     sta TempX
 
     lda #9
@@ -449,7 +451,7 @@ DrawMaterialMenu:
     adc #1
     sta Temp
 
-    lda #$48
+    lda #MENU_SUBMENU_ADDRESS_LOW
     sta TempX
 
     lda #9
@@ -478,7 +480,7 @@ DrawStashMaterialMenu:
     adc #1
     sta Temp
 
-    lda #$48
+    lda #MENU_SUBMENU_ADDRESS_LOW
     sta TempX
 
     lda #9
@@ -508,7 +510,7 @@ ClearSubMenu:
     adc #1
     sta Temp
 
-    lda #$48
+    lda #MENU_SUBMENU_ADDRESS_LOW
     sta TempX
 
     lda #9
@@ -1104,11 +1106,11 @@ MaterialItemClicked:
 
 ;--------------------------------------
 ActivateSubmenu:
-    lda #72
+    lda #MENU_SUBMENU_POINTER_X
     sta InventoryPointerX
     lda InventoryPointerY
     sta OldInventoryPointerY
-    lda #96
+    lda #MENU_SUBMENU_POINTER_MIN_Y
     sta InventoryPointerY
 
     rts
@@ -1863,7 +1865,7 @@ DoRegularInput:
 
     lda #16
     sta MenuStep
-    lda #112
+    lda #BASE_MENU_MIN_Y + 64
     sta MenuLowerLimit
     lda #BASE_MENU_MIN_Y
     sta MenuUpperLimit
@@ -2265,7 +2267,7 @@ UpdateInventorySprites:
     sta TempSpriteIdx
     sta TempSpriteCount
 
-    lda #32
+    lda #MENU_ITEM_SPRITE_MIN_Y
     sta TempTileYPos
 
     lda InventoryActivated
@@ -2357,7 +2359,7 @@ UpdateInventorySprites:
 
 
     inx
-    lda #63
+    lda #MAX_SPRITE_COUNT - 1
 
     cmp TempSpriteCount
     bcc @done
@@ -2376,8 +2378,6 @@ UpdateInventorySprites:
     dey
     bne @hideSpritesLoop
 @done:
-
-
 
     rts
 

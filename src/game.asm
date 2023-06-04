@@ -376,12 +376,18 @@ npc_anim_row_sequence:
     COOKING_FUEL_COST          = 5
 
 
-    INVENTORY_SPRITE_X         = 40
-    INVENTORY_SPRITE_MIN_Y     = 44
-    INVENTORY_SPRITE_MAX_Y     = 164
-    INVENTORY_POINTER_X        = 22
+    INVENTORY_SPRITE_X         = 32
+    INVENTORY_SPRITE_MIN_Y     = 68
+    INVENTORY_SPRITE_MAX_Y     = 188
+    INVENTORY_POINTER_X        = 14
     INVENTORY_STEP_PIXELS      = 12
-    BASE_MENU_MIN_Y            = 48 ;pointer position in base action menu
+    BASE_MENU_MIN_Y            = 63  ;pointer position in base action menu
+    MENU_ITEM_GRID_ADDRESS     = $03 ; y: 9 * 8
+    MENU_TITLE_ADDRESS         = $81
+    MENU_ITEM_SPRITE_MIN_Y     = 56
+    MENU_SUBMENU_ADDRESS_LOW   = $47
+    MENU_SUBMENU_POINTER_X     = 64
+    MENU_SUBMENU_POINTER_MIN_Y = 96
 
     ITEM_TYPE_FOOD             = 1
     ITEM_TYPE_FUEL             = 2
