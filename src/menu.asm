@@ -720,7 +720,7 @@ CraftingInput:
     sta pointer
     lda #>InventoryItemIndex
     sta pointer + 1
-    lda #INVENTORY_MAX_ITEMS - 1
+    lda #INVENTORY_MAX_ITEMS
     sta MenuMaxItem
     jsr MenuInputUpDownCheck
 
@@ -938,7 +938,7 @@ InventoryInput:
     sta pointer
     lda #>InventoryItemIndex
     sta pointer + 1
-    lda #INVENTORY_MAX_ITEMS  - 1
+    lda #INVENTORY_MAX_ITEMS
     sta MenuMaxItem
     jsr MenuInputUpDownCheck
 
@@ -1873,7 +1873,7 @@ DoRegularInput:
     sta pointer
     lda #>BaseMenuIndex
     sta pointer + 1
-    lda #4
+    lda #5
     sta MenuMaxItem
     jsr MenuInputUpDownCheck
 
