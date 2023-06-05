@@ -64,7 +64,7 @@ MapSpawnPoint:
     .byte 80, 208, 1, OUTDOORS_LOC2_SCREEN_COUNT, <Outside2_items, >Outside2_items, 4, <bg2_collision, >bg2_collision
     .byte 0, 0, 0, 3, 0, 0, 0
     ;Third location entry point
-    .byte 100, 48, 2, OUTDOORS_LOC3_SCREEN_COUNT, <House_items, >House_items, 0, <LOC3_collision0, >LOC3_collision0
+    .byte 100, 48, 2, OUTDOORS_LOC3_SCREEN_COUNT, <Outside3_items, >Outside3_items, 0, <LOC3_collision0, >LOC3_collision0
     .byte 0, 0, 0, 2, 0, 0, 0
     ;Exit point of second location
     .byte 128, 32, 0, OUTDOORS_LOC1_SCREEN_COUNT, <Outside1_items, >Outside1_items, 0, <bg_collision4, >bg_collision4
@@ -82,7 +82,7 @@ MapSpawnPoint:
     .byte 128, 136, 5, 1, <House_items, >House_items, 0, <villager2_hut_collision, >villager2_hut_collision
     .byte 1, <villager2_hut, >villager2_hut, 0, <villager2_npcs, >villager2_npcs, 0
     ;Second villager house's exit
-    .byte 119, 151, 2, OUTDOORS_LOC3_SCREEN_COUNT, <House_items, >House_items, 0, <LOC3_collision0, >LOC3_collision0
+    .byte 119, 151, 2, OUTDOORS_LOC3_SCREEN_COUNT, <Outside3_items, >Outside3_items, 0, <LOC3_collision0, >LOC3_collision0
     .byte 0, 0, 0, 0, 0, 0, 0
 
 
@@ -111,4 +111,21 @@ LocationPopulatedScreens:
     .byte 0, 0
     .byte 0, 0
     .byte 0, 0
+
+;indexes in Item_Location1_Collection_times
+LocationItemIndexes:
+    .byte 0
+    .byte ITEM_COUNT_LOC1
+    .byte ITEM_COUNT_LOC1 + ITEM_COUNT_LOC2
+    .byte ITEM_COUNT_LOC1 + ITEM_COUNT_LOC2 + ITEM_COUNT_LOC3
+    .byte ITEM_COUNT_LOC1 + ITEM_COUNT_LOC2 + ITEM_COUNT_LOC3
+    .byte ITEM_COUNT_LOC1 + ITEM_COUNT_LOC2 + ITEM_COUNT_LOC3
+
+LocationItemCounts:
+    .byte ITEM_COUNT_LOC1
+    .byte ITEM_COUNT_LOC2
+    .byte ITEM_COUNT_LOC3
+    .byte 0
+    .byte 0
+    .byte 0
 

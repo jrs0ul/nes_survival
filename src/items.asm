@@ -11,13 +11,16 @@ LoadItems:
     ldx #0
 @itemLoop:
 
-    lda LocationIndex
-    beq @location0
+    stx TempItemLoadX
+    sty TempItemLoadY
+    ldy LocationIndex
+    lda LocationItemIndexes, y
+    ldy TempItemLoadY
+    clc
+    adc TempItemLoadX
     
-    lda Item_Location2_Collection_times, x
-    jmp @checkDay
-@location0:
     lda Item_Location1_Collection_times, x
+    ldx TempItemLoadX
 @checkDay:
     cmp #ITEM_NEVER_BEEN_PICKED
     beq @loadIt
@@ -226,25 +229,31 @@ CheckYPoints:
 ;-------------------------------------
 ResetTimesWhenItemsWerePicked:
 
-    ldx #ITEM_COUNT_LOC1 - 1
-@location1_loop:
+    ldy #0
+@loop:
+    lda LocationItemCounts, y
+    beq @nextLocation
+    tax
+    dex
+    stx TempItemLoadX
+
+@location_loop:
+
+    lda LocationItemIndexes, y
+    clc
+    adc TempItemLoadX
+    tax
 
     lda #ITEM_NEVER_BEEN_PICKED
     sta Item_Location1_Collection_times, x
 
-    dex
-    bpl @location1_loop
+    dec TempItemLoadX
+    bpl @location_loop
 
-
-    ldx #ITEM_COUNT_LOC2 - 1
-@location2_loop:
-
-    lda #ITEM_NEVER_BEEN_PICKED
-    sta Item_Location2_Collection_times, x
-
-    dex
-    bpl @location2_loop
-
+@nextLocation:
+    iny
+    cpy #MAX_LOCATIONS
+    bcc @loop
 
     rts
 
@@ -288,23 +297,17 @@ AddAndDeactivateItems:
     jsr bankswitch_y
 
 
-    ldy TempY ; item index
-
     ;let's store the time when the item was picked up
-    lda LocationIndex
-    beq @location0
-    cpy #ITEM_COUNT_LOC2
-    bcs @continue_adding
-    lda Hours
-    sta Item_Location2_Collection_times, y
-    jmp @continue_adding
-@location0:
-    cpy #ITEM_COUNT_LOC1
-    bcs @continue_adding
+    ldy LocationIndex
+
+    lda LocationItemIndexes, y
+    clc
+    adc TempY ; add item index
+    tay
+
     lda Hours
     sta Item_Location1_Collection_times, y
-
-@continue_adding:
+    ldy TempY
 
     tya
     asl

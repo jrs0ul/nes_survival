@@ -415,6 +415,7 @@ npc_anim_row_sequence:
 
     ITEM_COUNT_LOC1            = 7
     ITEM_COUNT_LOC2            = 5
+    ITEM_COUNT_LOC3            = 3
 
     ITEM_NEVER_BEEN_PICKED     = 255
 
@@ -462,6 +463,8 @@ npc_anim_row_sequence:
     FADE_DELAY_GENERIC         = 2
     FADE_DELAY_SLEEP           = 10
     MAX_VILLAGERS              = 2
+
+    MAX_LOCATIONS              = 6
 
 
 ;===================================================================
@@ -1016,6 +1019,11 @@ TempItemScreen:
     .res 1
 ;--
 
+TempItemLoadY:
+    .res 1
+TempItemLoadX:
+    .res 1
+
 MustRedir: ; the current npc must change direction
     .res 1
 
@@ -1032,6 +1040,8 @@ Item_Location1_Collection_times:
     .res ITEM_COUNT_LOC1
 Item_Location2_Collection_times:
     .res ITEM_COUNT_LOC2
+Item_Location3_Collection_times:
+    .res ITEM_COUNT_LOC3
 
 Npcs:   ;animals and stuff
     .res 64 ; max 8 npcs * 8 bytes:
@@ -1052,7 +1062,7 @@ SourceMapIdx:
     .res 1
 
 Buffer:
-    .res 524  ;must see how much is still available
+    .res 519  ;must see how much is still available
 
 ;====================================================================================
 

@@ -1,6 +1,6 @@
 menu_palette:
-    .byte $0C,$20,$2C,$10, $0C,$0F,$17,$27, $0C,$30,$38,$16, $0C,$10,$0f,$01    ;background
-    .byte $0C,$07,$17,$27, $0C,$06,$16,$37, $0C,$0f,$16,$39, $0C,$0f,$37,$16    ;OAM sprites
+    .byte $1C,$20,$2C,$10, $1C,$0F,$17,$27, $1C,$30,$38,$16, $1C,$10,$0f,$01    ;background
+    .byte $1C,$07,$17,$27, $1C,$06,$16,$37, $1C,$0f,$16,$39, $1C,$0f,$37,$16    ;OAM sprites
 
 
 storage_title:
@@ -11,7 +11,7 @@ crafting_title:
     .byte $00,$3C,$4B,$3A,$3F,$4D,$00,$00
 equipment_title:
     .byte $00,$3e,$4a,$4e,$42,$49,$46,$3e,$47,$4d
-    
+
 
 
 MaterialMenu: 

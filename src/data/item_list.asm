@@ -11,7 +11,6 @@ Outside1_items:
     .byte %00000011, 250, 100, 1
     .byte %00001101, 135, 200, 0
 
-
 Outside2_items:
     .byte ITEM_COUNT_LOC2
     .byte %00000011, 50, 130, 0
@@ -20,3 +19,8 @@ Outside2_items:
     .byte %00000011, 200, 64, 1
     .byte %00100001, 200, 144, 1
 
+Outside3_items:
+    .byte ITEM_COUNT_LOC3
+    .byte %00001101, 50, 150, 0
+    .byte %00100001, 180, 78, 1
+    .byte %00000011, 80, 120, 1
