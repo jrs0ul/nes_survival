@@ -18,7 +18,7 @@ LoadItems:
     ldy TempItemLoadY
     clc
     adc TempItemLoadX
-    
+    tax
     lda Item_Location1_Collection_times, x
     ldx TempItemLoadX
 @checkDay:
@@ -299,6 +299,11 @@ AddAndDeactivateItems:
 
     ;let's store the time when the item was picked up
     ldy LocationIndex
+    lda LocationItemCounts, y
+    beq @continueAdding; item is generated, not loaded
+    cmp TempY
+    beq @continueAdding
+    bcc @continueAdding; also a generated item
 
     lda LocationItemIndexes, y
     clc
@@ -307,8 +312,9 @@ AddAndDeactivateItems:
 
     lda Hours
     sta Item_Location1_Collection_times, y
-    ldy TempY
 
+@continueAdding:
+    ldy TempY
     tya
     asl
     asl
