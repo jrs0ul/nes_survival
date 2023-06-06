@@ -312,6 +312,7 @@ npc_anim_row_sequence:
     HOURS_MAX                  = 240
     MINUTES_MAX                = 60
     SLEEP_TIME                 = 60
+    COOKING_TIME               = 5
 
     PLAYER_ATTACK_DELAY        = 16
 
@@ -346,6 +347,7 @@ npc_anim_row_sequence:
 
     WARMTH_NIGHT_DECREASE      = 5
     WARMTH_DAY_DECREASE        = 1
+    WARMTH_COOKING_INCREASE    = 9
 
     PALETTE_STATE_FADE_OUT     = 1
     PALETTE_STATE_FADE_IN      = 2
@@ -1023,6 +1025,9 @@ TempItemLoadY:
     .res 1
 TempItemLoadX:
     .res 1
+;----------
+ParamTimeValue:
+    .res 1
 
 MustRedir: ; the current npc must change direction
     .res 1
@@ -1062,7 +1067,7 @@ SourceMapIdx:
     .res 1
 
 Buffer:
-    .res 519  ;must see how much is still available
+    .res 518  ;must see how much is still available
 
 ;====================================================================================
 
@@ -2636,24 +2641,17 @@ OnExitVillagerHut:
     rts
 
 ;-------------------------------
-DoSleep:
-    lda #SLEEP_POS_X
-    sta PlayerY
-    lda #SLEEP_POS_Y
-    sta PlayerX
-    lda #2
-    sta PlayerFrame
-    lda #1
-    sta PlayerAnimationRowIndex
-    
+;skips a time interval 
+;specified by ParamTimeValue
+SkipTime:
     lda Hours
     clc
-    adc #SLEEP_TIME
+    adc ParamTimeValue
     sta Hours
     bcs @increaseDays
     cmp #HOURS_MAX
     bcs @increaseDays
-    jmp @adaptPalette
+    jmp @exit
 
 @increaseDays:
     lda Hours
@@ -2675,8 +2673,26 @@ DoSleep:
     sta pointer + 1
     jsr RotFood
 
+@exit:
+    rts
 
-@adaptPalette:
+
+;-------------------------------
+DoSleep:
+    lda #SLEEP_POS_X
+    sta PlayerY
+    lda #SLEEP_POS_Y
+    sta PlayerX
+    lda #2
+    sta PlayerFrame
+    lda #1
+    sta PlayerAnimationRowIndex
+
+    lda #SLEEP_TIME
+    sta ParamTimeValue
+    jsr SkipTime
+
+@decreaseHp:
 
     lda Food
     clc

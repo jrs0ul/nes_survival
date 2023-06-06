@@ -2107,20 +2107,7 @@ CookMeat:
     bcc @cantcook
 
 @cook:
-    lda #COOKING_FUEL_COST
-    sta DigitChangeSize
-    lda #MAX_FUEL_DELAY
-    sta FuelDelay
-    lda #<Fuel
-    sta DigitPtr
-    lda #>Fuel
-    sta DigitPtr + 1
-
-    stx TempPush
-    jsr DecreaseDigits
-    ldx TempPush
-
-   
+    jsr DoCooking
     lda TempItemIndex
     cmp #ITEM_RAW_MEAT
     bne @checkNextItem
@@ -2146,6 +2133,41 @@ CookMeat:
     lda Temp
     sta Storage, x
 @cantcook:
+
+    rts
+;--------------------------------------
+DoCooking:
+    lda #MAX_FUEL_DELAY
+    sta FuelDelay
+
+    stx TempPush ;preserve x register
+
+    lda #COOKING_FUEL_COST
+    sta DigitChangeSize
+
+    lda #<Fuel
+    sta DigitPtr
+    lda #>Fuel
+    sta DigitPtr + 1
+
+    jsr DecreaseDigits
+
+
+    lda #WARMTH_COOKING_INCREASE
+    sta DigitChangeSize
+    lda #<Warmth
+    sta DigitPtr
+    lda #>Warmth
+    sta DigitPtr + 1
+    jsr IncreaseDigits
+
+    lda #COOKING_TIME
+    sta ParamTimeValue
+    jsr SkipTime
+
+
+    ldx TempPush
+
 
     rts
 ;--------------------------------------
