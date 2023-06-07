@@ -336,14 +336,15 @@ AddAndDeactivateItems:
     rts
 
 ;===================================================
-
-UpdateItemSpritesInWorld:
+;update sprites from ItemCount-1 to 0
+UpdateItemSpritesInWorldZtoA:
 
     ldy ItemCount
     beq @exit ; no items
     dey ;let's start from ItemCount - 1
 @itemLoop:
 
+    sty TempItemIndex
     jsr UpdateSpritesForSingleItem
 
 @nextItem:
@@ -353,12 +354,28 @@ UpdateItemSpritesInWorld:
 
 @exit:
     rts
+;----------------------------------------
+;Update sprites from 0 to ItemCount-1
+UpdateItemSpritesInWorldAtoZ:
+
+    ldy #0
+    cpy ItemCount
+    beq @exit
+@itemLoop:
+    sty TempItemIndex
+    jsr UpdateSpritesForSingleItem
+@nextItem:
+    ldy TempItemIndex
+    iny
+    cpy ItemCount
+    bcc @itemLoop
+@exit:
+    rts
 
 ;----------------------------------------
 UpdateSpritesForSingleItem:
 ;X register stores sprite data byte index (sprites are made of 4 bytes)
 
-    sty TempItemIndex
     tya
     asl
     asl ; y * 4

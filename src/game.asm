@@ -278,6 +278,19 @@ npc_anim_row_sequence:
     .byte 96
 
 
+player_sprites_not_flip:
+    .byte 0, 0,  %00000011, 0 ;1st sprite
+    .byte 0, 1,  %00000011, 8 ;2nd
+    .byte 8, 16, %00000011, 0 ;3rd
+    .byte 8, 17, %00000011, 8 ;4th
+
+player_sprites_flip:
+    .byte 0, 1,  %01000011, 0 ;1st
+    .byte 0, 0,  %01000011, 8 ;2nd
+    .byte 8, 17, %01000011, 0 ;3rd
+    .byte 8, 16, %01000011, 8 ;4th
+
+
 ;--------------
 ; CONSTANTS
     FIRST_SPRITE                = $0204
@@ -569,8 +582,11 @@ IsLocationRoutine:
 ActiveMapEntryIndex:
     .res 1
 
+FlickerFrame: ;variable for alternating sprite update routines to achieve flickerine
+    .res 1
+
 ZPBuffer:
-    .res 130  ; I want to be aware of the free memory
+    .res 129  ; I want to be aware of the free memory
 
 ;--------------
 .segment "BSS" ; variables in ram
@@ -1027,6 +1043,9 @@ TempItemLoadY:
     .res 1
 TempItemLoadX:
     .res 1
+
+TempPlayerSpriteIdx:
+    .res 1
 ;----------
 ParamTimeValue:
     .res 1
@@ -1069,7 +1088,7 @@ SourceMapIdx:
     .res 1
 
 Buffer:
-    .res 518  ;must see how much is still available
+    .res 517  ;must see how much is still available
 
 ;====================================================================================
 
@@ -1121,6 +1140,7 @@ clrmem:
 
     lda #0
     sta NMINotFinished
+    sta FlickerFrame
 
 
     ldy #6
@@ -1135,7 +1155,7 @@ clrmem:
     jsr famistudio_init
     lda #2
     jsr famistudio_music_play
-   
+
 vblankwait2:      ; Second wait for vblank, PPU is ready after this
     bit $2002
     bpl vblankwait2
@@ -1329,8 +1349,8 @@ nmi:
     sta NMINotFinished
 transferOAM:
     ;copy sprite data
-    ;lda SpritesUpdated
-    ;beq startNMI
+    lda SpritesUpdated
+    beq startNMI
     lda #$00
     sta $2003        ; set the low byte (00) of the RAM address
     lda #$02
@@ -1437,7 +1457,7 @@ WaitSprite0:
     and #%01000000
     beq WaitSprite0      ; wait until sprite 0 is hit
 
-    ldx #192
+    ldx #219
 WaitScanline:
     dex
     bne WaitScanline
@@ -4950,162 +4970,176 @@ UpdateSprites:
 
     lda #0
     sta SpritesUpdated
+;--- MAIN CHARACTER:
 
     lda PlayerFrame
     asl  ; frame * 2
     sta TempFrame
 
-    ;sprite 1
-    ldx #$00
-    lda PlayerY
-    sta FIRST_SPRITE, x
-    inx
-    lda PlayerFlip
-    beq @NoFlip1
-
-    lda TempFrame
-    clc
-    adc #1
-    sta FIRST_SPRITE,x
-    inx
-    lda FIRST_SPRITE, x
-    lda #%01000011
-    sta FIRST_SPRITE, x
-    jmp @MoveX1
-@NoFlip1:
-
-    lda TempFrame
-    sta FIRST_SPRITE,x
-    inx
-    lda FIRST_SPRITE, x
-    lda #%00000011
-    sta FIRST_SPRITE, x
-@MoveX1:
-    inx
-    lda PlayerX
-    sta FIRST_SPRITE, x
-    inx
-;---
-    ;sprite 2
-    lda PlayerY
-    sta FIRST_SPRITE, x
-    inx
-    lda PlayerFlip
-    beq @NoFlip2
-    lda TempFrame
-    sta FIRST_SPRITE, x
-    inx
-    lda FIRST_SPRITE, x
-    lda #%01000011
-    sta FIRST_SPRITE, x
-    jmp @MoveX2
-@NoFlip2:
-    lda TempFrame
-    clc
-    adc #1
-    sta FIRST_SPRITE, x
-    inx
-    lda FIRST_SPRITE, x
-    lda #%00000011
-    sta FIRST_SPRITE, x
-@MoveX2:
-    inx
-    lda PlayerX
-    clc
-    adc #$08
-    sta FIRST_SPRITE, x
-    inx
-;----
-
     ldy PlayerAnimationRowIndex
     lda player_anim_row_sequence, y
     sta TempAnimIndex
 
-    ;sprite 3
+    ldx #0
+    ldy #0
+
+@maincharloop:
+
+    sty TempPlayerSpriteIdx
+    tya
+    asl
+    asl
+    ldy PlayerFlip
+    beq @notFlipped
+    clc
+    adc #16 ;16 bytes
+@notFlipped:
+    tay
     lda PlayerY
     clc
-    adc #$08
+    adc player_sprites_not_flip, y
     sta FIRST_SPRITE, x
     inx
-    lda PlayerFlip
-    beq @NoFlip3
+    iny
     lda TempFrame
     clc
-    adc #17
-    adc TempAnimIndex
-    sta FIRST_SPRITE, x
-    inx
-    lda FIRST_SPRITE, x
-    lda #%01000011
-    sta FIRST_SPRITE, x
-    jmp @MoveX3
-@NoFlip3:
-    lda TempFrame
+    adc player_sprites_not_flip, y
+    cpx #8
+    bcc @notAnimate
     clc
-    adc #16
     adc TempAnimIndex
+@notAnimate:
     sta FIRST_SPRITE, x
     inx
-    lda FIRST_SPRITE, x
-    lda #%00000011
+    iny
+    lda player_sprites_not_flip, y
     sta FIRST_SPRITE, x
-@MoveX3:
     inx
+    iny
     lda PlayerX
+    clc
+    adc player_sprites_not_flip, y
     sta FIRST_SPRITE, x
     inx
 
-    ;sprite 4
-    lda PlayerY
-    clc
-    adc #$08
-    sta FIRST_SPRITE,x
-    inx
-    lda PlayerFlip
-    beq @NoFlip4
-    lda TempFrame
-    clc
-    adc #16
-    adc TempAnimIndex
-    sta FIRST_SPRITE, x
-    inx
-    lda FIRST_SPRITE, x
-    lda #%01000011
-    sta FIRST_SPRITE, x
-    jmp @MoveX4
-@NoFlip4:
-    lda TempFrame
-    clc
-    adc #17
-    adc TempAnimIndex
-    sta FIRST_SPRITE, x
-    inx
-    lda FIRST_SPRITE, x
-    lda #%00000011
-    sta FIRST_SPRITE, x
-@MoveX4:
-    inx
-    lda PlayerX
-    clc
-    adc #$08
-    sta FIRST_SPRITE, x
+    ldy TempPlayerSpriteIdx
+    iny
+    cpy #4
+    bcc @maincharloop
 
+    dex
     lda #4
     sta TempSpriteCount
 
-;-----knife
+;-------------KNIFE
     lda AttackTimer
     beq @noKnife
-    jsr SetKnifeSprite
+
+    lda EquipedItem
+    beq @noKnife
+    cmp #ITEM_KNIFE
+    bne @noKnife
+
+    jsr PrepareKnifeSprite
+
+@updateKnife: ;update the actual sprite
+    inx
+    lda TempPointY
+    sta FIRST_SPRITE,x
+    inx
+    lda #240
+    clc
+    adc PlayerFrame
+    sta FIRST_SPRITE,x
+    inx
+    lda Temp
+    sta FIRST_SPRITE,x
+    inx
+    lda TempPointX
+    sta FIRST_SPRITE,x
+    inc TempSpriteCount
+
+;------ SPEAR
 @noKnife:
 
-    jsr UpdateSpearSprite
+    lda SpearActive
+    beq @fishingRod
 
-    jsr UpdateFishingRodSprites
-;---
+    lda SpearScreen
+    jsr CalcItemMapScreenIndexes
+
+    lda ItemMapScreenIndex
+    beq @skipPrevScreen
+    lda CurrentMapSegmentIndex
+    cmp PrevItemMapScreenIndex
+    bcc @fishingRod
+@skipPrevScreen:
+    lda CurrentMapSegmentIndex
+    cmp NextItemMapScreenIndex
+    bcs @fishingRod
+
+    lda CurrentMapSegmentIndex
+    cmp ItemMapScreenIndex
+    beq @SpearMatchesScreen
+
+    lda SpearX ; x
+    sec
+    sbc GlobalScroll
+    bcs @fishingRod
+    sta TempPointX ; save x
+    jmp @doUpdate
+@SpearMatchesScreen:
+    lda SpearX ; x
+    cmp GlobalScroll
+    bcc @fishingRod
+    sec
+    sbc GlobalScroll
+    sta TempPointX
+
+
+@doUpdate:
+
+    jsr SetTwoSpearSprites
+
+    lda TempSpriteCount
+    clc
+    adc #2
+    sta TempSpriteCount
+
+;---------------FISHING ROD
+@fishingRod:
+
+    lda FishingRodActive
+    beq @sunmoon
+
+    lda PlayerFrame
+    beq @horizontal
+
+    cmp #1
+    beq @down
+    ldy #16
+    jmp @update
+@down:
+    ldy #24
+    jmp @update
+
+@horizontal:
+    lda PlayerFlip
+    bne @flipIndex
+
+    ldy #0
+    jmp @update
+
+@flipIndex:
+
+    ldy #8
+@update:
+
+   jsr UpdateTwoRodSprites
+;------------------------------
+;------SUN-MOON INDICATOR
+@sunmoon:
     inx; next sprite byte
-;------sun-moon indicator
-
     lda Hours
     lsr
     lsr
@@ -5154,47 +5188,32 @@ UpdateSprites:
     inx
 ;--------------------
 @no_second_celestial_body:
-    jsr UpdateNpcSpritesInWorld
-    jsr UpdateItemSpritesInWorld
 
-    jsr UpdateTextDialogSprites
+    lda FlickerFrame
+    beq @doZtoA
+    lda #0
+    sta FlickerFrame
 
-@hidesprites:
-    lda #MAX_SPRITE_COUNT
-
-    cmp TempSpriteCount
-    bcc @done
-    sec
-    sbc TempSpriteCount
-
-    tay
-@hideSpritesLoop:
-    lda #$FE
-    sta FIRST_SPRITE, x
-    inx
-    inx
-    inx
-    inx
-
-    dey
-    bne @hideSpritesLoop
-@done:
-
+    jsr UpdateNpcSpritesInWorldAtoZ
+    jsr UpdateItemSpritesInWorldAtoZ
+    jmp @updateTextdialog
+@doZtoA:
     lda #1
-    sta SpritesUpdated
+    sta FlickerFrame
 
-    rts
-;----------------------------------
-UpdateTextDialogSprites:
+    jsr UpdateNpcSpritesInWorldZtoA
+    jsr UpdateItemSpritesInWorldZtoA
+@updateTextdialog:
+;-----------TEXT DIALOG SPRITES
 
     lda InVillagerHut
-    beq @exit
+    beq @hidesprites
 
     lda ItemIGave
-    bne @exit ;works for the quest dialogs so far
+    bne @hidesprites ;works for the quest dialogs so far
 
     lda MustUpdateTextBaloon
-    bne @exit
+    bne @hidesprites
 
     stx TempRegX
     jsr GetPaletteFadeValueForHour
@@ -5209,7 +5228,7 @@ UpdateTextDialogSprites:
     jmp @updateSprites
 @restoreXAndExit:
     ldx TempRegX
-    jmp @exit
+    jmp @hidesprites
 
 @updateSprites:
     lda VillagerIndex
@@ -5219,7 +5238,7 @@ UpdateTextDialogSprites:
     adc ActiveVillagerQuests, y
     tay
     lda QuestSpritesCount, y
-    beq @exit ;no sprites
+    beq @hidesprites ;no sprites
     sta TempFrame ;store sprite count
 
     tya
@@ -5254,62 +5273,34 @@ UpdateTextDialogSprites:
     dec TempFrame
     bne @spriteLoop
 
+;------------------- hide unused sprites
+@hidesprites:
+    lda #MAX_SPRITE_COUNT
 
-@exit:
-    rts
-
-;----------------------------------
-UpdateSpearSprite:
-
-    lda SpearActive
-    beq @exit
-
-    lda SpearScreen
-    jsr CalcItemMapScreenIndexes
-
-    lda ItemMapScreenIndex
-    beq @skipPrevScreen
-    lda CurrentMapSegmentIndex
-    cmp PrevItemMapScreenIndex
-    bcc @exit
-@skipPrevScreen:
-    lda CurrentMapSegmentIndex
-    cmp NextItemMapScreenIndex
-    bcs @exit
-
-    lda CurrentMapSegmentIndex
-    cmp ItemMapScreenIndex
-    beq @SpearMatchesScreen
-
-    lda SpearX ; x
+    cmp TempSpriteCount
+    bcc @done
     sec
-    sbc GlobalScroll
-    bcs @exit
-    sta TempPointX ; save x
-    jmp @doUpdate
-@SpearMatchesScreen:
-    lda SpearX ; x
-    cmp GlobalScroll
-    bcc @exit
-    sec
-    sbc GlobalScroll
-    sta TempPointX
+    sbc TempSpriteCount
 
+    tay
+@hideSpritesLoop:
+    lda #$FE
+    sta FIRST_SPRITE, x
+    inx
+    inx
+    inx
+    inx
 
-@doUpdate:
-   
-    jsr SetTwoSpearSprites
+    dey
+    bne @hideSpritesLoop
+@done:
 
-    lda TempSpriteCount
-    clc
-    adc #2
-    sta TempSpriteCount
+    lda #1
+    sta SpritesUpdated
 
-
-@exit:
     rts
+;==============================================================
 
-;---------------------------------
 SetTwoSpearSprites:
 
     lda SpearDir
@@ -5362,39 +5353,6 @@ SetTwoSpearSprites:
     adc spearSprites, y
     sta FIRST_SPRITE, x
 
-
-    rts
-;---------------------------------
-UpdateFishingRodSprites:
-
-    lda FishingRodActive
-    beq @exit
-
-    lda PlayerFrame
-    beq @horizontal
-
-    cmp #1
-    beq @down
-    ldy #16
-    jmp @update
-@down:
-    ldy #24
-    jmp @update
-
-@horizontal:
-    lda PlayerFlip
-    bne @flipIndex
-
-    ldy #0
-    jmp @update
-
-@flipIndex:
-
-    ldy #8
-@update:
-
-   jsr UpdateTwoRodSprites
-@exit:
 
     rts
 ;---------------------------------
@@ -5457,36 +5415,6 @@ UpdateTwoRodSprites:
 
     rts
 ;----------------------------------
-SetKnifeSprite:
-
-    lda EquipedItem
-    beq @exit
-    cmp #ITEM_KNIFE
-    bne @exit
-
-    jsr PrepareKnifeSprite
-
-@updateKnife: ;update the actual sprite
-;----------------------
-    inx
-    lda TempPointY
-    sta FIRST_SPRITE,x
-    inx
-    lda #240
-    clc
-    adc PlayerFrame
-    sta FIRST_SPRITE,x
-    inx
-    lda Temp
-    sta FIRST_SPRITE,x
-    inx
-    lda TempPointX
-    sta FIRST_SPRITE,x
-    inc TempSpriteCount
-
-@exit:
-    rts
-;---------------------------------
 PrepareKnifeSprite:
 
     lda PlayerFlip

@@ -862,7 +862,7 @@ BuildSpearAttackSquare:
     rts
 
 ;-------------------------------------
-UpdateNpcSpritesInWorld:
+UpdateNpcSpritesInWorldZtoA:
 
     ldy NpcCount
     beq @exit
@@ -875,6 +875,24 @@ UpdateNpcSpritesInWorld:
     ldy TempItemIndex; restore the index
     dey
     bpl @npcLoop
+@exit:
+    rts
+;-----------------------------------
+UpdateNpcSpritesInWorldAtoZ:
+
+    ldy #0
+    cmp NpcCount
+    beq @exit
+@npcLoop:
+    sty TempItemIndex
+    jsr UpdateSingleNpcSprites
+
+@nextNpc:
+    ldy TempItemIndex
+    iny
+    cpy NpcCount
+    bcc @npcLoop
+
 @exit:
     rts
 
