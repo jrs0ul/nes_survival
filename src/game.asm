@@ -313,6 +313,7 @@ npc_anim_row_sequence:
     MINUTES_MAX                = 60
     SLEEP_TIME                 = 60
     COOKING_TIME               = 5
+    CRAFTING_TIME              = 6
 
     PLAYER_ATTACK_DELAY        = 16
 
@@ -348,6 +349,7 @@ npc_anim_row_sequence:
     WARMTH_NIGHT_DECREASE      = 5
     WARMTH_DAY_DECREASE        = 1
     WARMTH_COOKING_INCREASE    = 9
+    WARMTH_CRAFTING_INCREASE   = 9
 
     PALETTE_STATE_FADE_OUT     = 1
     PALETTE_STATE_FADE_IN      = 2

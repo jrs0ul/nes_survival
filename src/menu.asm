@@ -829,6 +829,27 @@ CraftFromSelectedComponents:
     iny
     sta Inventory, y ; reset item hp as well
 
+    lda Fuel
+    clc
+    adc Fuel + 1
+    clc
+    adc Fuel + 2
+    cmp #1
+    bcc @skipWarmthIncrease
+
+    lda #WARMTH_CRAFTING_INCREASE
+    sta DigitChangeSize
+    lda #<Warmth
+    sta DigitPtr
+    lda #>Warmth
+    sta DigitPtr + 1
+    jsr IncreaseDigits
+
+@skipWarmthIncrease:
+    lda #CRAFTING_TIME
+    sta ParamTimeValue
+    jsr SkipTime
+
 
 @exit:
     rts
