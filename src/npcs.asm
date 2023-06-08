@@ -574,6 +574,7 @@ DropItemAfterDeath:
 @storeItem:
     sta Items, y
     iny
+    iny ; at item x
     lda DropedItemX
     clc
     adc #8
@@ -584,16 +585,18 @@ DropItemAfterDeath:
     sta TempItemScreen
 @continueSpawningItem:
     sta Items, y
+    dey ;screen index
+    lda KilledNpcScreenIdx
+    clc
+    adc TempItemScreen
+    sta Items, y
+    iny
     iny
     lda TempPointY
     clc
     adc #8
     sta Items, y
-    iny
-    lda KilledNpcScreenIdx
-    clc
-    adc TempItemScreen
-    sta Items, y
+
 @exit:
     rts
 ;-------------------------------------

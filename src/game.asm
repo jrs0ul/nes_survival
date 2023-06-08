@@ -1056,9 +1056,9 @@ MustRedir: ; the current npc must change direction
 Items:   ;items that lies in the map
     .res 80 ; max 20 items * 4 bytes
             ;(item index(7 bits) + active(1 bit),
+            ; screen_index
             ; x,
-            ; y,
-            ; screen_index)
+            ; y)
 ItemCount:
     .res 1
 
@@ -1097,6 +1097,17 @@ Buffer:
     lda banktable, y      ; read a byte from the banktable
     sta banktable, y      ; and write it back, switching banks
 .endmacro
+
+.macro calculateItemMapScreenIndexes
+    sta ItemMapScreenIndex
+    clc
+    adc #1
+    sta NextItemMapScreenIndex
+    sec
+    sbc #2
+    sta PrevItemMapScreenIndex
+.endmacro
+
 
 
 .segment "CODE"
@@ -4458,29 +4469,36 @@ PullOutRod:
     lda PlayerX
     adc GlobalScroll
     bcs @incrementScreen
-    sta Items, y
-    iny
-    lda PlayerY
-    clc
-    adc #FISHING_CATCH_OFFSET_Y
-    sta Items, y
-    iny
+
+    sta TempPointX
+
     lda CurrentMapSegmentIndex
     sta Items, y
-    jmp @exit
-@incrementScreen:
+    iny
+    lda TempPointX
     sta Items, y
     iny
     lda PlayerY
     clc
     adc #FISHING_CATCH_OFFSET_Y
     sta Items, y
-    iny
+
+    jmp @exit
+@incrementScreen:
+    sta TempPointX
+
     lda CurrentMapSegmentIndex
     clc
     adc #1
     sta Items, y
 
+    lda TempPointX
+    sta Items, y
+    iny
+    lda PlayerY
+    clc
+    adc #FISHING_CATCH_OFFSET_Y
+    sta Items, y
 
 @exit:
     rts
@@ -5418,7 +5436,7 @@ UpdateTwoRodSprites:
 PrepareKnifeSprite:
 
     lda PlayerFlip
-    beq @notFlipped
+    beq @notFlippedKnife
 
     lda #%01000000
     sta Temp
@@ -5442,7 +5460,7 @@ PrepareKnifeSprite:
     sta TempPointX
 
     jmp @exit
-@notFlipped:
+@notFlippedKnife:
 
     lda #%00000000
     sta Temp

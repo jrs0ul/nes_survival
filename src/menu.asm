@@ -1621,11 +1621,11 @@ SpawnRewardItem:
     asl
     ora #%00000001
     sta Items
-    lda #120
-    sta Items + 1
-    lda #108
-    sta Items + 2
     lda #0
+    sta Items + 1
+    lda #120
+    sta Items + 2
+    lda #108
     sta Items + 3
 
     lda #1

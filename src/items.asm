@@ -101,12 +101,9 @@ ItemCollisionCheck:
     lsr
     bcc @nextItem ; inactive
     inx
-    inx
-    inx
     lda Items, x ;screen index
     jsr CalcItemMapScreenIndexes
-    dex
-    dex
+    inx
 
     lda ItemMapScreenIndex
     beq @skipPrev; the item is in the 0 screen
@@ -386,14 +383,8 @@ UpdateSpritesForSingleItem:
     sta TempZ ; store item DB index
 
     iny
-    iny
-    iny
     lda Items, y; Item map screen index
-    jsr CalcItemMapScreenIndexes
-    dey
-    dey
-    dey
-
+    calculateItemMapScreenIndexes ; macro
 
     lda ItemMapScreenIndex
     beq @skipPrev; the item is in the 0 screen
@@ -428,82 +419,66 @@ UpdateSpritesForSingleItem:
     sta Temp
 @continueWithSprite:
 
-    jsr FinishFirstItemPart
-    ;------------------------------------
-    jsr SecondItemSpritePart
+    jsr UpdateItemSprites
 @exit:
     rts
 ;-----------------------
 
-FinishFirstItemPart:
+UpdateItemSprites:
     iny
     lda Items, y ; y coord
-    sta FIRST_SPRITE, x
-    inx; next byte
+    sta TempPointY
 
-    iny
     lda TempZ ; item index
     asl
     asl; a * 4
-    sty TempY; store item index
     tay
-
     lda item_data, y ;tile index
     sta TempZ
-    sta FIRST_SPRITE, x
     iny
     lda item_data, y
     sta TempPointX; store palette index
-    ldy TempY ;restore item index
 
+
+    lda #0
+    sta TempY ; sprite index (0 or 1)
+
+@spriteloop:
+    lda TempPointY
+    sta FIRST_SPRITE, x ;y
     inx
+    lda TempZ ;frame
+    clc
+    adc TempY
+    sta FIRST_SPRITE, x
+    inx
+    lda TempPointX 
     sta FIRST_SPRITE, x; ;write attributes
     inx
-    
-    dey
-    dey
-    ;--
-
-    lda Temp
+    lda Temp ;x
     sta FIRST_SPRITE, x
     ;x
     inx
     inc TempSpriteCount
-
-    rts
-
-;----------------------
-SecondItemSpritePart:
+;--------------
     lda Temp
     clc
     adc #8
     bcs @exit ; x > 255
     sta Temp
 
-    iny
-    lda Items, y
-    sta FIRST_SPRITE, x
-
-
-    ;y
-    inx
-    ;idx
-    lda TempZ
+    lda TempY
     clc
     adc #1
-    sta FIRST_SPRITE, x
-    inx
-    ;att
-    lda TempPointX
-    sta FIRST_SPRITE, x
-    inx
-    ;x
-    lda Temp
-    sta FIRST_SPRITE, x
-    inx
-    inc TempSpriteCount
-@exit:
+    sta TempY
+    cmp #2
+    bcc @spriteloop
+
+
+  @exit:
+
     rts
+
 ;---------------------------------
 ;pointer - storage or inventory
 RotFood:
