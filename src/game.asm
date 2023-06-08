@@ -3172,7 +3172,6 @@ AnimateFire:
 ;----------------------------------
 HandleInput:
 
-
     jsr CheckStartButton
 
     lda GameState
@@ -3365,7 +3364,7 @@ CalcMapColumnToUpdate:
     lsr
     lsr             ;GlobalScroll / 8
     cmp #16
-    bcc WriteToB
+    bcc @WriteToB
 ;Write to A
     sec
     sbc #16
@@ -3374,12 +3373,12 @@ CalcMapColumnToUpdate:
 ;---
     lda ScrollDirection
     cmp #1
-    beq LeftDir
+    beq @LeftDir
     lda #2
-    jmp SaveDir
-LeftDir:
+    jmp @SaveDir
+@LeftDir:
     lda #0
-SaveDir:
+@SaveDir:
     sta Temp
 ;---
     lda CurrentMapSegmentIndex
@@ -3387,20 +3386,20 @@ SaveDir:
     adc Temp
     sta SourceMapIdx
     ldx FirstNametableAddr
-    jmp storeIdx
-WriteToB:
+    jmp @storeIdx
+@WriteToB:
     clc
     adc #16
     sta BgColumnIdxToUpload
 ;---
     lda ScrollDirection
     cmp #1
-    beq LeftDir1
+    beq @LeftDir1
     lda #1
-    jmp SaveDir1
-LeftDir1:
+    jmp @SaveDir1
+@LeftDir1:
     lda #255 ; -1 ?
-SaveDir1:
+@SaveDir1:
     sta Temp
 
 ;---
@@ -3410,7 +3409,7 @@ SaveDir1:
     sta SourceMapIdx
     ldx SecondNametableAddr
 
-storeIdx:
+@storeIdx:
     stx DestScreenAddr
 
     lda BgColumnIdxToUpload
@@ -5221,6 +5220,7 @@ UpdateSprites:
 
     jsr UpdateNpcSpritesInWorldZtoA
     jsr UpdateItemSpritesInWorldZtoA
+
 @updateTextdialog:
 ;-----------TEXT DIALOG SPRITES
 

@@ -948,7 +948,15 @@ UpdateSingleNpcSprites:
     sbc GlobalScroll
     sta TempPointX
 @calcY:
-    jsr CalcNpcY
+    iny
+    lda Npcs, y; y
+    sta TempPointY ; save y
+
+    lda Temp ; row count
+    tay
+    lda #0
+    sta TempPush ; additionl Y
+    sta TempIndex ;additional sprite index
 @rowloop:
     jsr UpdateNpcRow
     dey
@@ -959,7 +967,6 @@ UpdateSingleNpcSprites:
 ;-----------------------------------
 CollectSingleNpcData:
 
-    
     cmp #NPC_STATE_DAMAGED
     bne @cont
 
@@ -987,19 +994,29 @@ CollectSingleNpcData:
 
     sta Temp; store tile rows
 
-   
     iny
     iny
     iny
     lda Npcs, y ; screen index where npc resides
-    jsr CalcItemMapScreenIndexes
+    calculateItemMapScreenIndexes ; macro
     iny
     lda Npcs, y ; direction
     sta TempDir
     iny
     lda Npcs, y ; frame
-    jsr NpcCalcAnimationFrame
-    sta TempFrame
+
+    ;let's calculate animation frame
+    lsr
+    lsr
+    lsr
+    lsr
+    lsr
+    stx TempRegX
+    tax
+    lda npc_anim_row_sequence, x
+    ldx TempRegX
+
+    sta TempFrame ; store frame
     iny
     lda Npcs, y ;timer
     sta TempNpcTimer
@@ -1022,38 +1039,8 @@ CollectSingleNpcData:
     lda #ANIM_FRAME_BLOODSTAIN
     sta TempZ
 @exit:
-
-
-
     rts
 
-;------------------------------------
-NpcCalcAnimationFrame:
-    lsr
-    lsr
-    lsr
-    lsr
-    lsr 
-    stx TempRegX
-    tax
-    lda npc_anim_row_sequence, x
-
-    ldx TempRegX
-
-    rts
-
-;------------------------------------
-CalcNpcY:
-    iny
-    lda Npcs, y; y
-    sta TempPointY ; save y
-
-    lda Temp ; row count
-    tay
-    lda #0
-    sta TempPush ; additionl Y
-    sta TempIndex ;additional sprite index
-    rts
 ;-------------------------------------
 UpdateNpcRow:
      ;Y
