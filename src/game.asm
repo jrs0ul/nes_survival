@@ -1241,7 +1241,6 @@ vblankwait2:      ; Second wait for vblank, PPU is ready after this
 
 endlessLoop:
 
-
     lda MustLoadSomething
     bne nextIteration ; don't do logics until *something* is not loaded to the PPU
 
@@ -1253,14 +1252,7 @@ endlessLoop:
 
     jsr HandleInput
 skipInput:
-    lda GameState
-    cmp #STATE_GAME
-    beq update_game_sprites
-    cmp #STATE_MENU
-    beq update_menu_sprites
-    jmp hide_sprites
-
-
+    jmp doSomeLogics
 
 checkItems:
     lda GameState
@@ -1283,12 +1275,27 @@ npcCollision:
     bne doSomeLogics
 
     jsr PlayerHitsNpcs
-    jmp doSomeLogics
 
-update_game_sprites:
+doSomeLogics:
+
+    jsr Logics
+
+nextIteration:
+
+    lda NMIActive
+    beq ne
+
+    jsr DoPaletteFades
+
+    lda GameState
+    cmp #STATE_GAME
+    bne checkMenuState
     jsr UpdateSprites
-    jmp doSomeLogics
-update_menu_sprites:
+    jmp runrandom
+checkMenuState:
+    cmp #STATE_MENU
+    bne hide_sprites ; some other state
+
     lda MustExitMenuState
     beq updateInventory
 exitMenu:
@@ -1298,20 +1305,12 @@ exitMenu:
     jmp nextIteration
 updateInventory:
     jsr UpdateInventorySprites
-    jmp doSomeLogics
+    jmp runrandom
+
 hide_sprites:
     jsr HideSprites
 
-doSomeLogics:
-
-    jsr Logics
-
-
-nextIteration:
-    
-    lda NMIActive
-    beq ne
-
+runrandom:
     jsr UpdateRandomNumber
 
     ;famistudio update
@@ -1360,8 +1359,8 @@ nmi:
     sta NMINotFinished
 transferOAM:
     ;copy sprite data
-    lda SpritesUpdated
-    beq startNMI
+    ;lda SpritesUpdated
+    ;beq startNMI
     lda #$00
     sta $2003        ; set the low byte (00) of the RAM address
     lda #$02
@@ -1751,12 +1750,9 @@ Logics:
     lda NMIActive
     beq @exit
 
-    jsr DoPaletteFades
-    
     lda GameState
     cmp #STATE_GAME
     bne @exit
-
 
     lda PlayerAlive
     bne @cont
