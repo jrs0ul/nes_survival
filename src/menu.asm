@@ -1959,7 +1959,7 @@ DoRegularInput:
     sta PlayerInteractedWithBed
     lda #4
     sta BaseMenuIndex
-    lda #112
+    lda #BASE_MENU_MIN_Y + 64
     sta InventoryPointerY
 
 

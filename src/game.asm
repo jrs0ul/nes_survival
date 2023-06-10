@@ -1287,6 +1287,28 @@ nextIteration:
 
     jsr DoPaletteFades
 
+    ;famistudio update
+    ldy current_bank
+    sty oldbank
+
+    ldy #6
+    bankswitch ; macro
+
+    lda MustPlayNewSong
+    beq doSoundUpdate
+
+    lda SongName
+    jsr famistudio_music_play
+    lda #0
+    sta MustPlayNewSong
+
+doSoundUpdate:
+    jsr famistudio_update
+
+    ldy oldbank
+
+    bankswitch
+
     lda GameState
     cmp #STATE_GAME
     bne checkMenuState
@@ -1313,27 +1335,7 @@ hide_sprites:
 runrandom:
     jsr UpdateRandomNumber
 
-    ;famistudio update
-    ldy current_bank
-    sty oldbank
 
-    ldy #6
-    bankswitch ; macro
-
-    lda MustPlayNewSong
-    beq doSoundUpdate
-
-    lda SongName
-    jsr famistudio_music_play
-    lda #0
-    sta MustPlayNewSong
-
-doSoundUpdate:
-    jsr famistudio_update
-
-    ldy oldbank
-
-    bankswitch
 
 
     lda #0
