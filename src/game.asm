@@ -483,6 +483,16 @@ player_sprites_flip:
 
     MAX_LOCATIONS              = 6
 
+    SUBMENU_FOOD               = 1
+    SUBMENU_STASH_FOOD         = 2
+    SUBMENU_ITEM               = 3
+    SUBMENU_STASH_ITEM         = 4
+    SUBMENU_MATERIAL           = 5
+    SUBMENU_STASH_MATERIAL     = 6
+    SUBMENU_TOOL               = 7
+    SUBMENU_STASH_TOOL         = 8
+
+
 
 ;===================================================================
 .segment "ZEROPAGE"
@@ -888,21 +898,9 @@ MenuMaxItem:
 
 InventoryActivated:
     .res 1
-FoodMenuActivated:  ; press b on raw meat in menu
+SubMenuIndex:
     .res 1
-StashFoodMenuActivated:
-    .res 1
-ItemMenuActivated:
-    .res 1
-StashItemMenuActivated:
-    .res 1
-MaterialMenuActivated:
-    .res 1
-StashMaterialMenuActivated:
-    .res 1
-StashToolMenuActivated:
-    .res 1
-ToolMenuActivated:
+SubMenuActivated:
     .res 1
 
 StashActivated:
@@ -1088,7 +1086,7 @@ SourceMapIdx:
     .res 1
 
 Buffer:
-    .res 517  ;must see how much is still available
+    .res 523  ;must see how much is still available
 
 ;====================================================================================
 
