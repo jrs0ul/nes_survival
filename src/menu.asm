@@ -2345,6 +2345,32 @@ UpdateInventorySprites:
 
 @ThePointer:
 
+    lda SubMenuActivated
+    beq @singlePointer
+    
+    ldx TempSpriteIdx
+    lda OldInventoryPointerY
+    sec
+    sbc #1                  ;subtract 1 because the gfx in the tile skips first pixel row
+    sta FIRST_SPRITE, x
+    inc TempSpriteIdx
+    lda #$FC
+    ldx TempSpriteIdx
+    sta FIRST_SPRITE, x
+    inc TempSpriteIdx
+    ldx TempSpriteIdx
+    lda #%00000000
+    sta FIRST_SPRITE, x
+    inc TempSpriteIdx
+    ldx TempSpriteIdx
+    lda #INVENTORY_POINTER_X
+    sta FIRST_SPRITE, x
+    inc TempSpriteCount
+    inc TempSpriteIdx
+    inx
+
+
+@singlePointer:
     ldx TempSpriteIdx
     lda InventoryPointerY
     sec
