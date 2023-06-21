@@ -58,6 +58,18 @@ LoadMenu:
 .segment "ROM1"
 ;------------------------------------
 
+inventorypositions:
+    .byte MENU_ITEM_SPRITE_MIN_Y + INVENTORY_STEP_PIXELS * 1
+    .byte MENU_ITEM_SPRITE_MIN_Y + INVENTORY_STEP_PIXELS * 2
+    .byte MENU_ITEM_SPRITE_MIN_Y + INVENTORY_STEP_PIXELS * 3
+    .byte MENU_ITEM_SPRITE_MIN_Y + INVENTORY_STEP_PIXELS * 4
+    .byte MENU_ITEM_SPRITE_MIN_Y + INVENTORY_STEP_PIXELS * 5
+    .byte MENU_ITEM_SPRITE_MIN_Y + INVENTORY_STEP_PIXELS * 6
+    .byte MENU_ITEM_SPRITE_MIN_Y + INVENTORY_STEP_PIXELS * 7
+    .byte MENU_ITEM_SPRITE_MIN_Y + INVENTORY_STEP_PIXELS * 8
+    .byte MENU_ITEM_SPRITE_MIN_Y + INVENTORY_STEP_PIXELS * 9
+    .byte MENU_ITEM_SPRITE_MIN_Y + INVENTORY_STEP_PIXELS * 10
+
 
 UpdateMenuGfx:
 
@@ -2389,9 +2401,43 @@ UpdateInventorySprites:
     lda InventoryPointerX
     sta FIRST_SPRITE, x
     inc TempSpriteCount
+    inc TempSpriteIdx
 
 
     inx
+
+    lda CraftingActivated
+    beq @hideSprites
+    lda CurrentCraftingComponent
+    beq @hideSprites
+
+    ldx #0
+    lda CraftingIndexes, x
+    lsr
+    tax
+    lda inventorypositions, x
+    sec
+    sbc #1                  ;subtract 1 because the gfx in the tile skips first pixel row
+    ldx TempSpriteIdx
+    sta FIRST_SPRITE, x
+    inc TempSpriteIdx
+    lda #$FC
+    ldx TempSpriteIdx
+    sta FIRST_SPRITE, x
+    inc TempSpriteIdx
+    ldx TempSpriteIdx
+    lda #%01000001
+    sta FIRST_SPRITE, x
+    inc TempSpriteIdx
+    ldx TempSpriteIdx
+    lda #MENU_CRAFT_POINTER_POS
+    sta FIRST_SPRITE, x
+    inc TempSpriteCount
+    inc TempSpriteIdx
+    inx
+
+
+@hideSprites:
     lda #MAX_SPRITE_COUNT - 1
 
     cmp TempSpriteCount

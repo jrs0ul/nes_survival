@@ -405,6 +405,7 @@ player_sprites_flip:
     MENU_SUBMENU_ADDRESS_LOW   = $47
     MENU_SUBMENU_POINTER_X     = 64
     MENU_SUBMENU_POINTER_MIN_Y = 96
+    MENU_CRAFT_POINTER_POS     = 58
 
     ITEM_TYPE_FOOD             = 1
     ITEM_TYPE_FUEL             = 2
