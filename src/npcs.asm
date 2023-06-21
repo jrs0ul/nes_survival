@@ -258,6 +258,167 @@ TestGeneratedNpcCollision:
 
 @exit:
     rts
+;---------------------------------
+IsPlayerCollidingWithNpcs:
+
+    ldy NpcCount
+    beq @exit
+
+    dey
+@npcLoop:
+    sty TempItemIndex
+
+
+    jsr SingleNpcVSPlayerCollision
+    bne @collides
+
+
+    ldy TempItemIndex
+    dey
+    bpl @npcLoop
+    jmp @exit
+
+@collides:
+    lda #1
+    jmp @end
+
+@exit:
+    lda #0
+@end:
+    rts
+
+;-------------------------------------
+SingleNpcVSPlayerCollision:
+
+    tya
+    asl
+    asl
+    asl ; y * 8
+    tay
+
+    lda Npcs, y; let's get the state
+    and #%00000011
+    sta TempNpcState
+    cmp #0
+    beq @exit ; it's dead
+
+    lda Npcs, y ; let's get DB index
+    lsr
+    lsr ;eliminate 2 state bits
+
+    sty Temp
+    asl
+    asl
+    asl
+    tay
+    iny
+    lda npc_data, y ; tile rows
+    sta TempNpcRows ; save row count
+    iny
+    iny
+    lda npc_data, y ; npc type
+    sta TempNpcType
+    ldy Temp
+
+    iny
+    iny
+    iny
+    lda Npcs, y ; screen index where npc resides
+    jsr CalcItemMapScreenIndexes
+    dey
+    dey
+
+    lda ItemMapScreenIndex
+    beq @skipPrevScreen
+    lda CurrentMapSegmentIndex
+    cmp PrevItemMapScreenIndex
+    bcc @exit
+@skipPrevScreen:
+    lda CurrentMapSegmentIndex
+    cmp NextItemMapScreenIndex
+    bcs @exit
+
+    lda Npcs, y
+    sta DropedItemX ; store this for item droping
+
+    lda CurrentMapSegmentIndex
+    cmp ItemMapScreenIndex
+    beq @NpcMatchesScreen
+    
+    ;X1
+    lda Npcs, y ; x
+    sec 
+    sbc GlobalScroll
+    bcs @exit
+    sta TempPointX
+    jmp @calcY
+@NpcMatchesScreen:
+    lda Npcs, y ; x
+    cmp GlobalScroll
+    bcc @exit
+    sec
+    sbc GlobalScroll
+    sta TempPointX
+
+@calcY: ; Y1
+    iny
+    lda Npcs, y ; y
+    sta TempPointY
+;-------
+    jsr PlayerNpcCollision
+    bne @collides
+    jmp @exit
+
+@collides:
+    lda #1
+    jmp @end
+
+@exit:
+    lda #0
+@end:
+
+    rts
+;-------------------------------------
+PlayerNpcCollision:
+
+    lda TempPointX
+    clc
+    adc #16
+    sta TempPointX2
+
+    lda TempPointY
+    clc
+    adc #16
+    sta TempPointY2
+;--
+    lda PlayerX
+    cmp TempPointX2
+    bcs @exit
+
+    lda PlayerX
+    clc
+    adc #16
+    cmp TempPointX
+    bcc @exit
+
+    lda PlayerY
+    cmp TempPointY2
+    bcs @exit
+
+    lda PlayerY
+    clc
+    adc #16
+    cmp TempPointY
+    bcc @exit
+
+
+@collides:
+    lda #1
+    jmp @end
+@exit:
+    lda #0
+@end:
+    rts
 
 ;-------------------------------------
 ;Player's attack box collides with all the npcs
@@ -1687,8 +1848,6 @@ CanNpcFacingDownHitPlayer:
 
 ;---------------------------
 
-
-
 NpcMovement:
     inx
     lda Npcs, x ; load dir
@@ -2145,9 +2304,7 @@ TestCollisionGoingDown:
     rts
 ;-----------------------------------------------------
 OnCollisionWithPlayer:
-    lda TempNpcType
-    beq @exit
-
+   
     dex
     lda Npcs, x; y
     sta TempPointY
@@ -2194,6 +2351,14 @@ OnCollisionWithPlayer:
     ldx Temp
     cmp PlayerY
     bcc @exit
+
+    lda #1
+    sta MustRedir
+
+    lda TempNpcType
+    beq @exit
+
+
     ;---
 
     dex

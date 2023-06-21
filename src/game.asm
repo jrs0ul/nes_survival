@@ -2207,25 +2207,6 @@ RoutinesAfterFadeOut:
     bne @next2
 
     jsr GetPaletteFadeValueForHour
-    cmp #$40 ; is it night?
-    beq @copyNightCollisionMap
-
-    jmp @finishUp
-
-@copyNightCollisionMap:
-
-    ldx #0
-@copyCollisionMapLoopNight:
-
-    lda villager_hut_collision_at_night, x
-    sta CollisionMap, x
-    inx
-    cpx #COLLISION_MAP_SIZE
-    bne @copyCollisionMapLoopNight
-
-@finishUp:
-
-    jsr GetPaletteFadeValueForHour
     cmp #$40
     bne @skip_night
 
@@ -3207,6 +3188,10 @@ HandleInput:
     
     ;gamepad button processing, the player could be moved here
     jsr ProcessButtons
+
+    jsr IsPlayerCollidingWithNpcs
+    bne @resetStuff
+
 
     ;first general check of newX and newY
     jsr CanPlayerGo
