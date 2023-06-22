@@ -386,10 +386,21 @@ PlayerNpcCollision:
     adc #16
     sta TempPointX2
 
+    stx Temp
+    lda TempNpcRows
+    sec
+    sbc #1
+    tax
     lda TempPointY
+
+@addRowsLoop:
     clc
-    adc #16
+    adc #8
+    dex
+    bne @addRowsLoop
+    ldx Temp
     sta TempPointY2
+
 ;--
     lda PlayerX
     cmp TempPointX2
@@ -400,6 +411,7 @@ PlayerNpcCollision:
     adc #16
     cmp TempPointX
     bcc @exit
+    beq @exit
 
     lda PlayerY
     cmp TempPointY2
@@ -410,6 +422,7 @@ PlayerNpcCollision:
     adc #16
     cmp TempPointY
     bcc @exit
+    beq @exit
 
 
 @collides:
@@ -2304,7 +2317,7 @@ TestCollisionGoingDown:
     rts
 ;-----------------------------------------------------
 OnCollisionWithPlayer:
-   
+
     dex
     lda Npcs, x; y
     sta TempPointY
@@ -2318,12 +2331,12 @@ OnCollisionWithPlayer:
 
     lda PlayerX
     clc
-    adc #8
+    adc #17
     sta TempX
 
     lda PlayerY
     clc
-    adc #8
+    adc #17
     sta TempY
 
     lda TempPointX
@@ -2339,9 +2352,12 @@ OnCollisionWithPlayer:
     cmp TempY
     bcs @exit
 
-    lda TempPointY
     stx Temp
-    ldx TempNpcRows
+    lda TempNpcRows
+    sec
+    sbc #1
+    tax
+    lda TempPointY
 
 @addRowsLoop:
     clc
@@ -2358,9 +2374,7 @@ OnCollisionWithPlayer:
     lda TempNpcType
     beq @exit
 
-
     ;---
-
     dex
     dex
     dex
