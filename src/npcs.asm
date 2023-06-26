@@ -1889,6 +1889,109 @@ NpcMovement:
     dex ; frame
     dex ; direction
     dex ; screen
+    dex ; y
+    dex ; x
+    stx TempIndex ; index at x
+
+
+    ;Calculate npcs new X and Y using the movement direction
+    ;----------
+    lda TempDir
+    and #%00000011
+    cmp #0
+    beq @movesVerticaly
+
+    cmp #1
+    bne @movingLeft
+
+    ;calculate X going right
+
+    lda Npcs, x ; load x
+    clc
+    adc #NPC_SPEED
+    bcs @IncreaseScreen
+    sta NewNpcX
+
+    jmp @movesVerticaly
+
+@IncreaseScreen:
+    sta NewNpcX
+    ;increase npc screen if needed
+
+    inx
+    inx
+    lda Npcs, x
+    clc
+    adc #1
+    sta NewNpcScreen
+
+    jmp @movesVerticaly
+
+@movingLeft:
+    ;calculate X going left
+
+    lda Npcs, x ; load x
+    sta Temp
+    sec
+    sbc #NPC_SPEED
+    cmp Temp
+    bcs @DecreaseScreen
+
+    sta NewNpcX
+    jmp @movesVerticaly
+
+@DecreaseScreen:
+
+    sta NewNpcX
+    ;decrease npc screen if needed
+    inx ;y
+    inx ;screen
+    lda Npcs, x; current screen
+    sec
+    sbc #1
+    sta NewNpcScreen
+
+
+@movesVerticaly:
+    lda TempDir
+    lsr
+    lsr
+    cmp #1
+    bne @movesDown
+
+    ;calculate Y going up
+
+    ldx TempIndex
+    inx ; move to y
+    lda Npcs, x
+
+    sec
+    sbc #NPC_SPEED
+
+    sta NewNpcY
+
+    jmp @doneCallculation
+@movesDown:
+    cmp #2
+    bne @doneCallculation
+
+    ;calculate Y going down
+
+    ldx TempIndex
+    inx ; move to y
+    lda Npcs, x
+    clc
+    adc #NPC_SPEED
+
+    sta NewNpcY
+
+
+@doneCallculation:
+    ;--------------
+
+    ldx TempIndex
+    inx ;y
+    inx ;screen
 
     jsr OnCollisionWithPlayer
     beq @nextNpc
@@ -1959,7 +2062,7 @@ HorizontalMovement:
 
 @goToNextScreen:
     jsr GoToNextSceen
-    cmp #1 ; 1 - change direction
+    cmp #1 ; 1 - change direction, mainly if the end of the last screen is reached
     beq @changeDir
     jmp @YMovement
 ;----
@@ -1981,7 +2084,7 @@ HorizontalMovement:
     jmp @YMovement
 @goToPrevScreen:
     jsr GoToPreviousScreen
-    cmp #1; ;if 1, change direction
+    cmp #1; ;if 1, change direction, if the x is 0 at the first screen
     beq @changeDir
     jmp @YMovement
 @changeDir:
@@ -2321,14 +2424,18 @@ OnCollisionWithPlayer:
     dex
     lda Npcs, x; y
     sta TempPointY
+
+;----x position to check
     dex
-    lda Npcs, x; x
+
+    lda Npcs, x
     sec
     sbc GlobalScroll
     sta TempPointX
     inx
     inx ; back to screen idx
-
+;-----
+;calc player box
     lda PlayerX
     clc
     adc #17
@@ -2338,7 +2445,7 @@ OnCollisionWithPlayer:
     clc
     adc #17
     sta TempY
-
+;--collision check
     lda TempPointX
     cmp TempX
     bcs @exit

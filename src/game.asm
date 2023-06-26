@@ -1020,6 +1020,13 @@ TempTextAddressLow:
 
 TempPlayerAttk:
     .res 1
+                ;for npc collision
+NewNpcX:
+    .res 1
+NewNpcY:
+    .res 1
+NewNpcScreen:
+    .res 1
 
 DropedItemX: ;x coordinate of item droped by npc
     .res 1
@@ -1087,7 +1094,7 @@ SourceMapIdx:
     .res 1
 
 Buffer:
-    .res 523  ;must see how much is still available
+    .res 520  ;must see how much is still available
 
 ;====================================================================================
 
