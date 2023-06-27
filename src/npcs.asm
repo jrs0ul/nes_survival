@@ -1897,6 +1897,17 @@ NpcMovement:
 
     ;Calculate npcs new X and Y using the movement direction
     ;----------
+    ldx NpcXPosition
+    lda Npcs, x
+    sta NewNpcX
+    inx
+    lda Npcs, x
+    sta NewNpcY
+    inx
+    lda Npcs, x
+    sta NewNpcScreen
+
+    ldx NpcXPosition
     lda TempDir
     and #%00000011
     cmp #0
