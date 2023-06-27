@@ -379,6 +379,7 @@ SingleNpcVSPlayerCollision:
 
     rts
 ;-------------------------------------
+;Does player collides with an npc?
 PlayerNpcCollision:
 
     lda TempPointX
@@ -2426,63 +2427,72 @@ TestCollisionGoingDown:
 ;does an npc collide with the player
 OnCollisionWithPlayer:
 
+    ;calc player box
+    lda PlayerX
+    clc
+    adc #16
+    sta TempX
+
+    lda PlayerY
+    clc
+    adc #16
+    sta TempY
+    ;---------------
+
     dex
-    lda Npcs, x; y
+    lda NewNpcY
     sta TempPointY
 
 ;----x position to check
     dex
 
-    lda Npcs, x
+    lda NewNpcX
     sec
     sbc GlobalScroll
     sta TempPointX
     inx
     inx ; back to screen idx
 ;-----
-;calc player box
-    lda PlayerX
-    clc
-    adc #17
-    sta TempX
-
-    lda PlayerY
-    clc
-    adc #17
-    sta TempY
-;--collision check
-    lda TempPointX
-    cmp TempX
-    bcs @exit
-    lda TempPointX
-    clc
-    adc #16 ; two tiles
-    cmp PlayerX
-    bcc @exit
-
-    lda TempPointY
-    cmp TempY
-    bcs @exit
-
-    stx Temp
+    stx TempNpcCollisionXReg
     lda TempNpcRows
     sec
     sbc #1
-    tax
-    lda TempPointY
+    tax ;npc sprite rows - 1
 
+    lda TempPointY
 @addRowsLoop:
     clc
     adc #8
     dex
     bne @addRowsLoop
-    ldx Temp
+    ldx TempNpcCollisionXReg
+    sta TempPointY2
+
+
+;--collision check
+    lda TempPointX ;npc min x
+    cmp TempX      ;player max x
+    bcs @exit
+
+    lda TempPointX
+    clc
+    adc #16 ; two tiles
+    cmp PlayerX
+    bcc @exit
+    beq @exit
+
+    lda TempPointY ;npc min y
+    cmp TempY
+    bcs @exit
+
+    lda TempPointY2
     cmp PlayerY
     bcc @exit
+    beq @exit
 
 
     lda TempNpcType
-    beq @collides
+    beq @timid
 
     ;---
     ldx NpcXPosition
@@ -2509,6 +2519,9 @@ OnCollisionWithPlayer:
 @collides:
     lda #0
     jmp @done
+@timid:
+    lda #1
+    sta MustRedir
 @exit:
     lda #1
 @done:

@@ -1057,6 +1057,9 @@ TempItemLoadX:
 
 TempPlayerSpriteIdx:
     .res 1
+
+TempNpcCollisionXReg:
+    .res 1
 ;----------
 ParamTimeValue:
     .res 1
@@ -1099,7 +1102,7 @@ SourceMapIdx:
     .res 1
 
 Buffer:
-    .res 518  ;must see how much is still available
+    .res 517  ;must see how much is still available
 
 ;====================================================================================
 
