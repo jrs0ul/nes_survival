@@ -2222,10 +2222,14 @@ ChangeNpcDirection:
     clc
     adc #16
     sta Temp
+    lda PlayerY
+    clc
+    adc #8
+    sta PlayerCenterY
 
     lda TempPointY
-    cmp PlayerY
-    bcc @goDown
+    cmp PlayerCenterY
+    bcc @goDown ; bottom of npc should bump to center of player
     cmp Temp
     bcs @goUp
     bcc @storeDirection
@@ -2476,16 +2480,13 @@ OnCollisionWithPlayer:
     cmp PlayerY
     bcc @exit
 
-    lda #1
-    sta MustRedir
 
     lda TempNpcType
     beq @collides
 
     ;---
-    dex
-    dex
-    dex
+    ldx NpcXPosition
+    dex ;status
     lda Npcs, x
     and #%11111100
     eor #%00000010;set the attack state
@@ -2501,9 +2502,9 @@ OnCollisionWithPlayer:
     inx ; timer
     lda #0
     sta Npcs, x
-    dex
-    dex
-    dex
+    dex ;frame
+    dex ;direction
+    dex ;screen
 
 @collides:
     lda #0
