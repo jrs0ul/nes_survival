@@ -1028,6 +1028,9 @@ NewNpcY:
 NewNpcScreen:
     .res 1
 
+NpcXPosition: ;x coordinate position in ram
+    .res 1
+
 DropedItemX: ;x coordinate of item droped by npc
     .res 1
 
@@ -1094,7 +1097,7 @@ SourceMapIdx:
     .res 1
 
 Buffer:
-    .res 520  ;must see how much is still available
+    .res 519  ;must see how much is still available
 
 ;====================================================================================
 

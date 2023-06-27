@@ -1891,7 +1891,7 @@ NpcMovement:
     dex ; screen
     dex ; y
     dex ; x
-    stx TempIndex ; index at x
+    stx NpcXPosition ; index at x
 
 
     ;Calculate npcs new X and Y using the movement direction
@@ -1961,7 +1961,7 @@ NpcMovement:
 
     ;calculate Y going up
 
-    ldx TempIndex
+    ldx NpcXPosition
     inx ; move to y
     lda Npcs, x
 
@@ -1977,7 +1977,7 @@ NpcMovement:
 
     ;calculate Y going down
 
-    ldx TempIndex
+    ldx NpcXPosition
     inx ; move to y
     lda Npcs, x
     clc
@@ -1989,7 +1989,7 @@ NpcMovement:
 @doneCallculation:
     ;--------------
 
-    ldx TempIndex
+    ldx NpcXPosition
     inx ;y
     inx ;screen
 
@@ -2096,7 +2096,7 @@ HorizontalMovement:
 
 ;--------------------------
 SaveX:
-    ldx TempIndex
+    ldx NpcXPosition
     lda TempX
     sta Npcs, x ;save x
 
@@ -2323,14 +2323,14 @@ TestCollisionGoingRight:
     sbc GlobalScroll
     sta TempPointX
 
-    stx TempIndex
+    ldx NpcXPosition
     inx
     lda Npcs, x ;y
     clc
     adc TempYOffset
     sta TempPointY
     jsr TestPointAgainstCollisionMap
-    ldx TempIndex
+    ldx NpcXPosition
     inx
     inx ;increment to screen idx
     ;collision result is in A
@@ -2419,6 +2419,7 @@ TestCollisionGoingDown:
 
     rts
 ;-----------------------------------------------------
+;does an npc collide with the player
 OnCollisionWithPlayer:
 
     dex
@@ -2479,7 +2480,7 @@ OnCollisionWithPlayer:
     sta MustRedir
 
     lda TempNpcType
-    beq @exit
+    beq @collides
 
     ;---
     dex
@@ -2504,11 +2505,12 @@ OnCollisionWithPlayer:
     dex
     dex
 
-
+@collides:
     lda #0
-
+    jmp @done
 @exit:
     lda #1
+@done:
     rts
 ;---------------------
 DamagePlayer:
