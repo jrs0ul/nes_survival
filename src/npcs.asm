@@ -1897,7 +1897,8 @@ NpcMovement:
 
     ;Calculate npcs new X and Y using the movement direction
     ;----------
-    ldx NpcXPosition
+    ;store the new coordinates, because there might not be any direction
+    ;but we need the collision detection working
     lda Npcs, x
     sta NewNpcX
     inx
@@ -1906,7 +1907,7 @@ NpcMovement:
     inx
     lda Npcs, x
     sta NewNpcScreen
-
+    ;now let's see if the npc is moving any of the directions
     ldx NpcXPosition
     lda TempDir
     and #%00000011
@@ -2000,25 +2001,24 @@ NpcMovement:
 
 @doneCallculation:
     ;--------------
-
+    ;let's check collision with the player
     ldx NpcXPosition
     inx ;y
     inx ;screen
 
     jsr OnCollisionWithPlayer
-    beq @nextNpc
+    beq @nextNpc ; if hostile and collides
 
-    lda MustRedir
+    lda MustRedir   ;if not hostile and collides, probably will have mustRedir set to 1
     bne @changeDir
 
-    dex
-    dex
+    ldx NpcXPosition ;return the x regster to X coordinate position
 
     lda TempDir
     and #%00000011
     cmp #0
     beq @YMovement
-    
+
     jsr HorizontalMovement
     lda MustRedir
     bne @changeDir
@@ -2060,24 +2060,25 @@ HorizontalMovement:
     bne @notRight
 
 @goRight:
-
-    lda Npcs, x ;load x
-    clc
-    adc #NPC_SPEED
-    bcs @goToNextScreen
-
+    lda NewNpcX
+    ;let's test the newly callculated x coordinate
     jsr TestCollisionGoingRight
     cmp #1
     beq @changeDir ; collides
     jsr SaveX
+
+    lda NewNpcScreen
+    cmp ScreenCount
+    bcs @changeDir
+
+    inx ;y
+    inx ;screen
+    sta Npcs, x
+    dex
+    dex
+
     jmp @YMovement
 
-@goToNextScreen:
-    jsr GoToNextSceen
-    cmp #1 ; 1 - change direction, mainly if the end of the last screen is reached
-    beq @changeDir
-    jmp @YMovement
-;----
 @notRight:
     cmp #2
     bne @YMovement
@@ -2133,28 +2134,7 @@ GoToPreviousScreen:
     lda #1
 @exit:
     rts
-;---------------------
-GoToNextSceen:
-    sta Temp
-    inx
-    inx
-    lda Npcs, x; screen idx
-    clc
-    adc #1
-    cmp ScreenCount
-    bcs @changeDir
-    sta Npcs, x
-    dex
-    dex
-    lda Temp
-    sta Npcs, x; save changed x
-    lda #0
-    jmp @exit
-@changeDir:
-    lda #1
-@exit:
 
-    rts
 ;---------------------
 ChangeNpcDirection:
     lda #0
