@@ -2083,27 +2083,29 @@ HorizontalMovement:
     cmp #2
     bne @YMovement
 @goLeft:
-    lda Npcs, x
-    sta Temp
-    sec
-    sbc #NPC_SPEED
-    cmp Temp
-    bcs @goToPrevScreen
 
+    lda NewNpcX
     jsr TestCollisionGoingLeft
     cmp #1 
     beq @changeDir ;collides
     jsr SaveX
+
+    lda NewNpcScreen
+    cmp ScreenCount
+    bcs @changeDir
+
+    inx ;y
+    inx ;screen
+    sta Npcs, x
+    dex
+    dex
+
     jmp @YMovement
-@goToPrevScreen:
-    jsr GoToPreviousScreen
-    cmp #1; ;if 1, change direction, if the x is 0 at the first screen
-    beq @changeDir
-    jmp @YMovement
+
 @changeDir:
     lda #1
     sta MustRedir
-    
+
 @YMovement:
     rts
 
@@ -2113,26 +2115,6 @@ SaveX:
     lda TempX
     sta Npcs, x ;save x
 
-    rts
-;---------------------
-GoToPreviousScreen:
-    sta Temp
-    inx
-    inx
-    lda Npcs, x ; scr
-    beq @changeDir
-    sec
-    sbc #1
-    sta Npcs, x
-    dex
-    dex
-    lda Temp
-    sta Npcs, x; save changed x
-    lda #0
-    jmp @exit
-@changeDir:
-    lda #1
-@exit:
     rts
 
 ;---------------------
@@ -2354,9 +2336,7 @@ TestCollisionGoingLeft:
 TestCollisionGoingUp:
     inx
     stx TempIndex
-    lda Npcs, x ; y
-    sec
-    sbc #NPC_SPEED
+    lda NewNpcY
     sta TempZ
 
     clc
