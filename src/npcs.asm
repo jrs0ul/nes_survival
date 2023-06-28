@@ -2334,16 +2334,14 @@ TestCollisionGoingLeft:
     rts
 ;-------------------------------------
 TestCollisionGoingUp:
-    inx
-    stx TempIndex
     lda NewNpcY
     sta TempZ
 
     clc
     adc TempYOffset
     sta TempPointY
-    dex
-    lda Npcs, x ; x
+
+    lda NewNpcX
     sec
     sbc GlobalScroll
     clc
@@ -2352,30 +2350,28 @@ TestCollisionGoingUp:
     jsr TestPointAgainstCollisionMap
     cmp #1
     beq @exit
-    
+
     lda TempPointX
     clc
     adc #12
     sta TempPointX
     jsr TestPointAgainstCollisionMap
 @exit:
-    ldx TempIndex
+
+    ldx NpcXPosition
     inx
+    inx ;screen
     rts
 ;--------------------------------------
 TestCollisionGoingDown:
-    inx
-    stx TempIndex
-    lda Npcs, x ; y
-    clc
-    adc #NPC_SPEED
+
+    lda NewNpcY ; y
     sta TempZ
 
     clc
     adc TempYOffset
     sta TempPointY
-    dex
-    lda Npcs, x ; x
+    lda NewNpcX
     sec
     sbc GlobalScroll
     sta TempPointX
@@ -2390,8 +2386,9 @@ TestCollisionGoingDown:
     jsr TestPointAgainstCollisionMap
 
 @exit:
-    ldx TempIndex
+    ldx NpcXPosition
     inx
+    inx ; screen
 
     rts
 ;-----------------------------------------------------
@@ -2438,7 +2435,6 @@ OnCollisionWithPlayer:
     bne @addRowsLoop
     ldx TempNpcCollisionXReg
     sta TempPointY2
-
 
 ;--collision check
     lda TempPointX ;npc min x
