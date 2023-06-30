@@ -2465,8 +2465,14 @@ OnCollisionWithPlayer:
     ldx NpcXPosition
     dex ;status
     lda Npcs, x
-    and #%11111100
-    eor #%00000010;set the attack state
+
+    and #%00000011
+    cmp #NPC_STATE_DAMAGED
+    beq @collides ; don't attack if in damaged state
+
+    lda Npcs, x     ;  reload the status
+    and #%11111100  ;  remove previous status
+    eor #%00000010  ;  set the attack state
     sta Npcs, x
 
     txa
