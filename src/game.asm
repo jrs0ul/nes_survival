@@ -47,15 +47,8 @@ main_tiles_chr: .incbin "main.chr"
 .segment "ROM2"
 
 title_tiles_chr: .incbin "title.chr"
+intro_tiles_chr: .incbin "intro.chr"
 
-title_palette:
-
-    .byte $0F,$07,$05,$26, $0F,$01,$26,$07, $0F,$26,$26,$35, $0F,$07,$26,$35    ;background
-    .byte $0F,$0f,$17,$20, $0F,$06,$26,$39, $0F,$17,$21,$31, $0F,$0f,$37,$26    ;OAM sprites
-
-
-.include "data/title.asm"
-.include "data/game_over.asm"
 
 ;============================================================
 .segment "ROM3" ; indoors
@@ -74,6 +67,18 @@ main_tiles_chr2: .incbin "main.chr"
 .include "data/maps/field2_bg.asm"
 .include "data/maps/field2_bg1.asm"
 .include "data/collision_data2.asm"
+
+;=============================================================
+.segment "ROM5" ;title and intro data (?)
+
+title_palette:
+
+    .byte $0F,$07,$05,$26, $0F,$01,$26,$07, $0F,$26,$26,$35, $0F,$07,$26,$35    ;background
+    .byte $0F,$0f,$17,$20, $0F,$06,$26,$39, $0F,$17,$21,$31, $0F,$0f,$37,$26    ;OAM sprites
+
+
+.include "data/title.asm"
+.include "data/game_over.asm"
 
 ;=============================================================
 .segment "ROM6"
@@ -300,6 +305,7 @@ player_sprites_flip:
     STATE_GAME                 = 1
     STATE_MENU                 = 2
     STATE_GAME_OVER            = 3
+    STATE_INTRO                = 4
 
     BUTTON_RIGHT_MASK           = %00000001
     BUTTON_LEFT_MASK            = %00000010
@@ -1189,7 +1195,16 @@ vblankwait2:      ; Second wait for vblank, PPU is ready after this
 
 ;---
     ldy #2
-    jsr bankswitch_y ;switching to Title/Game Over bank
+    bankswitch ;switching to Title/Game Over bank
+
+    lda #<title_tiles_chr
+    sta pointer
+    lda #>title_tiles_chr
+    sta pointer + 1
+    jsr CopyCHRTiles
+
+    ldy #5
+    bankswitch
 
     lda #<title_palette
     sta pointer
@@ -1199,12 +1214,6 @@ vblankwait2:      ; Second wait for vblank, PPU is ready after this
     sta Temp
     jsr LoadPalette
 
-
-    lda #<title_tiles_chr
-    sta pointer
-    lda #>title_tiles_chr
-    sta pointer + 1
-    jsr CopyCHRTiles
 
     lda #<title
     sta pointer
@@ -3591,7 +3600,7 @@ LoadTitle:
     lda MustLoadTitle
     beq @exit
 
-    ldy #2
+    ldy #5
     jsr bankswitch_y
 
     lda #<title_palette
@@ -3655,6 +3664,9 @@ LoadGameOver:
 
     lda #STATE_GAME_OVER
     sta GameState
+
+    ldy #5
+    bankswitch
 
     lda #<game_over
     sta pointer
@@ -3982,11 +3994,21 @@ CheckStartButton:
     ;On title state------
 
     jsr ClearPalette
-   
+
+    lda #STATE_INTRO
+    sta GameState
+
+        
+
+    jmp @exit
+@someOtherState: ; not title
+
+
+    cmp #STATE_INTRO
+    bne @checkGameOver
 
     lda #STATE_GAME
     sta GameState
-
     ldy #0
     jsr bankswitch_y
 
@@ -4008,11 +4030,9 @@ CheckStartButton:
     
     ldx #0
     jsr LoadCollisionMap
-    
 
-    jmp @exit
-@someOtherState:
 
+@checkGameOver:
     cmp #STATE_GAME_OVER
     bne @CheckOnGame
     lda #1
