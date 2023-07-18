@@ -77,8 +77,27 @@ title_palette:
     .byte $0F,$0f,$17,$20, $0F,$06,$26,$39, $0F,$17,$21,$31, $0F,$0f,$37,$26    ;OAM sprites
 
 
+intro_scenes_low:
+    .byte <intro_bg_mowdens
+    .byte <intro_bg_cockpit
+    .byte <intro_bg_mowdens
+    .byte <intro_bg_mowdens_base
+    .byte <intro_bg_mowdens_top
+
+intro_scenes_high:
+    .byte >intro_bg_mowdens
+    .byte >intro_bg_cockpit
+    .byte >intro_bg_mowdens
+    .byte >intro_bg_mowdens_base
+    .byte >intro_bg_mowdens_top
+
+
 .include "data/title.asm"
 .include "data/game_over.asm"
+.include "data/intro_bg_mowdens.asm"
+.include "data/intro_bg_cockpit.asm"
+.include "data/intro_bg_mowdens_base.asm"
+.include "data/intro_bg_mowdens_top.asm"
 
 ;=============================================================
 .segment "ROM6"
@@ -326,6 +345,10 @@ player_sprites_flip:
     ANIM_FRAME_BLOODSTAIN      = $B8
 
     MAX_QUEST                  = 2
+
+
+    INTRO_SCENE_MAX            = 5
+    INTRO_SCENE_DURATION       = 5
 
 
     HOURS_MAX                  = 240
@@ -848,6 +871,10 @@ MustLoadTitle:
     .res 1
 MustLoadGameOver:
     .res 1
+MustLoadIntro:
+    .res 1
+MustLoadIntroChr:
+    .res 1
 MustDrawMenuTitle:
     .res 1
 
@@ -928,6 +955,12 @@ PaletteFadeAnimationState:
 PaletteFadeTimer:
     .res 1
 FadeIdx:
+    .res 1
+
+IntroSceneIdx:
+    .res 1
+
+IntroTimer:
     .res 1
 
 
@@ -1108,7 +1141,7 @@ SourceMapIdx:
     .res 1
 
 Buffer:
-    .res 517  ;must see how much is still available
+    .res 513  ;must see how much is still available
 
 ;====================================================================================
 
@@ -1568,6 +1601,7 @@ LoadBackgroundsIfNeeded:
 
     jsr LoadTitle
     jsr LoadGameOver
+    jsr LoadIntro
     jsr LoadMenu
 
     jsr LoadInteriorMap
@@ -1777,7 +1811,7 @@ Logics:
 
     lda GameState
     cmp #STATE_GAME
-    bne @exit
+    bne @check_intro
 
     lda PlayerAlive
     bne @cont
@@ -1838,11 +1872,45 @@ Logics:
 
 
     jsr CheckEntryPoints
-    
+
+    jmp @exit
+@check_intro:
+
+    cmp #STATE_INTRO
+    bne @exit
+    jsr IntroLogics
 
 @exit:
 
     rts
+;-----------------------------
+IntroLogics:
+
+    dec IntroTimer
+    beq @increaseScene
+    jmp @exit
+
+@increaseScene:
+    lda #INTRO_SCENE_DURATION
+    sta IntroTimer
+    inc IntroSceneIdx
+    lda IntroSceneIdx
+    cmp #INTRO_SCENE_MAX
+    bcs @exit
+
+    lda #1
+    sta MustLoadIntro
+    sta MustLoadSomething
+    lda #0
+    sta MustLoadIntroChr
+
+;    jmp @exit
+
+;@StartGame:
+;    jsr StartGame
+@exit:
+    rts
+
 ;------------------------------
 CheckEntryPoints:
 
@@ -3975,38 +4043,54 @@ ClearPalette:
     rts
 
 ;-------------------------------------
-CheckStartButton:
+LoadIntro:
 
-    lda Buttons
-    and #BUTTON_START_MASK
-    bne @checkOld
-    jmp @exit
-@checkOld:
-    lda OldButtons
-    and #BUTTON_START_MASK
-    bne @exit
+    lda MustLoadIntro
+    beq @exit
+
+    lda #0
+    sta $2000
+    sta $2001
 
 
-    lda GameState
-    cmp #STATE_TITLE
-    bne @someOtherState
+    lda MustLoadIntroChr
+    beq @loadScene
 
-    ;On title state------
-
-    jsr ClearPalette
-
-    lda #STATE_INTRO
-    sta GameState
-
-        
-
-    jmp @exit
-@someOtherState: ; not title
+    ldy #2
+    jsr bankswitch_y
 
 
-    cmp #STATE_INTRO
-    bne @checkGameOver
+    lda #<intro_tiles_chr
+    sta pointer
+    lda #>intro_tiles_chr
+    sta pointer + 1
+    jsr CopyCHRTiles
 
+ 
+
+@loadScene:
+
+    ldy #5
+    jsr bankswitch_y
+
+    ldy IntroSceneIdx
+    lda intro_scenes_low, y
+    sta pointer
+    lda intro_scenes_high, y
+    sta pointer+1
+    jsr LoadNametable
+
+
+
+    
+    lda #0
+    sta MustLoadIntro
+    sta MustLoadSomething
+
+@exit:
+    rts
+;-------------------------------------
+StartGame:
     lda #STATE_GAME
     sta GameState
     ldy #0
@@ -4031,6 +4115,53 @@ CheckStartButton:
     ldx #0
     jsr LoadCollisionMap
 
+
+
+    rts
+
+;-------------------------------------
+CheckStartButton:
+
+    lda Buttons
+    and #BUTTON_START_MASK
+    bne @checkOld
+    jmp @exit
+@checkOld:
+    lda OldButtons
+    and #BUTTON_START_MASK
+    bne @exit
+
+
+    lda GameState
+    cmp #STATE_TITLE
+    bne @someOtherState
+
+    ;On title state------
+
+    ;jsr ClearPalette
+
+    lda #1
+    sta MustLoadSomething
+    sta MustLoadIntro
+    sta MustLoadIntroChr
+    lda #0
+    sta IntroSceneIdx
+    lda #INTRO_SCENE_DURATION
+    sta IntroTimer
+
+    lda #STATE_INTRO
+    sta GameState
+
+
+    jmp @exit
+@someOtherState: ; not title
+
+
+    cmp #STATE_INTRO
+    bne @checkGameOver
+
+    jsr StartGame
+    jmp @exit
 
 @checkGameOver:
     cmp #STATE_GAME_OVER
