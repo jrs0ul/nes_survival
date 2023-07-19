@@ -98,6 +98,7 @@ intro_scenes_high:
 .include "data/intro_bg_cockpit.asm"
 .include "data/intro_bg_mowdens_base.asm"
 .include "data/intro_bg_mowdens_top.asm"
+.include "data/IntroSprites.asm"
 
 ;=============================================================
 .segment "ROM6"
@@ -198,8 +199,17 @@ game_over_palette:
     .byte $0f,$10,$20,$30,$0f,$0c,$35,$21,$0f,$0c,$16,$21,$0f,$01,$07,$21
     .byte $0f,$10,$20,$30,$0f,$0c,$35,$21,$0f,$0c,$16,$21,$0f,$01,$07,$21
 
+
+intro_palette:
+    .byte $0C,$18,$31,$30, $0C,$01,$31,$30, $0C,$0c,$16,$21, $0C,$01,$07,$21
+    .byte $0C,$06,$16,$30, $0C,$0c,$35,$21, $0C,$0c,$16,$21, $0C,$01,$07,$21
+
+
+
+
+
 sprites:
-    .byte $11, $FF, $00000011, $08   ; sprite 0 
+    .byte $11, $FF, %00000011, $08   ; sprite 0 
     .byte $00, $00, %00000011, $00
     .byte $00, $01, %00000011, $00
     .byte $00, $10, %00000011, $00
@@ -348,7 +358,7 @@ player_sprites_flip:
 
 
     INTRO_SCENE_MAX            = 5
-    INTRO_SCENE_DURATION       = 5
+    INTRO_SCENE_DURATION       = 10
 
 
     HOURS_MAX                  = 240
@@ -963,6 +973,9 @@ IntroSceneIdx:
 IntroTimer:
     .res 1
 
+IntroSpriteCount:
+    .res 1
+
 
 CarrySet:
     .res 1
@@ -1141,7 +1154,7 @@ SourceMapIdx:
     .res 1
 
 Buffer:
-    .res 513  ;must see how much is still available
+    .res 512  ;must see how much is still available
 
 ;====================================================================================
 
@@ -1372,7 +1385,7 @@ doSoundUpdate:
     jmp runrandom
 checkMenuState:
     cmp #STATE_MENU
-    bne hide_sprites ; some other state
+    bne checkIntro ; intro?
 
     lda MustExitMenuState
     beq updateInventory
@@ -1383,6 +1396,12 @@ exitMenu:
     jmp nextIteration
 updateInventory:
     jsr UpdateInventorySprites
+    jmp runrandom
+
+checkIntro:
+    cmp #STATE_INTRO
+    bne hide_sprites ; some other state
+    jsr UpdateIntroSprites
     jmp runrandom
 
 hide_sprites:
@@ -1612,6 +1631,43 @@ LoadBackgroundsIfNeeded:
 
 @exit:
     rts
+
+;---------------------------------
+UpdateIntroSprites:
+
+
+    ldx #0
+    lda #20 * 4
+    sta IntroSpriteCount
+
+@updateLoop:
+
+
+    lda #50 ; y
+    clc
+    adc IntroSprites, x
+
+    sta FIRST_SPRITE, x
+    inx
+    lda IntroSprites, x
+    sta FIRST_SPRITE, x
+    inx
+    lda IntroSprites, x
+    sta FIRST_SPRITE, x
+    inx
+
+    lda #50 ; x
+    clc
+    adc IntroSprites, x
+    sta FIRST_SPRITE, x
+    inx
+
+    cpx IntroSpriteCount
+    bcc @updateLoop
+
+
+    rts
+
 
 ;---------------------------------
 ResetNameTableAdresses:
@@ -4080,9 +4136,21 @@ LoadIntro:
     sta pointer+1
     jsr LoadNametable
 
+    jsr ClearPalette
+
+    lda #<intro_palette
+    sta PalettePtr
+    lda #>intro_palette
+    sta PalettePtr + 1
+
+    lda #PALETTE_STATE_FADE_IN
+    sta PaletteFadeAnimationState
+    lda #PALETTE_FADE_MAX_ITERATION
+    sta FadeIdx
+    lda #FADE_DELAY_GAME_OVER
+    sta PaletteAnimDelay
 
 
-    
     lda #0
     sta MustLoadIntro
     sta MustLoadSomething
