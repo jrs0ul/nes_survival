@@ -81,12 +81,14 @@ intro_scenes_low:
     .byte <intro_bg_mowdens
     .byte <intro_bg_cockpit
     .byte <intro_bg_mowdens
+    .byte <intro_bg_mowdens
     .byte <intro_bg_mowdens_base
     .byte <intro_bg_mowdens_top
 
 intro_scenes_high:
     .byte >intro_bg_mowdens
     .byte >intro_bg_cockpit
+    .byte >intro_bg_mowdens
     .byte >intro_bg_mowdens
     .byte >intro_bg_mowdens_base
     .byte >intro_bg_mowdens_top
@@ -357,8 +359,8 @@ player_sprites_flip:
     MAX_QUEST                  = 2
 
 
-    INTRO_SCENE_MAX            = 5
-    INTRO_SCENE_DURATION       = 10
+    INTRO_SCENE_MAX            = 6
+    INTRO_SCENE_DURATION       = 15
 
 
     HOURS_MAX                  = 240
@@ -550,6 +552,8 @@ DigitPtr:
     .res 2
 MapPtr:
     .res 2
+IntroSpritePtr:
+    .res 2
 pointer2:
     .res 2
 PalettePtr:
@@ -636,7 +640,7 @@ FlickerFrame: ;variable for alternating sprite update routines to achieve flicke
     .res 1
 
 ZPBuffer:
-    .res 129  ; I want to be aware of the free memory
+    .res 127  ; I want to be aware of the free memory
 
 ;--------------
 .segment "BSS" ; variables in ram
@@ -1636,36 +1640,66 @@ LoadBackgroundsIfNeeded:
 UpdateIntroSprites:
 
 
-    ldx #0
-    lda #20 * 4
+    ldx IntroSceneIdx
+    cpx #INTRO_SCENE_MAX
+    bcs @done
+
+    ldy #0
+    lda intro_sprite_count, x
     sta IntroSpriteCount
+
+    lda intro_sprites_low, x
+    sta IntroSpritePtr
+    lda intro_sprites_high, x
+    sta IntroSpritePtr + 1
 
 @updateLoop:
 
-
-    lda #50 ; y
+    lda intro_sprite_pos_y, x ; y coord
     clc
-    adc IntroSprites, x
+    adc (IntroSpritePtr), y
 
-    sta FIRST_SPRITE, x
-    inx
-    lda IntroSprites, x
-    sta FIRST_SPRITE, x
-    inx
-    lda IntroSprites, x
-    sta FIRST_SPRITE, x
-    inx
+    sta FIRST_SPRITE, y
+    iny
+    lda (IntroSpritePtr), y
+    sta FIRST_SPRITE, y
+    iny
+    lda (IntroSpritePtr), y
+    sta FIRST_SPRITE, y
+    iny
 
-    lda #50 ; x
+    lda intro_sprite_pos_x, x ; x coord
     clc
-    adc IntroSprites, x
-    sta FIRST_SPRITE, x
-    inx
+    adc (IntroSpritePtr), y
+    sta FIRST_SPRITE, y
+    iny
 
-    cpx IntroSpriteCount
+    cpy IntroSpriteCount
     bcc @updateLoop
 
+    lda IntroSpriteCount
+    lsr
+    lsr
+    sta IntroSpriteCount
 
+    lda #MAX_SPRITE_COUNT
+    cmp IntroSpriteCount
+    bcc @done
+    sec
+    sbc IntroSpriteCount
+
+    tax
+@hideSpritesLoop:
+    lda #$FE
+    sta FIRST_SPRITE, y
+    iny
+    iny
+    iny
+    iny
+
+    dex
+    bne @hideSpritesLoop
+@done:
     rts
 
 
