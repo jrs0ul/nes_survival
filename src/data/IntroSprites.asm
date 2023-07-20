@@ -52,6 +52,12 @@ pilot:
     .byte  12,$9b,0 ,  8
     .byte  12,$9c,0 , 16
 
+    .byte  20,$a8,0 ,240
+    .byte  20,$a9,0 ,248
+    .byte  20,$aa,0 ,  0
+    .byte  20,$ab,0 ,  8
+    .byte  20,$ac,0 , 16
+
 
 
 dude_climbs:
@@ -88,7 +94,6 @@ parachute:
     .byte 244,$71,0,232
     .byte 244,$72,0,240
     .byte 244,$73,0,248
-    .byte 244,$74,0,0
     .byte 244,$75,0,8
     .byte 244,$76,0, 16
     .byte 252,$81,0,232
@@ -115,44 +120,159 @@ parachute:
     .byte  28,$c5,0,  8
     .byte  28,$c6,0, 16
 
+rocket:
+    .byte 0, 0, 0, 0
+plane_falling:
+    .byte 236,$0a,0,236
+    .byte 236,$0b,0,244
+    .byte 244,$19,0,228
+    .byte 244,$1a,0,236
+    .byte 244,$1b,0,244
+    .byte 244,$1c,0,252
+    .byte 252,$2a,0,236
+    .byte 252,$2b,0,244
+    .byte 252,$2c,0,252
+    .byte 252,$2d,0,  4
+    .byte   4,$3b,0,244
+    .byte   4,$3c,0,252
+    .byte   4,$3d,0,  4
+    .byte   4,$3e,0, 12
+    .byte   4,$3f,0, 20
+    .byte  12,$4b,0,244
+    .byte  12,$4c,0,252
+    .byte  12,$4d,0,  4
+    .byte  12,$4e,0, 12
+    .byte  12,$4f,0, 20
+
+
+yoke:
+    .byte 244,$8d,0,0
+    .byte 244,$8e,0,8
+    .byte 244,$8f,0,16
+
+    .byte 252,$9d,0,0
+    .byte 252,$9e,0,8
+    .byte 252,$9f,0,16
+
+    .byte   4,$ad,0,0
+    .byte   4,$ae,0,8
+    .byte   4,$af,0,16
+
+    .byte 244,$8d,%01000000,248
+    .byte 244,$8e,%01000000,240
+    .byte 244,$8f,%01000000,232
+
+    .byte 252,$9d,%01000000,248
+    .byte 252,$9e,%01000000,240
+    .byte 252,$9f,%01000000,232
+
+    .byte   4,$ad,%01000000,248
+    .byte   4,$ae,%01000000,240
+    .byte   4,$af,%01000000,232
+
+
+
 
 intro_sprite_count:
     .byte 20 * 4
-    .byte 30 * 4
+    .byte 0
+
+    .byte 35 * 4
+    .byte 18 * 4
+
     .byte 20 * 4
-    .byte 44 * 4
+    .byte 4
+
+    .byte 43 * 4
+    .byte 20 * 4
+
     .byte 13 * 4
+    .byte 0
+
     .byte 13 * 4
+    .byte 0
 
 intro_sprite_pos_y:
     .byte 50
+    .byte 0
+
+    .byte 123
+    .byte 20;140
+
+    .byte 50
+    .byte 0
+
+    .byte 50
     .byte 130
-    .byte 50
-    .byte 50
+
     .byte 60
+    .byte 0
+
     .byte 150
+    .byte 0
 
 intro_sprite_pos_x:
     .byte 50
+    .byte 0
+
     .byte 60
+    .byte 120
+
     .byte 90
+    .byte 0
+
     .byte 50
+    .byte 160
+
     .byte 150
+    .byte 0
+
     .byte 150
+    .byte 0
 
 
 intro_sprites_low:
     .byte <plane_flies
+    .byte 0
+
     .byte <pilot
+    .byte <yoke
+
     .byte <plane_flies
+    .byte <rocket
+
     .byte <parachute
+    .byte <plane_falling
+
     .byte <dude_climbs
+    .byte 0
+
     .byte <dude_climbs
+    .byte 0
 
 intro_sprites_high:
     .byte >plane_flies
+    .byte 0
+
     .byte >pilot
+    .byte >yoke
+
     .byte >plane_flies
+    .byte >rocket
+
     .byte >parachute
+    .byte >plane_falling
+
     .byte >dude_climbs
+    .byte 0
+
     .byte >dude_climbs
+    .byte 0
+
+intro_meta_sprite_count:
+    .byte 1
+    .byte 2
+    .byte 2
+    .byte 2
+    .byte 1
+    .byte 1

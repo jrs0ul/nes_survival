@@ -980,6 +980,11 @@ IntroTimer:
 IntroSpriteCount:
     .res 1
 
+IntroMetaspriteCount:
+    .res 1
+IntroMetaspriteIndex:
+    .res 1
+
 
 CarrySet:
     .res 1
@@ -1158,7 +1163,7 @@ SourceMapIdx:
     .res 1
 
 Buffer:
-    .res 512  ;must see how much is still available
+    .res 510  ;must see how much is still available
 
 ;====================================================================================
 
@@ -1645,6 +1650,18 @@ UpdateIntroSprites:
     bcs @done
 
     ldy #0
+    sty TempSpriteCount
+    sty IntroMetaspriteIndex
+
+    lda intro_meta_sprite_count, x
+    sta IntroMetaspriteCount
+
+
+    txa
+    asl
+    tax
+
+@metaspriteloop:
     lda intro_sprite_count, x
     sta IntroSpriteCount
 
@@ -1653,40 +1670,96 @@ UpdateIntroSprites:
     lda intro_sprites_high, x
     sta IntroSpritePtr + 1
 
+    tya
+    sta TempPointY2 ;backup y for writing
+    sec
+    sbc TempSpriteCount
+    sta TempPointY ; backup y for reading
+    tay
+
+
 @updateLoop:
+
+    jsr DoIntroSpriteUpdate
+
+    cpy IntroSpriteCount
+    bcc @updateLoop
+
+    lda TempSpriteCount
+    clc
+    adc IntroSpriteCount
+    sta TempSpriteCount
+
+    inc IntroMetaspriteIndex
+    inx
+    lda IntroMetaspriteIndex
+    cmp IntroMetaspriteCount
+    bcc @metaspriteloop
+
+
+    lda TempSpriteCount
+    lsr
+    lsr
+    sta TempSpriteCount
+
+    ldy TempPointY2
+    jsr HideIntroSprites
+
+@done:
+    rts
+;---------------------------------
+DoIntroSpriteUpdate:
 
     lda intro_sprite_pos_y, x ; y coord
     clc
     adc (IntroSpritePtr), y
 
-    sta FIRST_SPRITE, y
-    iny
-    lda (IntroSpritePtr), y
-    sta FIRST_SPRITE, y
-    iny
-    lda (IntroSpritePtr), y
-    sta FIRST_SPRITE, y
-    iny
+    ldy TempPointY2
+    sta FIRST_SPRITE, y ; store Y
+    ;---
+    inc TempPointY2
+    inc TempPointY
+    ldy TempPointY
 
+    lda (IntroSpritePtr), y
+
+    ldy TempPointY2
+    sta FIRST_SPRITE, y ; store frame
+    ;---
+    inc TempPointY2
+    inc TempPointY
+    ldy TempPointY
+
+    lda (IntroSpritePtr), y
+
+    ldy TempPointY2
+    sta FIRST_SPRITE, y ; store attribs
+    ;--
+    inc TempPointY2
+    inc TempPointY
+    ldy TempPointY
     lda intro_sprite_pos_x, x ; x coord
     clc
     adc (IntroSpritePtr), y
-    sta FIRST_SPRITE, y
-    iny
 
-    cpy IntroSpriteCount
-    bcc @updateLoop
+    ldy TempPointY2
+    sta FIRST_SPRITE, y ; store X
+    ;--
+    inc TempPointY2
+    inc TempPointY
+    ldy TempPointY
 
-    lda IntroSpriteCount
-    lsr
-    lsr
-    sta IntroSpriteCount
+    rts
+
+;---------------------------------
+;TODO might be a duplicate
+HideIntroSprites:
 
     lda #MAX_SPRITE_COUNT
-    cmp IntroSpriteCount
+    cmp TempSpriteCount
     bcc @done
     sec
-    sbc IntroSpriteCount
+    sbc TempSpriteCount
 
     tax
 @hideSpritesLoop:
@@ -1700,9 +1773,8 @@ UpdateIntroSprites:
     dex
     bne @hideSpritesLoop
 @done:
+
     rts
-
-
 ;---------------------------------
 ResetNameTableAdresses:
 
