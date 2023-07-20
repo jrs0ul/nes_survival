@@ -20,45 +20,6 @@ plane_flies:
     .byte   8,$33,0,252
     .byte   8,$34,0,4
 
-pilot:
-    .byte 236,$57,0 ,232
-    .byte 236,$58,0 ,240
-    .byte 236,$59,0 ,248
-    .byte 236,$5a,0 ,  0
-    .byte 236,$5b,0 ,  8
-    .byte 236,$5c,0 , 16
-    .byte 244,$67,0 ,232
-    .byte 244,$68,0 ,240
-    .byte 244,$69,0 ,248
-    .byte 244,$6a,0 ,  0
-    .byte 244,$6b,0 ,  8
-    .byte 244,$6c,0 , 16
-    .byte 252,$77,0 ,232
-    .byte 252,$78,0 ,240
-    .byte 252,$79,0 ,248
-    .byte 252,$7a,0 ,  0
-    .byte 252,$7b,0 ,  8
-    .byte 252,$7c,0 , 16
-    .byte   4,$87,0 ,232
-    .byte   4,$88,0 ,240
-    .byte   4,$89,0 ,248
-    .byte   4,$8a,0 ,  0
-    .byte   4,$8b,0 ,  8
-    .byte   4,$8c,0 , 16
-    .byte  12,$97,0 ,232
-    .byte  12,$98,0 ,240
-    .byte  12,$99,0 ,248
-    .byte  12,$9a,0 ,  0
-    .byte  12,$9b,0 ,  8
-    .byte  12,$9c,0 , 16
-
-    .byte  20,$a8,0 ,240
-    .byte  20,$a9,0 ,248
-    .byte  20,$aa,0 ,  0
-    .byte  20,$ab,0 ,  8
-    .byte  20,$ac,0 , 16
-
-
 
 dude_climbs:
     .byte 236,$ba,0,248
@@ -121,7 +82,12 @@ parachute:
     .byte  28,$c6,0, 16
 
 rocket:
-    .byte 0, 0, 0, 0
+    .byte 248,$07,0,248
+    .byte 248,$08,0,  0
+    .byte   0,$17,0,248
+    .byte   0,$18,0,  0
+
+
 plane_falling:
     .byte 236,$0a,0,236
     .byte 236,$0b,0,244
@@ -177,11 +143,11 @@ intro_sprite_count:
     .byte 20 * 4
     .byte 0
 
-    .byte 35 * 4
     .byte 18 * 4
+    .byte 0
 
     .byte 20 * 4
-    .byte 4
+    .byte 4 * 4
 
     .byte 43 * 4
     .byte 20 * 4
@@ -196,11 +162,11 @@ intro_sprite_pos_y:
     .byte 50
     .byte 0
 
-    .byte 123
-    .byte 20;140
+    .byte 140
+    .byte 0
 
     .byte 50
-    .byte 0
+    .byte 100
 
     .byte 50
     .byte 130
@@ -215,11 +181,11 @@ intro_sprite_pos_x:
     .byte 50
     .byte 0
 
-    .byte 60
     .byte 120
+    .byte 0
 
     .byte 90
-    .byte 0
+    .byte 20
 
     .byte 50
     .byte 160
@@ -235,8 +201,8 @@ intro_sprites_low:
     .byte <plane_flies
     .byte 0
 
-    .byte <pilot
     .byte <yoke
+    .byte 0
 
     .byte <plane_flies
     .byte <rocket
@@ -254,8 +220,8 @@ intro_sprites_high:
     .byte >plane_flies
     .byte 0
 
-    .byte >pilot
     .byte >yoke
+    .byte 0
 
     .byte >plane_flies
     .byte >rocket
@@ -271,7 +237,7 @@ intro_sprites_high:
 
 intro_meta_sprite_count:
     .byte 1
-    .byte 2
+    .byte 1
     .byte 2
     .byte 2
     .byte 1
