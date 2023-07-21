@@ -120,9 +120,6 @@ yoke:
     .byte 252,$9e,0,8
     .byte 252,$9f,0,16
 
-    .byte   4,$ad,0,0
-    .byte   4,$ae,0,8
-    .byte   4,$af,0,16
 
     .byte 244,$8d,%01000000,248
     .byte 244,$8e,%01000000,240
@@ -132,9 +129,6 @@ yoke:
     .byte 252,$9e,%01000000,240
     .byte 252,$9f,%01000000,232
 
-    .byte   4,$ad,%01000000,248
-    .byte   4,$ae,%01000000,240
-    .byte   4,$af,%01000000,232
 
 
 
@@ -143,7 +137,7 @@ intro_sprite_count:
     .byte 20 * 4
     .byte 0
 
-    .byte 18 * 4
+    .byte 12 * 4
     .byte 0
 
     .byte 20 * 4
@@ -162,7 +156,7 @@ intro_sprite_pos_y:
     .byte 50
     .byte 0
 
-    .byte 140
+    .byte 135
     .byte 0
 
     .byte 50

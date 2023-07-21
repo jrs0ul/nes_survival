@@ -203,7 +203,7 @@ game_over_palette:
 
 
 intro_palette:
-    .byte $0C,$18,$31,$30, $0C,$01,$31,$30, $0C,$0c,$16,$21, $0C,$01,$07,$21
+    .byte $0C,$18,$31,$30, $0C,$01,$31,$30, $0C,$16,$31,$36, $0C,$01,$07,$21
     .byte $0C,$06,$16,$30, $0C,$0c,$35,$21, $0C,$0c,$16,$21, $0C,$01,$07,$21
 
 
@@ -360,7 +360,7 @@ player_sprites_flip:
 
 
     INTRO_SCENE_MAX            = 6
-    INTRO_SCENE_DURATION       = 15
+    INTRO_SCENE_DURATION       = 30
 
 
     HOURS_MAX                  = 240
