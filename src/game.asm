@@ -554,6 +554,8 @@ MapPtr:
     .res 2
 IntroSpritePtr:
     .res 2
+IntroSpriteCoordPtr:
+    .res 2
 pointer2:
     .res 2
 PalettePtr:
@@ -640,7 +642,7 @@ FlickerFrame: ;variable for alternating sprite update routines to achieve flicke
     .res 1
 
 ZPBuffer:
-    .res 127  ; I want to be aware of the free memory
+    .res 125  ; I want to be aware of the free memory
 
 ;--------------
 .segment "BSS" ; variables in ram
@@ -985,6 +987,14 @@ IntroMetaspriteCount:
 IntroMetaspriteIndex:
     .res 1
 
+IntroSprite1X:
+    .res 1
+IntroSprite1Y:
+    .res 1
+IntroSprite2X:
+    .res 1
+IntroSprite2Y:
+    .res 1
 
 CarrySet:
     .res 1
@@ -1163,7 +1173,7 @@ SourceMapIdx:
     .res 1
 
 Buffer:
-    .res 510  ;must see how much is still available
+    .res 506  ;must see how much is still available
 
 ;====================================================================================
 
@@ -1645,6 +1655,12 @@ LoadBackgroundsIfNeeded:
 UpdateIntroSprites:
 
 
+    lda #<IntroSprite1X
+    sta IntroSpriteCoordPtr
+    lda #>IntroSprite1X
+    sta IntroSpriteCoordPtr + 1
+
+
     ldx IntroSceneIdx
     cpx #INTRO_SCENE_MAX
     bcs @done
@@ -1690,6 +1706,9 @@ UpdateIntroSprites:
     adc IntroSpriteCount
     sta TempSpriteCount
 
+    inc IntroSpriteCoordPtr ;increment pointer to point to next metasprite coordinates
+    inc IntroSpriteCoordPtr
+
     inc IntroMetaspriteIndex
     inx
     lda IntroMetaspriteIndex
@@ -1710,7 +1729,9 @@ UpdateIntroSprites:
 ;---------------------------------
 DoIntroSpriteUpdate:
 
-    lda intro_sprite_pos_y, x ; y coord
+    ldy #1
+    lda (IntroSpriteCoordPtr), y ; y coord
+    ldy TempPointY
     clc
     adc (IntroSpritePtr), y
 
@@ -1737,8 +1758,9 @@ DoIntroSpriteUpdate:
     ;--
     inc TempPointY2
     inc TempPointY
+    ldy #0
+    lda (IntroSpriteCoordPtr), y ; x coord
     ldy TempPointY
-    lda intro_sprite_pos_x, x ; x coord
     clc
     adc (IntroSpritePtr), y
 
@@ -2048,6 +2070,9 @@ Logics:
 ;-----------------------------
 IntroLogics:
 
+
+    inc IntroSprite1Y
+
     dec IntroTimer
     beq @increaseScene
     jmp @exit
@@ -2059,6 +2084,21 @@ IntroLogics:
     lda IntroSceneIdx
     cmp #INTRO_SCENE_MAX
     bcs @exit
+
+    lda IntroSceneIdx
+    asl
+    tax
+    lda intro_sprite_pos_x, x
+    sta IntroSprite1X
+    lda intro_sprite_pos_y, x
+    sta IntroSprite1Y
+    inx
+    lda intro_sprite_pos_x, x
+    sta IntroSprite2X
+    lda intro_sprite_pos_y, x
+    sta IntroSprite2Y
+
+
 
     lda #1
     sta MustLoadIntro
@@ -4320,6 +4360,18 @@ CheckStartButton:
     sta MustLoadIntroChr
     lda #0
     sta IntroSceneIdx
+    asl
+    tax
+    lda intro_sprite_pos_x, x
+    sta IntroSprite1X
+    lda intro_sprite_pos_y, x
+    sta IntroSprite1Y
+    inx
+    lda intro_sprite_pos_x, x
+    sta IntroSprite2X
+    lda intro_sprite_pos_y, x
+    sta IntroSprite2Y
+
     lda #INTRO_SCENE_DURATION
     sta IntroTimer
 
