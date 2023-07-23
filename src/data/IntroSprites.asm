@@ -131,8 +131,6 @@ yoke:
 
 
 
-
-
 intro_sprite_count:
     .byte 20 * 4
     .byte 0
@@ -142,6 +140,9 @@ intro_sprite_count:
 
     .byte 20 * 4
     .byte 4 * 4
+
+    .byte 0
+    .byte 0
 
     .byte 43 * 4
     .byte 20 * 4
@@ -156,11 +157,14 @@ intro_sprite_pos_y:
     .byte 50
     .byte 0
 
-    .byte 135
+    .byte 128
     .byte 0
 
     .byte 50
     .byte 100
+
+    .byte 0
+    .byte 0
 
     .byte 50
     .byte 130
@@ -181,6 +185,9 @@ intro_sprite_pos_x:
     .byte 90
     .byte 20
 
+    .byte 0
+    .byte 0
+
     .byte 50
     .byte 160
 
@@ -188,6 +195,84 @@ intro_sprite_pos_x:
     .byte 0
 
     .byte 150
+    .byte 0
+
+;two part movement
+intro_sprite_dir_x:
+;1st half of the scene
+    .byte 1
+    .byte 0
+;2nd half
+    .byte 1
+    .byte 0
+;-------------scene ends here
+    .byte 0
+    .byte 0
+
+    .byte 0
+    .byte 0
+;--
+    .byte 1
+    .byte 4
+
+    .byte 1
+    .byte 4
+;--
+
+    .byte 0
+    .byte 0
+    .byte 0
+    .byte 0
+
+    .byte 0
+    .byte 0
+    .byte 0
+    .byte 0
+
+    .byte 0
+    .byte 0
+    .byte 0
+    .byte 0
+
+    .byte 0
+    .byte 0
+    .byte 0
+    .byte 0
+
+intro_sprite_dir_y:
+    .byte 1
+    .byte 0
+    .byte 255
+    .byte 0
+
+    .byte 1
+    .byte 0
+    .byte 255
+    .byte 0
+
+    .byte 0
+    .byte 253
+    .byte 0
+    .byte 253
+
+    .byte 0
+    .byte 0
+    .byte 0
+    .byte 0
+
+    .byte 1
+    .byte 0
+    .byte 1
+    .byte 0
+
+    .byte 255
+    .byte 0
+    .byte 255
+    .byte 0
+
+    .byte 255
+    .byte 0
+    .byte 255
     .byte 0
 
 
@@ -200,6 +285,9 @@ intro_sprites_low:
 
     .byte <plane_flies
     .byte <rocket
+
+    .byte 0
+    .byte 0
 
     .byte <parachute
     .byte <plane_falling
@@ -220,6 +308,9 @@ intro_sprites_high:
     .byte >plane_flies
     .byte >rocket
 
+    .byte 0
+    .byte 0
+
     .byte >parachute
     .byte >plane_falling
 
@@ -233,6 +324,7 @@ intro_meta_sprite_count:
     .byte 1
     .byte 1
     .byte 2
+    .byte 0
     .byte 2
     .byte 1
     .byte 1

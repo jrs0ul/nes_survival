@@ -81,6 +81,7 @@ intro_scenes_low:
     .byte <intro_bg_mowdens
     .byte <intro_bg_cockpit
     .byte <intro_bg_mowdens
+    .byte <intro_bg_boom
     .byte <intro_bg_mowdens
     .byte <intro_bg_mowdens_base
     .byte <intro_bg_mowdens_top
@@ -89,6 +90,7 @@ intro_scenes_high:
     .byte >intro_bg_mowdens
     .byte >intro_bg_cockpit
     .byte >intro_bg_mowdens
+    .byte >intro_bg_boom
     .byte >intro_bg_mowdens
     .byte >intro_bg_mowdens_base
     .byte >intro_bg_mowdens_top
@@ -98,6 +100,7 @@ intro_scenes_high:
 .include "data/game_over.asm"
 .include "data/intro_bg_mowdens.asm"
 .include "data/intro_bg_cockpit.asm"
+.include "data/intro_bg_boom.asm"
 .include "data/intro_bg_mowdens_base.asm"
 .include "data/intro_bg_mowdens_top.asm"
 .include "data/IntroSprites.asm"
@@ -359,8 +362,9 @@ player_sprites_flip:
     MAX_QUEST                  = 2
 
 
-    INTRO_SCENE_MAX            = 6
-    INTRO_SCENE_DURATION       = 30
+    INTRO_SCENE_MAX            = 7
+    INTRO_SCENE_DURATION       = 20
+    INTRO_SCENE_DURATION_HALF  = 10
 
 
     HOURS_MAX                  = 240
@@ -376,6 +380,7 @@ player_sprites_flip:
     NPC_AI_DELAY               = 133
     NPC_COLLISION_DELAY        = 250
     FISHING_DELAY              = 2
+    DELAY_INTRO                = 10
 
     COLLISION_MAP_SIZE         = 120 ; 4 columns * 30 rows
     COLLISION_MAP_COLUMN_COUNT = 4
@@ -567,6 +572,7 @@ tmpAttribAddress:
 
 InputUpdateDelay:
     .res 1
+IntroDelay:
 ItemUpdateDelay:
     .res 1
 NpcAIUpdateDelay:
@@ -1420,6 +1426,12 @@ updateInventory:
 checkIntro:
     cmp #STATE_INTRO
     bne hide_sprites ; some other state
+    dec IntroDelay
+    bne runrandom
+    
+    lda #DELAY_INTRO
+    sta IntroDelay
+    jsr IntroLogics
     jsr UpdateIntroSprites
     jmp runrandom
 
@@ -1995,7 +2007,7 @@ Logics:
 
     lda GameState
     cmp #STATE_GAME
-    bne @check_intro
+    bne @exit
 
     lda PlayerAlive
     bne @cont
@@ -2057,21 +2069,48 @@ Logics:
 
     jsr CheckEntryPoints
 
-    jmp @exit
-@check_intro:
-
-    cmp #STATE_INTRO
-    bne @exit
-    jsr IntroLogics
-
 @exit:
 
     rts
 ;-----------------------------
 IntroLogics:
+    lda IntroSceneIdx
+    asl
+    asl
+    tax
+
+    lda IntroTimer
+    cmp #INTRO_SCENE_DURATION_HALF
+    bcs @cont
+
+    inx
+    inx
+
+@cont:
+    lda IntroSprite1X
+    clc
+    adc intro_sprite_dir_x, x
+    sta IntroSprite1X
+
+    lda IntroSprite1Y
+    clc
+    adc intro_sprite_dir_y, x
+    sta IntroSprite1Y
+
+    inx
+
+    lda IntroSprite2X
+    clc
+    adc intro_sprite_dir_x, x
+    sta IntroSprite2X
+
+    lda IntroSprite2Y
+    clc
+    adc intro_sprite_dir_y, x
+    sta IntroSprite2Y
 
 
-    inc IntroSprite1Y
+
 
     dec IntroTimer
     beq @increaseScene
@@ -4374,6 +4413,9 @@ CheckStartButton:
 
     lda #INTRO_SCENE_DURATION
     sta IntroTimer
+
+    lda #DELAY_INTRO
+    sta IntroDelay
 
     lda #STATE_INTRO
     sta GameState
