@@ -23,22 +23,22 @@ intro_scenes_high:
     .byte >intro_bg_mowdens_top
 
 intro_scenes_delay:
-    .byte 7
+    .byte 5
     .byte 37
-    .byte 7
+    .byte 5
     .byte 6
-    .byte 10
-    .byte 12
-    .byte 11
+    .byte 15
+    .byte 20
+    .byte 25
 
 intro_scenes_duration:
-    .byte 30
+    .byte 90
     .byte 10
+    .byte 19
     .byte 20
     .byte 20
-    .byte 20
-    .byte 20
-    .byte 20
+    .byte 18
+    .byte 17
 
 
 plane_flies:
@@ -60,11 +60,10 @@ plane_flies:
     .byte   0,$23,0,252
     .byte   0,$24,0,4
     .byte   0,$26,0,20
-    .byte   8,$33,0,252
-    .byte   8,$34,0,4
+    .byte   0,$21,0,236
 
 
-dude_climbs:
+dude_climbs_f:
     .byte 236,$ba,0,248
     .byte 236,$bb,0,0
     .byte 236,$bc,0,8
@@ -77,7 +76,24 @@ dude_climbs:
     .byte   4,$e9,0,240
     .byte   4,$ea,0,248
     .byte   4,$eb,0,0
-    .byte  12,$fa,0,248
+    .byte  12,$fb,0,0
+
+dude_climbs:
+    .byte 236,$ba,%01000000,248
+    .byte 236,$bb,%01000000,240
+    .byte 236,$bc,%01000000,232
+    .byte 244,$ca,%01000000,248
+    .byte 244,$cb,%01000000,240
+    .byte 244,$cc,%01000000,232
+
+    .byte 252,$d9,%01000000,0
+    .byte 252,$da,%01000000,248
+    .byte 252,$db,%01000000,240
+    .byte   4,$e9,%01000000,0
+    .byte   4,$ea,%01000000,248
+    .byte   4,$eb,%01000000,240
+    .byte  12,$fb,%01000000,240
+
 
 parachute:
     .byte 220,$43,0,248
@@ -175,13 +191,13 @@ yoke:
 
 
 intro_sprite_count:
-    .byte 20 * 4
+    .byte 19 * 4
     .byte 0
 
     .byte 12 * 4
     .byte 0
 
-    .byte 20 * 4
+    .byte 19 * 4
     .byte 4 * 4
 
     .byte 0
@@ -215,7 +231,7 @@ intro_sprite_pos_y:
     .byte 130
     .byte 0
 
-    .byte 150
+    .byte 200
     .byte 0
 
 intro_sprite_pos_x:
@@ -243,10 +259,10 @@ intro_sprite_pos_x:
 ;two part movement
 intro_sprite_dir_x:
 ;1st half of the scene
-    .byte 1
+    .byte 2
     .byte 0
 ;2nd half
-    .byte 1
+    .byte 2
     .byte 0
 ;-------------scene ends here
     .byte 0
@@ -308,14 +324,14 @@ intro_sprite_dir_y:
     .byte 1
     .byte 0
 
-    .byte 255
+    .byte 250
     .byte 0
-    .byte 255
+    .byte 250
     .byte 0
 
-    .byte 255
+    .byte 250
     .byte 0
-    .byte 255
+    .byte 252
     .byte 0
 
 
@@ -362,6 +378,54 @@ intro_sprites_high:
 
     .byte >dude_climbs
     .byte 0
+
+
+;alternative frames for the metasprites
+
+intro_sprites_2_low:
+    .byte 0
+    .byte 0
+
+    .byte 0
+    .byte 0
+
+    .byte 0
+    .byte 0
+
+    .byte 0
+    .byte 0
+
+    .byte 0
+    .byte 0
+
+    .byte <dude_climbs_f
+    .byte 0
+
+    .byte <dude_climbs_f
+    .byte 0
+
+intro_sprites_2_high:
+    .byte 0
+    .byte 0
+
+    .byte 0
+    .byte 0
+
+    .byte 0
+    .byte 0
+
+    .byte 0
+    .byte 0
+
+    .byte 0
+    .byte 0
+
+    .byte >dude_climbs_f
+    .byte 0
+
+    .byte >dude_climbs_f
+    .byte 0
+
 
 intro_meta_sprite_count:
     .byte 1

@@ -974,6 +974,9 @@ IntroSprite2X:
 IntroSprite2Y:
     .res 1
 
+IntroSpriteAnimFrame:
+    .res 1
+
 CarrySet:
     .res 1
 
@@ -1151,7 +1154,7 @@ SourceMapIdx:
     .res 1
 
 Buffer:
-    .res 506  ;must see how much is still available
+    .res 505  ;must see how much is still available
 
 ;====================================================================================
 
@@ -1666,11 +1669,25 @@ UpdateIntroSprites:
     lda intro_sprite_count, x
     sta IntroSpriteCount
 
+    lda IntroSpriteAnimFrame
+    bne @secondFrame
+
+@firstFrame:
     lda intro_sprites_low, x
     sta IntroSpritePtr
     lda intro_sprites_high, x
     sta IntroSpritePtr + 1
+    jmp @cont
+@secondFrame:
+    lda intro_sprites_2_low, x
+    sta IntroSpritePtr
+    lda intro_sprites_2_high, x
+    sta IntroSpritePtr + 1
+    clc
+    adc IntroSpritePtr
+    beq @firstFrame
 
+@cont:
     tya
     sta TempPointY2 ;backup y for writing
     sec
@@ -2047,6 +2064,14 @@ Logics:
     rts
 ;-----------------------------
 IntroLogics:
+
+    inc IntroSpriteAnimFrame
+    lda IntroSpriteAnimFrame
+    cmp #2
+    bcc @go
+    lda #0
+    sta IntroSpriteAnimFrame
+@go:
     lda IntroSceneIdx
     tax
     lda intro_scenes_duration, x
