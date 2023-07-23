@@ -76,34 +76,9 @@ title_palette:
     .byte $0F,$07,$05,$26, $0F,$01,$26,$07, $0F,$26,$26,$35, $0F,$07,$26,$35    ;background
     .byte $0F,$0f,$17,$20, $0F,$06,$26,$39, $0F,$17,$21,$31, $0F,$0f,$37,$26    ;OAM sprites
 
-
-intro_scenes_low:
-    .byte <intro_bg_mowdens
-    .byte <intro_bg_cockpit
-    .byte <intro_bg_mowdens
-    .byte <intro_bg_boom
-    .byte <intro_bg_mowdens
-    .byte <intro_bg_mowdens_base
-    .byte <intro_bg_mowdens_top
-
-intro_scenes_high:
-    .byte >intro_bg_mowdens
-    .byte >intro_bg_cockpit
-    .byte >intro_bg_mowdens
-    .byte >intro_bg_boom
-    .byte >intro_bg_mowdens
-    .byte >intro_bg_mowdens_base
-    .byte >intro_bg_mowdens_top
-
-
 .include "data/title.asm"
 .include "data/game_over.asm"
-.include "data/intro_bg_mowdens.asm"
-.include "data/intro_bg_cockpit.asm"
-.include "data/intro_bg_boom.asm"
-.include "data/intro_bg_mowdens_base.asm"
-.include "data/intro_bg_mowdens_top.asm"
-.include "data/IntroSprites.asm"
+.include "data/IntroData.asm"
 
 ;=============================================================
 .segment "ROM6"
@@ -363,8 +338,6 @@ player_sprites_flip:
 
 
     INTRO_SCENE_MAX            = 7
-    INTRO_SCENE_DURATION       = 20
-    INTRO_SCENE_DURATION_HALF  = 10
 
 
     HOURS_MAX                  = 240
@@ -380,7 +353,6 @@ player_sprites_flip:
     NPC_AI_DELAY               = 133
     NPC_COLLISION_DELAY        = 250
     FISHING_DELAY              = 2
-    DELAY_INTRO                = 10
 
     COLLISION_MAP_SIZE         = 120 ; 4 columns * 30 rows
     COLLISION_MAP_COLUMN_COUNT = 4
@@ -1428,8 +1400,9 @@ checkIntro:
     bne hide_sprites ; some other state
     dec IntroDelay
     bne runrandom
-    
-    lda #DELAY_INTRO
+
+    ldx IntroSceneIdx
+    lda intro_scenes_delay, x
     sta IntroDelay
     jsr IntroLogics
     jsr UpdateIntroSprites
@@ -2075,12 +2048,18 @@ Logics:
 ;-----------------------------
 IntroLogics:
     lda IntroSceneIdx
+    tax
+    lda intro_scenes_duration, x
+    lsr
+    sta TempHp ; let's store half of the scene duration
+
+    lda IntroSceneIdx
     asl
     asl
     tax
 
     lda IntroTimer
-    cmp #INTRO_SCENE_DURATION_HALF
+    cmp TempHp
     bcs @cont
 
     inx
@@ -2117,13 +2096,14 @@ IntroLogics:
     jmp @exit
 
 @increaseScene:
-    lda #INTRO_SCENE_DURATION
-    sta IntroTimer
     inc IntroSceneIdx
     lda IntroSceneIdx
     cmp #INTRO_SCENE_MAX
     bcs @exit
 
+    ldx IntroSceneIdx
+    lda intro_scenes_duration, x
+    sta IntroTimer
     lda IntroSceneIdx
     asl
     tax
@@ -4411,10 +4391,10 @@ CheckStartButton:
     lda intro_sprite_pos_y, x
     sta IntroSprite2Y
 
-    lda #INTRO_SCENE_DURATION
+    ldx IntroSceneIdx
+    lda intro_scenes_duration, x
     sta IntroTimer
-
-    lda #DELAY_INTRO
+    lda intro_scenes_delay, x
     sta IntroDelay
 
     lda #STATE_INTRO

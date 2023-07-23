@@ -1,3 +1,46 @@
+.include "data/intro_bg_mowdens.asm"
+.include "data/intro_bg_cockpit.asm"
+.include "data/intro_bg_boom.asm"
+.include "data/intro_bg_mowdens_base.asm"
+.include "data/intro_bg_mowdens_top.asm"
+
+intro_scenes_low:
+    .byte <intro_bg_mowdens
+    .byte <intro_bg_cockpit
+    .byte <intro_bg_mowdens
+    .byte <intro_bg_boom
+    .byte <intro_bg_mowdens
+    .byte <intro_bg_mowdens_base
+    .byte <intro_bg_mowdens_top
+
+intro_scenes_high:
+    .byte >intro_bg_mowdens
+    .byte >intro_bg_cockpit
+    .byte >intro_bg_mowdens
+    .byte >intro_bg_boom
+    .byte >intro_bg_mowdens
+    .byte >intro_bg_mowdens_base
+    .byte >intro_bg_mowdens_top
+
+intro_scenes_delay:
+    .byte 7
+    .byte 37
+    .byte 7
+    .byte 6
+    .byte 10
+    .byte 12
+    .byte 11
+
+intro_scenes_duration:
+    .byte 30
+    .byte 10
+    .byte 20
+    .byte 20
+    .byte 20
+    .byte 20
+    .byte 20
+
+
 plane_flies:
     .byte 240,$00,0,228
     .byte 240,$01,0,236
@@ -157,7 +200,7 @@ intro_sprite_pos_y:
     .byte 50
     .byte 0
 
-    .byte 128
+    .byte 130
     .byte 0
 
     .byte 50
@@ -169,7 +212,7 @@ intro_sprite_pos_y:
     .byte 50
     .byte 130
 
-    .byte 60
+    .byte 130
     .byte 0
 
     .byte 150
