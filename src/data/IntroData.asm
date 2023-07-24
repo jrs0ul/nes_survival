@@ -34,11 +34,11 @@ intro_scenes_delay:
 intro_scenes_duration:
     .byte 90
     .byte 10
-    .byte 19
-    .byte 20
-    .byte 20
     .byte 18
-    .byte 17
+    .byte 20
+    .byte 20
+    .byte 15
+    .byte 16
 
 
 plane_flies:
@@ -334,6 +334,26 @@ intro_sprite_dir_y:
     .byte 252
     .byte 0
 
+;backround scrolling directions for the scenes
+
+intro_scroll_dir_x:
+    .byte 1
+    .byte 0
+    .byte 1
+    .byte 0
+    .byte 0
+    .byte 0
+    .byte 0
+
+intro_scroll_dir_y:
+    .byte 0
+    .byte 0
+    .byte 0
+    .byte 0
+    .byte 0
+    .byte 0
+    .byte 0
+
 
 intro_sprites_low:
     .byte <plane_flies
@@ -426,7 +446,7 @@ intro_sprites_2_high:
     .byte >dude_climbs_f
     .byte 0
 
-
+;how many metasprites in a scene ?
 intro_meta_sprite_count:
     .byte 1
     .byte 1

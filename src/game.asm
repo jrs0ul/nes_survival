@@ -393,7 +393,7 @@ player_sprites_flip:
     OUTDOORS_LOC2_SCREEN_COUNT = 2
     OUTDOORS_LOC3_SCREEN_COUNT = 2
     PLAYER_START_X             = $50
-    PLAYER_START_Y             = $90
+    PLAYER_START_Y             = 200
 
 
     SCREEN_ROW_COUNT           = 30
@@ -631,6 +631,9 @@ CurrentPaletteDecrementValue: ;a helper value to prevent doing too much of palet
 OldGlobalScroll:
     .res 1
 GlobalScroll:
+    .res 1
+
+GlobalScrollY:
     .res 1
 
 CurrentMapSegmentIndex: ;starting screen
@@ -1154,7 +1157,7 @@ SourceMapIdx:
     .res 1
 
 Buffer:
-    .res 505  ;must see how much is still available
+    .res 504  ;must see how much is still available
 
 ;====================================================================================
 
@@ -1539,7 +1542,10 @@ doneUpdatingPalette:
 
     lda GameState
     cmp #STATE_GAME
-    bne endOfNmi
+    beq WaitNotSprite0
+    cmp #STATE_INTRO
+    beq justScroll
+    jmp endOfNmi
 
 WaitNotSprite0:
     lda $2002
@@ -1556,10 +1562,11 @@ WaitScanline:
     dex
     bne WaitScanline
 
+justScroll:
     lda GlobalScroll
     sta $2005        ; write the horizontal scroll count register
 
-    lda #0           ; no vertical scrolling
+    lda GlobalScrollY ; vertical scroll
     sta $2005
 
 endOfNmi:
@@ -2065,6 +2072,7 @@ Logics:
 ;-----------------------------
 IntroLogics:
 
+
     inc IntroSpriteAnimFrame
     lda IntroSpriteAnimFrame
     cmp #2
@@ -2073,7 +2081,22 @@ IntroLogics:
     sta IntroSpriteAnimFrame
 @go:
     lda IntroSceneIdx
+    cmp #INTRO_SCENE_MAX
+    bcs @exit
     tax
+
+    ;do some scrolling
+    lda GlobalScroll
+    clc
+    adc intro_scroll_dir_x, x
+    sta GlobalScroll
+
+    lda GlobalScrollY
+    clc
+    adc intro_scroll_dir_y, x
+    sta GlobalScrollY
+
+
     lda intro_scenes_duration, x
     lsr
     sta TempHp ; let's store half of the scene duration
@@ -2091,6 +2114,51 @@ IntroLogics:
     inx
 
 @cont:
+    jsr MoveIntroSprites
+
+    dec IntroTimer
+    beq @increaseScene
+    jmp @exit
+
+@increaseScene:
+    inc IntroSceneIdx
+    lda IntroSceneIdx
+    cmp #INTRO_SCENE_MAX
+    bcs @exit;@StartGame
+
+    ldx IntroSceneIdx
+    lda intro_scenes_duration, x
+    sta IntroTimer
+    lda IntroSceneIdx
+    asl
+    tax
+    lda intro_sprite_pos_x, x
+    sta IntroSprite1X
+    lda intro_sprite_pos_y, x
+    sta IntroSprite1Y
+    inx
+    lda intro_sprite_pos_x, x
+    sta IntroSprite2X
+    lda intro_sprite_pos_y, x
+    sta IntroSprite2Y
+
+
+    lda #1
+    sta MustLoadIntro
+    sta MustLoadSomething
+    lda #0
+    sta MustLoadIntroChr
+    sta GlobalScroll
+
+    jmp @exit
+
+@StartGame:
+    jsr StartGame
+@exit:
+    rts
+
+;------------------------------
+MoveIntroSprites:
     lda IntroSprite1X
     clc
     adc intro_sprite_dir_x, x
@@ -2112,49 +2180,6 @@ IntroLogics:
     clc
     adc intro_sprite_dir_y, x
     sta IntroSprite2Y
-
-
-
-
-    dec IntroTimer
-    beq @increaseScene
-    jmp @exit
-
-@increaseScene:
-    inc IntroSceneIdx
-    lda IntroSceneIdx
-    cmp #INTRO_SCENE_MAX
-    bcs @exit
-
-    ldx IntroSceneIdx
-    lda intro_scenes_duration, x
-    sta IntroTimer
-    lda IntroSceneIdx
-    asl
-    tax
-    lda intro_sprite_pos_x, x
-    sta IntroSprite1X
-    lda intro_sprite_pos_y, x
-    sta IntroSprite1Y
-    inx
-    lda intro_sprite_pos_x, x
-    sta IntroSprite2X
-    lda intro_sprite_pos_y, x
-    sta IntroSprite2Y
-
-
-
-    lda #1
-    sta MustLoadIntro
-    sta MustLoadSomething
-    lda #0
-    sta MustLoadIntroChr
-
-;    jmp @exit
-
-;@StartGame:
-;    jsr StartGame
-@exit:
     rts
 
 ;------------------------------
@@ -4131,6 +4156,9 @@ ResetEntityVariables:
     sta PlayerY
     lda #1
     sta PlayerAlive
+    lda #1
+    sta PlayerFrame
+    sta PlayerAnimationRowIndex
 
     lda #ITEM_KNIFE
     sta EquipedItem
@@ -4320,10 +4348,22 @@ LoadIntro:
     jsr bankswitch_y
 
     ldy IntroSceneIdx
+
     lda intro_scenes_low, y
     sta pointer
     lda intro_scenes_high, y
     sta pointer+1
+    lda #$24
+    sta NametableAddress
+    jsr LoadNametable
+    ldy IntroSceneIdx
+    lda intro_scenes_low, y
+    sta pointer
+    lda intro_scenes_high, y
+    sta pointer+1
+
+    lda #$20
+    sta NametableAddress
     jsr LoadNametable
 
     jsr ClearPalette
@@ -4404,6 +4444,7 @@ CheckStartButton:
     sta MustLoadIntroChr
     lda #0
     sta IntroSceneIdx
+    sta GlobalScroll
     asl
     tax
     lda intro_sprite_pos_x, x
