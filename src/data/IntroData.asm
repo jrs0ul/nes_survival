@@ -38,7 +38,7 @@ intro_scenes_duration:
     .byte 20
     .byte 20
     .byte 15
-    .byte 16
+    .byte 14
 
 
 plane_flies:

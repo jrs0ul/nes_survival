@@ -181,8 +181,8 @@ game_over_palette:
 
 
 intro_palette:
-    .byte $0C,$18,$31,$30, $0C,$01,$31,$30, $0C,$16,$31,$36, $0C,$01,$07,$21
-    .byte $0C,$06,$16,$30, $0C,$0c,$35,$21, $0C,$0c,$16,$21, $0C,$01,$07,$21
+    .byte $0C,$00,$31,$30, $0C,$01,$31,$30, $0C,$16,$31,$36, $0C,$18,$07,$30 ; background
+    .byte $0C,$06,$16,$30, $0C,$0c,$35,$21, $0C,$0c,$16,$21, $0C,$01,$07,$21 ; sprites
 
 
 
@@ -2124,7 +2124,7 @@ IntroLogics:
     inc IntroSceneIdx
     lda IntroSceneIdx
     cmp #INTRO_SCENE_MAX
-    bcs @exit;@StartGame
+    bcs @StartGame
 
     ldx IntroSceneIdx
     lda intro_scenes_duration, x
@@ -2153,9 +2153,22 @@ IntroLogics:
     jmp @exit
 
 @StartGame:
-    jsr StartGame
+    jsr FadeOutToStartGame
 @exit:
     rts
+
+;------------------------------
+FadeOutToStartGame:
+    lda #PALETTE_STATE_FADE_OUT
+    sta PaletteFadeAnimationState
+    lda #0
+    sta PaletteFadeTimer
+    sta FadeIdx
+    sta IsLocationRoutine
+    lda #FADE_DELAY_GENERIC
+    sta PaletteAnimDelay
+    rts
+
 
 ;------------------------------
 MoveIntroSprites:
@@ -2551,13 +2564,18 @@ RoutinesAfterFadeOut:
     rts
 @next: ;game over
     lda MustLoadGameOverAfterFadeOut
-    beq @next1
+    beq @afterIntro
     lda #1
     sta MustLoadSomething
     sta MustLoadGameOver
     lda #0
     sta PaletteFadeAnimationState
+    sta MustLoadGameOverAfterFadeOut
     rts
+@afterIntro:
+    jsr StartGame
+    rts
+    
     ;---------------------------------------
 @locationRoutines: ;location routines start here
     ;--some general location code----
@@ -4083,10 +4101,8 @@ ResetEntityVariables:
     sta ActiveVillagerQuests + 1
     sta HP + 1
     sta HP + 2
-    ;sta Warmth
     sta Warmth + 1
     sta Warmth + 2
-    ;sta Food
     sta Food + 1
     sta Food + 2
     sta Fuel + 1
@@ -4156,7 +4172,6 @@ ResetEntityVariables:
     sta PlayerY
     lda #1
     sta PlayerAlive
-    lda #1
     sta PlayerFrame
     sta PlayerAnimationRowIndex
 
@@ -4167,8 +4182,8 @@ ResetEntityVariables:
 
     lda #31
     sta BgColumnIdxToUpload
-    lda #24
-    sta DestScreenAddr
+    ;lda #24
+    ;sta DestScreenAddr
 
     lda #$20
     sta FirstNametableAddr
@@ -4389,16 +4404,11 @@ LoadIntro:
     rts
 ;-------------------------------------
 StartGame:
-    lda #STATE_GAME
-    sta GameState
     ldy #0
     jsr bankswitch_y
 
     jsr ResetEntityVariables
-    lda #1
-    sta MustLoadOutside
-    sta MustLoadSomething
-    sta MustCopyMainChr
+
 
     lda #<Outside1_items
     sta pointer
@@ -4409,10 +4419,15 @@ StartGame:
     lda #7
     sta TempNpcCnt
     jsr GenerateNpcs
-    
+
     ldx #0
     jsr LoadCollisionMap
-
+    lda #STATE_GAME
+    sta GameState
+    lda #1
+    sta MustLoadOutside
+    sta MustLoadSomething
+    sta MustCopyMainChr
 
 
     rts
@@ -4442,6 +4457,8 @@ CheckStartButton:
     sta MustLoadSomething
     sta MustLoadIntro
     sta MustLoadIntroChr
+    ldy #5
+    jsr bankswitch_y
     lda #0
     sta IntroSceneIdx
     sta GlobalScroll
@@ -4474,7 +4491,7 @@ CheckStartButton:
     cmp #STATE_INTRO
     bne @checkGameOver
 
-    jsr StartGame
+    jsr FadeOutToStartGame
     jmp @exit
 
 @checkGameOver:
