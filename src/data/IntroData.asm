@@ -73,6 +73,7 @@ dude_climbs_f:
     .byte 252,$d9,0,240
     .byte 252,$da,0,248
     .byte 252,$db,0,0
+    .byte 252,$dc,0,8
     .byte   4,$e9,0,240
     .byte   4,$ea,0,248
     .byte   4,$eb,0,0
@@ -89,6 +90,7 @@ dude_climbs:
     .byte 252,$d9,%01000000,0
     .byte 252,$da,%01000000,248
     .byte 252,$db,%01000000,240
+    .byte 252,$dc,%01000000,232
     .byte   4,$e9,%01000000,0
     .byte   4,$ea,%01000000,248
     .byte   4,$eb,%01000000,240
@@ -206,10 +208,10 @@ intro_sprite_count:
     .byte 43 * 4
     .byte 20 * 4
 
-    .byte 13 * 4
+    .byte 14 * 4
     .byte 0
 
-    .byte 13 * 4
+    .byte 14 * 4
     .byte 0
 
 intro_sprite_pos_y:
