@@ -190,6 +190,14 @@ yoke:
     .byte 252,$9e,%01000010,240
     .byte 252,$9f,%01000010,232
 
+cloud:
+    .byte 248,$e1,%00000000,244
+    .byte 248,$e2,%00000000,252
+    .byte 248,$e3,%00000000,  4
+    .byte   0,$f1,%00000000,244
+    .byte   0,$f2,%00000000,252
+    .byte   0,$f3,%00000000,  4
+
 
 
 intro_sprite_count:
@@ -197,7 +205,7 @@ intro_sprite_count:
     .byte 0
 
     .byte 12 * 4
-    .byte 0
+    .byte 6 * 4
 
     .byte 19 * 4
     .byte 4 * 4
@@ -219,7 +227,7 @@ intro_sprite_pos_y:
     .byte 0
 
     .byte 130
-    .byte 0
+    .byte 80
 
     .byte 50
     .byte 100
@@ -241,7 +249,7 @@ intro_sprite_pos_x:
     .byte 0
 
     .byte 120
-    .byte 0
+    .byte 125
 
     .byte 90
     .byte 20
@@ -268,10 +276,10 @@ intro_sprite_dir_x:
     .byte 0
 ;-------------scene ends here
     .byte 0
-    .byte 0
+    .byte 250
 
     .byte 0
-    .byte 0
+    .byte 250
 ;--
     .byte 1
     .byte 4
@@ -362,7 +370,7 @@ intro_sprites_low:
     .byte 0
 
     .byte <yoke
-    .byte 0
+    .byte <cloud
 
     .byte <plane_flies
     .byte <rocket
@@ -384,7 +392,7 @@ intro_sprites_high:
     .byte 0
 
     .byte >yoke
-    .byte 0
+    .byte >cloud
 
     .byte >plane_flies
     .byte >rocket
@@ -451,7 +459,7 @@ intro_sprites_2_high:
 ;how many metasprites in a scene ?
 intro_meta_sprite_count:
     .byte 1
-    .byte 1
+    .byte 2
     .byte 2
     .byte 0
     .byte 2
