@@ -184,16 +184,8 @@ intro_palette:
     .byte $0C,$00,$31,$30, $0C,$01,$31,$30, $0C,$16,$31,$36, $0C,$18,$07,$30 ; background
     .byte $0C,$06,$16,$30, $0C,$0c,$35,$21, $0C,$0c,$16,$36, $0C,$01,$07,$21 ; sprites
 
-
-
-
-
 sprites:
     .byte $11, $FF, %00000011, $08   ; sprite 0 
-    .byte $00, $00, %00000011, $00
-    .byte $00, $01, %00000011, $00
-    .byte $00, $10, %00000011, $00
-    .byte $00, $11, %00000011, $00
 
 
 ;position of knife sprite depending on the player frame
@@ -1240,7 +1232,7 @@ vblankwait2:      ; Second wait for vblank, PPU is ready after this
     bit $2002
     bpl vblankwait2
 
-    jsr loadSprites
+    jsr initZeroSprite
 
 ;---
     ldy #2
@@ -2554,7 +2546,13 @@ RoutinesAfterFadeOut:
     ;fade in after sleep
     lda MustSleepAfterFadeOut
     beq @next
+    ldy current_bank
+    sty oldbank
+    ldy #3
+    jsr bankswitch_y
     jsr DoSleep
+    ldy oldbank
+    jsr bankswitch_y
     lda #0
     sta MustSleepAfterFadeOut
     lda #PALETTE_STATE_FADE_IN
@@ -3070,6 +3068,7 @@ SkipTime:
 
 
 ;-------------------------------
+.segment "ROM3"
 DoSleep:
     lda #SLEEP_POS_X
     sta PlayerY
@@ -3224,7 +3223,7 @@ DoSleep:
 @exit:
     rts
 
-
+.segment "CODE"
 ;-------------------------------
 RunTime:
 
@@ -5977,13 +5976,13 @@ PrepareKnifeSprite:
     rts
 
 ;----------------------------------
-loadSprites:
+initZeroSprite:
     ldx #$00
 spriteLoadLoop:
     lda sprites, x
     sta FIRST_SPRITE - 4, x
     inx
-    cpx #$32
+    cpx #4
     bne spriteLoadLoop
 
     lda #1
