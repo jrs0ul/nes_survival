@@ -5706,6 +5706,11 @@ UpdateSprites:
     lda InVillagerHut
     beq @hidesprites
 
+    ldy current_bank
+    sty oldbank
+    ldy #3
+    bankswitch
+
     lda ItemIGave
     bne @hidesprites ;works for the quest dialogs so far
 
@@ -5769,6 +5774,9 @@ UpdateSprites:
 
     dec TempFrame
     bne @spriteLoop
+
+    ldy oldbank
+    bankswitch
 
 ;------------------- hide unused sprites
 @hidesprites:

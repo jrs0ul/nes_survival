@@ -1,3 +1,5 @@
+.segment "ROM3" ; indoors
+
 villager_bear_quest_0: ;jam
     .byte $00,$00,$00,$00,$42,$00,$45,$48,$4f,$3e,$00,$43,$3a,$46,$59,$00
     .byte $3c,$3a,$47,$54,$52,$48,$4e,$00,$00,$00,$00,$00,$00,$00,$00,$00
@@ -99,6 +101,8 @@ thanks_list_high:
     .byte >dialog_thanks_1
 
 
+.segment "ROM1" ; menu
+
 goal_items_list:
     .byte ITEM_JAM, ITEM_COOKED_FISH
     .byte ITEM_KNIFE, ITEM_SPEAR
@@ -107,4 +111,5 @@ reward_items_list:
     .byte ITEM_FISHING_ROD, ITEM_COAT
     .byte ITEM_ROWAN_BERRIES, ITEM_HIDE
 
+.segment "RODATA"
 
