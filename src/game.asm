@@ -5341,6 +5341,7 @@ CheckToolTable:
 @exit:
     rts
 ;-----------------------------------
+.segment "ROM3"
 SetupVillagerText:
 
     lda InVillagerHut
@@ -5398,7 +5399,7 @@ SetupVillagerText:
 @exit:
     rts
 
-
+.segment "CODE"
 ;-------------------------------------
 LoadInteriorMap:
 
