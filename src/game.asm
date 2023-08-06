@@ -72,9 +72,12 @@ main_tiles_chr2: .incbin "main.chr"
 .segment "ROM5" ;title and intro data (?)
 
 title_palette:
-
     .byte $0F,$07,$05,$26, $0F,$01,$26,$07, $0F,$26,$26,$35, $0F,$07,$26,$35    ;background
     .byte $0F,$0f,$17,$20, $0F,$06,$26,$39, $0F,$17,$21,$31, $0F,$0f,$37,$26    ;OAM sprites
+
+intro_palette:
+    .byte $0C,$00,$31,$30, $0C,$01,$31,$30, $0C,$16,$31,$36, $0C,$18,$07,$30 ; background
+    .byte $0C,$06,$16,$30, $0C,$0c,$35,$21, $0C,$0c,$16,$36, $0C,$01,$07,$21 ; sprites
 
 .include "data/title.asm"
 .include "data/game_over.asm"
@@ -180,9 +183,6 @@ game_over_palette:
     .byte $0f,$10,$20,$30,$0f,$0c,$35,$21,$0f,$0c,$16,$21,$0f,$01,$07,$21
 
 
-intro_palette:
-    .byte $0C,$00,$31,$30, $0C,$01,$31,$30, $0C,$16,$31,$36, $0C,$18,$07,$30 ; background
-    .byte $0C,$06,$16,$30, $0C,$0c,$35,$21, $0C,$0c,$16,$36, $0C,$01,$07,$21 ; sprites
 
 sprites:
     .byte $11, $FF, %00000011, $08   ; sprite 0 
@@ -1568,6 +1568,7 @@ noBankSwitch:
 .include "random.asm"
 .include "menu.asm"
 .include "IntroCode.asm"
+.include "IndoorCode.asm"
 
 ;---------------------------------
 doIntro:
@@ -2775,164 +2776,6 @@ SkipTime:
 @exit:
     rts
 
-
-;-------------------------------
-.segment "ROM3"
-DoSleep:
-    lda #SLEEP_POS_X
-    sta PlayerY
-    lda #SLEEP_POS_Y
-    sta PlayerX
-    lda #2
-    sta PlayerFrame
-    lda #1
-    sta PlayerAnimationRowIndex
-
-    lda #SLEEP_TIME
-    sta ParamTimeValue
-    jsr SkipTime
-
-@decreaseHp:
-
-    lda Food
-    clc
-    adc Food + 1
-    adc Food + 2
-    cmp #0
-    beq @decreaseHealthFromHunger
-
-    lda HP
-    bne @makeHundred
-
-    lda HP + 1
-    clc
-    adc #SLEEP_ADD_HP_TIMES_TEN
-    cmp #10
-    bcs @makeHundred
-    sta HP + 1
-    jmp @checkWarmth
-
-@makeHundred:
-    lda #1
-    sta HP
-    lda #0
-    sta HP + 1
-    sta HP + 2
-    jmp @checkWarmth
-
-@decreaseHealthFromHunger:
-
-    lda HP + 1
-    cmp #SLEEP_SUB_HP_HUNGER_TT
-    bcs @subtractHPHunger
-
-    lda HP
-    beq @kill
-
-    dec HP
-    lda #10
-
-@subtractHPHunger:
-    sec
-    sbc #SLEEP_SUB_HP_HUNGER_TT
-    sta HP + 1
-
-@checkWarmth:
-
-    lda Warmth
-    clc
-    adc Warmth + 1
-    adc Warmth + 2
-    cmp #0
-    bne @checkFuel
-
-    lda HP + 1
-    cmp #SLEEP_SUB_HP_COLD_TT
-    bcs @subtractHPCold
-
-    lda HP
-    beq @kill
-
-    dec HP
-    lda #10
-
-@subtractHPCold:
-    sec
-    sbc #SLEEP_SUB_HP_HUNGER_TT
-    sta HP + 1
-
-@checkFuel:
-
-    lda Fuel
-    clc
-    adc Fuel + 1
-    adc Fuel + 2
-    cmp #0
-    bne @subtractStuff
-
-    lda Warmth + 1
-    cmp #5
-    bcs @subtractWarmth
-
-    lda Warmth
-    beq @zeroWarmth
-
-    dec Warmth
-    lda #10
-
-@subtractWarmth:
-    sec
-    sbc #5
-    sta Warmth + 1
-
-    jmp @subtractStuff
-
-@zeroWarmth:
-    lda #0
-    sta Warmth
-    sta Warmth + 1
-    sta Warmth + 2
-    jmp @subtractStuff
-
-
-@kill:
-    lda #0
-    sta HP
-    sta HP + 1
-    sta HP + 2
-
-@subtractStuff:
-    lda #0
-    sta Fuel
-    sta Fuel + 1
-    sta Fuel + 2
-
-    lda Food + 1
-    cmp #5
-    bcs @subtractFood
-
-    lda Food
-    beq @makeFoodZero
-
-    dec Food
-    lda #10
-
-@subtractFood:
-    sec
-    sbc #5
-    sta Food + 1
-    jmp @exit
-
-@makeFoodZero:
-    lda #0
-    sta Food
-    sta Food + 1
-    sta Food + 2
-
-@exit:
-    rts
-
-.segment "CODE"
 ;-------------------------------
 RunTime:
 
@@ -4933,66 +4776,6 @@ CheckToolTable:
     lda #0
 @exit:
     rts
-;-----------------------------------
-.segment "ROM3"
-SetupVillagerText:
-
-    lda InVillagerHut
-    beq @exit
-
-    lda VillagerIndex
-    bne @skipNightCheck
-    jsr GetPaletteFadeValueForHour
-    cmp #$40
-    beq @exit
-@skipNightCheck:
-    lda #1
-    sta MustUpdateTextBaloon
-    lda #0
-    sta TextBaloonIndex
-
-    lda ItemIGave
-    bne @thanks
-
-    lda VillagerIndex
-    tay
-    asl
-    clc
-    adc ActiveVillagerQuests, y
-    tax
-
-    lda quest_list_low, x
-    sta TextPtr
-    lda quest_list_high, x
-    sta TextPtr + 1
-    lda #DIALOG_TEXT_LENGTH
-    sta TextLength
-
-
-    jmp @exit
-
-@thanks:
-
-    lda VillagerIndex
-    tay
-    asl
-    clc
-    adc ActiveVillagerQuests, y
-    tax
-
-    lda thanks_list_low, x
-    sta TextPtr
-    lda thanks_list_high, x
-    sta TextPtr + 1
-    lda #DIALOG_TEXT_LENGTH
-    sta TextLength
-
-
-
-@exit:
-    rts
-
-.segment "CODE"
 ;-------------------------------------
 LoadInteriorMap:
 
@@ -5002,57 +4785,9 @@ LoadInteriorMap:
     ldy #3
     jsr bankswitch_y
 
-    lda #$00
-    sta $2000
-    sta $2001
+    jsr LoadIndoorMapData ; from bank 3
 
-    lda #<house_tiles_chr
-    sta pointer
-    lda #>house_tiles_chr
-    sta pointer + 1
-    jsr CopyCHRTiles
-
-    
-    lda MustRestartIndoorsMusic
-    beq @loadHouseStuff
-    lda #1
-    sta SongName
-    sta MustPlayNewSong
-    lda #0
-    sta MustRestartIndoorsMusic
-
-@loadHouseStuff:
-    lda MapPtr
-    sta pointer
-    lda MapPtr + 1
-    sta pointer + 1
-    lda #$20    ; $20000
-    sta NametableAddress
-
-    jsr LoadNametable
-    jsr LoadStatusBar
-
-    lda #<house_palette
-    sta PalettePtr
-    lda #>house_palette
-    sta PalettePtr + 1
-
-
-    lda #0
-    sta MustLoadHouseInterior
-    sta MustLoadSomething
-
-    lda MustSleepAfterFadeOut
-    bne @nope
-    lda #PALETTE_STATE_FADE_IN
-    sta PaletteFadeAnimationState
-    lda #PALETTE_FADE_MAX_ITERATION
-    sta FadeIdx
-    lda #FADE_DELAY_GENERIC
-    sta PaletteAnimDelay
-
-    jsr SetupVillagerText
-@nope:
+   @nope:
     rts
 
 ;-----------------------------------
@@ -5305,72 +5040,7 @@ UpdateSprites:
     ldy #3
     bankswitch
 
-    lda ItemIGave
-    bne @hidesprites ;works for the quest dialogs so far
-
-    lda MustUpdateTextBaloon
-    bne @hidesprites
-
-    stx TempRegX
-    jsr GetPaletteFadeValueForHour
-    cmp #$40
-    bne @continue
-
-    lda VillagerIndex  ;don't show sprites if bear
-    beq @restoreXAndExit
-
-@continue:
-    ldx TempRegX
-    jmp @updateSprites
-@restoreXAndExit:
-    ldx TempRegX
-    jmp @hidesprites
-
-@updateSprites:
-    lda VillagerIndex
-    tay
-    asl
-    clc
-    adc ActiveVillagerQuests, y
-    tay
-    lda QuestSpritesCount, y
-    beq @hidesprites ;no sprites
-    sta TempFrame ;store sprite count
-
-    tya
-    asl
-    asl
-    asl
-    asl
-    tay
-
-@spriteLoop:
-
-    lda QuestSprites, y
-    sta FIRST_SPRITE, x
-    inx
-    iny
-    lda QuestSprites, y
-    sta FIRST_SPRITE, x
-    inx
-    iny
-    lda QuestSprites, y
-    sta FIRST_SPRITE, x
-    inx
-    iny
-    lda QuestSprites, y
-    sta FIRST_SPRITE, x
-    inx
-    iny
-
-
-    inc TempSpriteCount
-
-    dec TempFrame
-    bne @spriteLoop
-
-    ldy oldbank
-    bankswitch
+    jsr UpdateVillagerDialogSprites ;from bank 3
 
 ;------------------- hide unused sprites
 @hidesprites:
