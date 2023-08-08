@@ -16,6 +16,31 @@ map_list_low:
     .byte 0
     .byte 0
 
+    .byte 0
+    .byte 0
+    .byte 0
+    .byte 0
+
+    .byte 0
+    .byte 0
+    .byte 0
+    .byte 0
+
+    .byte 0
+    .byte 0
+    .byte 0
+    .byte 0
+
+    .byte <cave1
+    .byte 0
+    .byte 0
+    .byte 0
+
+    .byte <crashsite
+    .byte 0
+    .byte 0
+    .byte 0
+
 
 
 map_list_high:
@@ -31,5 +56,30 @@ map_list_high:
 ;---
     .byte >LOC3_bg0
     .byte >LOC3_bg1
+    .byte 0
+    .byte 0
+
+    .byte 0
+    .byte 0
+    .byte 0
+    .byte 0
+
+    .byte 0
+    .byte 0
+    .byte 0
+    .byte 0
+
+    .byte 0
+    .byte 0
+    .byte 0
+    .byte 0
+
+    .byte >cave1
+    .byte 0
+    .byte 0
+    .byte 0
+
+    .byte >crashsite
+    .byte 0
     .byte 0
     .byte 0

@@ -7,3 +7,4 @@
 
 .include "maps/LOC3_collision0.asm"
 .include "maps/LOC3_collision1.asm"
+

@@ -67,6 +67,8 @@ main_tiles_chr2: .incbin "main.chr"
 .include "data/maps/field2_bg.asm"
 .include "data/maps/field2_bg1.asm"
 .include "data/collision_data2.asm"
+.include "data/maps/cave1.asm"
+.include "data/maps/crashsite.asm"
 
 ;=============================================================
 .segment "ROM5" ;title and intro data (?)
@@ -360,7 +362,7 @@ player_sprites_flip:
     MAX_TILE_SCROLL_RIGHT      = 8
 
 
-    ENTRY_POINT_COUNT          = 10
+    ENTRY_POINT_COUNT          = 12
 
     SLEEP_POS_X                = 100
     SLEEP_POS_Y                = 72
@@ -2622,6 +2624,34 @@ RoutinesAfterFadeOut:
     jsr OnExitVillagerHut
 
 @next11:
+    lda ActiveMapEntryIndex
+    cmp #10
+    bne @next12
+
+
+    lda #0
+    sta CurrentMapSegmentIndex
+    sta GlobalScroll
+    sta TilesScroll
+    lda #1
+    sta MustLoadOutside
+
+@next12:
+
+    lda ActiveMapEntryIndex
+    cmp #11
+    bne @next13
+
+
+    lda #0
+    sta CurrentMapSegmentIndex
+    sta GlobalScroll
+    sta TilesScroll
+    lda #1
+    sta MustLoadOutside
+
+@next13:
+
 
     rts
 ;------------------------------
@@ -2673,6 +2703,15 @@ CommonLocationRoutine:
     sta pointer + 1
     inx
     lda MapSpawnPoint, x
+;TODO: this must work
+;    bne @itsAnIndoorMap
+;    lda #1
+;    sta MustLoadOutside
+;    jmp @loadMapptr
+;@itsAnIndoorMap:
+;    lda #1
+;    sta MustLoadHouseInterior
+@loadMapptr:
     inx
     lda MapSpawnPoint, x
     sta MapPtr

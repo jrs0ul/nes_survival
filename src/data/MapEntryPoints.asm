@@ -10,6 +10,8 @@
 ;MaxY
 ;<unused bytes>
 
+;entry point count is stored in ENTRY_POINT_COUNT
+
 MapEntryPoints:
     ;Entry to player's house from outside
     .byte 0, 0, 64,  88,  0,   255,   102, 110, 0, 0, 0, 0, 0, 0, 0, 0
@@ -31,6 +33,10 @@ MapEntryPoints:
     .byte 2, 0, 119, 121, 48, 66, 136, 142, 0, 0, 0, 0, 0, 0, 0, 0
     ;Second villager house's exit
     .byte 5, 0, 0, 255, 0, 255, 168, 255, 0, 0, 0, 0, 0, 0, 0, 0
+    ;cave entrance
+    .byte 1, 0, 119, 121, 20, 30, 40, 50, 0, 0, 0, 0, 0, 0, 0, 0
+    ;cave exit
+    .byte 6, 0, 0, 255, 0, 255, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0
 
 
 ;-----------------------------------------------------
@@ -84,6 +90,12 @@ MapSpawnPoint:
     ;Second villager house's exit
     .byte 119, 151, 2, OUTDOORS_LOC3_SCREEN_COUNT, <Outside3_items, >Outside3_items, 0, <LOC3_collision0, >LOC3_collision0
     .byte 0, 0, 0, 0, 0, 0, 0
+    ;cave entrance
+    .byte 30, 188, 6, 1, <House_items, >House_items, 4, <cave1_collision, >cave1_collision
+    .byte 0, 0, 0, 0, 0, 0, 0
+    ;cave exit, place where the plane is
+    .byte 30, 180, 7, 1, <House_items, >House_items, 4, <crashsite_collision, >crashsite_collision
+    .byte 0, 0, 0, 0, 0, 0, 0
 
 
 LocationScreenCountList:
@@ -93,6 +105,8 @@ LocationScreenCountList:
     .byte 1                          ; 3
     .byte 1                          ; 4
     .byte 1                          ; 5
+    .byte 1                          ; 6
+    .byte 1                          ; 7
 
 ;which location in which bank
 LocationBanks:
@@ -102,12 +116,16 @@ LocationBanks:
     .byte 0
     .byte 0
     .byte 0
+    .byte 4
+    .byte 4
 
 ;screens where npcs should appear
 LocationPopulatedScreens:
     .byte 2, 1
     .byte 1, 0
     .byte 1, 0
+    .byte 0, 0
+    .byte 0, 0
     .byte 0, 0
     .byte 0, 0
     .byte 0, 0
@@ -120,11 +138,15 @@ LocationItemIndexes:
     .byte ITEM_COUNT_LOC1 + ITEM_COUNT_LOC2 + ITEM_COUNT_LOC3
     .byte ITEM_COUNT_LOC1 + ITEM_COUNT_LOC2 + ITEM_COUNT_LOC3
     .byte ITEM_COUNT_LOC1 + ITEM_COUNT_LOC2 + ITEM_COUNT_LOC3
+    .byte 0
+    .byte 0
 
 LocationItemCounts:
     .byte ITEM_COUNT_LOC1
     .byte ITEM_COUNT_LOC2
     .byte ITEM_COUNT_LOC3
+    .byte 0
+    .byte 0
     .byte 0
     .byte 0
     .byte 0
