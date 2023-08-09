@@ -12,6 +12,34 @@ collision_list_low:
 ;---
     .byte <LOC3_collision0
     .byte <LOC3_collision1
+    .byte 0
+    .byte 0
+
+    .byte 0
+    .byte 0
+    .byte 0
+    .byte 0
+
+    .byte 0
+    .byte 0
+    .byte 0
+    .byte 0
+
+    .byte 0
+    .byte 0
+    .byte 0
+    .byte 0
+
+    .byte <cave1_collision
+    .byte <cave2_collision
+    .byte 0
+    .byte 0
+
+    .byte <crashsite_collision
+    .byte 0
+    .byte 0
+    .byte 0
+
 
 collision_list_high:
     .byte >bg_collision
@@ -26,3 +54,30 @@ collision_list_high:
 ;---
     .byte >LOC3_collision0
     .byte >LOC3_collision1
+    .byte 0
+    .byte 0
+
+    .byte 0
+    .byte 0
+    .byte 0
+    .byte 0
+
+    .byte 0
+    .byte 0
+    .byte 0
+    .byte 0
+
+    .byte 0
+    .byte 0
+    .byte 0
+    .byte 0
+
+    .byte >cave1_collision
+    .byte >cave2_collision
+    .byte 0
+    .byte 0
+
+    .byte >crashsite_collision
+    .byte 0
+    .byte 0
+    .byte 0

@@ -68,6 +68,7 @@ main_tiles_chr2: .incbin "main.chr"
 .include "data/maps/field2_bg1.asm"
 .include "data/collision_data2.asm"
 .include "data/maps/cave1.asm"
+.include "data/maps/cave2.asm"
 .include "data/maps/crashsite.asm"
 
 ;=============================================================
@@ -362,7 +363,7 @@ player_sprites_flip:
     MAX_TILE_SCROLL_RIGHT      = 8
 
 
-    ENTRY_POINT_COUNT          = 12
+    ENTRY_POINT_COUNT          = 14
 
     SLEEP_POS_X                = 100
     SLEEP_POS_Y                = 72
@@ -386,6 +387,7 @@ player_sprites_flip:
     OUTDOORS_LOC1_SCREEN_COUNT = 4
     OUTDOORS_LOC2_SCREEN_COUNT = 2
     OUTDOORS_LOC3_SCREEN_COUNT = 2
+    OUTDOORS_LOC7_SCREEN_COUNT = 2
     PLAYER_START_X             = $50
     PLAYER_START_Y             = 200
 
@@ -2628,13 +2630,30 @@ RoutinesAfterFadeOut:
     cmp #10
     bne @next12
 
-
-    lda #0
-    sta CurrentMapSegmentIndex
-    sta GlobalScroll
-    sta TilesScroll
     lda #1
     sta MustLoadOutside
+    lda #0
+    sta CurrentMapSegmentIndex
+
+    lda #1
+    sta RightCollisonMapIdx
+    lda #0
+    sta RightCollisionColumnIndex
+    jsr LoadRightCollisionColumn
+    lda #255
+    sta LeftCollisionColumnIndex
+
+
+    jsr ResetNameTableAdresses
+
+    lda #0
+    sta LeftCollisionMapIdx
+    sta GlobalScroll
+    sta TilesScroll
+    sta TimesShiftedLeft
+    sta TimesShiftedRight
+
+
 
 @next12:
 
@@ -2651,6 +2670,80 @@ RoutinesAfterFadeOut:
     sta MustLoadOutside
 
 @next13:
+
+    lda ActiveMapEntryIndex
+    cmp #12
+    bne @next14
+
+    lda #1
+    sta MustLoadOutside
+    lda #0
+    sta CurrentMapSegmentIndex
+
+    lda #1
+    sta RightCollisonMapIdx
+    lda #0      ;load the first column
+    sta RightCollisionColumnIndex
+    jsr LoadRightCollisionColumn
+    lda #255
+    sta LeftCollisionColumnIndex
+
+
+    jsr ResetNameTableAdresses
+
+    lda #0
+    sta LeftCollisionMapIdx
+    sta GlobalScroll
+    sta TilesScroll
+    sta TimesShiftedLeft
+    sta TimesShiftedRight
+
+@next14:
+    lda ActiveMapEntryIndex
+    cmp #13
+    bne @next15
+
+
+    lda #255
+    sta LeftCollisionMapIdx
+
+    lda #1
+    sta RightCollisonMapIdx
+
+    lda #0      ;load the first column
+    sta TimesShiftedLeft
+    sta TimesShiftedRight
+    sta RightCollisionColumnIndex
+    jsr LoadRightCollisionColumn
+    lda #255
+    sta LeftCollisionColumnIndex
+
+
+    lda #0 ;hack
+    sta TilesScroll
+    lda #1
+    sta CurrentMapSegmentIndex
+
+    ;TODO: rework this
+    jsr PushCollisionMapLeft
+    jsr PushCollisionMapLeft
+    jsr PushCollisionMapLeft
+    
+    lda #0
+    sta CurrentMapSegmentIndex
+
+    lda #24
+    sta GlobalScroll
+
+    lda #2
+    sta ScrollDirection
+
+
+    lda #1
+    sta MustLoadOutside
+
+
+@next15:
 
 
     rts

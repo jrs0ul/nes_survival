@@ -33,10 +33,14 @@ MapEntryPoints:
     .byte 2, 0, 119, 121, 48, 66, 136, 142, 0, 0, 0, 0, 0, 0, 0, 0
     ;Second villager house's exit
     .byte 5, 0, 0, 255, 0, 255, 168, 255, 0, 0, 0, 0, 0, 0, 0, 0
-    ;cave entrance
+    ;cave entrance from location 2
     .byte 1, 0, 119, 121, 20, 30, 40, 50, 0, 0, 0, 0, 0, 0, 0, 0
-    ;cave exit
+    ;crashsite entrance from cave
     .byte 6, 0, 0, 255, 0, 255, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0
+    ;crashsite exit to cave
+    .byte 7, 0, 0, 255, 0, 255, 230, 255, 0, 0, 0, 0, 0, 0, 0, 0
+    ;cave exit to second location
+    .byte 6, 0, 0, 255, 0, 255, 230, 255, 0, 0, 0, 0 ,0, 0, 0, 0
 
 
 ;-----------------------------------------------------
@@ -91,11 +95,18 @@ MapSpawnPoint:
     .byte 119, 151, 2, OUTDOORS_LOC3_SCREEN_COUNT, <Outside3_items, >Outside3_items, 0, <LOC3_collision0, >LOC3_collision0
     .byte 0, 0, 0, 0, 0, 0, 0
     ;cave entrance
-    .byte 30, 188, 6, 1, <House_items, >House_items, 4, <cave1_collision, >cave1_collision
+    .byte 56, 207, 6, OUTDOORS_LOC7_SCREEN_COUNT, <House_items, >House_items, 4, <cave1_collision, >cave1_collision
     .byte 0, 0, 0, 0, 0, 0, 0
-    ;cave exit, place where the plane is
-    .byte 30, 180, 7, 1, <House_items, >House_items, 4, <crashsite_collision, >crashsite_collision
+    ;entrance to place where the plane is
+    .byte 57, 210, 7, 1, <House_items, >House_items, 4, <crashsite_collision, >crashsite_collision
     .byte 0, 0, 0, 0, 0, 0, 0
+    ;crashsite exit to cave
+    .byte 57, 34, 6, OUTDOORS_LOC7_SCREEN_COUNT, <House_items, >House_items, 4, <cave1_collision, >cave1_collision
+    .byte 0, 0, 0, 0, 0, 0, 0
+    ;cave exit to second location
+    .byte 120, 63, 1, OUTDOORS_LOC2_SCREEN_COUNT, <Outside2_items, >Outside2_items, 4, <bg2_collision, >bg2_collision
+    .byte 0, 0, 0, 3, 0, 0, 0
+
 
 
 LocationScreenCountList:
@@ -105,7 +116,7 @@ LocationScreenCountList:
     .byte 1                          ; 3
     .byte 1                          ; 4
     .byte 1                          ; 5
-    .byte 1                          ; 6
+    .byte OUTDOORS_LOC7_SCREEN_COUNT ; 6 cave
     .byte 1                          ; 7
 
 ;which location in which bank

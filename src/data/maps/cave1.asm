@@ -10,49 +10,49 @@ cave1:
     .byte $a0,$a0,$a0,$a0,$a0,$a0,$a0,$ef,$ef,$a0,$a0,$a0,$a0,$a0,$a0,$a0
     .byte $a0,$a0,$a0,$a0,$a0,$a0,$a0,$a0,$a0,$a0,$a0,$a0,$a0,$a0,$a0,$a0
     .byte $a0,$a0,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef
-    .byte $ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$a0,$a0
+    .byte $c0,$c0,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef
     .byte $a0,$a0,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef
-    .byte $ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$a0,$a0
+    .byte $c0,$c0,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef
     .byte $a0,$a0,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef
-    .byte $ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$a0,$a0
+    .byte $c0,$c0,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef
     .byte $a0,$a0,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef
-    .byte $ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$a0,$a0
+    .byte $c0,$c0,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef
     .byte $a0,$a0,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef
-    .byte $ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$a0,$a0
+    .byte $c0,$c0,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef
     .byte $a0,$a0,$ef,$ef,$ef,$a0,$a0,$a0,$a0,$a0,$a0,$a0,$a0,$a0,$a0,$a0
-    .byte $a0,$a0,$a0,$a0,$a0,$a0,$a0,$a0,$a0,$a0,$a0,$a0,$a0,$a0,$a0,$a0
+    .byte $a0,$a0,$a0,$a0,$a0,$a0,$a0,$a0,$a0,$a0,$ef,$ef,$a0,$a0,$a0,$a0
     .byte $a0,$a0,$ef,$ef,$ef,$a0,$a0,$a0,$a0,$a0,$a0,$a0,$a0,$a0,$a0,$a0
-    .byte $a0,$a0,$a0,$a0,$a0,$a0,$a0,$a0,$a0,$a0,$a0,$a0,$a0,$a0,$a0,$a0
+    .byte $a0,$a0,$a0,$a0,$a0,$a0,$a0,$a0,$a0,$a0,$ef,$ef,$a0,$a0,$a0,$a0
     .byte $a0,$a0,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef
-    .byte $ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$a0,$a0
+    .byte $ef,$ef,$c0,$c0,$c0,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef
     .byte $a0,$a0,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef
-    .byte $ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$a0,$a0
+    .byte $ef,$ef,$c0,$c0,$c0,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef
     .byte $a0,$a0,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef
-    .byte $ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$a0,$a0
+    .byte $ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef
     .byte $a0,$a0,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef
-    .byte $ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$a0,$a0
+    .byte $ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef
     .byte $a0,$a0,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef
-    .byte $ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$a0,$a0
+    .byte $ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef
     .byte $a0,$a0,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef
-    .byte $ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$a0,$a0
+    .byte $ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef
     .byte $a0,$a0,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$c0,$c0,$c0,$c0
-    .byte $ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$a0,$a0
+    .byte $ef,$ef,$ef,$ef,$ef,$ef,$a0,$a0,$a0,$a0,$a0,$a0,$a0,$a0,$a0,$a0
     .byte $a0,$a0,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$c0,$c0,$c0,$c0
-    .byte $ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$a0,$a0
+    .byte $ef,$ef,$ef,$ef,$ef,$ef,$a0,$a0,$a0,$a0,$a0,$a0,$a0,$a0,$a0,$a0
     .byte $a0,$a0,$c0,$c0,$c0,$c0,$c0,$c0,$c0,$c0,$c0,$c0,$c0,$c0,$c0,$c0
-    .byte $c0,$c0,$c0,$c0,$c0,$c0,$c0,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$a0,$a0
+    .byte $c0,$c0,$c0,$c0,$c0,$c0,$c0,$a0,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef
     .byte $a0,$a0,$c0,$c0,$c0,$c0,$c0,$c0,$c0,$c0,$c0,$c0,$c0,$c0,$c0,$c0
-    .byte $c0,$c0,$c0,$c0,$c0,$c0,$c0,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$a0,$a0
+    .byte $c0,$c0,$c0,$c0,$c0,$c0,$c0,$a0,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef
     .byte $a0,$a0,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef
-    .byte $ef,$ef,$ef,$ef,$c0,$c0,$c0,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$a0,$a0
+    .byte $ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef
     .byte $a0,$a0,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef
-    .byte $ef,$ef,$ef,$ef,$c0,$c0,$c0,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$a0,$a0
+    .byte $ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef
     .byte $a0,$c0,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef
-    .byte $ef,$ef,$ef,$ef,$c0,$c0,$c0,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$a0,$a0
+    .byte $ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef
     .byte $a0,$a0,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef
-    .byte $ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$c0,$c0,$c0,$c0,$a0,$a0
+    .byte $ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$c0,$c0,$c0,$c0,$ef,$ef
     .byte $a0,$a0,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef
-    .byte $ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$c0,$c0,$c0,$c0,$a0,$a0
+    .byte $ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$c0,$c0,$c0,$c0,$ef,$ef
     .byte $a0,$a0,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef
     .byte $ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$ef,$c0,$c0,$c0,$c0,$a0,$a0
     .byte $a0,$a0,$c0,$c0,$c0,$c0,$c0,$ef,$ef,$c0,$c0,$c0,$c0,$c0,$c0,$c0

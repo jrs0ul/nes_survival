@@ -32,7 +32,7 @@ map_list_low:
     .byte 0
 
     .byte <cave1
-    .byte 0
+    .byte <cave2
     .byte 0
     .byte 0
 
@@ -75,7 +75,7 @@ map_list_high:
     .byte 0
 
     .byte >cave1
-    .byte 0
+    .byte >cave2
     .byte 0
     .byte 0
 
