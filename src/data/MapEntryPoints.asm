@@ -98,7 +98,7 @@ MapSpawnPoint:
     .byte 56, 207, 6, OUTDOORS_LOC7_SCREEN_COUNT, <House_items, >House_items, 4, <cave1_collision, >cave1_collision
     .byte 0, 0, 0, 0, 0, 0, 0
     ;entrance to place where the plane is
-    .byte 57, 210, 7, 1, <House_items, >House_items, 4, <crashsite_collision, >crashsite_collision
+    .byte 57, 210, 7, 1, <Crashsite_items, >Crashsite_items, 4, <crashsite_collision, >crashsite_collision
     .byte 0, 0, 0, 0, 0, 0, 0
     ;crashsite exit to cave
     .byte 57, 34, 6, OUTDOORS_LOC7_SCREEN_COUNT, <House_items, >House_items, 4, <cave1_collision, >cave1_collision

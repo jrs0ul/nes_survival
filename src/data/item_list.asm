@@ -1,5 +1,14 @@
+;item_list_name:
+; .byte ITEM_COUNT
+; .byte (item index(7 bits) + active(1 bit), screen index, x, y
+
+
 House_items:
     .byte 0
+
+Crashsite_items:
+    .byte 1
+    .byte %00100111, 0, 80, 96
 
 Outside1_items:
     .byte ITEM_COUNT_LOC1
