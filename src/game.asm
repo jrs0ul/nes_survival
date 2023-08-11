@@ -310,6 +310,7 @@ player_sprites_flip:
     STATE_MENU                 = 2
     STATE_GAME_OVER            = 3
     STATE_INTRO                = 4
+    STATE_OUTRO                = 5
 
     BUTTON_RIGHT_MASK           = %00000001
     BUTTON_LEFT_MASK            = %00000010
@@ -333,6 +334,7 @@ player_sprites_flip:
 
 
     INTRO_SCENE_MAX            = 7
+    OUTRO_SCENE_MAX            = 1
 
 
     HOURS_MAX                  = 240
@@ -807,6 +809,8 @@ FuelDelay:
 
 PlayerAlive:
     .res 1
+PlayerWins:
+    .res 1
 
 InHouse:    ;is the player inside his hut?
     .res 1
@@ -862,16 +866,26 @@ MustLoadMenu:
     .res 1
 MustLoadTitle:
     .res 1
+MustLoadTitleCHR:
+    .res 1
 MustLoadGameOver:
     .res 1
 MustLoadIntro:
     .res 1
 MustLoadIntroChr:
     .res 1
+MustLoadOutro:
+    .res 1
 MustDrawMenuTitle:
     .res 1
 
 MustLoadGameOverAfterFadeOut:
+    .res 1
+
+MustShowOutroAfterFadeout:
+    .res 1
+
+MustShowTitleAfterFadeout:
     .res 1
 
 MustDrawInventoryGrid:
@@ -1153,7 +1167,7 @@ SourceMapIdx:
     .res 1
 
 Buffer:
-    .res 504  ;must see how much is still available
+    .res 499  ;must see how much is still available
 
 ;====================================================================================
 
@@ -1379,11 +1393,18 @@ updateInventory:
 
 checkIntro:
     cmp #STATE_INTRO
-    bne hide_sprites ; some other state
+    bne checkOutro ; you win ?
     dec IntroDelay
     bne runrandom
 
     jsr doIntro
+    jmp runrandom
+
+checkOutro:
+    cmp #STATE_OUTRO
+    bne hide_sprites ; some other state
+
+    jsr doOutro
     jmp runrandom
 
 hide_sprites:
@@ -1588,7 +1609,21 @@ doIntro:
     ldy oldbank
     bankswitch
     rts
+;---------------------------------
+doOutro:
 
+    ldy current_bank
+    sty oldbank
+    ldy #5
+    bankswitch
+
+    jsr OutroLogics
+    jsr UpdateOutroSprites
+
+    ldy oldbank
+    bankswitch
+
+    rts
 
 
 ;--------------------------------------------
@@ -1625,6 +1660,7 @@ LoadBackgroundsIfNeeded:
     jsr LoadTitle
     jsr LoadGameOver
     jsr LoadIntro
+    jsr LoadOutro
     jsr LoadMenu
 
     jsr LoadInteriorMap
@@ -1825,6 +1861,20 @@ UpdateAttributeColumn:
     bne @attribLoop
 
     rts
+;-----------------------------------
+ActivateYouWin:
+    lda PaletteFadeAnimationState
+    bne @exit
+    lda #1
+    sta PaletteFadeAnimationState
+    sta MustShowOutroAfterFadeout
+    lda #0
+    sta PaletteFadeTimer
+    sta FadeIdx
+    lda #FADE_DELAY_GENERIC
+    sta PaletteAnimDelay
+@exit:
+    rts
 
 ;-----------------------------------
 Logics:
@@ -1853,6 +1903,13 @@ Logics:
     sta PaletteAnimDelay
 ;---
 @cont:
+    lda PlayerWins
+    beq @cont2
+
+    jsr ActivateYouWin
+
+@cont2:
+
     jsr AnimateFire
 
     lda HP
@@ -2276,7 +2333,7 @@ RoutinesAfterFadeOut:
     rts
 @next: ;game over
     lda MustLoadGameOverAfterFadeOut
-    beq @afterIntro
+    beq @nextYouWin
     lda #1
     sta MustLoadSomething
     sta MustLoadGameOver
@@ -2284,6 +2341,42 @@ RoutinesAfterFadeOut:
     sta PaletteFadeAnimationState
     sta MustLoadGameOverAfterFadeOut
     rts
+@nextYouWin:
+    lda MustShowOutroAfterFadeout
+    beq @showTitle
+
+    lda #1
+    sta MustLoadOutro
+    sta MustLoadSomething
+    sta MustLoadIntroChr
+    lda #0
+    sta PaletteFadeAnimationState
+    sta MustShowOutroAfterFadeout
+
+    ldy #5
+    jsr bankswitch_y
+    jsr InitOutro
+
+    rts
+
+@showTitle:
+
+    lda MustShowTitleAfterFadeout
+    beq @afterIntro
+
+    lda #1
+    sta MustLoadSomething
+    sta MustLoadTitle
+    sta MustLoadTitleCHR
+    lda #%10010000
+    sta PPUCTRL
+    lda #0
+    sta MustShowTitleAfterFadeout
+    sta PaletteFadeAnimationState
+
+    rts
+
+
 @afterIntro:
     jsr StartGame
     rts
@@ -3640,6 +3733,32 @@ LoadTitle:
     lda MustLoadTitle
     beq @exit
 
+    lda MustLoadTitleCHR
+    beq @loadJustData
+
+    lda #2
+    sta SongName
+    lda #1
+    sta MustPlayNewSong
+
+    ldy #2
+    jsr bankswitch_y
+
+    lda #0
+    sta $2000
+    sta $2001
+
+    lda #<title_tiles_chr
+    sta pointer
+    lda #>title_tiles_chr
+    sta pointer + 1
+    jsr CopyCHRTiles
+
+    lda #0
+    sta MustLoadTitleCHR
+
+
+@loadJustData:
     ldy #5
     jsr bankswitch_y
 
@@ -3765,6 +3884,7 @@ ResetEntityVariables:
     sta FireFrameDelay
 
     lda #0
+    sta PlayerWins
     sta ItemIGave
     sta PaletteFadeAnimationState
     sta FadeIdx
@@ -3981,6 +4101,39 @@ LoadIntro:
     jsr LoadIntroScene ; from bank 5
 @exit:
     rts
+;-----------------------------------
+LoadOutro:
+    lda MustLoadOutro
+    beq @exit
+    
+    lda #0
+    sta $2000
+    sta $2001
+
+
+    lda MustLoadIntroChr
+    beq @loadScene
+
+    ldy #2
+    jsr bankswitch_y
+
+
+    lda #<intro_tiles_chr
+    sta pointer
+    lda #>intro_tiles_chr
+    sta pointer + 1
+    jsr CopyCHRTiles
+
+@loadScene:
+    ldy #5
+    jsr bankswitch_y
+
+    jsr LoadOutroScene ; from bank 5
+
+@exit:
+    rts
+
+
 ;-------------------------------------
 StartGame:
     ldy #0
@@ -4022,6 +4175,20 @@ FadeOutToStartGame:
     lda #FADE_DELAY_GENERIC
     sta PaletteAnimDelay
     rts
+;--------------------------------
+FadeOutToGoToTitle:
+    lda #PALETTE_STATE_FADE_OUT
+    sta PaletteFadeAnimationState
+    lda #1
+    sta MustShowTitleAfterFadeout
+    lda #0
+    sta PaletteFadeTimer
+    sta FadeIdx
+    sta IsLocationRoutine
+    lda #FADE_DELAY_GENERIC
+    sta PaletteAnimDelay
+    rts
+
 
 
 ;-------------------------------------
@@ -4064,7 +4231,8 @@ CheckStartButton:
 
 @checkGameOver:
     cmp #STATE_GAME_OVER
-    bne @CheckOnGame
+    bne @CheckOutro
+@goToTitle:
     lda #1
     sta MustLoadSomething
     sta MustLoadTitle
@@ -4073,6 +4241,12 @@ CheckStartButton:
     sta PPUCTRL
 
     jmp @exit
+@CheckOutro:
+    cmp #STATE_OUTRO
+    bne @CheckOnGame
+    lda #1
+    sta MustLoadTitleCHR
+    jmp @goToTitle
 @CheckOnGame:
     cmp #STATE_GAME
     beq @enterMenuScreen

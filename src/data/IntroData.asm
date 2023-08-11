@@ -4,6 +4,8 @@
 .include "data/intro_bg_mowdens_base.asm"
 .include "data/intro_bg_mowdens_top.asm"
 
+.include "data/outro_bg_victory.asm"
+
 intro_scenes_low:
     .byte <intro_bg_mowdens
     .byte <intro_bg_cockpit
@@ -22,6 +24,11 @@ intro_scenes_high:
     .byte >intro_bg_mowdens_base
     .byte >intro_bg_mowdens_top
 
+outro_scenes_low:
+    .byte <outro_bg_victory
+outro_scenes_high:
+    .byte >outro_bg_victory
+
 intro_scenes_delay:
     .byte 5
     .byte 37
@@ -39,6 +46,9 @@ intro_scenes_duration:
     .byte 20
     .byte 12
     .byte 10
+
+outro_scenes_duration:
+    .byte 90
 
 
 plane_flies:
@@ -222,6 +232,11 @@ intro_sprite_count:
     .byte 14 * 4
     .byte 0
 
+outro_sprite_count:
+   .byte 0
+   .byte 0
+
+
 intro_sprite_pos_y:
     .byte 50
     .byte 0
@@ -265,6 +280,20 @@ intro_sprite_pos_x:
 
     .byte 150
     .byte 0
+
+
+outro_sprite_pos_x:
+    .byte 0
+outro_sprite_pos_y:
+    .byte 0
+outro_sprite_dir_y:
+    .byte 0
+outro_sprite_dir_x:
+    .byte 0
+outro_scroll_dir_x:
+outro_scroll_dir_y:
+    .byte 0
+
 
 ;two part movement
 intro_sprite_dir_x:
@@ -409,6 +438,21 @@ intro_sprites_high:
     .byte >dude_climbs
     .byte 0
 
+outro_sprites_high:
+    .byte 0
+    .byte 0
+outro_sprites_low:
+    .byte 0
+    .byte 0
+
+outro_sprites_2_high:
+    .byte 0
+    .byte 0
+outro_sprites_2_low:
+    .byte 0
+    .byte 0
+
+
 
 ;alternative frames for the metasprites
 
@@ -465,3 +509,6 @@ intro_meta_sprite_count:
     .byte 2
     .byte 1
     .byte 1
+
+outro_meta_sprite_count:
+    .byte 0

@@ -1742,6 +1742,14 @@ ItemMenuInput:
     lda ItemMenuIndex
     bne @checkIfStash
     ;use
+
+    lda TempItemIndex
+    cmp #19
+    bne @checktype
+    lda #1
+    sta PlayerWins
+    sta MustExitMenuState
+@checktype:
     lda TempIndex
     cmp #ITEM_TYPE_FUEL
     bne @medicine

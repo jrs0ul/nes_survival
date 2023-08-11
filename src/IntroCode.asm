@@ -86,8 +86,89 @@ IntroLogics:
     jsr FadeOutToStartGame
 @exit:
     rts
+;---------------------------------
+OutroLogics:
 
 
+    inc IntroSpriteAnimFrame
+    lda IntroSpriteAnimFrame
+    cmp #2
+    bcc @go
+    lda #0
+    sta IntroSpriteAnimFrame
+@go:
+    lda IntroSceneIdx
+    cmp #OUTRO_SCENE_MAX
+    bcs @exit
+    tax
+
+    ;do some scrolling
+    lda GlobalScroll
+    clc
+    adc outro_scroll_dir_x, x
+    sta GlobalScroll
+
+    lda GlobalScrollY
+    clc
+    adc outro_scroll_dir_y, x
+    sta GlobalScrollY
+
+
+    lda outro_scenes_duration, x
+    lsr
+    sta TempHp ; let's store half of the scene duration
+
+    lda IntroSceneIdx
+    asl
+    asl
+    tax
+
+    lda IntroTimer
+    cmp TempHp
+    bcs @cont
+
+    inx
+    inx
+
+@cont:
+    jsr MoveOutroSprites
+
+    dec IntroTimer
+    beq @increaseScene
+    jmp @exit
+
+@increaseScene:
+    inc IntroSceneIdx
+    lda IntroSceneIdx
+    cmp #OUTRO_SCENE_MAX
+    bcs @exit
+
+    ldx IntroSceneIdx
+    lda outro_scenes_duration, x
+    sta IntroTimer
+    lda IntroSceneIdx
+    asl
+    tax
+    lda outro_sprite_pos_x, x
+    sta IntroSprite1X
+    lda outro_sprite_pos_y, x
+    sta IntroSprite1Y
+    inx
+    lda outro_sprite_pos_x, x
+    sta IntroSprite2X
+    lda outro_sprite_pos_y, x
+    sta IntroSprite2Y
+
+
+    lda #1
+    sta MustLoadOutro
+    sta MustLoadSomething
+    lda #0
+    sta MustLoadIntroChr
+    sta GlobalScroll
+
+@exit:
+    rts
 
 ;------------------------------
 MoveIntroSprites:
@@ -112,6 +193,120 @@ MoveIntroSprites:
     clc
     adc intro_sprite_dir_y, x
     sta IntroSprite2Y
+    rts
+;--------------------------------
+MoveOutroSprites:
+    lda IntroSprite1X
+    clc
+    adc outro_sprite_dir_x, x
+    sta IntroSprite1X
+
+    lda IntroSprite1Y
+    clc
+    adc outro_sprite_dir_y, x
+    sta IntroSprite1Y
+
+    inx
+
+    lda IntroSprite2X
+    clc
+    adc outro_sprite_dir_x, x
+    sta IntroSprite2X
+
+    lda IntroSprite2Y
+    clc
+    adc outro_sprite_dir_y, x
+    sta IntroSprite2Y
+
+    rts
+;--------------------------------
+UpdateOutroSprites:
+
+
+    lda #<IntroSprite1X
+    sta IntroSpriteCoordPtr
+    lda #>IntroSprite1X
+    sta IntroSpriteCoordPtr + 1
+
+
+    ldx IntroSceneIdx
+    cpx #OUTRO_SCENE_MAX
+    bcs @done
+
+    ldy #0
+    sty TempSpriteCount
+    sty IntroMetaspriteIndex
+
+    lda outro_meta_sprite_count, x
+    sta IntroMetaspriteCount
+
+
+    txa
+    asl
+    tax
+
+@metaspriteloop:
+    lda outro_sprite_count, x
+    sta IntroSpriteCount
+
+    lda IntroSpriteAnimFrame
+    bne @secondFrame
+
+@firstFrame:
+    lda outro_sprites_low, x
+    sta IntroSpritePtr
+    lda outro_sprites_high, x
+    sta IntroSpritePtr + 1
+    jmp @cont
+@secondFrame:
+    lda outro_sprites_2_low, x
+    sta IntroSpritePtr
+    lda outro_sprites_2_high, x
+    sta IntroSpritePtr + 1
+    clc
+    adc IntroSpritePtr
+    beq @firstFrame
+
+@cont:
+    tya
+    sta TempPointY2 ;backup y for writing
+    sec
+    sbc TempSpriteCount
+    sta TempPointY ; backup y for reading
+    tay
+
+
+@updateLoop:
+
+    jsr DoIntroSpriteUpdate
+
+    cpy IntroSpriteCount
+    bcc @updateLoop
+
+    lda TempSpriteCount
+    clc
+    adc IntroSpriteCount
+    sta TempSpriteCount
+
+    inc IntroSpriteCoordPtr ;increment pointer to point to next metasprite coordinates
+    inc IntroSpriteCoordPtr
+
+    inc IntroMetaspriteIndex
+    inx
+    lda IntroMetaspriteIndex
+    cmp IntroMetaspriteCount
+    bcc @metaspriteloop
+
+
+    lda TempSpriteCount
+    lsr
+    lsr
+    sta TempSpriteCount
+
+    ldy TempPointY2
+    jsr HideIntroSprites
+
+@done:
     rts
 
 ;---------------------------------
@@ -316,6 +511,46 @@ LoadIntroScene:
 
 
     rts
+;------------------------------------
+LoadOutroScene:
+    ldy IntroSceneIdx
+
+    lda outro_scenes_low, y
+    sta pointer
+    lda outro_scenes_high, y
+    sta pointer+1
+    lda #$24
+    sta NametableAddress
+    jsr LoadNametable
+    ldy IntroSceneIdx
+    lda outro_scenes_low, y
+    sta pointer
+    lda outro_scenes_high, y
+    sta pointer+1
+
+    lda #$20
+    sta NametableAddress
+    jsr LoadNametable
+
+    jsr ClearPalette
+
+    lda #<intro_palette
+    sta PalettePtr
+    lda #>intro_palette
+    sta PalettePtr + 1
+
+    lda #PALETTE_STATE_FADE_IN
+    sta PaletteFadeAnimationState
+    lda #PALETTE_FADE_MAX_ITERATION
+    sta FadeIdx
+    lda #FADE_DELAY_GAME_OVER
+    sta PaletteAnimDelay
+
+    lda #0
+    sta MustLoadOutro
+    sta MustLoadSomething
+
+    rts
 
 ;-------------------------------
 InitIntro:
@@ -343,6 +578,17 @@ InitIntro:
     lda #STATE_INTRO
     sta GameState
 
+
+    rts
+;-------------------------------------
+InitOutro:
+
+    lda #0
+    sta IntroSceneIdx
+    sta GlobalScroll
+
+    lda #STATE_OUTRO
+    sta GameState
 
     rts
 
