@@ -34,7 +34,10 @@ LoadNpcs:
     sta Npcs, x ;timer
     inx
     ;hp
+    lda (pointer), y
+    sta Npcs, x ; hp
     inx
+    iny
 
     dec TempNpcCnt
     lda TempNpcCnt

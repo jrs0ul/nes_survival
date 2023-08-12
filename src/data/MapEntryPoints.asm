@@ -30,11 +30,11 @@ MapEntryPoints:
     ;Player's house exit
     .byte 4, 0, 0, 255, 0, 255, 168, 255, 0, 0, 0, 0, 0, 0, 0, 0
     ;Second villager's house
-    .byte 2, 0, 119, 121, 48, 66, 136, 142, 0, 0, 0, 0, 0, 0, 0, 0
+    .byte 2, 0, 118, 121, 48, 66, 136, 142, 0, 0, 0, 0, 0, 0, 0, 0
     ;Second villager house's exit
     .byte 5, 0, 0, 255, 0, 255, 168, 255, 0, 0, 0, 0, 0, 0, 0, 0
     ;cave entrance from location 2
-    .byte 1, 0, 119, 121, 20, 30, 40, 50, 0, 0, 0, 0, 0, 0, 0, 0
+    .byte 1, 0, 118, 121, 20, 30, 40, 50, 0, 0, 0, 0, 0, 0, 0, 0
     ;crashsite entrance from cave
     .byte 6, 0, 0, 255, 0, 255, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0
     ;crashsite exit to cave
@@ -96,13 +96,13 @@ MapSpawnPoint:
     .byte 0, 0, 0, 0, 0, 0, 0
     ;cave entrance
     .byte 56, 207, 6, OUTDOORS_LOC7_SCREEN_COUNT, <House_items, >House_items, 4, <cave1_collision, >cave1_collision
-    .byte 0, 0, 0, 0, 0, 0, 0
+    .byte 0, 0, 0, 0, <cave_npcs, >cave_npcs, 0
     ;entrance to place where the plane is
     .byte 57, 210, 7, 1, <Crashsite_items, >Crashsite_items, 4, <crashsite_collision, >crashsite_collision
     .byte 0, 0, 0, 0, 0, 0, 0
     ;crashsite exit to cave
     .byte 57, 34, 6, OUTDOORS_LOC7_SCREEN_COUNT, <House_items, >House_items, 4, <cave1_collision, >cave1_collision
-    .byte 0, 0, 0, 0, 0, 0, 0
+    .byte 0, 0, 0, 0, <cave_npcs, >cave_npcs, 0
     ;cave exit to second location
     .byte 120, 63, 1, OUTDOORS_LOC2_SCREEN_COUNT, <Outside2_items, >Outside2_items, 4, <bg2_collision, >bg2_collision
     .byte 0, 0, 0, 3, 0, 0, 0
