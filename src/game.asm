@@ -75,7 +75,7 @@ main_tiles_chr2: .incbin "main.chr"
 .segment "ROM5" ;title and intro data (?)
 
 title_palette:
-    .byte $0F,$07,$05,$26, $0F,$01,$26,$07, $0F,$26,$26,$35, $0F,$07,$26,$35    ;background
+    .byte $0F,$07,$11,$20, $0F,$01,$26,$07, $0F,$31,$26,$35, $0F,$07,$26,$35    ;background
     .byte $0F,$0f,$17,$20, $0F,$06,$26,$39, $0F,$17,$21,$31, $0F,$0f,$37,$26    ;OAM sprites
 
 intro_palette:
