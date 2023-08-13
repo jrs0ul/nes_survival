@@ -84,7 +84,7 @@ intro_palette:
 
 .include "data/title.asm"
 .include "data/game_over.asm"
-.include "data/IntroData.asm"
+.include "data/CutsceneData.asm"
 
 ;=============================================================
 .segment "ROM6"
@@ -334,7 +334,7 @@ player_sprites_flip:
 
 
     INTRO_SCENE_MAX            = 7
-    OUTRO_SCENE_MAX            = 1
+    OUTRO_SCENE_MAX            = 4
 
 
     HOURS_MAX                  = 240
