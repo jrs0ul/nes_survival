@@ -122,49 +122,49 @@ dude_climbs:
 
 
 parachute:
-    .byte 220,$43,0,248
-    .byte 220,$44,0,0
-    .byte 220,$45,0,8
-    .byte 228,$51,0,232
-    .byte 228,$52,0,240
-    .byte 228,$53,0,248
-    .byte 228,$54,0,0
-    .byte 228,$55,0,8
-    .byte 228,$56,0,16
-    .byte 236,$61,0,232
-    .byte 236,$62,0,240
-    .byte 236,$63,0,248
-    .byte 236,$64,0,0
-    .byte 236,$65,0,8
-    .byte 236,$66,0,16
-    .byte 244,$71,0,232
-    .byte 244,$72,0,240
-    .byte 244,$73,0,248
-    .byte 244,$75,0,8
-    .byte 244,$76,0, 16
-    .byte 252,$81,0,232
-    .byte 252,$82,0,240
-    .byte 252,$83,0,248
-    .byte 252,$84,0,  0
-    .byte 252,$85,0,  8
-    .byte 252,$86,0, 16
-    .byte   4,$91,0,232
-    .byte   4,$92,0,240
-    .byte   4,$93,0,248
-    .byte   4,$94,0,  0
-    .byte   4,$95,0,  8
-    .byte   4,$96,0, 16
-    .byte  12,$a3,0,248
-    .byte  12,$a4,0,  0
-    .byte  12,$a5,0,  8
-    .byte  12,$a6,0, 16
-    .byte  20,$b3,0,248
-    .byte  20,$b4,0,  0
-    .byte  20,$b5,0,  8
-    .byte  20,$b6,0, 16
-    .byte  28,$c4,0,  0
-    .byte  28,$c5,0,  8
-    .byte  28,$c6,0, 16
+    .byte 220,$42,0,248
+    .byte 220,$43,0,0
+    .byte 220,$44,0,8
+    .byte 228,$50,0,232
+    .byte 228,$51,0,240
+    .byte 228,$52,0,248
+    .byte 228,$53,0,0
+    .byte 228,$54,0,8
+    .byte 228,$55,0,16
+    .byte 236,$60,0,232
+    .byte 236,$61,0,240
+    .byte 236,$62,0,248
+    .byte 236,$63,0,0
+    .byte 236,$64,0,8
+    .byte 236,$65,0,16
+    .byte 244,$70,0,232
+    .byte 244,$71,0,240
+    .byte 244,$72,0,248
+    .byte 244,$74,0,8
+    .byte 244,$75,0, 16
+    .byte 252,$80,0,232
+    .byte 252,$81,0,240
+    .byte 252,$82,0,248
+    .byte 252,$83,0,  0
+    .byte 252,$84,0,  8
+    .byte 252,$85,0, 16
+    .byte   4,$90,0,232
+    .byte   4,$91,0,240
+    .byte   4,$92,0,248
+    .byte   4,$93,0,  0
+    .byte   4,$94,0,  8
+    .byte   4,$95,0, 16
+    .byte  12,$a2,0,248
+    .byte  12,$a3,0,  0
+    .byte  12,$a4,0,  8
+    .byte  12,$a5,0, 16
+    .byte  20,$b2,0,248
+    .byte  20,$b3,0,  0
+    .byte  20,$b4,0,  8
+    .byte  20,$b5,0, 16
+    .byte  28,$c3,0,  0
+    .byte  28,$c4,0,  8
+    .byte  28,$c5,0, 16
 
 rocket:
     .byte 248,$07,0,248
@@ -197,22 +197,22 @@ plane_falling:
 
 
 yoke:
-    .byte 244,$8d,%00000010,0
-    .byte 244,$8e,%00000010,8
-    .byte 244,$8f,%00000010,16
+    .byte 244,$dd,%00000010,0
+    .byte 244,$de,%00000010,8
+    .byte 244,$df,%00000010,16
 
-    .byte 252,$9d,%00000010,0
-    .byte 252,$9e,%00000010,8
-    .byte 252,$9f,%00000010,16
+    .byte 252,$ed,%00000010,0
+    .byte 252,$ee,%00000010,8
+    .byte 252,$ef,%00000010,16
 
 
-    .byte 244,$8d,%01000010,248
-    .byte 244,$8e,%01000010,240
-    .byte 244,$8f,%01000010,232
+    .byte 244,$dd,%01000010,248
+    .byte 244,$de,%01000010,240
+    .byte 244,$df,%01000010,232
 
-    .byte 252,$9d,%01000010,248
-    .byte 252,$9e,%01000010,240
-    .byte 252,$9f,%01000010,232
+    .byte 252,$ed,%01000010,248
+    .byte 252,$ee,%01000010,240
+    .byte 252,$ef,%01000010,232
 
 cloud:
     .byte 248,$e1,%00000000,244
@@ -222,6 +222,67 @@ cloud:
     .byte   0,$f2,%00000000,252
     .byte   0,$f3,%00000000,  4
 
+chopper:
+    .byte 232,$56,0,216
+    .byte 232,$57,0,224
+    .byte 232,$58,0,232
+    .byte 232,$59,0,240
+    .byte 232,$5a,0,248
+    .byte 232,$5b,0,  0
+    .byte 232,$5c,0,  8
+    .byte 232,$5d,0, 16
+    .byte 232,$5e,0, 24
+    .byte 232,$5f,0, 32
+    .byte 240,$66,0,216
+    .byte 240,$67,0,224
+    .byte 240,$68,0,232
+    .byte 240,$69,0,240
+    .byte 240,$6a,0,248
+    .byte 240,$6b,0,  0
+    .byte 240,$6c,0,  8
+    .byte 240,$6d,0, 16
+    .byte 240,$6e,0, 24
+    .byte 240,$6f,0, 32
+    .byte 248,$76,0,216
+    .byte 248,$77,0,224
+    .byte 248,$78,0,232
+    .byte 248,$79,0,240
+    .byte 248,$7a,0,248
+    .byte 248,$7b,0,  0
+    .byte 248,$7c,0,  8
+    .byte 248,$7d,0, 16
+    .byte 248,$7e,0, 24
+    .byte 248,$7f,0, 32
+    .byte   0,$86,0,216
+    .byte   0,$87,0,224
+    .byte   0,$88,0,232
+    .byte   0,$89,0,240
+    .byte   0,$8a,0,248
+    .byte   0,$8b,0,  0
+    .byte   0,$8c,0,  8
+    .byte   0,$8d,0, 16
+    .byte   0,$8e,0, 24
+    .byte   0,$8f,0, 32
+    .byte   8,$96,0,216
+    .byte   8,$97,0,224
+    .byte   8,$98,0,232
+    .byte   8,$99,0,240
+    .byte   8,$9a,0,248
+    .byte   8,$9b,0,  0
+    .byte   8,$9c,0,  8
+    .byte   8,$9d,0, 16
+    .byte   8,$9e,0, 24
+    .byte   8,$9f,0, 32
+    .byte  16,$a6,0,216
+    .byte  16,$a7,0,224
+    .byte  16,$a8,0,232
+    .byte  16,$a9,0,240
+    .byte  16,$aa,0,248
+    .byte  16,$ab,0,  0
+    .byte  16,$ac,0,  8
+    .byte  16,$ad,0, 16
+    .byte  16,$ae,0, 24
+    .byte  16,$af,0, 32
 
 
 intro_sprite_count:
@@ -253,10 +314,10 @@ outro_sprite_count:
    .byte 0
    .byte 0
 
-   .byte 0
+   .byte 60 * 4
    .byte 0
 
-   .byte 0
+   .byte 60 * 4
    .byte 0
 
 
@@ -313,10 +374,10 @@ outro_sprite_pos_x:
     .byte 0
     .byte 0
 
-    .byte 0
+    .byte 150
     .byte 0
 
-    .byte 0
+    .byte 100
     .byte 0
 
 
@@ -327,10 +388,10 @@ outro_sprite_pos_y:
     .byte 0
     .byte 0
 
-    .byte 0
+    .byte 60
     .byte 0
 
-    .byte 0
+    .byte 90
     .byte 0
 
 outro_sprite_dir_y:
@@ -541,10 +602,10 @@ outro_sprites_high:
     .byte 0
     .byte 0
 
-    .byte 0
+    .byte >chopper
     .byte 0
 
-    .byte 0
+    .byte >chopper
     .byte 0
 
 outro_sprites_low:
@@ -554,10 +615,10 @@ outro_sprites_low:
     .byte 0
     .byte 0
 
-    .byte 0
+    .byte <chopper
     .byte 0
 
-    .byte 0
+    .byte <chopper
     .byte 0
 
 outro_sprites_2_high:
@@ -646,5 +707,5 @@ intro_meta_sprite_count:
 outro_meta_sprite_count:
     .byte 0
     .byte 0
-    .byte 0
-    .byte 0
+    .byte 1
+    .byte 1
