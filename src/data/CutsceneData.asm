@@ -59,16 +59,16 @@ intro_scenes_duration:
     .byte 10
 
 outro_scenes_duration:
-    .byte 50
     .byte 70
-    .byte 60
     .byte 50
+    .byte 60
+    .byte 63
 
 outro_scenes_delay:
     .byte 5
     .byte 8
     .byte 10
-    .byte 10
+    .byte 5
 
 
 plane_flies:
@@ -322,6 +322,16 @@ chopper_flipped:
     .byte  16,$ab,%01000000,248
     .byte  16,$ac,%01000000,240
 
+raised_hand:
+    .byte 240,$c7,0,252
+    .byte 240,$c8,0,  4
+    .byte 248,$d7,0,252
+    .byte 248,$d8,0,  4
+    .byte   0,$e6,0,244
+    .byte   0,$e7,0,252
+    .byte   0,$e8,0,  4
+    .byte   8,$f7,0,252
+    .byte   8,$f8,0,  4
 
 intro_sprite_count:
     .byte 19 * 4
@@ -353,7 +363,7 @@ outro_sprite_count:
    .byte 0
 
    .byte 45 * 4
-   .byte 0
+   .byte 9 * 4
 
    .byte 45 * 4
    .byte 0
@@ -413,7 +423,7 @@ outro_sprite_pos_x:
     .byte 0
 
     .byte 160
-    .byte 0
+    .byte 85
 
     .byte 80
     .byte 0
@@ -427,7 +437,7 @@ outro_sprite_pos_y:
     .byte 0
 
     .byte 10
-    .byte 0
+    .byte 138
 
     .byte 90
     .byte 0
@@ -450,7 +460,7 @@ outro_sprite_dir_y:
 
     .byte 0
     .byte 0
-    .byte 0
+    .byte 255
     .byte 0
 
 outro_sprite_dir_x:
@@ -470,9 +480,9 @@ outro_sprite_dir_x:
     .byte 0
     .byte 0
 
-    .byte 1
+    .byte 2
     .byte 0
-    .byte 1
+    .byte 3
     .byte 0
 
 outro_scroll_dir_x:
@@ -641,7 +651,7 @@ outro_sprites_high:
     .byte 0
 
     .byte >chopper
-    .byte 0
+    .byte >raised_hand
 
     .byte >chopper_flipped
     .byte 0
@@ -654,7 +664,7 @@ outro_sprites_low:
     .byte 0
 
     .byte <chopper
-    .byte 0
+    .byte <raised_hand
 
     .byte <chopper_flipped
     .byte 0
@@ -745,5 +755,5 @@ intro_meta_sprite_count:
 outro_meta_sprite_count:
     .byte 0
     .byte 0
-    .byte 1
+    .byte 2
     .byte 1
