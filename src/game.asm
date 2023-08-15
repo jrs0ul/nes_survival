@@ -542,7 +542,7 @@ tmpAttribAddress:
 
 InputUpdateDelay:
     .res 1
-IntroDelay:
+CutsceneDelay:
 ItemUpdateDelay:
     .res 1
 NpcAIUpdateDelay:
@@ -964,30 +964,30 @@ PaletteFadeTimer:
 FadeIdx:
     .res 1
 
-IntroSceneIdx:
+CutsceneSceneIdx:
     .res 1
 
-IntroTimer:
+CutsceneTimer:
     .res 1
 
-IntroSpriteCount:
+CutsceneSpriteCount:
     .res 1
 
-IntroMetaspriteCount:
+CutsceneMetaspriteCount:
     .res 1
-IntroMetaspriteIndex:
-    .res 1
-
-IntroSprite1X:
-    .res 1
-IntroSprite1Y:
-    .res 1
-IntroSprite2X:
-    .res 1
-IntroSprite2Y:
+CutsceneMetaspriteIndex:
     .res 1
 
-IntroSpriteAnimFrame:
+CutsceneSprite1X:
+    .res 1
+CutsceneSprite1Y:
+    .res 1
+CutsceneSprite2X:
+    .res 1
+CutsceneSprite2Y:
+    .res 1
+
+CutsceneSpriteAnimFrame:
     .res 1
 
 CarrySet:
@@ -1394,7 +1394,7 @@ updateInventory:
 checkIntro:
     cmp #STATE_INTRO
     bne checkOutro ; you win ?
-    dec IntroDelay
+    dec CutsceneDelay
     bne runrandom
 
     jsr doIntro
@@ -1403,6 +1403,9 @@ checkIntro:
 checkOutro:
     cmp #STATE_OUTRO
     bne hide_sprites ; some other state
+
+    dec CutsceneDelay
+    bne runrandom
 
     jsr doOutro
     jmp runrandom
@@ -1538,6 +1541,8 @@ doneUpdatingPalette:
     beq WaitNotSprite0
     cmp #STATE_INTRO
     beq justScroll
+    cmp #STATE_OUTRO
+    beq justScroll
     jmp endOfNmi
 
 WaitNotSprite0:
@@ -1597,20 +1602,27 @@ noBankSwitch:
 
 ;---------------------------------
 doIntro:
-    ldx IntroSceneIdx
+    ldx CutsceneSceneIdx
     lda intro_scenes_delay, x
-    sta IntroDelay
+    sta CutsceneDelay
+
     ldy current_bank
     sty oldbank
     ldy #5
     bankswitch
+
     jsr IntroLogics
     jsr UpdateIntroSprites
+
     ldy oldbank
     bankswitch
     rts
 ;---------------------------------
 doOutro:
+
+    ldx CutsceneSceneIdx
+    lda outro_scenes_delay, x
+    sta CutsceneDelay
 
     ldy current_bank
     sty oldbank
@@ -1624,7 +1636,6 @@ doOutro:
     bankswitch
 
     rts
-
 
 ;--------------------------------------------
 ;copy chr tiles from ROM bank to a CHR RAM

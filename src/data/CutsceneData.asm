@@ -59,10 +59,16 @@ intro_scenes_duration:
     .byte 10
 
 outro_scenes_duration:
-    .byte 90
-    .byte 90
-    .byte 90
-    .byte 90
+    .byte 50
+    .byte 70
+    .byte 60
+    .byte 50
+
+outro_scenes_delay:
+    .byte 5
+    .byte 8
+    .byte 10
+    .byte 10
 
 
 plane_flies:
@@ -231,8 +237,6 @@ chopper:
     .byte 232,$5b,0,  0
     .byte 232,$5c,0,  8
     .byte 232,$5d,0, 16
-    .byte 232,$5e,0, 24
-    .byte 232,$5f,0, 32
     .byte 240,$66,0,216
     .byte 240,$67,0,224
     .byte 240,$68,0,232
@@ -241,19 +245,14 @@ chopper:
     .byte 240,$6b,0,  0
     .byte 240,$6c,0,  8
     .byte 240,$6d,0, 16
-    .byte 240,$6e,0, 24
-    .byte 240,$6f,0, 32
-    .byte 248,$76,0,216
     .byte 248,$77,0,224
     .byte 248,$78,0,232
     .byte 248,$79,0,240
     .byte 248,$7a,0,248
     .byte 248,$7b,0,  0
     .byte 248,$7c,0,  8
-    .byte 248,$7d,0, 16
     .byte 248,$7e,0, 24
     .byte 248,$7f,0, 32
-    .byte   0,$86,0,216
     .byte   0,$87,0,224
     .byte   0,$88,0,232
     .byte   0,$89,0,240
@@ -262,8 +261,6 @@ chopper:
     .byte   0,$8c,0,  8
     .byte   0,$8d,0, 16
     .byte   0,$8e,0, 24
-    .byte   0,$8f,0, 32
-    .byte   8,$96,0,216
     .byte   8,$97,0,224
     .byte   8,$98,0,232
     .byte   8,$99,0,240
@@ -271,18 +268,59 @@ chopper:
     .byte   8,$9b,0,  0
     .byte   8,$9c,0,  8
     .byte   8,$9d,0, 16
-    .byte   8,$9e,0, 24
-    .byte   8,$9f,0, 32
-    .byte  16,$a6,0,216
     .byte  16,$a7,0,224
     .byte  16,$a8,0,232
     .byte  16,$a9,0,240
     .byte  16,$aa,0,248
     .byte  16,$ab,0,  0
     .byte  16,$ac,0,  8
-    .byte  16,$ad,0, 16
-    .byte  16,$ae,0, 24
-    .byte  16,$af,0, 32
+
+chopper_flipped:
+    .byte 232,$56,%01000000, 32
+    .byte 232,$57,%01000000, 24
+    .byte 232,$58,%01000000, 16
+    .byte 232,$59,%01000000,  8
+    .byte 232,$5a,%01000000,  0
+    .byte 232,$5b,%01000000,248
+    .byte 232,$5c,%01000000,240
+    .byte 232,$5d,%01000000,232
+    .byte 240,$66,%01000000, 32
+    .byte 240,$67,%01000000, 24
+    .byte 240,$68,%01000000, 16
+    .byte 240,$69,%01000000,  8
+    .byte 240,$6a,%01000000,  0
+    .byte 240,$6b,%01000000,248
+    .byte 240,$6c,%01000000,240
+    .byte 240,$6d,%01000000,232
+    .byte 248,$77,%01000000, 24
+    .byte 248,$78,%01000000, 16
+    .byte 248,$79,%01000000,  8
+    .byte 248,$7a,%01000000,  0
+    .byte 248,$7b,%01000000,248
+    .byte 248,$7c,%01000000,240
+    .byte 248,$7e,%01000000,224
+    .byte 248,$7f,%01000000,216
+    .byte   0,$87,%01000000, 24
+    .byte   0,$88,%01000000, 16
+    .byte   0,$89,%01000000,  8
+    .byte   0,$8a,%01000000,  0
+    .byte   0,$8b,%01000000,248
+    .byte   0,$8c,%01000000,240
+    .byte   0,$8d,%01000000,232
+    .byte   0,$8e,%01000000,224
+    .byte   8,$97,%01000000, 24
+    .byte   8,$98,%01000000, 16
+    .byte   8,$99,%01000000,  8
+    .byte   8,$9a,%01000000,  0
+    .byte   8,$9b,%01000000,248
+    .byte   8,$9c,%01000000,240
+    .byte   8,$9d,%01000000,232
+    .byte  16,$a7,%01000000, 24
+    .byte  16,$a8,%01000000, 16
+    .byte  16,$a9,%01000000,  8
+    .byte  16,$aa,%01000000,  0
+    .byte  16,$ab,%01000000,248
+    .byte  16,$ac,%01000000,240
 
 
 intro_sprite_count:
@@ -314,10 +352,10 @@ outro_sprite_count:
    .byte 0
    .byte 0
 
-   .byte 60 * 4
+   .byte 45 * 4
    .byte 0
 
-   .byte 60 * 4
+   .byte 45 * 4
    .byte 0
 
 
@@ -374,10 +412,10 @@ outro_sprite_pos_x:
     .byte 0
     .byte 0
 
-    .byte 150
+    .byte 160
     .byte 0
 
-    .byte 100
+    .byte 80
     .byte 0
 
 
@@ -388,7 +426,7 @@ outro_sprite_pos_y:
     .byte 0
     .byte 0
 
-    .byte 60
+    .byte 10
     .byte 0
 
     .byte 90
@@ -405,9 +443,9 @@ outro_sprite_dir_y:
     .byte 0
     .byte 0
 
+    .byte 1
     .byte 0
-    .byte 0
-    .byte 0
+    .byte 1
     .byte 0
 
     .byte 0
@@ -432,19 +470,19 @@ outro_sprite_dir_x:
     .byte 0
     .byte 0
 
+    .byte 1
     .byte 0
-    .byte 0
-    .byte 0
+    .byte 1
     .byte 0
 
 outro_scroll_dir_x:
+    .byte 0
+    .byte 0
+
+    .byte 0
+    .byte 1
+
 outro_scroll_dir_y:
-    .byte 0
-    .byte 0
-
-    .byte 0
-    .byte 0
-
     .byte 0
     .byte 0
 
@@ -605,7 +643,7 @@ outro_sprites_high:
     .byte >chopper
     .byte 0
 
-    .byte >chopper
+    .byte >chopper_flipped
     .byte 0
 
 outro_sprites_low:
@@ -618,7 +656,7 @@ outro_sprites_low:
     .byte <chopper
     .byte 0
 
-    .byte <chopper
+    .byte <chopper_flipped
     .byte 0
 
 outro_sprites_2_high:

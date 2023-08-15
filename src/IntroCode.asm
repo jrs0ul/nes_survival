@@ -3,14 +3,14 @@
 IntroLogics:
 
 
-    inc IntroSpriteAnimFrame
-    lda IntroSpriteAnimFrame
+    inc CutsceneSpriteAnimFrame
+    lda CutsceneSpriteAnimFrame
     cmp #2
     bcc @go
     lda #0
-    sta IntroSpriteAnimFrame
+    sta CutsceneSpriteAnimFrame
 @go:
-    lda IntroSceneIdx
+    lda CutsceneSceneIdx
     cmp #INTRO_SCENE_MAX
     bcs @exit
     tax
@@ -31,12 +31,12 @@ IntroLogics:
     lsr
     sta TempHp ; let's store half of the scene duration
 
-    lda IntroSceneIdx
+    lda CutsceneSceneIdx
     asl
     asl
     tax
 
-    lda IntroTimer
+    lda CutsceneTimer
     cmp TempHp
     bcs @cont
 
@@ -46,31 +46,31 @@ IntroLogics:
 @cont:
     jsr MoveIntroSprites
 
-    dec IntroTimer
+    dec CutsceneTimer
     beq @increaseScene
     jmp @exit
 
 @increaseScene:
-    inc IntroSceneIdx
-    lda IntroSceneIdx
+    inc CutsceneSceneIdx
+    lda CutsceneSceneIdx
     cmp #INTRO_SCENE_MAX
     bcs @StartGame
 
-    ldx IntroSceneIdx
+    ldx CutsceneSceneIdx
     lda intro_scenes_duration, x
-    sta IntroTimer
-    lda IntroSceneIdx
+    sta CutsceneTimer
+    lda CutsceneSceneIdx
     asl
     tax
     lda intro_sprite_pos_x, x
-    sta IntroSprite1X
+    sta CutsceneSprite1X
     lda intro_sprite_pos_y, x
-    sta IntroSprite1Y
+    sta CutsceneSprite1Y
     inx
     lda intro_sprite_pos_x, x
-    sta IntroSprite2X
+    sta CutsceneSprite2X
     lda intro_sprite_pos_y, x
-    sta IntroSprite2Y
+    sta CutsceneSprite2Y
 
 
     lda #1
@@ -90,14 +90,14 @@ IntroLogics:
 OutroLogics:
 
 
-    inc IntroSpriteAnimFrame
-    lda IntroSpriteAnimFrame
+    inc CutsceneSpriteAnimFrame
+    lda CutsceneSpriteAnimFrame
     cmp #2
     bcc @go
     lda #0
-    sta IntroSpriteAnimFrame
+    sta CutsceneSpriteAnimFrame
 @go:
-    lda IntroSceneIdx
+    lda CutsceneSceneIdx
     cmp #OUTRO_SCENE_MAX
     bcs @exit
     tax
@@ -118,12 +118,12 @@ OutroLogics:
     lsr
     sta TempHp ; let's store half of the scene duration
 
-    lda IntroSceneIdx
+    lda CutsceneSceneIdx
     asl
     asl
     tax
 
-    lda IntroTimer
+    lda CutsceneTimer
     cmp TempHp
     bcs @cont
 
@@ -133,31 +133,31 @@ OutroLogics:
 @cont:
     jsr MoveOutroSprites
 
-    dec IntroTimer
+    dec CutsceneTimer
     beq @increaseScene
     jmp @exit
 
 @increaseScene:
-    inc IntroSceneIdx
-    lda IntroSceneIdx
+    inc CutsceneSceneIdx
+    lda CutsceneSceneIdx
     cmp #OUTRO_SCENE_MAX
     bcs @exit
 
-    ldx IntroSceneIdx
+    ldx CutsceneSceneIdx
     lda outro_scenes_duration, x
-    sta IntroTimer
-    lda IntroSceneIdx
+    sta CutsceneTimer
+    lda CutsceneSceneIdx
     asl
     tax
     lda outro_sprite_pos_x, x
-    sta IntroSprite1X
+    sta CutsceneSprite1X
     lda outro_sprite_pos_y, x
-    sta IntroSprite1Y
+    sta CutsceneSprite1Y
     inx
     lda outro_sprite_pos_x, x
-    sta IntroSprite2X
+    sta CutsceneSprite2X
     lda outro_sprite_pos_y, x
-    sta IntroSprite2Y
+    sta CutsceneSprite2Y
 
 
     lda #1
@@ -172,73 +172,73 @@ OutroLogics:
 
 ;------------------------------
 MoveIntroSprites:
-    lda IntroSprite1X
+    lda CutsceneSprite1X
     clc
     adc intro_sprite_dir_x, x
-    sta IntroSprite1X
+    sta CutsceneSprite1X
 
-    lda IntroSprite1Y
+    lda CutsceneSprite1Y
     clc
     adc intro_sprite_dir_y, x
-    sta IntroSprite1Y
+    sta CutsceneSprite1Y
 
     inx
 
-    lda IntroSprite2X
+    lda CutsceneSprite2X
     clc
     adc intro_sprite_dir_x, x
-    sta IntroSprite2X
+    sta CutsceneSprite2X
 
-    lda IntroSprite2Y
+    lda CutsceneSprite2Y
     clc
     adc intro_sprite_dir_y, x
-    sta IntroSprite2Y
+    sta CutsceneSprite2Y
     rts
 ;--------------------------------
 MoveOutroSprites:
-    lda IntroSprite1X
+    lda CutsceneSprite1X
     clc
     adc outro_sprite_dir_x, x
-    sta IntroSprite1X
+    sta CutsceneSprite1X
 
-    lda IntroSprite1Y
+    lda CutsceneSprite1Y
     clc
     adc outro_sprite_dir_y, x
-    sta IntroSprite1Y
+    sta CutsceneSprite1Y
 
     inx
 
-    lda IntroSprite2X
+    lda CutsceneSprite2X
     clc
     adc outro_sprite_dir_x, x
-    sta IntroSprite2X
+    sta CutsceneSprite2X
 
-    lda IntroSprite2Y
+    lda CutsceneSprite2Y
     clc
     adc outro_sprite_dir_y, x
-    sta IntroSprite2Y
+    sta CutsceneSprite2Y
 
     rts
 ;--------------------------------
 UpdateOutroSprites:
 
 
-    lda #<IntroSprite1X
+    lda #<CutsceneSprite1X
     sta IntroSpriteCoordPtr
-    lda #>IntroSprite1X
+    lda #>CutsceneSprite1X
     sta IntroSpriteCoordPtr + 1
 
 
-    ldx IntroSceneIdx
+    ldx CutsceneSceneIdx
     cpx #OUTRO_SCENE_MAX
     bcs @done
 
     ldy #0
     sty TempSpriteCount
-    sty IntroMetaspriteIndex
+    sty CutsceneMetaspriteIndex
 
     lda outro_meta_sprite_count, x
-    sta IntroMetaspriteCount
+    sta CutsceneMetaspriteCount
 
 
     txa
@@ -247,9 +247,9 @@ UpdateOutroSprites:
 
 @metaspriteloop:
     lda outro_sprite_count, x
-    sta IntroSpriteCount
+    sta CutsceneSpriteCount
 
-    lda IntroSpriteAnimFrame
+    lda CutsceneSpriteAnimFrame
     bne @secondFrame
 
 @firstFrame:
@@ -280,21 +280,21 @@ UpdateOutroSprites:
 
     jsr DoIntroSpriteUpdate
 
-    cpy IntroSpriteCount
+    cpy CutsceneSpriteCount
     bcc @updateLoop
 
     lda TempSpriteCount
     clc
-    adc IntroSpriteCount
+    adc CutsceneSpriteCount
     sta TempSpriteCount
 
     inc IntroSpriteCoordPtr ;increment pointer to point to next metasprite coordinates
     inc IntroSpriteCoordPtr
 
-    inc IntroMetaspriteIndex
+    inc CutsceneMetaspriteIndex
     inx
-    lda IntroMetaspriteIndex
-    cmp IntroMetaspriteCount
+    lda CutsceneMetaspriteIndex
+    cmp CutsceneMetaspriteCount
     bcc @metaspriteloop
 
 
@@ -313,22 +313,22 @@ UpdateOutroSprites:
 UpdateIntroSprites:
 
 
-    lda #<IntroSprite1X
+    lda #<CutsceneSprite1X
     sta IntroSpriteCoordPtr
-    lda #>IntroSprite1X
+    lda #>CutsceneSprite1X
     sta IntroSpriteCoordPtr + 1
 
 
-    ldx IntroSceneIdx
+    ldx CutsceneSceneIdx
     cpx #INTRO_SCENE_MAX
     bcs @done
 
     ldy #0
     sty TempSpriteCount
-    sty IntroMetaspriteIndex
+    sty CutsceneMetaspriteIndex
 
     lda intro_meta_sprite_count, x
-    sta IntroMetaspriteCount
+    sta CutsceneMetaspriteCount
 
 
     txa
@@ -337,9 +337,9 @@ UpdateIntroSprites:
 
 @metaspriteloop:
     lda intro_sprite_count, x
-    sta IntroSpriteCount
+    sta CutsceneSpriteCount
 
-    lda IntroSpriteAnimFrame
+    lda CutsceneSpriteAnimFrame
     bne @secondFrame
 
 @firstFrame:
@@ -370,21 +370,21 @@ UpdateIntroSprites:
 
     jsr DoIntroSpriteUpdate
 
-    cpy IntroSpriteCount
+    cpy CutsceneSpriteCount
     bcc @updateLoop
 
     lda TempSpriteCount
     clc
-    adc IntroSpriteCount
+    adc CutsceneSpriteCount
     sta TempSpriteCount
 
     inc IntroSpriteCoordPtr ;increment pointer to point to next metasprite coordinates
     inc IntroSpriteCoordPtr
 
-    inc IntroMetaspriteIndex
+    inc CutsceneMetaspriteIndex
     inx
-    lda IntroMetaspriteIndex
-    cmp IntroMetaspriteCount
+    lda CutsceneMetaspriteIndex
+    cmp CutsceneMetaspriteCount
     bcc @metaspriteloop
 
 
@@ -471,7 +471,7 @@ HideIntroSprites:
     rts
 ;---------------------
 LoadIntroScene:
-    ldy IntroSceneIdx
+    ldy CutsceneSceneIdx
 
     lda intro_scenes_low, y
     sta pointer
@@ -480,7 +480,7 @@ LoadIntroScene:
     lda #$24
     sta NametableAddress
     jsr LoadNametable
-    ldy IntroSceneIdx
+    ldy CutsceneSceneIdx
     lda intro_scenes_low, y
     sta pointer
     lda intro_scenes_high, y
@@ -513,7 +513,7 @@ LoadIntroScene:
     rts
 ;------------------------------------
 LoadOutroScene:
-    ldy IntroSceneIdx
+    ldy CutsceneSceneIdx
 
     lda outro_scenes_low, y
     sta pointer
@@ -522,7 +522,7 @@ LoadOutroScene:
     lda #$24
     sta NametableAddress
     jsr LoadNametable
-    ldy IntroSceneIdx
+    ldy CutsceneSceneIdx
     lda outro_scenes_low, y
     sta pointer
     lda outro_scenes_high, y
@@ -555,25 +555,25 @@ LoadOutroScene:
 ;-------------------------------
 InitIntro:
     lda #0
-    sta IntroSceneIdx
+    sta CutsceneSceneIdx
     sta GlobalScroll
     asl
     tax
     lda intro_sprite_pos_x, x
-    sta IntroSprite1X
+    sta CutsceneSprite1X
     lda intro_sprite_pos_y, x
-    sta IntroSprite1Y
+    sta CutsceneSprite1Y
     inx
     lda intro_sprite_pos_x, x
-    sta IntroSprite2X
+    sta CutsceneSprite2X
     lda intro_sprite_pos_y, x
-    sta IntroSprite2Y
+    sta CutsceneSprite2Y
 
-    ldx IntroSceneIdx
+    ldx CutsceneSceneIdx
     lda intro_scenes_duration, x
-    sta IntroTimer
+    sta CutsceneTimer
     lda intro_scenes_delay, x
-    sta IntroDelay
+    sta CutsceneDelay
 
     lda #STATE_INTRO
     sta GameState
@@ -584,11 +584,31 @@ InitIntro:
 InitOutro:
 
     lda #0
-    sta IntroSceneIdx
+    sta CutsceneSceneIdx
     sta GlobalScroll
+    asl
+    tax
+    lda outro_sprite_pos_x, x
+    sta CutsceneSprite1X
+    lda outro_sprite_pos_y, x
+    sta CutsceneSprite1Y
+    inx
+    lda outro_sprite_pos_x, x
+    sta CutsceneSprite2X
+    lda outro_sprite_pos_y, x
+    sta CutsceneSprite2Y
+
+    ldx CutsceneSceneIdx
+    lda outro_scenes_duration, x
+    sta CutsceneTimer
+
 
     lda #STATE_OUTRO
     sta GameState
+
+    lda outro_scenes_delay, x
+    sta CutsceneDelay
+
 
     rts
 
