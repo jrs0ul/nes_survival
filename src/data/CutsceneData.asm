@@ -74,24 +74,26 @@ outro_scenes_delay:
 plane_flies:
     .byte 240,$00,0,228
     .byte 240,$01,0,236
-    .byte 240,$02,0,244
     .byte 240,$03,0,252
-    .byte 240,$04,0,4
-    .byte 240,$05,0,12
-    .byte 240,$06,0,20
+    .byte 240,$04,0,  4
+    .byte 240,$05,0, 12
+    .byte 240,$06,0, 20
     .byte 248,$10,0,228
     .byte 248,$11,0,236
     .byte 248,$12,0,244
     .byte 248,$13,0,252
-    .byte 248,$14,0, 4
-    .byte 248,$15,0,12
-    .byte 248,$16,0,20
+    .byte 248,$14,0,  4
+    .byte 248,$15,0, 12
+    .byte 248,$16,0, 20
+    .byte   0,$21,0,236
     .byte   0,$22,0,244
     .byte   0,$23,0,252
-    .byte   0,$24,0,4
-    .byte   0,$26,0,20
-    .byte   0,$21,0,236
-
+    .byte   0,$24,0,  4
+    .byte   0,$25,0, 12
+    .byte   0,$26,0, 20
+    .byte   8,$32,0,244
+    .byte   8,$33,0,252
+    .byte   8,$34,0,  4
 
 dude_climbs_f:
     .byte 236,$ba,0,248
@@ -323,24 +325,33 @@ chopper_flipped:
     .byte  16,$ac,%01000000,240
 
 raised_hand:
-    .byte 240,$c7,0,252
-    .byte 240,$c8,0,  4
-    .byte 248,$d7,0,252
-    .byte 248,$d8,0,  4
-    .byte   0,$e6,0,244
-    .byte   0,$e7,0,252
-    .byte   0,$e8,0,  4
-    .byte   8,$f7,0,252
-    .byte   8,$f8,0,  4
+    .byte 240,$c7,%00000010,252
+    .byte 240,$c8,%00000010,  4
+    .byte 248,$d7,%00000010,252
+    .byte 248,$d8,%00000010,  4
+    .byte   0,$e6,%00000010,244
+    .byte   0,$e7,%00000010,252
+    .byte   0,$e8,%00000010,  4
+    .byte   8,$f7,%00000010,252
+    .byte   8,$f8,%00000010,  4
+
+radio_hand:
+    .byte 244,$ae,%00000010,248
+    .byte 244,$af,%00000010,  0
+    .byte 252,$be,%00000010,248
+    .byte 252,$bf,%00000010,  0
+    .byte   4,$ce,%00000010,248
+    .byte   4,$cf,%00000010,  0
+
 
 intro_sprite_count:
-    .byte 19 * 4
+    .byte 22 * 4
     .byte 0
 
     .byte 12 * 4
     .byte 6 * 4
 
-    .byte 19 * 4
+    .byte 22 * 4
     .byte 4 * 4
 
     .byte 0
@@ -356,7 +367,7 @@ intro_sprite_count:
     .byte 0
 
 outro_sprite_count:
-   .byte 0
+   .byte 6 * 4
    .byte 0
 
    .byte 0
@@ -416,28 +427,28 @@ intro_sprite_pos_x:
 
 
 outro_sprite_pos_x:
-    .byte 0
+    .byte 112
     .byte 0
 
     .byte 0
     .byte 0
 
     .byte 160
-    .byte 85
+    .byte 117
 
-    .byte 80
+    .byte 65
     .byte 0
 
 
 outro_sprite_pos_y:
-    .byte 0
+    .byte 130
     .byte 0
 
     .byte 0
     .byte 0
 
     .byte 10
-    .byte 138
+    .byte 134
 
     .byte 90
     .byte 0
@@ -644,7 +655,7 @@ intro_sprites_high:
     .byte 0
 
 outro_sprites_high:
-    .byte 0
+    .byte >radio_hand
     .byte 0
 
     .byte 0
@@ -657,7 +668,7 @@ outro_sprites_high:
     .byte 0
 
 outro_sprites_low:
-    .byte 0
+    .byte <radio_hand
     .byte 0
 
     .byte 0
@@ -753,7 +764,7 @@ intro_meta_sprite_count:
     .byte 1
 
 outro_meta_sprite_count:
-    .byte 0
+    .byte 1
     .byte 0
     .byte 2
     .byte 1
