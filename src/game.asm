@@ -4133,14 +4133,18 @@ LoadIntro:
 LoadOutro:
     lda MustLoadOutro
     beq @exit
-    
+
     lda #0
     sta $2000
     sta $2001
 
-
     lda MustLoadIntroChr
     beq @loadScene
+
+    lda #2
+    sta SongName
+    lda #1
+    sta MustPlayNewSong
 
     ldy #2
     jsr bankswitch_y

@@ -91,6 +91,9 @@ ItemCollisionCheck:
     lda #ITEM_DELAY
     sta ItemUpdateDelay
 
+    lda ItemCount
+    beq @exit
+
     ldy #0
 @itemLoop:
     tya
