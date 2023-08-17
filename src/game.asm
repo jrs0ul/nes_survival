@@ -815,6 +815,9 @@ PlayerWins:
 InHouse:    ;is the player inside his hut?
     .res 1
 
+InCave:
+    .res 1
+
 InVillagerHut:
     .res 1
 
@@ -1167,7 +1170,7 @@ SourceMapIdx:
     .res 1
 
 Buffer:
-    .res 499  ;must see how much is still available
+    .res 498  ;must see how much is still available
 
 ;====================================================================================
 
@@ -2728,13 +2731,14 @@ RoutinesAfterFadeOut:
     sta MustLoadOutside
     sta MustCopyMainChr
     jsr OnExitVillagerHut
-
+;-------cave entrance
 @next11:
     lda ActiveMapEntryIndex
     cmp #10
     bne @next12
 
     lda #1
+    sta InCave
     sta MustLoadOutside
     lda #0
     sta CurrentMapSegmentIndex
@@ -2757,7 +2761,7 @@ RoutinesAfterFadeOut:
     sta TimesShiftedLeft
     sta TimesShiftedRight
 
-
+;crashsite from cave
 
 @next12:
 
@@ -2773,6 +2777,7 @@ RoutinesAfterFadeOut:
     lda #1
     sta MustLoadOutside
 
+;cave from crashsite
 @next13:
 
     lda ActiveMapEntryIndex
@@ -2780,6 +2785,7 @@ RoutinesAfterFadeOut:
     bne @next14
 
     lda #1
+    sta InCave
     sta MustLoadOutside
     lda #0
     sta CurrentMapSegmentIndex
@@ -2802,6 +2808,7 @@ RoutinesAfterFadeOut:
     sta TimesShiftedLeft
     sta TimesShiftedRight
 
+;location 2 from cave
 @next14:
     lda ActiveMapEntryIndex
     cmp #13
@@ -2855,6 +2862,7 @@ RoutinesAfterFadeOut:
 CommonLocationRoutine:
 
     lda #0
+    sta InCave
     sta IsLocationRoutine
     sta PaletteFadeAnimationState
     lda #1
@@ -3067,8 +3075,16 @@ AdaptBackgroundPaletteByTime:
 
     ldy #$01 ;keeps the outline for the background objects
 
-    jsr GetPaletteFadeValueForHour
+    lda InCave
+    beq @calc ; if not in cave, we need to use lookup table to get certain fade level
 
+    ldx #0 ; night time index
+    lda palette_fade_for_periods, x
+    jmp @cont
+
+@calc:
+    jsr GetPaletteFadeValueForHour
+@cont:
     cmp CurrentPaletteDecrementValue
     beq @exit
     sta CurrentPaletteDecrementValue
@@ -3906,6 +3922,7 @@ ResetEntityVariables:
     sta TimesShiftedRight
     sta BaseMenuIndex
     sta InHouse
+    sta InCave
     sta InVillagerHut
     sta LocationIndex
     sta SpearActive
