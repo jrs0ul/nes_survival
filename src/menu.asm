@@ -1744,7 +1744,7 @@ ItemMenuInput:
     ;use
 
     lda TempItemIndex
-    cmp #19
+    cmp #ITEM_RADIO
     bne @checktype
     lda #1
     sta PlayerWins

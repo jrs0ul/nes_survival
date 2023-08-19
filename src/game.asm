@@ -172,6 +172,14 @@ fishingRodSprites:
     .byte   8, $E6, %00000000, 0,  16, $D8, %00000000, 0  ;down
     .byte   0, $E6, %10000000, 0,  248, $D8, %10000000, 0 ;up
 
+hammerSprites:
+    .byte   7, $A9, %00000000, 0,   7, $A8, %00000000, 248  ;left
+    .byte   7, $A9, %01000000, 8,   7, $A8, %01000000, 16   ;right
+    .byte   255, $99, %11000000, 8,  250, $98, %11000000, 8 ;up
+    .byte   9, $99, %00000000, 0,  17, $98, %00000000, 0    ;down
+    .byte   255, $99, %10000000, 0,  250, $98, %10000000, 0 ;up-flipped
+    .byte   9,   $99, %01000000, 8,  17,  $98, %01000000, 8 ;down-flipped
+
 
 house_palette:
     .byte $0C,$16,$27,$37, $0C,$07,$00,$31, $0C,$17,$27,$31, $0C,$20,$37,$16    ;background
@@ -444,6 +452,8 @@ player_sprites_flip:
     ITEM_FISHING_ROD           = 15
     ITEM_RAW_FISH              = 17
     ITEM_COOKED_FISH           = 18
+    ITEM_RADIO                 = 19
+    ITEM_HAMMER                = 20
 
     SPEAR_SPEED                = 3
 
@@ -5273,7 +5283,7 @@ UpdateSprites:
 @fishingRod:
 
     lda FishingRodActive
-    beq @sunmoon
+    beq @hammer
 
     lda PlayerFrame
     beq @horizontal
@@ -5299,6 +5309,15 @@ UpdateSprites:
 @update:
 
    jsr UpdateTwoRodSprites
+;-----------HAMMER
+@hammer:
+    lda EquipedItem
+    beq @sunmoon
+    cmp #ITEM_HAMMER
+    bne @sunmoon
+
+    jsr UpdateHammerSprites
+
 ;------------------------------
 ;------SUN-MOON INDICATOR
 @sunmoon:
@@ -5576,7 +5595,86 @@ PrepareKnifeSprite:
 
 @exit:
     rts
+;----------------------------------
+UpdateHammerSprites:
 
+    lda AttackTimer
+    beq @exit
+
+    lda PlayerFrame
+    beq @horizontal ; ( playerframe - 1 ) * 8 + 16
+    sec
+    sbc #1
+    asl
+    asl
+    asl
+    clc
+    adc #16
+    tay
+    lda PlayerFlip
+    beq @updatesprites
+    tya
+    clc
+    adc #16
+    tay
+    jmp @updatesprites
+@horizontal:
+    lda PlayerFlip ; playerflip * 8 
+    asl
+    asl
+    asl
+    tay
+
+@updatesprites:
+    inx
+    lda PlayerY
+    clc
+    adc hammerSprites, y
+    sta FIRST_SPRITE, x ;y
+    iny
+    inx
+    lda hammerSprites, y
+    sta FIRST_SPRITE, x ;frame
+    inx
+    iny
+    lda hammerSprites, y
+    sta FIRST_SPRITE, x ;attr
+    inx
+    iny
+    lda PlayerX
+    clc
+    adc hammerSprites, y
+    sta FIRST_SPRITE, x ;x
+
+    inx
+    iny
+    lda PlayerY
+    clc
+    adc hammerSprites, y
+    sta FIRST_SPRITE, x ;y
+    inx
+    iny
+    lda hammerSprites, y
+
+    sta FIRST_SPRITE, x ;frame
+    inx
+    iny
+    lda hammerSprites, y
+    sta FIRST_SPRITE, x ;attr
+    inx
+    iny
+    lda PlayerX
+    clc
+    adc hammerSprites, y
+    sta FIRST_SPRITE, x ;x
+
+    lda TempSpriteCount
+    clc
+    adc #2
+    sta TempSpriteCount
+
+@exit:
+    rts
 ;----------------------------------
 initZeroSprite:
     ldx #$00
