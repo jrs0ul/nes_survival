@@ -3506,6 +3506,8 @@ HandleInput:
     lda #INPUT_DELAY
     sta InputUpdateDelay
     rts
+
+;Erase collision bits if tiles are destroyed
 ;--------------------------------
 UpdateDestructableTilesCollision:
 
@@ -3541,12 +3543,12 @@ UpdateDestructableTilesCollision:
     lda destructable_tiles_list, x ; x
     tax
     lda x_collision_pattern, x
-    eor #%11111111
+    eor #%11111111 ; invert byte
     sta Temp
-    txa
+    txa 
     lsr
     lsr
-    lsr
+    lsr ; divide x by 8 again
     clc
     adc TempY
     adc TempY
@@ -3556,8 +3558,6 @@ UpdateDestructableTilesCollision:
     lda CollisionMap, x
     and Temp
     sta CollisionMap, x
-
-
 
     jmp @loop
 
@@ -4058,6 +4058,9 @@ ResetEntityVariables:
     sta MustLoadGameOverAfterFadeOut
     sta EquipedClothing
     sta EquipedClothing + 1
+
+    sta Destructables
+    sta Destructables + 1
 
     lda #PLAYER_START_X
     sta PlayerX
