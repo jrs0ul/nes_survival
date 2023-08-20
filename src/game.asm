@@ -229,6 +229,19 @@ fist_collision_pos:
     .byte 2, 18, 6, 18
 
 
+;data: 
+;   location,
+;   tile address high, (in video memory)
+;   tile address low,
+;   tile row
+;   tile column
+destructable_tiles_list:
+    .byte 6, $20, $87, 4, 7, 0, 0, 0
+    .byte 6, $20, $88, 4, 8, 0, 0, 0
+
+
+
+
 
 npc_direction_list:
     .byte 0
@@ -595,7 +608,8 @@ NMINotFinished: ;to figure if another nmi called during nmi :/
     .res 1
 MustUpdatePalette: ;flag that signals the palette update
     .res 1
-
+MustUpdateDestructables:
+    .res 1
 
 HP:
     .res 3
@@ -628,7 +642,7 @@ FlickerFrame: ;variable for alternating sprite update routines to achieve flicke
     .res 1
 
 ZPBuffer:
-    .res 125  ; I want to be aware of the free memory
+    .res 124  ; I want to be aware of the free memory
 
 ;--------------
 .segment "BSS" ; variables in ram
@@ -1174,13 +1188,16 @@ Npcs:   ;animals and stuff
 NpcCount:
     .res 1
 
+Destructables:
+    .res 2  ;two destructables so far, 1 means destroyed
+
 AttribHighAddress:
     .res 1
 SourceMapIdx:
     .res 1
 
 Buffer:
-    .res 498  ;must see how much is still available
+    .res 496  ;must see how much is still available
 
 ;====================================================================================
 
@@ -1505,6 +1522,7 @@ DoneLoadingMaps:
 
     jsr UpdateFireplace
     jsr UploadBgColumns
+    jsr UpdateDestructableTiles
     jsr UpdateStatusDigits
 
 UpdatePalette:
@@ -1748,11 +1766,51 @@ UpdateFireplace:
 
 @exit:
     rts
+;--------------------------------------------
+UpdateDestructableTiles:
+
+    ;lda MustUpdateDestructables
+    ;bne @exit
+
+    ldy #2
+@loop:
+    dey
+    bmi @exit
+    lda Destructables, y
+    beq @loop
+
+    tya
+    asl
+    asl
+    asl
+    tax
+    lda destructable_tiles_list, x
+    cmp LocationIndex
+    bne @loop
+    inx
+    lda $2002
+    lda destructable_tiles_list, x
+    sta $2006
+    inx
+    lda destructable_tiles_list, x
+    sta $2006
+
+    lda #$EF
+    sta $2007
+
+
+    jmp @loop
+
+
+    ;lda #0
+    ;sta MustUpdateDestructables
+@exit:
+    rts
 
 ;--------------------------------------------
 ;Check and upload background columns from rom map to the PPU
 UploadBgColumns:
-    
+
     lda ScreenCount
     cmp #2
     bcc @exit
@@ -3443,10 +3501,69 @@ HandleInput:
     sta OldButtons
 
     jsr CalcMapColumnToUpdate
+    jsr UpdateDestructableTilesCollision
 
     lda #INPUT_DELAY
     sta InputUpdateDelay
     rts
+;--------------------------------
+UpdateDestructableTilesCollision:
+
+    lda GlobalScroll ;this will limit destructable tiles to the very first screen
+    bne @exit
+
+    ldy #2
+@loop:
+    dey
+    bmi @exit
+    lda Destructables, y
+    beq @loop
+
+    tya
+    asl
+    asl
+    asl
+    tax
+    lda destructable_tiles_list, x
+    cmp LocationIndex
+    bne @loop
+
+
+    inx
+    inx
+    inx
+
+    lda destructable_tiles_list, x ; y
+    sta TempY
+
+
+    inx
+    lda destructable_tiles_list, x ; x
+    tax
+    lda x_collision_pattern, x
+    eor #%11111111
+    sta Temp
+    txa
+    lsr
+    lsr
+    lsr
+    clc
+    adc TempY
+    adc TempY
+    adc TempY
+    adc TempY
+    tax
+    lda CollisionMap, x
+    and Temp
+    sta CollisionMap, x
+
+
+
+    jmp @loop
+
+@exit:
+    rts
+
 ;--------------------------------
 BackupMovement:
 
@@ -4471,9 +4588,14 @@ CheckB:
     jmp @regularAttack
 @checkNext:
     cmp #ITEM_FISHING_ROD
-    bne @regularAttack
+    bne @checkhammer
 
     jsr ActivateFishingRod
+@checkhammer:
+    cmp #ITEM_HAMMER
+    bne @regularAttack
+
+    jsr useHammerOnEnvironment
 
 @regularAttack:
 
@@ -4487,7 +4609,15 @@ CheckB:
     ldy #6
     jsr bankswitch_y
 
+    lda EquipedItem
+    cmp #ITEM_HAMMER
+    bne @generic_sfx
+
+    lda #3
+    jmp @play_sfx
+@generic_sfx:
     lda #1
+@play_sfx:
     ldx #FAMISTUDIO_SFX_CH0
     jsr famistudio_sfx_play
 
@@ -4521,8 +4651,169 @@ WearWeapon:
     sta EquipedItem + 1
 @exit:
     rts
+;----------------------------------
+useHammerOnEnvironment:
+    ;TODO: copy paste code begins here
+
+    ;let's check if I can throw there
+
+    lda PlayerFrame
+    beq @horizontal ;player is facing left or right
+
+    lda PlayerX
+    clc
+    adc #4
+    jmp @cont
+
+@horizontal:
+    lda PlayerFlip
+    beq @left
+    ;right
+    lda PlayerX
+    clc
+    adc #20 ;two tiles and a half
+    jmp @cont
+@left:
+    lda PlayerX
+    sec
+    sbc #4
 
 
+@cont:
+    clc
+    adc GlobalScroll
+    sta TempX
+    bcs @mustIncrementScreen
+
+
+    lda LocationIndex
+    asl
+    asl
+    clc
+    adc CurrentMapSegmentIndex
+    tay ;store screen index to Y register
+    jmp @continueCalc
+
+@mustIncrementScreen:
+
+    lda LocationIndex
+    asl
+    asl
+    clc
+    adc CurrentMapSegmentIndex
+    clc
+    adc #1
+    tay; screen index goes to Y register
+    sty TempPointY2 ; store screen index
+
+@continueCalc:
+
+    lda TempX ; x / 8
+    lsr
+    lsr
+    lsr
+    sta TempX
+
+    lda PlayerFrame
+    bne @vertical
+    ;horizontal
+    lda PlayerY
+    clc
+    adc #8
+    jmp @divide
+@vertical:
+    cmp #1
+    bne @down
+
+    ;up
+    lda PlayerY
+    sec
+    sbc #4
+    jmp @divide
+
+@down:
+
+    lda PlayerY
+    clc
+    adc #20
+
+@divide:
+    ; y / 8
+    lsr
+    lsr
+    lsr
+    sta TempY
+
+
+    lda map_list_low, y
+    sta pointer
+    lda map_list_high, y
+    sta pointer + 1
+
+
+@calcaddress:
+    ldy TempY
+    beq @skip
+@addressLoop:
+
+    lda pointer
+    clc
+    adc #32
+    sta pointer
+    bcs @incrementUpper
+    jmp @nextRow
+@incrementUpper:
+    inc pointer + 1
+@nextRow:
+    dey
+    bne @addressLoop
+@skip:
+    lda TempX
+    tay
+
+    lda (pointer), y
+
+;--end of copy paste
+
+    cmp #$F7
+    bne @exit
+
+    ldy #2
+@destructable_loop:
+    dey
+    bmi @exit
+
+    tya
+    asl
+    asl
+    asl
+    tax
+    lda destructable_tiles_list, x
+    cmp LocationIndex
+    bne @destructable_loop
+    inx
+    inx
+    inx
+    lda destructable_tiles_list, x
+    cmp TempY
+    bne @destructable_loop
+    inx
+    lda destructable_tiles_list, x
+    cmp TempX
+    bne @destructable_loop
+
+
+    lda #1
+    sta Destructables, y
+
+
+    ;TODO: update destructabe tiles
+    lda #1
+    sta MustUpdateDestructables
+
+@exit:
+
+    rts
 ;----------------------------------
 ActivateFishingRod:
 
