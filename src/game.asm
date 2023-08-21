@@ -75,7 +75,7 @@ main_tiles_chr2: .incbin "main.chr"
 .segment "ROM5" ;title and intro data (?)
 
 title_palette:
-    .byte $0F,$07,$11,$20, $0F,$01,$26,$07, $0F,$31,$26,$35, $0F,$07,$26,$35    ;background
+    .byte $0F,$07,$11,$20, $0F,$01,$11,$07, $0F,$31,$26,$35, $0F,$07,$11,$35    ;background
     .byte $0F,$0f,$17,$20, $0F,$06,$26,$39, $0F,$17,$21,$31, $0F,$0f,$37,$26    ;OAM sprites
 
 intro_palette:
@@ -193,7 +193,12 @@ game_over_palette:
     .byte $0f,$10,$20,$30,$0f,$0c,$35,$21,$0f,$0c,$16,$21,$0f,$01,$07,$21
     .byte $0f,$10,$20,$30,$0f,$0c,$35,$21,$0f,$0c,$16,$21,$0f,$01,$07,$21
 
-
+snow_palette_frames: ;white and black
+    .byte $20, $0F
+    .byte $0F, $20
+snow_palette_frames_1: ; white and blue
+    .byte $20, $11
+    .byte $11, $20
 
 sprites:
     .byte $11, $FF, %00000011, $08   ; sprite 0 
@@ -715,6 +720,7 @@ PlayerX:
 PlayerY:
     .res 1
 
+SnowDelay:
 PlayerSpeed:
     .res 1
 
@@ -731,6 +737,7 @@ PlayerFrame:
 PlayerFlip:
     .res 1
 
+SnowFrame:
 Stamina:
     .res 1
 
@@ -1281,8 +1288,6 @@ vblankwait2:      ; Second wait for vblank, PPU is ready after this
     bit $2002
     bpl vblankwait2
 
-    jsr initZeroSprite
-
 ;---
     ldy #2
     bankswitch ;switching to Title/Game Over bank
@@ -1433,13 +1438,19 @@ checkIntro:
 
 checkOutro:
     cmp #STATE_OUTRO
-    bne hide_sprites ; some other state
+    bne checkTitle ; some other state
 
     dec CutsceneDelay
     bne runrandom
 
     jsr doOutro
     jmp runrandom
+
+checkTitle:
+    cmp #STATE_TITLE
+    bne hide_sprites
+
+    jsr doTitle
 
 hide_sprites:
     jsr HideSprites
@@ -1668,7 +1679,70 @@ doOutro:
     bankswitch
 
     rts
+;--------------------------------------
+doTitle:
 
+    inc SnowDelay
+    lda SnowDelay
+    cmp #50
+    bcc @exit
+    lda #0
+    sta SnowDelay
+
+@incframe:
+
+    inc SnowFrame
+    lda SnowFrame
+    cmp #2
+    bcc @cont
+
+    lda #0
+    sta SnowFrame
+
+@cont:
+
+    lda #0
+    clc
+    adc SnowFrame
+    tay
+    lda snow_palette_frames, y
+
+    ldx #5
+    sta RamPalette, x
+;--
+    lda #2
+    clc
+    adc SnowFrame
+    tay
+    lda snow_palette_frames, y
+    ldx #7
+    sta RamPalette, x
+
+    lda #0
+    clc
+    adc SnowFrame
+    tay
+    lda snow_palette_frames_1, y
+
+    ldx #13
+    sta RamPalette, x
+;--
+    lda #2
+    clc
+    adc SnowFrame
+    tay
+    lda snow_palette_frames_1, y
+    ldx #15
+    sta RamPalette, x
+
+
+
+    lda #1
+    sta MustUpdatePalette
+    lda #16
+    sta PaletteUpdateSize
+@exit:
+    rts
 ;--------------------------------------------
 ;copy chr tiles from ROM bank to a CHR RAM
 ;pointer -  sits at zero page, points to the chr data
@@ -3868,7 +3942,7 @@ HideSprites:
     ldy #64
 @hideSpritesLoop:
     lda #$FE
-    sta FIRST_SPRITE, x
+    sta ZERO_SPRITE, x
     inx
     ;index
     inx
@@ -4317,6 +4391,7 @@ StartGame:
 
     ldx #0
     jsr LoadCollisionMap
+    jsr initZeroSprite
     lda #STATE_GAME
     sta GameState
     lda #1

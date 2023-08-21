@@ -616,6 +616,12 @@ InitOutro:
 ;technicaly doesn't have anything in common with Intro, but should reside in bank5
 LoadTitleData:
 
+    lda #0
+    sta SnowFrame
+    lda #50
+    sta SnowDelay
+
+
     lda #<title_palette
     sta pointer
     lda #>title_palette
