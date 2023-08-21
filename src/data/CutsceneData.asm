@@ -61,13 +61,13 @@ intro_scenes_duration:
 outro_scenes_duration:
     .byte 70
     .byte 50
-    .byte 60
+    .byte 39
     .byte 63
 
 outro_scenes_delay:
     .byte 5
     .byte 8
-    .byte 10
+    .byte 11
     .byte 5
 
 
@@ -434,7 +434,7 @@ outro_sprite_pos_x:
     .byte 0
 
     .byte 160
-    .byte 117
+    .byte 90
 
     .byte 65
     .byte 0
@@ -447,8 +447,8 @@ outro_sprite_pos_y:
     .byte 0
     .byte 0
 
-    .byte 10
-    .byte 134
+    .byte 30
+    .byte 139
 
     .byte 90
     .byte 0
@@ -487,9 +487,9 @@ outro_sprite_dir_x:
     .byte 0
 
     .byte 0
+    .byte 1
     .byte 0
-    .byte 0
-    .byte 0
+    .byte 255
 
     .byte 2
     .byte 0

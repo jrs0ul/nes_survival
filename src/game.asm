@@ -323,6 +323,7 @@ player_sprites_flip:
 
 ;--------------
 ; CONSTANTS
+    ZERO_SPRITE                 = $0200
     FIRST_SPRITE                = $0204
 
     ;possible game states
