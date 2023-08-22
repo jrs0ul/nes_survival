@@ -157,13 +157,15 @@ DoSleep:
 SetupVillagerText:
 
     lda InVillagerHut
-    beq @exit
+    beq @checkPlayersHouse
 
     lda VillagerIndex
     bne @skipNightCheck
+
     jsr GetPaletteFadeValueForHour
     cmp #$40
     beq @exit
+
 @skipNightCheck:
     lda #1
     sta MustUpdateTextBaloon
@@ -176,6 +178,7 @@ SetupVillagerText:
     lda VillagerIndex
     tay
     asl
+    asl ; index * 4
     clc
     adc ActiveVillagerQuests, y
     tax
@@ -195,6 +198,7 @@ SetupVillagerText:
     lda VillagerIndex
     tay
     asl
+    asl ; index * 4
     clc
     adc ActiveVillagerQuests, y
     tax
@@ -205,8 +209,25 @@ SetupVillagerText:
     sta TextPtr + 1
     lda #DIALOG_TEXT_LENGTH
     sta TextLength
+    jmp @exit
 
+@checkPlayersHouse:
+    lda InHouse
+    beq @exit
+    lda FirstTime
+    beq @exit
 
+    lda #1
+    sta MustUpdateTextBaloon
+    lda #0
+    sta TextBaloonIndex
+
+    lda #<first_time_text
+    sta TextPtr
+    lda #>first_time_text
+    sta TextPtr + 1
+    lda #DIALOG_TEXT_LENGTH
+    sta TextLength
 
 @exit:
     rts
@@ -295,6 +316,7 @@ UpdateVillagerDialogSprites:
     lda VillagerIndex
     tay
     asl
+    asl ; index * 4
     clc
     adc ActiveVillagerQuests, y
     tay

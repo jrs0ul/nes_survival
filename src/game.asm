@@ -357,7 +357,7 @@ player_sprites_flip:
 
     ANIM_FRAME_BLOODSTAIN      = $B8
 
-    MAX_QUEST                  = 2
+    MAX_QUEST                  = 4
 
 
     INTRO_SCENE_MAX            = 7
@@ -800,6 +800,8 @@ Minutes:
 Hours:
     .res 1
 
+FirstTime: ;entered the house for the firt time
+    .res 1
 
 EquipedItem:
     .res 2   ;item index + hp
@@ -1205,7 +1207,7 @@ SourceMapIdx:
     .res 1
 
 Buffer:
-    .res 496  ;must see how much is still available
+    .res 495  ;must see how much is still available
 
 ;====================================================================================
 
@@ -2689,6 +2691,7 @@ RoutinesAfterFadeOut:
 
     lda #0
     sta InHouse
+    sta FirstTime
 
     lda #1
     sta MustLoadOutside
@@ -3746,7 +3749,7 @@ UpdateTextBaloon:
     sta TempTextAddress
 
 
-    lda #$E3
+    lda #$E0
     clc
     adc TextBaloonIndex
     bcc @continue
@@ -4345,6 +4348,7 @@ StartGame:
     lda #STATE_GAME
     sta GameState
     lda #1
+    sta FirstTime
     sta MustLoadOutside
     sta MustLoadSomething
     sta MustCopyMainChr
@@ -5376,8 +5380,9 @@ CheckFireplace:
     lda PlayerY
     cmp #80
     bcs @nope
-    
 
+    lda #0
+    sta FirstTime
     lda #1
     sta MustLoadSomething
     sta MustLoadMenu
@@ -5404,6 +5409,8 @@ CheckStashBox:
     cmp #80
     bcs @nope
 
+    lda #0
+    sta FirstTime
     lda #1
     sta MustLoadSomething
     sta MustLoadMenu
@@ -5431,6 +5438,8 @@ CheckToolTable:
     cmp #112
     bcc @nope
 
+    lda #0
+    sta FirstTime
     lda #1
     sta MustLoadSomething
     sta MustLoadMenu
@@ -5451,6 +5460,7 @@ LoadInteriorMap:
     beq @nope
 
     ldy #3
+    sty bankBeforeNMI ; hack
     jsr bankswitch_y
 
     jsr LoadIndoorMapData ; from bank 3

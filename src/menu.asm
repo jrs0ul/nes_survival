@@ -1356,6 +1356,7 @@ FoodMenuInputVillager:
     lda VillagerIndex
     tay
     asl
+    asl ; villager index * 4
     clc
     adc ActiveVillagerQuests, y
     tay
@@ -1610,6 +1611,7 @@ ToolMenuInputVillager:
     lda VillagerIndex
     tay
     asl
+    asl
     clc
     adc ActiveVillagerQuests, y
     tay
@@ -1641,6 +1643,7 @@ SpawnRewardItem:
 
     sta ItemCount
     lda reward_items_list, y
+    beq @no_item
     asl
     ora #%00000001
     sta Items
@@ -1651,6 +1654,7 @@ SpawnRewardItem:
     lda #108
     sta Items + 3
 
+@no_item:
     lda #1
     sta MustExitMenuState
 

@@ -61,6 +61,6 @@ house:
 	.byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
 	.byte $ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$aa,$aa,$aa,$aa,$aa,$aa,$aa,$aa
 	.byte $aa,$aa,$aa,$a2,$aa,$aa,$aa,$aa,$aa,$aa,$aa,$aa,$aa,$aa,$aa,$aa
-	.byte $aa,$aa,$aa,$aa,$aa,$aa,$aa,$aa,$aa,$aa,$aa,$aa,$aa,$aa,$aa,$aa
-	.byte $aa,$aa,$aa,$aa,$aa,$aa,$aa,$aa,$0a,$0a,$0a,$0a,$0a,$0a,$0a,$0a
+	.byte $aa,$aa,$aa,$aa,$aa,$aa,$aa,$aa,$fa,$fa,$fa,$fa,$fa,$fa,$fa,$fa
+	.byte $ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$0f,$0f,$0f,$0f,$0f,$0f,$0f,$0f
 
