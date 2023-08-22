@@ -1,5 +1,71 @@
 .segment "ROM5"
 ;-----------------------------
+TitleLogics:
+    inc SnowDelay
+    lda SnowDelay
+    cmp #50
+    bcc @exit
+    lda #0
+    sta SnowDelay
+
+@incframe:
+
+    inc SnowFrame
+    lda SnowFrame
+    cmp #2
+    bcc @cont
+
+    lda #0
+    sta SnowFrame
+
+@cont:
+
+    lda #0
+    clc
+    adc SnowFrame
+    tay
+    lda snow_palette_frames, y
+
+    ldx #5
+    sta RamPalette, x
+;--
+    lda #2
+    clc
+    adc SnowFrame
+    tay
+    lda snow_palette_frames, y
+    ldx #7
+    sta RamPalette, x
+
+    lda #0
+    clc
+    adc SnowFrame
+    tay
+    lda snow_palette_frames_1, y
+
+    ldx #13
+    sta RamPalette, x
+;--
+    lda #2
+    clc
+    adc SnowFrame
+    tay
+    lda snow_palette_frames_1, y
+    ldx #15
+    sta RamPalette, x
+
+
+
+    lda #1
+    sta MustUpdatePalette
+    lda #16
+    sta PaletteUpdateSize
+@exit:
+
+    rts
+
+
+;-----------------------------
 IntroLogics:
 
 
