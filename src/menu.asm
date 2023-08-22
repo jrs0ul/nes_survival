@@ -1639,9 +1639,7 @@ ToolMenuInputVillager:
 SpawnRewardItem:
 
     sta ItemIGave
-    lda #1
-
-    sta ItemCount
+    
     lda reward_items_list, y
     beq @no_item
     asl
@@ -1653,6 +1651,10 @@ SpawnRewardItem:
     sta Items + 2
     lda #108
     sta Items + 3
+
+    lda #1
+    sta ItemCount
+
 
 @no_item:
     lda #1
