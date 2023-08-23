@@ -3074,7 +3074,7 @@ OnExitVillagerHut:
     cmp #MAX_QUEST
     bcc @saveQuestIndex
 
-    lda #0
+    lda #1 ; let's skip the very first quest
 @saveQuestIndex:
     sta ActiveVillagerQuests, y
 @exit:
