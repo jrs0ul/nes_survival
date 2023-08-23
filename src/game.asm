@@ -5355,6 +5355,9 @@ CheckBed:
     cmp #128
     bcs @nope
 
+    lda #0
+    sta FirstTime
+    sta MustUpdateTextBaloon
     lda #1
     sta MustLoadSomething
     sta MustLoadMenu
@@ -5383,6 +5386,7 @@ CheckFireplace:
 
     lda #0
     sta FirstTime
+    sta MustUpdateTextBaloon
     lda #1
     sta MustLoadSomething
     sta MustLoadMenu
@@ -5411,6 +5415,7 @@ CheckStashBox:
 
     lda #0
     sta FirstTime
+    sta MustUpdateTextBaloon
     lda #1
     sta MustLoadSomething
     sta MustLoadMenu
@@ -5440,6 +5445,7 @@ CheckToolTable:
 
     lda #0
     sta FirstTime
+    sta MustUpdateTextBaloon
     lda #1
     sta MustLoadSomething
     sta MustLoadMenu

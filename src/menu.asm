@@ -464,10 +464,24 @@ DrawMaterialMenu:
     lda #7
     sta TempPointY
 
+    lda InVillagerHut
+    bne @villagermenu
+
+
     lda #<MaterialMenu
     sta pointer
     lda #>MaterialMenu
     sta pointer + 1
+    jmp TransferTiles
+
+@villagermenu:
+
+    lda #<MaterialMenuVillager
+    sta pointer
+    lda #>MaterialMenuVillager
+    sta pointer + 1
+
+@transfertiles:
     jsr TransferTiles
 
     lda #0
@@ -1445,6 +1459,10 @@ MaterialMenuInput:
 
     lda ItemMenuIndex
     bne @clearItem ; DROP
+
+    lda InVillagerHut
+    bne @giveItem
+
     lda StashActivated
     bne @take_from_stash
     jsr StoreItemInStash
@@ -1453,6 +1471,36 @@ MaterialMenuInput:
 @take_from_stash:
     jsr TakeItemFromStash
     bne @exit ;failed to retrieve
+    jmp @clearItem
+
+@giveItem:
+    stx TempRegX
+    jsr GetPaletteFadeValueForHour
+    cmp #$40
+    bne @continue
+
+    lda VillagerIndex
+    beq @exit ;can't give item to a bear at night
+@continue:
+    lda ItemIGave
+    bne @exit ; already gave an item
+
+    ldx TempRegX
+
+    lda VillagerIndex
+    tay
+    asl
+    asl ; villager index * 4
+    clc
+    adc ActiveVillagerQuests, y
+    tay
+    lda Inventory, x
+    cmp goal_items_list, y
+    bne @exit
+
+    jsr SpawnRewardItem
+
+
 
 @clearItem:
     jsr ClearThatItem
