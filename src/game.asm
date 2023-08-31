@@ -377,6 +377,7 @@ player_sprites_flip:
     NPC_AI_DELAY               = 133
     NPC_COLLISION_DELAY        = 250
     FISHING_DELAY              = 2
+    STAMINA_DELAY              = 5
 
     COLLISION_MAP_SIZE         = 120 ; 4 columns * 30 rows
     COLLISION_MAP_COLUMN_COUNT = 4
@@ -386,7 +387,7 @@ player_sprites_flip:
     PLAYER_COLLISION_LINE_X2    = 13 ;16 - 3
     PLAYER_COLLISION_LINE_Y1    = 8
     PLAYER_WIDTH                = 16
-    PLAYER_STAMINA_SIZE         = 64
+    PLAYER_STAMINA_SIZE         = 128
 
     MAX_TILE_SCROLL_LEFT       = 248; -8
     MAX_TILE_SCROLL_RIGHT      = 8
@@ -578,6 +579,8 @@ NpcAIUpdateDelay:
     .res 1
 NpcCollisionDelay:
     .res 1
+StaminaDelay:
+    .res 1
 PaletteUpdateSize:
     .res 1
 RamPalette:
@@ -648,7 +651,7 @@ FlickerFrame: ;variable for alternating sprite update routines to achieve flicke
     .res 1
 
 ZPBuffer:
-    .res 124  ; I want to be aware of the free memory
+    .res 123  ; I want to be aware of the free memory
 
 ;--------------
 .segment "BSS" ; variables in ram
@@ -739,6 +742,8 @@ PlayerFlip:
 
 SnowFrame:
 Stamina:
+    .res 1
+FoodToStamina:
     .res 1
 
 DirectionX:
@@ -1207,7 +1212,7 @@ SourceMapIdx:
     .res 1
 
 Buffer:
-    .res 495  ;must see how much is still available
+    .res 494  ;must see how much is still available
 
 ;====================================================================================
 
@@ -2042,6 +2047,8 @@ Logics:
 
     jsr RunTime
 
+    jsr RestoreStamina
+
 
 @doneLogics:
 
@@ -2065,7 +2072,54 @@ Logics:
 @exit:
 
     rts
+;------------------------------
+RestoreStamina:
 
+    lda FoodToStamina
+    beq @convertfood ;we need to convert some food to stamina
+    jmp @doRefill
+
+@convertfood:
+
+    lda Food
+    clc
+    adc Food + 1
+    adc Food + 2
+    cmp #0
+    beq @exit ; can't convert food to stamina refill
+
+    lda #<Food
+    sta DigitPtr
+    lda #>Food
+    sta DigitPtr + 1
+    lda #1
+    sta DigitChangeSize
+    jsr DecreaseDigits
+    lda #1
+    sta FoodUpdated
+    lda #PLAYER_STAMINA_SIZE
+    sta FoodToStamina
+
+
+@doRefill:
+    lda PlayerSpeed
+    cmp #2
+    beq @exit
+    dec StaminaDelay
+    bne @exit
+
+    lda #STAMINA_DELAY
+    sta StaminaDelay
+    
+    lda Stamina
+    cmp #PLAYER_STAMINA_SIZE
+    bcs @exit
+    dec FoodToStamina
+    inc Stamina
+
+
+@exit:
+    rts
 
 ;------------------------------
 CheckEntryPoints:
@@ -3767,7 +3821,60 @@ UpdateStatusDigits:
     lda #0
     sta $2001
 
+    lda $2002
+    lda #$20
+    sta $2006
+    lda #$55
+    sta $2006
 
+    lda Stamina
+    beq @fail1
+    lda #$F1
+    sta $2007
+    jmp @segment2
+
+@fail1:
+    lda #0
+    sta $2007
+
+@segment2:
+
+    lda Stamina
+    cmp #32
+    bcc @fail2
+    lda #$F1
+    sta $2007
+    jmp @segment3
+
+@fail2:
+    lda #0
+    sta $2007
+
+@segment3:
+    lda Stamina
+    cmp #64
+    bcc @fail3
+
+    lda #$F1
+    sta $2007
+    jmp @segment4
+
+@fail3:
+    lda #0
+    sta $2007
+@segment4:
+    lda Stamina
+    cmp #96
+    bcc @fail4
+    lda #$F1
+    sta $2007
+    jmp @Hp
+
+@fail4:
+    lda #0
+    sta $2007
+
+@Hp:
     lda HpUpdated
     beq @warmth
 
@@ -4002,6 +4109,7 @@ ResetEntityVariables:
     sta Food + 2
     sta Fuel + 1
     sta Fuel + 2
+    lda #PLAYER_STAMINA_SIZE
     sta Stamina
 
     lda #120
@@ -4040,9 +4148,12 @@ ResetEntityVariables:
     sta FuelDelay
     lda #FIRE_ANIMATION_DELAY
     sta FireFrameDelay
+    lda #STAMINA_DELAY
+    sta StaminaDelay
 
     lda #0
     sta PlayerWins
+    sta FoodToStamina
     sta ItemIGave
     sta PaletteFadeAnimationState
     sta FadeIdx
@@ -4521,30 +4632,8 @@ CheckA:
     beq @exit
 
     lda Stamina
-    bne @speedup ; we have some stamina
+    beq @exit ; no stamina
 
-    ;let's refill stamina
-    lda Food
-    clc
-    adc Food + 1
-    adc Food + 2
-    cmp #0
-    beq @exit ; can't refill stamina
-
-
-    lda #<Food
-    sta DigitPtr
-    lda #>Food
-    sta DigitPtr + 1
-    lda #1
-    sta DigitChangeSize
-    jsr DecreaseDigits
-    lda #1
-    sta FoodUpdated
-    lda #PLAYER_STAMINA_SIZE
-    sta Stamina
-
-@speedup:
     dec Stamina
     lda #2
     jmp @end
