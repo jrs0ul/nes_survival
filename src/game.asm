@@ -2440,6 +2440,7 @@ RoutinesAfterFadeOut:
     lda #PALETTE_FADE_MAX_ITERATION
     sta FadeIdx
     rts
+
 @next: ;game over
     lda MustLoadGameOverAfterFadeOut
     beq @nextYouWin
@@ -2450,6 +2451,7 @@ RoutinesAfterFadeOut:
     sta PaletteFadeAnimationState
     sta MustLoadGameOverAfterFadeOut
     rts
+
 @nextYouWin:
     lda MustShowOutroAfterFadeout
     beq @showTitle
@@ -2489,7 +2491,7 @@ RoutinesAfterFadeOut:
 @afterIntro:
     jsr StartGame
     rts
-    
+
     ;---------------------------------------
 @locationRoutines: ;location routines start here
     ;--some general location code----
@@ -2513,11 +2515,6 @@ RoutinesAfterFadeOut:
 
 @skip_night:
 
-    lda #1
-    sta MustLoadHouseInterior
-    sta MustRestartIndoorsMusic
-    sta InVillagerHut
-
     jsr ResetNameTableAdresses
 
     lda #0
@@ -2526,6 +2523,9 @@ RoutinesAfterFadeOut:
     sta TilesScroll
     sta ScrollDirection
 
+    lda #1
+    sta MustRestartIndoorsMusic
+    sta InVillagerHut
     ;------------------------------------
     ; load the outdoors of bear's hut
 @next2:
@@ -2573,10 +2573,9 @@ RoutinesAfterFadeOut:
     lda #$B8 ;hack
     sta GlobalScroll
 
-    lda #1
-    sta MustLoadOutside
-    sta MustCopyMainChr
     jsr OnExitVillagerHut
+    lda #1
+    sta MustCopyMainChr
 
 ;--------------------------Second location
 @next3:
@@ -2587,8 +2586,6 @@ RoutinesAfterFadeOut:
 
     jsr ResetNameTableAdresses
 
-    lda #1
-    sta MustLoadOutside
     lda #0
     sta CurrentMapSegmentIndex
 
@@ -2615,8 +2612,6 @@ RoutinesAfterFadeOut:
     cmp #3
     bne @next5
 
-    lda #1
-    sta MustLoadOutside
     lda #0
     sta CurrentMapSegmentIndex
 
@@ -2647,7 +2642,6 @@ RoutinesAfterFadeOut:
     jsr ResetNameTableAdresses
 
     lda #1
-    sta MustLoadHouseInterior
     sta MustRestartIndoorsMusic
     sta InHouse
     ;---------------------------------------------
@@ -2657,11 +2651,6 @@ RoutinesAfterFadeOut:
     lda ActiveMapEntryIndex
     cmp #4
     bne @next7
-
-    ;jsr FlipStartingNametable
-
-    lda #1
-    sta MustLoadOutside
 
     lda #0
     sta TimesShiftedLeft
@@ -2737,16 +2726,13 @@ RoutinesAfterFadeOut:
     lda #103
     sta GlobalScroll
 
-    lda #1
-    sta CurrentMapSegmentIndex
-    sta MustLoadOutside
-
-    ;jsr FlipStartingNametable
 
     lda #28
     sta BgColumnIdxToUpload
     lda #2
     sta ScrollDirection
+    lda #1
+    sta CurrentMapSegmentIndex
     ;------------------------------------------
     ;second villager
 @next9:
@@ -2770,8 +2756,6 @@ RoutinesAfterFadeOut:
     sta TilesScroll
     sta ScrollDirection
 
-    lda #1
-    sta MustLoadHouseInterior
     ;------------------------------------------
     ;second villager exit
 @next10:
@@ -2822,11 +2806,10 @@ RoutinesAfterFadeOut:
     sta ScrollDirection
 
 
+    jsr OnExitVillagerHut
     lda #1
     sta TilesScroll
-    sta MustLoadOutside
     sta MustCopyMainChr
-    jsr OnExitVillagerHut
 ;-------cave entrance
 @next11:
     lda ActiveMapEntryIndex
@@ -2835,7 +2818,6 @@ RoutinesAfterFadeOut:
 
     lda #1
     sta InCave
-    sta MustLoadOutside
     lda #0
     sta CurrentMapSegmentIndex
 
@@ -2870,8 +2852,6 @@ RoutinesAfterFadeOut:
     sta CurrentMapSegmentIndex
     sta GlobalScroll
     sta TilesScroll
-    lda #1
-    sta MustLoadOutside
 
 ;cave from crashsite
 @next13:
@@ -2882,7 +2862,6 @@ RoutinesAfterFadeOut:
 
     lda #1
     sta InCave
-    sta MustLoadOutside
     lda #0
     sta CurrentMapSegmentIndex
 
@@ -2946,12 +2925,12 @@ RoutinesAfterFadeOut:
     sta ScrollDirection
 
 
-    lda #1
-    sta MustLoadOutside
 
 
 @next15:
 
+    lda #1
+    sta MustLoadSomething ; activate location loading in NMI
 
     rts
 ;------------------------------
@@ -2961,8 +2940,6 @@ CommonLocationRoutine:
     sta InCave
     sta IsLocationRoutine
     sta PaletteFadeAnimationState
-    lda #1
-    sta MustLoadSomething
     lda ActiveMapEntryIndex
     asl
     asl
@@ -3004,14 +2981,13 @@ CommonLocationRoutine:
     sta pointer + 1
     inx
     lda MapSpawnPoint, x
-;TODO: this must work
-;    bne @itsAnIndoorMap
-;    lda #1
-;    sta MustLoadOutside
-;    jmp @loadMapptr
-;@itsAnIndoorMap:
-;    lda #1
-;    sta MustLoadHouseInterior
+    bne @itsAnIndoorMap
+    lda #1
+    sta MustLoadOutside
+    jmp @loadMapptr
+@itsAnIndoorMap:
+    lda #1
+    sta MustLoadHouseInterior
 @loadMapptr:
     inx
     lda MapSpawnPoint, x
