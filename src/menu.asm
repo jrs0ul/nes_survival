@@ -472,7 +472,7 @@ DrawMaterialMenu:
     sta pointer
     lda #>MaterialMenu
     sta pointer + 1
-    jmp TransferTiles
+    jmp @transfertiles
 
 @villagermenu:
 
