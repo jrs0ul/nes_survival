@@ -159,6 +159,19 @@ x_collision_pattern:
     .byte %00000010
     .byte %00000001
 
+stamina_sprite_lookup:
+    .byte 168
+    .byte 176
+    .byte 184
+    .byte 192
+    .byte 200
+stamina_segment_values:
+    .byte 0
+    .byte 32
+    .byte 64
+    .byte 96
+    .byte 128
+
 spearSprites:
           ;+Y,frame,attributes,+X
     .byte 248, $E2, %00000000, 252, 0, $E3, %00000000, 252 ;up
@@ -183,11 +196,11 @@ hammerSprites:
 
 house_palette:
     .byte $0C,$16,$27,$37, $0C,$07,$00,$31, $0C,$17,$27,$31, $0C,$20,$37,$16    ;background
-    .byte $0C,$0f,$17,$20, $0C,$06,$16,$39, $0C,$0f,$16,$39, $0C,$0f,$37,$16    ;OAM sprites
+    .byte $0C,$0f,$17,$20, $0C,$0C,$16,$39, $0C,$0f,$16,$39, $0C,$0f,$37,$16    ;OAM sprites
 
 main_palette:
     .byte $0C,$00,$21,$31, $0C,$1B,$21,$31, $0C,$18,$21,$31, $0C,$20,$37,$16    ;background
-    .byte $0C,$0f,$17,$20, $0C,$06,$16,$39, $0C,$0f,$16,$39, $0C,$0f,$37,$16    ;OAM sprites
+    .byte $0C,$0f,$17,$20, $0C,$0C,$16,$39, $0C,$0f,$16,$39, $0C,$0f,$37,$16    ;OAM sprites
 
 game_over_palette:
     .byte $0f,$10,$20,$30,$0f,$0c,$35,$21,$0f,$0c,$16,$21,$0f,$01,$07,$21
@@ -745,6 +758,12 @@ Stamina:
     .res 1
 FoodToStamina:
     .res 1
+StaminaSpritetempx:
+    .res 1
+StaminaSpritePos:
+    .res 1
+StaminaSpriteOffset:
+    .res 1
 
 DirectionX:
     .res 1
@@ -1212,7 +1231,7 @@ SourceMapIdx:
     .res 1
 
 Buffer:
-    .res 494  ;must see how much is still available
+    .res 491  ;must see how much is still available
 
 ;====================================================================================
 
@@ -5769,8 +5788,55 @@ UpdateSprites:
     inc TempSpriteCount
 
     inx
-;--------------------
+;---------------------
 @no_second_celestial_body:
+    lda Stamina
+    beq @no_stamina_bar
+    cmp #PLAYER_STAMINA_SIZE
+    bcs @no_stamina_bar
+
+    lda #15
+    sta FIRST_SPRITE, x
+    inx
+    lda #$FD
+    sta FIRST_SPRITE, x
+    inx
+    lda #%00000001
+    sta FIRST_SPRITE, x
+    inx
+
+    lda Stamina ; current max stamina is 128, and it has 4 segments
+    lsr
+    lsr
+    lsr
+    lsr
+    lsr         ;so let's divide value by segment width 32
+    stx StaminaSpritetempx
+    tax
+
+    lda stamina_sprite_lookup, x
+    sta StaminaSpritePos
+
+    lda Stamina
+    sec
+    sbc stamina_segment_values, x
+    lsr
+    lsr
+    sta StaminaSpriteOffset
+
+    ldx StaminaSpritetempx
+
+    lda StaminaSpritePos
+    clc
+    adc StaminaSpriteOffset
+
+    sta FIRST_SPRITE, x
+    inx
+
+    inc TempSpriteCount
+
+;--------------------
+@no_stamina_bar:
 
     lda FlickerFrame
     beq @doZtoA

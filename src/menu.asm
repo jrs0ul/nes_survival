@@ -2388,7 +2388,12 @@ UpdateInventorySprites:
     tay
     lda item_data, y ;grab sprite index
     bne @store_sprite_index
-    lda #$FD ;empty sprite index
+    iny ;increment data index
+    lda TempTileYPos
+    clc
+    adc #INVENTORY_STEP_PIXELS
+    sta TempTileYPos
+    jmp @next
 @store_sprite_index:
     sta TempTileIndex ; save sprite index
     iny
