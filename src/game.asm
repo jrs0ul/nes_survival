@@ -113,6 +113,7 @@ banktable:              ; Write to this table to switch banks.
 
 .include "data/villager_quests.asm"
 .include "data/MapEntryPoints.asm"
+.include "data/AnimalSpawnPositions.asm"
 
 
 zerosprite:
@@ -581,6 +582,9 @@ PalettePtr:
     .res 2
 collisionMapPtr:
     .res 2
+AnimalSpawnPointsPtr:
+    .res 2
+
 tmpAttribAddress:
     .res 1
 
@@ -665,7 +669,7 @@ FlickerFrame: ;variable for alternating sprite update routines to achieve flicke
     .res 1
 
 ZPBuffer:
-    .res 123  ; I want to be aware of the free memory
+    .res 121  ; I want to be aware of the free memory
 
 ;--------------
 .segment "BSS" ; variables in ram
@@ -1194,6 +1198,9 @@ ParamTimeValue:
 MustRedir: ; the current npc must change direction
     .res 1
 
+TempScreenNpcCount:
+    .res 1
+
 Items:   ;items that lies in the map
     .res 80 ; max 20 items * 4 bytes
             ;(item index(7 bits) + active(1 bit),
@@ -1211,7 +1218,7 @@ Item_Location3_Collection_times:
     .res ITEM_COUNT_LOC3
 
 Npcs:   ;animals and stuff
-    .res 64 ; max 8 npcs * 8 bytes:
+    .res 128 ; max 16 npcs * 8 bytes:
             ;   (npc type(6 bits) + state(2 bit, 0 - dead, 1 - alive, 2 - attacks, 3 - damaged),
             ;   x,
             ;   y,
@@ -1232,7 +1239,7 @@ SourceMapIdx:
     .res 1
 
 Buffer:
-    .res 491  ;must see how much is still available
+    .res 426  ;must see how much is still available
 
 ;====================================================================================
 
@@ -3086,6 +3093,7 @@ CommonLocationRoutine:
 
     stx TempRegX
     lda MapSpawnPoint, x ;generated npc count
+    sta TempScreenNpcCount
     beq @skipGeneration
     sta TempNpcCnt
     inx
@@ -3093,6 +3101,13 @@ CommonLocationRoutine:
     inx
     lda MapSpawnPoint, x
     sta TempIndex ; map segment for generator
+    jsr GenerateNpcs
+    inc TempIndex
+    lda TempIndex
+    cmp ScreenCount
+    bcs @skipLoadingNpcs
+    lda TempScreenNpcCount
+    sta TempNpcCnt
     jsr GenerateNpcs
     jmp @skipLoadingNpcs ; we're generating, no need to load
 @skipGeneration:
@@ -3675,6 +3690,16 @@ SwitchScreenIdxIfNeeded:
     jsr FlipStartingNametable
     lda #0
     sta MustIncrementScreenIndex
+
+    lda TempScreenNpcCount
+    sta TempNpcCnt
+    lda CurrentMapSegmentIndex
+    clc
+    adc #1
+    cmp ScreenCount
+    bcs @exit
+    sta TempIndex
+    jsr GenerateNpcs
 
 @checkDecrement:
     lda MustDecrementScreenIndex
@@ -4451,7 +4476,7 @@ StartGame:
     sta pointer + 1
     jsr LoadItems
 
-    lda #4
+    lda #3
     sta TempNpcCnt
     lda #0
     sta TempIndex

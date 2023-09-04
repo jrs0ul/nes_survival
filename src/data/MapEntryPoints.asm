@@ -61,7 +61,7 @@ MapEntryPoints:
 ;generated npc count
 ;not generated Npcs Low
 ;NpcsHigh
-;currentMapSegment we are entering
+;currentMapSegment we are entering (only used for animal generation now)
 
 MapSpawnPoint:
     ;Entry to player's house from outside

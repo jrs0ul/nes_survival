@@ -50,7 +50,19 @@ LoadNpcs:
 ;            TempIndex  - location screen index
 ;Generate random npcs
 GenerateNpcs:
+
+    lda #0
+    sta TempNpcIndex
+
+
+    ldx LocationIndex
+    lda location_spawns_low, x
+    sta AnimalSpawnPointsPtr
+    lda location_spawns_high, x
+    sta AnimalSpawnPointsPtr + 1
+
     lda NpcCount
+    tay ; store npc count in y
     clc
     adc TempNpcCnt
     sta NpcCount
@@ -58,8 +70,13 @@ GenerateNpcs:
     jsr GetPaletteFadeValueForHour
     sta TempFrame
 
+    ;calculate npc data index (npccount * 8)
+    tya
+    asl
+    asl
+    asl
+    tax
 
-    ldx #0
 @npcLoop:
     ;npc type
     lda TempFrame
@@ -97,149 +114,45 @@ GenerateNpcs:
 @storeType:
     sta Npcs, x
     inx
-    stx TempZ
 
-@generateCoords:
-    jsr GenerateNPCCoords
-
-    jsr StoreGeneratedNpc
-
-
-    dec TempNpcCnt
-    bne @npcLoop
-
-    rts
-;------------------------------------
-GenerateNPCCoords:
     ;x
-    jsr UpdateRandomNumber
-    and #%00011111 ; 32
-    sta TempPointX
-    ;y
-    jsr UpdateRandomNumber
-    and #%00001111; 16
-    clc
-    adc #4
-    sta TempPointY
-
-    rts
-;------------------------------------
-StoreGeneratedNpc:
-    ldx TempZ
-    ;x
-    lda TempPointX
-    asl
-    asl
-    asl ; x8
+    ldy TempNpcIndex
+    lda (AnimalSpawnPointsPtr), y
     sta Npcs, x
     inx
+
     ;y
-    lda TempPointY
-    asl
-    asl
-    asl
+    iny
+    lda (AnimalSpawnPointsPtr), y
     sta Npcs, x
     inx
+
     ;screen
     lda TempIndex
     sta Npcs, x
     inx
     ;dir
     lda #1
-    sta Npcs, x
+;    sta Npcs, x
     inx
     ;frame
     inx
-    sta Npcs, x;timer
+;    sta Npcs, x;timer
     inx
     lda TempHp
     sta Npcs, x
     ;hp
     inx
 
+    inc TempNpcIndex
+    inc TempNpcIndex
+
+
+    dec TempNpcCnt
+    bne @npcLoop
+
     rts
 
-;------------------------------------
-;npc x - TempPointX, npc y - TempPointY, screen - TempIndex
-;pointer - collision list low
-;pointer2 - collision list high
-TestGeneratedNpcCollision:
-
-    lda TempIndex
-    cmp ScreenCount
-    bcs @collisionDetected
-
-    lda LocationIndex
-    asl
-    asl
-    clc
-    adc TempIndex
-    tay
-    lda collision_list_low, y
-    sta pointer ; reuse the pointer :)
-    lda collision_list_high, y
-    sta pointer + 1
-
-
-    lda TempPointY
-    sta TempY
-@RowLoop:
-
-    lda TempPointX
-    tax
-    lda x_collision_pattern, x
-    sta Temp
-    txa
-    lsr
-    lsr
-    lsr
-    clc
-    adc TempY
-    adc TempY
-    adc TempY
-    adc TempY
-    tay
-
-    lda (pointer), y
-    and Temp
-    bne @collisionDetected
-
-    lda TempPointX
-    clc
-    adc #1
-    bcs @collisionDetected
-
-    tax
-    lda x_collision_pattern, x
-    sta Temp
-    txa
-    lsr
-    lsr
-    lsr
-    clc
-    adc TempY
-    adc TempY
-    adc TempY
-    adc TempY
-    tay
-
-    lda (pointer), y
-    and Temp
-    bne @collisionDetected
-
-    inc TempY
-    dec TempNpcRows
-    bne @RowLoop
-
-    lda #0
-    jmp @exit
-
-
-@collisionDetected:
-    lda #1
-
-@exit:
-    rts
 ;---------------------------------
 IsPlayerCollidingWithNpcs:
 

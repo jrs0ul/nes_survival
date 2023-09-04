@@ -20,15 +20,15 @@ location_spawns_high:
 
 
 spawnpoints_base_loc_1:
-    .byte 0, 0
-    .byte 0, 0
-    .byte 0, 0
-    .byte 0, 0
+    .byte 208, 48
+    .byte 208, 120
+    .byte 208, 48
+    .byte 208, 192
 
-    .byte 0, 0
-    .byte 0, 0
-    .byte 0, 0
-    .byte 0, 0
+    .byte 120, 72
+    .byte 168, 184
+    .byte 120, 0
+    .byte 120, 0
 
     .byte 0, 0
     .byte 0, 0
