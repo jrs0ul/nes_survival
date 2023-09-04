@@ -27,18 +27,18 @@ spawnpoints_base_loc_1:
 
     .byte 120, 72
     .byte 168, 184
-    .byte 120, 0
-    .byte 120, 0
+    .byte 48, 128
+    .byte 98, 160
 
-    .byte 0, 0
-    .byte 0, 0
-    .byte 0, 0
-    .byte 0, 0
+    .byte 120, 72
+    .byte 168, 184
+    .byte 48, 128
+    .byte 98, 160
 
-    .byte 0, 0
-    .byte 0, 0
-    .byte 0, 0
-    .byte 0, 0
+    .byte 120, 72
+    .byte 168, 184
+    .byte 48, 128
+    .byte 98, 160
 
 spawnpoints_loc_2:
     .byte 0, 0

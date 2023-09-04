@@ -51,7 +51,10 @@ LoadNpcs:
 ;Generate random npcs
 GenerateNpcs:
 
-    lda #0
+    lda TempIndex
+    asl
+    asl
+    asl
     sta TempNpcIndex
 
 
@@ -65,6 +68,8 @@ GenerateNpcs:
     tay ; store npc count in y
     clc
     adc TempNpcCnt
+    cmp #NPC_MAX_COUNT
+    bcs @exit
     sta NpcCount
 
     jsr GetPaletteFadeValueForHour
@@ -78,6 +83,17 @@ GenerateNpcs:
     tax
 
 @npcLoop:
+
+
+    jsr GenerateSingleNpc
+
+
+    dec TempNpcCnt
+    bne @npcLoop
+@exit:
+    rts
+;---------------------------------
+GenerateSingleNpc:
     ;npc type
     lda TempFrame
     cmp #$40    ;check if it's night
@@ -132,26 +148,24 @@ GenerateNpcs:
     sta Npcs, x
     inx
     ;dir
-    lda #1
-;    sta Npcs, x
     inx
     ;frame
     inx
-;    sta Npcs, x;timer
     inx
     lda TempHp
     sta Npcs, x
     ;hp
     inx
 
-    inc TempNpcIndex
-    inc TempNpcIndex
+    lda TempNpcIndex
+    clc
+    adc #2
+    sta TempNpcIndex
 
 
-    dec TempNpcCnt
-    bne @npcLoop
 
     rts
+
 
 ;---------------------------------
 IsPlayerCollidingWithNpcs:

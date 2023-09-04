@@ -364,6 +364,8 @@ player_sprites_flip:
     BUTTON_B_MASK               = %01000000
     BUTTON_A_MASK               = %10000000
 
+    NPC_MAX_COUNT              = 16
+
     NPC_SPEED                  = 1
 
     MAX_SPRITE_COUNT           = 64
@@ -4478,8 +4480,15 @@ StartGame:
 
     lda #3
     sta TempNpcCnt
+    sta TempScreenNpcCount
     lda #0
     sta TempIndex
+    jsr GenerateNpcs
+
+    lda #1
+    sta TempIndex
+    lda #3
+    sta TempNpcCnt
     jsr GenerateNpcs
 
     ldx #0
