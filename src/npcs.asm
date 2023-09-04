@@ -46,16 +46,14 @@ LoadNpcs:
 
     rts
 ;-------------------------------------
-;Parameters: TempNpcCnt - max npc number used with and instruction
-
+;Parameters: TempNpcCnt - npc number
+;            TempIndex  - location screen index
 ;Generate random npcs
 GenerateNpcs:
-    jsr UpdateRandomNumber
-    and TempNpcCnt ; maximum npcs
+    lda NpcCount
     clc
-    adc #1         ; you don't want 0 so add at least 1
+    adc TempNpcCnt
     sta NpcCount
-    sta TempNpcCnt
 
     jsr GetPaletteFadeValueForHour
     sta TempFrame
@@ -104,10 +102,6 @@ GenerateNpcs:
 @generateCoords:
     jsr GenerateNPCCoords
 
-@testCollision:
-    jsr TestGeneratedNpcCollision
-    bne @generateCoords
-
     jsr StoreGeneratedNpc
 
 
@@ -127,21 +121,6 @@ GenerateNPCCoords:
     clc
     adc #4
     sta TempPointY
-
-    ;screen idx-------------
-    lda LocationIndex
-    asl
-    tay
-    lda LocationPopulatedScreens, y
-    sta TempIndex
-    jsr UpdateRandomNumber
-    and TempIndex
-    iny
-    clc
-    adc LocationPopulatedScreens, y
-    sta TempIndex
-
-@exit:
 
     rts
 ;------------------------------------

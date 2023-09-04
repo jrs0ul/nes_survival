@@ -261,6 +261,7 @@ destructable_tiles_list:
 
 
 
+
 npc_direction_list:
     .byte 0
     .byte %00000100 ; Up
@@ -3084,10 +3085,16 @@ CommonLocationRoutine:
     sta NpcCount
 
     stx TempRegX
-    lda MapSpawnPoint, x ;npc count
+    lda MapSpawnPoint, x ;generated npc count
     beq @skipGeneration
     sta TempNpcCnt
+    inx
+    inx
+    inx
+    lda MapSpawnPoint, x
+    sta TempIndex ; map segment for generator
     jsr GenerateNpcs
+    jmp @skipLoadingNpcs ; we're generating, no need to load
 @skipGeneration:
     ldx TempRegX
     inx
@@ -4444,8 +4451,10 @@ StartGame:
     sta pointer + 1
     jsr LoadItems
 
-    lda #7
+    lda #4
     sta TempNpcCnt
+    lda #0
+    sta TempIndex
     jsr GenerateNpcs
 
     ldx #0
