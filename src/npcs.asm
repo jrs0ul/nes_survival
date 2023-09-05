@@ -64,32 +64,47 @@ GenerateNpcs:
     lda location_spawns_high, x
     sta AnimalSpawnPointsPtr + 1
 
-    lda NpcCount
-    tay ; store npc count in y
-    clc
-    adc TempNpcCnt
-    cmp #NPC_MAX_COUNT
-    bcs @exit
-    sta NpcCount
 
     jsr GetPaletteFadeValueForHour
     sta TempFrame
 
-    ;calculate npc data index (npccount * 8)
-    tya
+    ldx #0
+    stx TempNpcGenerationIdx
+
+@npcLoop:
+
+    lda TempNpcGenerationIdx
     asl
     asl
     asl
     tax
 
-@npcLoop:
+    lda TempNpcGenerationIdx
+    cmp NpcCount
+    bcc @checkOldNpc
 
+    inc NpcCount
+    jmp @generate
 
+@checkOldNpc:
+    lda Npcs, x
+    and #%00000011
+    cmp #0
+    bne @next
+
+@generate:
     jsr GenerateSingleNpc
 
 
+    inc TempNpcGenerationIdx
     dec TempNpcCnt
     bne @npcLoop
+    jmp @exit
+
+@next:
+    inc TempNpcGenerationIdx
+    jmp @npcLoop
+
 @exit:
     rts
 ;---------------------------------
@@ -165,7 +180,53 @@ GenerateSingleNpc:
 
 
     rts
+;---------------------------------
+EliminateInactiveNpcs:
 
+
+    lda #NPC_ELIMINATION_DELAY
+    sta NpcEliminationDelay
+
+    ldy NpcCount
+    beq @exit ; no npcs
+    dey
+
+@npcLoop:
+    tya
+    asl
+    asl
+    asl
+    tax
+    stx TempEliminationDest
+
+    lda Npcs, x 
+    and #%00000011
+    cmp #0
+    beq @next
+    inx
+    inx
+    inx
+    lda Npcs, x
+    cmp CurrentMapSegmentIndex
+    bcc @eliminate
+    ;TODO: complete elimination if the npc screen is too large
+    ;cmp CurrentMapSegmentIndex + 2
+    ;bcs @eliminate
+    jmp @next
+
+
+@eliminate:
+
+   ldx TempEliminationDest
+   lda #0
+   sta Npcs, x
+
+@next:
+    dey
+    bpl @npcLoop
+@exit:
+
+    rts
 
 ;---------------------------------
 IsPlayerCollidingWithNpcs:

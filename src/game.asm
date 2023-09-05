@@ -395,6 +395,7 @@ player_sprites_flip:
     NPC_COLLISION_DELAY        = 250
     FISHING_DELAY              = 2
     STAMINA_DELAY              = 5
+    NPC_ELIMINATION_DELAY      = 30
 
     COLLISION_MAP_SIZE         = 120 ; 4 columns * 30 rows
     COLLISION_MAP_COLUMN_COUNT = 4
@@ -601,6 +602,8 @@ NpcCollisionDelay:
     .res 1
 StaminaDelay:
     .res 1
+NpcEliminationDelay:
+    .res 1
 PaletteUpdateSize:
     .res 1
 RamPalette:
@@ -671,7 +674,7 @@ FlickerFrame: ;variable for alternating sprite update routines to achieve flicke
     .res 1
 
 ZPBuffer:
-    .res 121  ; I want to be aware of the free memory
+    .res 120  ; I want to be aware of the free memory
 
 ;--------------
 .segment "BSS" ; variables in ram
@@ -1188,6 +1191,11 @@ TempItemLoadY:
 TempItemLoadX:
     .res 1
 
+TempEliminationDest:
+    .res 1
+TempNpcGenerationIdx:
+    .res 1
+
 TempPlayerSpriteIdx:
     .res 1
 
@@ -1241,7 +1249,7 @@ SourceMapIdx:
     .res 1
 
 Buffer:
-    .res 426  ;must see how much is still available
+    .res 424  ;must see how much is still available
 
 ;====================================================================================
 
@@ -1395,9 +1403,15 @@ checkItems:
     bne nextIteration
 
     dec ItemUpdateDelay
-    bne npcAI
+    bne npcElimination
 
     jsr ItemCollisionCheck
+
+npcElimination:
+    dec NpcEliminationDelay
+    bne npcAI
+
+    jsr EliminateInactiveNpcs
 
 npcAI:
     dec NpcAIUpdateDelay
