@@ -395,7 +395,7 @@ player_sprites_flip:
     NPC_COLLISION_DELAY        = 250
     FISHING_DELAY              = 2
     STAMINA_DELAY              = 5
-    NPC_ELIMINATION_DELAY      = 30
+    NPC_ELIMINATION_DELAY      = 50
 
     COLLISION_MAP_SIZE         = 120 ; 4 columns * 30 rows
     COLLISION_MAP_COLUMN_COUNT = 4
@@ -1201,6 +1201,9 @@ TempPlayerSpriteIdx:
 
 TempNpcCollisionXReg:
     .res 1
+
+FarOffNpcScreen:
+    .res 1
 ;----------
 ParamTimeValue:
     .res 1
@@ -1249,7 +1252,7 @@ SourceMapIdx:
     .res 1
 
 Buffer:
-    .res 424  ;must see how much is still available
+    .res 423  ;must see how much is still available
 
 ;====================================================================================
 
@@ -3725,6 +3728,15 @@ SwitchScreenIdxIfNeeded:
     jsr FlipStartingNametable
     lda #0
     sta MustDecrementScreenIndex
+
+
+    lda CurrentMapSegmentIndex
+    cmp ScreenCount
+    bcs @exit
+    sta TempIndex
+    lda TempScreenNpcCount
+    sta TempNpcCnt
+    jsr GenerateNpcs
 
 @exit:
     rts

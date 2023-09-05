@@ -77,7 +77,7 @@ GenerateNpcs:
     asl
     asl
     asl
-    tax
+    tax ; npc slot * 8
 
     lda TempNpcGenerationIdx
     cmp NpcCount
@@ -187,6 +187,11 @@ EliminateInactiveNpcs:
     lda #NPC_ELIMINATION_DELAY
     sta NpcEliminationDelay
 
+    lda CurrentMapSegmentIndex
+    clc
+    adc #2
+    sta FarOffNpcScreen
+
     ldy NpcCount
     beq @exit ; no npcs
     dey
@@ -209,9 +214,8 @@ EliminateInactiveNpcs:
     lda Npcs, x
     cmp CurrentMapSegmentIndex
     bcc @eliminate
-    ;TODO: complete elimination if the npc screen is too large
-    ;cmp CurrentMapSegmentIndex + 2
-    ;bcs @eliminate
+    cmp FarOffNpcScreen
+    bcs @eliminate
     jmp @next
 
 
