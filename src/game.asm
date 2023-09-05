@@ -4231,6 +4231,7 @@ ResetEntityVariables:
     sta StaminaDelay
 
     lda #0
+    sta NpcCount
     sta PlayerWins
     sta FoodToStamina
     sta ItemIGave
@@ -4272,8 +4273,6 @@ ResetEntityVariables:
 
     lda #31
     sta BgColumnIdxToUpload
-    ;lda #24
-    ;sta DestScreenAddr
 
     lda #$20
     sta FirstNametableAddr
