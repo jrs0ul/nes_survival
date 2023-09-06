@@ -377,6 +377,10 @@ player_sprites_flip:
     MAX_QUEST                  = 4
 
 
+    NUM_OF_BUNNIES_BEFORE_DOG  = 3
+
+
+
     INTRO_SCENE_MAX            = 7
     OUTRO_SCENE_MAX            = 4
 
@@ -395,7 +399,7 @@ player_sprites_flip:
     NPC_COLLISION_DELAY        = 250
     FISHING_DELAY              = 2
     STAMINA_DELAY              = 5
-    NPC_ELIMINATION_DELAY      = 50
+    NPC_ELIMINATION_DELAY      = 200
 
     COLLISION_MAP_SIZE         = 120 ; 4 columns * 30 rows
     COLLISION_MAP_COLUMN_COUNT = 4
@@ -556,8 +560,6 @@ player_sprites_flip:
     SUBMENU_STASH_MATERIAL     = 6
     SUBMENU_TOOL               = 7
     SUBMENU_STASH_TOOL         = 8
-
-
 
 ;===================================================================
 .segment "ZEROPAGE"
@@ -1214,6 +1216,9 @@ MustRedir: ; the current npc must change direction
 TempScreenNpcCount:
     .res 1
 
+DogCounter: ; used for canid generation
+    .res 1
+
 Items:   ;items that lies in the map
     .res 80 ; max 20 items * 4 bytes
             ;(item index(7 bits) + active(1 bit),
@@ -1252,7 +1257,7 @@ SourceMapIdx:
     .res 1
 
 Buffer:
-    .res 423  ;must see how much is still available
+    .res 421  ;must see how much is still available
 
 ;====================================================================================
 
@@ -3036,6 +3041,8 @@ RoutinesAfterFadeOut:
 ;------------------------------
 CommonLocationRoutine:
 
+    lda #NUM_OF_BUNNIES_BEFORE_DOG
+    sta DogCounter
     lda #0
     sta InCave
     sta IsLocationRoutine
@@ -4502,6 +4509,9 @@ StartGame:
     lda #>Outside1_items
     sta pointer + 1
     jsr LoadItems
+
+    lda #NUM_OF_BUNNIES_BEFORE_DOG
+    sta DogCounter
 
     lda #3
     sta TempNpcCnt

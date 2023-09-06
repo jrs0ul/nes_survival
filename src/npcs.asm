@@ -51,6 +51,15 @@ LoadNpcs:
 ;Generate random npcs
 GenerateNpcs:
 
+    lda InCave
+    bne @exit
+
+    jsr UpdateRandomNumber
+    and TempNpcCnt
+    beq @exit
+    sta TempNpcCnt
+
+    ;let's calculate index for the screen coordinates
     lda TempIndex
     asl
     asl
@@ -113,10 +122,11 @@ GenerateSingleNpc:
     lda TempFrame
     cmp #$40    ;check if it's night
     beq @makeWolf
-    lda TempNpcCnt;if it's a last npc, let's make it hostile
-    cmp #1
+
+    dec DogCounter
     beq @makeCanid
 
+@makeBunny:
     ldy #9
     lda npc_data, y
     sta TempNpcRows
@@ -135,6 +145,8 @@ GenerateSingleNpc:
     lda #%00000001
     jmp @storeType
 @makeCanid:
+    lda #NUM_OF_BUNNIES_BEFORE_DOG
+    sta DogCounter
     ldy #25
     lda npc_data, y
     sta TempNpcRows
@@ -183,17 +195,20 @@ GenerateSingleNpc:
 ;---------------------------------
 EliminateInactiveNpcs:
 
-
     lda #NPC_ELIMINATION_DELAY
     sta NpcEliminationDelay
+
+    lda InCave
+    bne @exit
+
+    ldy NpcCount
+    beq @exit ; no npcs
 
     lda CurrentMapSegmentIndex
     clc
     adc #2
     sta FarOffNpcScreen
 
-    ldy NpcCount
-    beq @exit ; no npcs
     dey
 
 @npcLoop:

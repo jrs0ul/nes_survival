@@ -1,10 +1,10 @@
 UpdateRandomNumber:
 
     lda RandomNumber
-    lsr 
-    bcc noeor
+    lsr
+    bcc @noeor
     eor #$B4
-noeor:
+@noeor:
     sta RandomNumber
 
     rts
