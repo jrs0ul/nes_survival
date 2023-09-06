@@ -92,7 +92,12 @@ GenerateNpcs:
     cmp NpcCount
     bcc @checkOldNpc
 
-    inc NpcCount
+    lda NpcCount
+    clc
+    adc #1
+    cmp #NPC_MAX_COUNT
+    bcs @exit
+    sta NpcCount
     jmp @generate
 
 @checkOldNpc:
