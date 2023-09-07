@@ -24,27 +24,29 @@ item_data:
     .byte 8  , 0, 3, 0  ; 19 radio
     .byte 24 , 2, 5, 5  ; 20 hammer
     .byte 24 , 0, 5, 1  ; 21 wooden hammer
+    .byte 40 , 2, 5, 3  ; 22 slingshot
 
 item_wear:
-    .byte 0 ;empty
-    .byte 0 ;stick
-    .byte 0 ;raw meat
-    .byte 0 ;cooked meat
-    .byte 0 ;rowan berries
-    .byte 0 ;jam
-    .byte 0 ;rock
-    .byte 0 ;spear
-    .byte 10 ;knife
-    .byte 0  ;poop
-    .byte 0  ;hide
-    .byte 5  ;coat
-    .byte 0  ;jumbo meat
-    .byte 0  ;cooked jumbo meat
-    .byte 0  ;rope
+    .byte 0   ;empty
+    .byte 0   ;stick
+    .byte 0   ;raw meat
+    .byte 0   ;cooked meat
+    .byte 0   ;rowan berries
+    .byte 0   ;jam
+    .byte 0   ;rock
+    .byte 0   ;spear
+    .byte 10  ;knife
+    .byte 0   ;poop
+    .byte 0   ;hide
+    .byte 5   ;coat
+    .byte 0   ;jumbo meat
+    .byte 0   ;cooked jumbo meat
+    .byte 0   ;rope
     .byte 15  ;fishing rod
     .byte 0   ;reeds
     .byte 0   ;fish
     .byte 0   ;cooked fish
     .byte 0   ;radio
     .byte 25  ;hammer
-    .byte 15   ;wooden hammer
+    .byte 15  ;wooden hammer
+    .byte 5   ;slingshot
