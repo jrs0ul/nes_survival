@@ -496,6 +496,7 @@ player_sprites_flip:
     ITEM_COOKED_FISH           = 18
     ITEM_RADIO                 = 19
     ITEM_HAMMER                = 20
+    ITEM_WOOD_HAMMER           = 21
 
     SPEAR_SPEED                = 3
 
@@ -535,7 +536,7 @@ player_sprites_flip:
 
     DIALOG_TEXT_LENGTH         = 96
 
-    RECIPES_SIZE               = 24
+    RECIPES_SIZE               = 27
 
     ROT_AMOUNT_RAW_MEAT        = 50
     ROT_AMOUNT_COOKED_MEAT     = 25
@@ -4788,8 +4789,10 @@ CheckB:
     jsr ActivateFishingRod
 @checkhammer:
     cmp #ITEM_HAMMER
+    beq @use_hammer
+    cmp #ITEM_WOOD_HAMMER
     bne @regularAttack
-
+@use_hammer:
     jsr useHammerOnEnvironment
 
 @regularAttack:
@@ -4806,8 +4809,10 @@ CheckB:
 
     lda EquipedItem
     cmp #ITEM_HAMMER
+    beq @hammer_sfx
+    cmp #ITEM_WOOD_HAMMER
     bne @generic_sfx
-
+@hammer_sfx:
     lda #3
     jmp @play_sfx
 @generic_sfx:
@@ -4971,7 +4976,11 @@ useHammerOnEnvironment:
 ;--end of copy paste
 
     cmp #$F7
-    bne @exit
+    bne @check_other_tiles
+
+    lda EquipedItem
+    cmp #ITEM_WOOD_HAMMER
+    beq @check_other_tiles
 
     ldy #2
 @destructable_loop:
@@ -5005,11 +5014,130 @@ useHammerOnEnvironment:
     ;TODO: update destructabe tiles
     lda #1
     sta MustUpdateDestructables
+    jmp @exit
+
+@check_other_tiles:
+;rock
+    lda (pointer), y
+    cmp #$1C
+    beq @spawn_rock
+    cmp #$1D
+    beq @spawn_rock
+    cmp #$0C
+    beq @spawn_rock
+    cmp #$0D
+    beq @spawn_rock
+;wood
+    jsr IsTree
+    bne @spawn_wood
+    jmp @exit
+@spawn_rock:
+
+    jsr WearWeapon
+
+    jsr UpdateRandomNumber
+    and #1
+    bne @exit
+
+    lda #%00001101
+    sta Temp
+    jsr SpawnItem
+    jmp @exit
+@spawn_wood:
+    jsr WearWeapon
+    jsr UpdateRandomNumber
+    and #1
+    bne @exit
+
+    lda #%00000011
+    sta Temp
+    jsr SpawnItem
+
 
 @exit:
 
     rts
+;---------------------------------
+IsTree:
+    cmp #$0A
+    beq @yes
+    cmp #$0B
+    beq @yes
+    cmp #$1A
+    beq @yes
+    cmp #$1B
+    beq @yes
+    cmp #$2A
+    beq @yes
+    cmp #$2B
+    beq @yes
+    cmp #$87
+    beq @yes
+    cmp #$88
+    beq @yes
+    bne @nope
+@yes:
+    lda #1
+    jmp @end
+@nope:
+    lda #0
+@end:
+    rts
+
 ;----------------------------------
+;Temp is the item
+SpawnItem:
+
+    inc ItemCount
+    lda ItemCount
+    sec
+    sbc #1
+    asl
+    asl
+    tay
+
+    lda Temp ; item id and hp are in Temp
+    sta Items, y
+    iny
+    lda PlayerX
+    adc GlobalScroll
+    bcs @incrementScreen
+
+    sta TempPointX
+
+    lda CurrentMapSegmentIndex
+    sta Items, y
+    iny
+    lda TempPointX
+    sta Items, y
+    iny
+    lda PlayerY
+    clc
+    adc #FISHING_CATCH_OFFSET_Y
+    sta Items, y
+
+    jmp @exit
+@incrementScreen:
+    sta TempPointX
+
+    lda CurrentMapSegmentIndex
+    clc
+    adc #1
+    sta Items, y
+
+    lda TempPointX
+    sta Items, y
+    iny
+    lda PlayerY
+    clc
+    adc #FISHING_CATCH_OFFSET_Y
+    sta Items, y
+
+@exit:
+    rts
+
+
+;---------------------------------
 ActivateFishingRod:
 
     lda FishingRodActive
@@ -5203,51 +5331,9 @@ PullOutRod:
 @cont:
     jsr WearWeapon
 
-    inc ItemCount
-    lda ItemCount
-    sec
-    sbc #1
-    asl
-    asl
-    tay
-
     lda #%00100011
-    sta Items, y
-    iny
-    lda PlayerX
-    adc GlobalScroll
-    bcs @incrementScreen
-
-    sta TempPointX
-
-    lda CurrentMapSegmentIndex
-    sta Items, y
-    iny
-    lda TempPointX
-    sta Items, y
-    iny
-    lda PlayerY
-    clc
-    adc #FISHING_CATCH_OFFSET_Y
-    sta Items, y
-
-    jmp @exit
-@incrementScreen:
-    sta TempPointX
-
-    lda CurrentMapSegmentIndex
-    clc
-    adc #1
-    sta Items, y
-
-    lda TempPointX
-    sta Items, y
-    iny
-    lda PlayerY
-    clc
-    adc #FISHING_CATCH_OFFSET_Y
-    sta Items, y
-
+    sta Temp
+    jsr SpawnItem
 @exit:
     rts
 
@@ -5812,8 +5898,10 @@ UpdateSprites:
     lda EquipedItem
     beq @sunmoon
     cmp #ITEM_HAMMER
+    beq @ok
+    cmp #ITEM_WOOD_HAMMER
     bne @sunmoon
-
+@ok:
     jsr UpdateHammerSprites
 
 ;------------------------------

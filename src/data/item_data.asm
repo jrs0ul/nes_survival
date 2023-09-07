@@ -23,6 +23,7 @@ item_data:
     .byte 214, 0, 1, 3  ; 18 cooked fish
     .byte 8  , 0, 3, 0  ; 19 radio
     .byte 24 , 2, 5, 5  ; 20 hammer
+    .byte 24 , 0, 5, 1  ; 21 wooden hammer
 
 item_wear:
     .byte 0 ;empty
@@ -46,3 +47,4 @@ item_wear:
     .byte 0   ;cooked fish
     .byte 0   ;radio
     .byte 25  ;hammer
+    .byte 15   ;wooden hammer

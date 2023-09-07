@@ -7,3 +7,4 @@ recipes:
     .byte 1,  14, 15 ;  stick + rope = fishing rod
     .byte 14, 1,  15 ;  rope + stick = fishing rod
     .byte 16, 16, 14 ;  reeds + reeds = rope
+    .byte 1,  1, 21   ;  stick + stick = wooden hammer
