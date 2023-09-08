@@ -366,6 +366,8 @@ player_sprites_flip:
 
     NPC_MAX_COUNT              = 16
 
+    PROJECTILE_MAX_COUNT       = 4
+
     NPC_SPEED                  = 1
 
     MAX_SPRITE_COUNT           = 64
@@ -497,6 +499,7 @@ player_sprites_flip:
     ITEM_RADIO                 = 19
     ITEM_HAMMER                = 20
     ITEM_WOOD_HAMMER           = 21
+    ITEM_SLINGSHOT             = 22
 
     SPEAR_SPEED                = 3
 
@@ -1249,6 +1252,19 @@ Npcs:   ;animals and stuff
 NpcCount:
     .res 1
 
+Projectiles:
+    .res 16 ;  4 bytes * 4 projectiles
+            ;  direction(7bit) + state (1bit)
+            ;  x
+            ;  screen
+            ;  y
+
+ProjectileCount:
+    .res 1
+
+ProjectileIdx:
+    .res 1
+
 Destructables:
     .res 2  ;two destructables so far, 1 means destroyed
 
@@ -1258,7 +1274,7 @@ SourceMapIdx:
     .res 1
 
 Buffer:
-    .res 421  ;must see how much is still available
+    .res 403  ;must see how much is still available
 
 ;====================================================================================
 
@@ -2104,6 +2120,7 @@ Logics:
 
 @doneLogics:
 
+    jsr UpdateProjectiles
     jsr UpdateSpear
     jsr UpdateFishingRod
 
@@ -2295,7 +2312,32 @@ UpdateFishingRod:
 
 @exit:
     rts
+;-------------------------------
+UpdateProjectiles:
 
+    ldy ProjectileCount
+    beq @exit
+
+    dey
+    sta ProjectileIdx
+
+@projectileLoop:
+    lda ProjectileIdx
+    asl
+    asl
+    tax
+
+    lda Projectiles, x
+    lsr
+    bcc @next
+
+@next:
+    dec ProjectileIdx
+    bpl @projectileLoop
+
+
+@exit:
+    rts
 ;-------------------------------
 UpdateSpear:
 
@@ -4240,6 +4282,7 @@ ResetEntityVariables:
 
     lda #0
     sta NpcCount
+    sta ProjectileCount
     sta PlayerWins
     sta FoodToStamina
     sta ItemIGave
@@ -4783,10 +4826,18 @@ CheckB:
     jsr LaunchSpear
     jmp @regularAttack
 @checkNext:
+    cmp #ITEM_SLINGSHOT
+    bne @checkIfFishingRod
+
+    jsr ShootSlingshot
+    jmp @regularAttack
+
+@checkIfFishingRod:
     cmp #ITEM_FISHING_ROD
     bne @checkhammer
 
     jsr ActivateFishingRod
+    jmp @regularAttack
 @checkhammer:
     cmp #ITEM_HAMMER
     beq @use_hammer
@@ -4802,6 +4853,14 @@ CheckB:
     lda #0
     sta NpcsHitByPlayer
 
+    jsr PlayAttackSfx
+
+
+@exit:
+
+    rts
+;----------------------------------
+PlayAttackSfx:
     ldy current_bank
     sty oldbank
     ldy #6
@@ -4823,10 +4882,6 @@ CheckB:
 
     ldy oldbank
     jsr bankswitch_y
-
-
-@exit:
-
     rts
 ;----------------------------------
 WearWeapon:
@@ -5336,7 +5391,66 @@ PullOutRod:
     jsr SpawnItem
 @exit:
     rts
+;-----------------------------------
+ShootSlingshot:
 
+    lda ProjectileCount
+    asl
+    asl
+    tax
+
+    lda ProjectileCount
+    clc
+    adc #1
+    cmp #PROJECTILE_MAX_COUNT + 1
+    bcs @exit
+    sta ProjectileCount
+
+
+    lda PlayerFrame
+    bne @saveDir
+;horizontal direction
+    lda PlayerFlip
+    clc
+    adc #3
+@saveDir:
+    asl
+    and #%11111110
+    eor #1
+    sta Projectiles, x
+
+    inx ; X
+
+    lda PlayerX
+    adc GlobalScroll
+    bcs @incrementScreen
+
+
+    sta Projectiles, x
+    lda CurrentMapSegmentIndex
+    inx ;screen
+    sta Projectiles, x
+    jmp @writeY
+
+@incrementScreen:
+    sta Projectiles, x
+
+    lda CurrentMapSegmentIndex
+    clc
+    adc #1
+    inx ; screen
+    sta Projectiles, x
+
+@writeY:
+    inx
+    lda PlayerY
+    clc
+    adc #8
+    sta Projectiles, x
+
+
+@exit:
+    rts
 
 ;-----------------------------------
 LaunchSpear:
@@ -5820,7 +5934,7 @@ UpdateSprites:
 @noKnife:
 
     lda SpearActive
-    beq @fishingRod
+    beq @projectiles
 
     lda SpearScreen
     jsr CalcItemMapScreenIndexes
@@ -5829,11 +5943,11 @@ UpdateSprites:
     beq @skipPrevScreen
     lda CurrentMapSegmentIndex
     cmp PrevItemMapScreenIndex
-    bcc @fishingRod
+    bcc @projectiles
 @skipPrevScreen:
     lda CurrentMapSegmentIndex
     cmp NextItemMapScreenIndex
-    bcs @fishingRod
+    bcs @projectiles
 
     lda CurrentMapSegmentIndex
     cmp ItemMapScreenIndex
@@ -5842,13 +5956,13 @@ UpdateSprites:
     lda SpearX ; x
     sec
     sbc GlobalScroll
-    bcs @fishingRod
+    bcs @projectiles
     sta TempPointX ; save x
     jmp @doUpdate
 @SpearMatchesScreen:
     lda SpearX ; x
     cmp GlobalScroll
-    bcc @fishingRod
+    bcc @projectiles
     sec
     sbc GlobalScroll
     sta TempPointX
@@ -5862,6 +5976,9 @@ UpdateSprites:
     clc
     adc #2
     sta TempSpriteCount
+;------------------PROJECTILES
+@projectiles:
+    jsr UpdateProjectileSprites
 
 ;---------------FISHING ROD
 @fishingRod:
@@ -6173,6 +6290,88 @@ UpdateTwoRodSprites:
 
 
     rts
+;----------------------------------
+UpdateProjectileSprites:
+
+    ldy ProjectileCount
+    beq @exit
+
+    dey
+    sty ProjectileIdx
+
+@projectileLoop:
+
+    lda ProjectileIdx
+    asl
+    asl
+    tay
+
+    lda Projectiles, y
+    lsr
+    bcc @next ; this projectile is inactive
+
+    iny
+    iny
+    lda Projectiles, y ;screen
+
+    jsr CalcItemMapScreenIndexes
+    lda ItemMapScreenIndex
+    beq @skipPrevScreen
+    lda CurrentMapSegmentIndex
+    cmp PrevItemMapScreenIndex
+    bcc @next
+@skipPrevScreen:
+    lda CurrentMapSegmentIndex
+    cmp NextItemMapScreenIndex
+    bcs @next
+
+    lda CurrentMapSegmentIndex
+    cmp ItemMapScreenIndex
+    beq @projectileMatchesScreen
+
+    dey
+    lda Projectiles, y ; x
+    sec
+    sbc GlobalScroll
+    bcs @next
+    sta TempPointX
+    iny ; screen
+    jmp @continueUpdate
+@projectileMatchesScreen:
+    dey
+    lda Projectiles, y ; x
+    cmp GlobalScroll
+    bcc @next
+    sec
+    sbc GlobalScroll
+    sta TempPointX
+    iny; screen
+
+@continueUpdate:
+    iny ; y
+    inx
+    lda Projectiles, y ; y
+    sta FIRST_SPRITE, x ; y
+    inx
+    lda #$FB
+    sta FIRST_SPRITE, x
+    inx
+    lda #%00000011
+    sta FIRST_SPRITE, x
+    inx
+    lda TempPointX
+    sta FIRST_SPRITE, x
+
+
+    inc TempSpriteCount
+@next:
+    dec ProjectileIdx
+    bpl @projectileLoop
+
+@exit:
+
+    rts
+
 ;----------------------------------
 PrepareKnifeSprite:
 
