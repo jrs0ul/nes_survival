@@ -2316,8 +2316,11 @@ UpdateFishingRod:
 UpdateProjectiles:
 
     ldy ProjectileCount
-    beq @exit
+    bne @continue
 
+    rts
+
+@continue:
     dey
     sta ProjectileIdx
 
@@ -2327,10 +2330,24 @@ UpdateProjectiles:
     asl
     tax
 
+    jsr UpdateSingleProjectile
+
+@next:
+    dec ProjectileIdx
+    bpl @projectileLoop
+
+
+@exit:
+    rts
+;-------------------------------
+UpdateSingleProjectile:
     lda Projectiles, x
     lsr
-    bcc @next
+    bcs @continue
 
+    rts
+
+@continue:
     cmp #PROJECTILE_DIR_LEFT
     bcc @otherDir
     beq @moveLeft
@@ -2363,10 +2380,53 @@ UpdateProjectiles:
     jmp @filter
 
 @moveLeft:
+    inx
+    lda Projectiles, x
+    cmp #SPEAR_SPEED
+    bcc @less
+
+    sec
+    sbc #SPEAR_SPEED
+    sta Projectiles, x
+    jmp @filter
+
+@less:
+    
+    lda #SPEAR_SPEED
+    sec
+    sbc Projectiles, x
+    sta Temp
+    lda #255
+    sec
+    sbc Temp
+    sta Projectiles, x
+    
+    inx
+    lda Projectiles, x
+    sec
+    sbc #1
+    sta Projectiles, x
 
 
 @filter:
-    jmp @next
+    lda ProjectileIdx
+    asl
+    asl
+    tax
+    inx
+    inx
+    lda Projectiles, x
+    jsr CalcItemMapScreenIndexes
+
+    ;lda ItemMapScreenIndex
+    ;beq @skipPrev
+    ;lda CurrentMapSegmentIndex
+    ;cmp PrevItemMapScreenIndex
+    ;bcc @disable
+;@skipPrev:
+
+
+    jmp @exit
 
 @otherDir:
 
@@ -2382,11 +2442,11 @@ UpdateProjectiles:
     sta Projectiles, x
     cmp #252
     bcs @disable
-    jmp @next
+    jmp @exit
 
 @checkUp:
     cmp #PROJECTILE_DIR_UP
-    bne @next
+    bne @exit
 
     inx
     inx
@@ -2400,18 +2460,25 @@ UpdateProjectiles:
     cmp #SPEAR_SPEED
     bcc @disable
 
-    jmp @next
+    jmp @exit
 
 
 @disable:
 
-@next:
-    dec ProjectileIdx
-    bpl @projectileLoop
+    lda ProjectileIdx
+    asl
+    asl
+    tax
+    lda Projectiles, x
+    and #%11111110
+    sta Projectiles, x
 
 
 @exit:
+
     rts
+
+
 ;-------------------------------
 UpdateSpear:
 
