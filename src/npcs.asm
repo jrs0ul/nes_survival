@@ -424,8 +424,9 @@ PlayerNpcCollision:
 ;Player's attack box collides with all the npcs
 PlayerHitsNpcs:
 
-    lda SpearActive
-    bne @ignoreTimer ;ignore attack timer and hit multiple npcs
+    lda SpearData
+    lsr
+    bcs @ignoreTimer ;ignore attack timer and hit multiple npcs
     lda AttackTimer
     beq @exit
     lda NpcsHitByPlayer
@@ -984,10 +985,11 @@ PreparePlayerAttackSquare:
 ;------------------------------------
 BuildSpearAttackSquare:
 
-    lda SpearActive
-    beq @exit
+    lda SpearData
+    lsr
+    bcc @exit
 
-    lda SpearScreen
+    lda SpearData + 2 ; screen
 
     jsr ScreenFilter
     bne @exit
@@ -996,14 +998,14 @@ BuildSpearAttackSquare:
     cmp ItemMapScreenIndex
     beq @SpearMatchesScreen
 
-    lda SpearX ; x
+    lda SpearData + 1 ; x
     sec
     sbc GlobalScroll
     bcs @exit
     sta TempSpearX; save x
     jmp @doUpdate
 @SpearMatchesScreen:
-    lda SpearX ; x
+    lda SpearData + 1 ; x
     cmp GlobalScroll
     bcc @exit
     sec
@@ -1014,7 +1016,8 @@ BuildSpearAttackSquare:
 
 @doUpdate:
 
-    lda SpearDir
+    lda SpearData ; Dir + Active
+    lsr
     sec
     sbc #1
     ;(SpearDir - 1) * 8
@@ -1023,7 +1026,7 @@ BuildSpearAttackSquare:
     asl
     tay
 
-    lda SpearY
+    lda SpearData + 3 ; Y
     clc
     adc spearSprites, y
     sta AttackTopLeftY
@@ -1038,7 +1041,7 @@ BuildSpearAttackSquare:
 
     iny
 
-    lda SpearY
+    lda SpearData + 3 ; Y
     clc
     adc spearSprites, y
     sta AttackBottomRightY

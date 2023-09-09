@@ -910,8 +910,9 @@ EquipmentInput:
     lda EquipedItem
     beq @exit ; no item equiped
 
-    lda SpearActive
-    bne @exit ; you've launched a spear can't unequip it now
+    lda SpearData
+    lsr
+    bcc @exit ; you've launched a spear can't unequip it now
 
     ;let's simply unequip
 
@@ -1536,8 +1537,9 @@ ToolInput:
     and #BUTTON_B_MASK
     beq @CheckA
 
-    lda SpearActive
-    bne @exit ; can't equip anything when you throw a spear
+    lda SpearData
+    lsr
+    bcs @exit ; can't equip anything when you throw a spear
 
     jsr LoadSelectedItemStuff
     beq @exit

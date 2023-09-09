@@ -802,16 +802,8 @@ FishingDelay:
 FishBiteDuration:   ;for how long a fish will bite
     .res 1
 
-SpearActive:
-    .res 1
-SpearScreen:
-    .res 1
-SpearX:
-    .res 1
-SpearY:
-    .res 1
-SpearDir:
-    .res 1
+SpearData: ; Direction(7bit) + Active(1bit), X, Screen, Y
+    .res 4
 
 ;attack square
 AttackTopLeftX:
@@ -1274,7 +1266,7 @@ SourceMapIdx:
     .res 1
 
 Buffer:
-    .res 403  ;must see how much is still available
+    .res 404  ;must see how much is still available
 
 ;====================================================================================
 
@@ -2542,36 +2534,36 @@ FilterProjectiles:
 ;-------------------------------
 UpdateSpear:
 
-    lda SpearActive
-    beq @exit
+    lda SpearData ; Dir + Active
+    lsr
+    bcc @exit
 
-    lda SpearDir
     cmp #PROJECTILE_DIR_LEFT
     bcc @otherDir
 
     beq @moveLeft
 
-    lda SpearX
+    lda SpearData + 1
     cmp #255 - SPEAR_SPEED
     bcs @more
 
     clc
     adc #SPEAR_SPEED
-    sta SpearX
+    sta SpearData + 1
 
     jmp @filter
 
 
 @more:
-    inc SpearScreen
+    inc SpearData + 2
     lda #255
     sec
-    sbc SpearX
+    sbc SpearData + 1
     sta Temp
     lda #SPEAR_SPEED
     sec
     sbc Temp
-    sta SpearX
+    sta SpearData + 1
 
     jmp @filter
 
@@ -2581,7 +2573,7 @@ UpdateSpear:
 
 
 @filter:
-    lda SpearScreen
+    lda SpearData + 2
 
     jsr ScreenFilter
     bne @disable
@@ -2590,13 +2582,13 @@ UpdateSpear:
     cmp ItemMapScreenIndex
     beq @SpearMatchesScreen
 
-    lda SpearX
+    lda SpearData + 1
     sec
     sbc GlobalScroll
     bcs @disable
     jmp @exit
 @SpearMatchesScreen:
-    lda SpearX ; x
+    lda SpearData + 1 ; x
     cmp GlobalScroll
     bcc @disable
 
@@ -2611,7 +2603,7 @@ UpdateSpear:
 @disable:
     lda #0
     sta EquipedItem
-    sta SpearActive
+    sta SpearData
 
 
 @exit:
@@ -2619,25 +2611,25 @@ UpdateSpear:
     rts
 ;------------------------------
 MoveSpearLeft:
-    lda SpearX
+    lda SpearData + 1
     cmp #SPEAR_SPEED
     bcc @less
 
     sec
     sbc #SPEAR_SPEED
-    sta SpearX
+    sta SpearData + 1
     jmp @exit
 
 @less:
-    dec SpearScreen
+    dec SpearData + 2 ; screen
     lda #SPEAR_SPEED
     sec
-    sbc SpearX
+    sbc SpearData + 1
     sta Temp
     lda #255
     sec
     sbc Temp
-    sta SpearX
+    sta SpearData + 1
 
 @exit:
 
@@ -2647,10 +2639,10 @@ MoveSpearVerticaly:
     cmp #PROJECTILE_DIR_DOWN
     bne @checkUp
 
-    lda SpearY
+    lda SpearData + 3 ; Y
     clc
     adc #SPEAR_SPEED
-    sta SpearY
+    sta SpearData + 3 ; Y
     cmp #252
     bcs @return_disable
 
@@ -2659,11 +2651,11 @@ MoveSpearVerticaly:
     cmp #PROJECTILE_DIR_UP
     bne @exit
 
-    lda SpearY
+    lda SpearData + 3 ; y
 
     sec
     sbc #SPEAR_SPEED
-    sta SpearY
+    sta SpearData + 3 ; Y
 
     cmp #SPEAR_SPEED
     bcc @return_disable
@@ -4491,7 +4483,7 @@ ResetEntityVariables:
     sta InCave
     sta InVillagerHut
     sta LocationIndex
-    sta SpearActive
+    sta SpearData
     sta FishBiteTimer
     sta FishingRodActive
     sta MustLoadGameOverAfterFadeOut
@@ -5003,8 +4995,9 @@ CheckB:
 
 @useForAttack:
 
-    lda SpearActive
-    bne @exit
+    lda SpearData
+    lsr
+    bcs @exit
 
     lda AttackTimer
     bne @exit
@@ -5563,25 +5556,26 @@ ShootSlingshot:
 LaunchSpear:
 
     ;throw a spear
-    lda #1
-    sta SpearActive
 
     lda PlayerFrame
-    beq @horizontalDir
-    sta SpearDir
-    jmp @setOtherParams
+    bne @saveDir
 
-@horizontalDir:
     lda PlayerFlip
     clc
     adc #3
-    sta SpearDir
+
+@saveDir:
+    asl
+    and #%11111110
+    eor #1
+    sta SpearData
+
 @setOtherParams:
 
     lda PlayerY
     clc
     adc #8
-    sta SpearY
+    sta SpearData + 3
 
     lda PlayerX
     clc
@@ -5590,18 +5584,18 @@ LaunchSpear:
     bcs @incrementScreen
 
 
-    sta SpearX
+    sta SpearData + 1
     lda CurrentMapSegmentIndex
-    sta SpearScreen
+    sta SpearData + 2 ; screen
     jmp @exit
 
 @incrementScreen:
-    sta SpearX
+    sta SpearData + 1
 
     lda CurrentMapSegmentIndex
     clc
     adc #1
-    sta SpearScreen
+    sta SpearData + 2 ; screen
 
 @exit:
 
@@ -6040,10 +6034,11 @@ UpdateSprites:
 ;------ SPEAR
 @noKnife:
 
-    lda SpearActive
-    beq @projectiles
+    lda SpearData
+    lsr
+    bcc @projectiles
 
-    lda SpearScreen
+    lda SpearData + 2 ; screen
 
     jsr ScreenFilter
     bne @projectiles
@@ -6052,14 +6047,14 @@ UpdateSprites:
     cmp ItemMapScreenIndex
     beq @SpearMatchesScreen
 
-    lda SpearX ; x
+    lda SpearData + 1 ; x
     sec
     sbc GlobalScroll
     bcs @projectiles
     sta TempPointX ; save x
     jmp @doUpdate
 @SpearMatchesScreen:
-    lda SpearX ; x
+    lda SpearData + 1; x
     cmp GlobalScroll
     bcc @projectiles
     sec
@@ -6278,7 +6273,8 @@ UpdateSprites:
 
 SetTwoSpearSprites:
 
-    lda SpearDir
+    lda SpearData
+    lsr
     ;(dir - 1) * 8
     sec
     sbc #1
@@ -6288,7 +6284,7 @@ SetTwoSpearSprites:
     tay
 
     inx
-    lda SpearY
+    lda SpearData + 3; Y
     clc
     adc spearSprites, y
     sta FIRST_SPRITE, x
@@ -6309,7 +6305,7 @@ SetTwoSpearSprites:
     inx
     iny
     ;----
-    lda SpearY
+    lda SpearData + 3 ; Y
     clc
     adc spearSprites, y
     sta FIRST_SPRITE, x
