@@ -2331,6 +2331,80 @@ UpdateProjectiles:
     lsr
     bcc @next
 
+    cmp #PROJECTILE_DIR_LEFT
+    bcc @otherDir
+    beq @moveLeft
+
+    inx
+    lda Projectiles, x
+    cmp #255 - SPEAR_SPEED
+    bcs @more
+
+    clc
+    adc #SPEAR_SPEED
+    sta Projectiles, x
+    jmp @filter
+@more:
+
+    lda #255
+    sec
+    sbc Projectiles, x
+    sta Temp
+    lda #SPEAR_SPEED
+    sec
+    sbc Temp
+    sta Projectiles, x
+
+    inx
+    lda Projectiles, x
+    clc
+    adc #1
+    sta Projectiles, x
+    jmp @filter
+
+@moveLeft:
+
+
+@filter:
+    jmp @next
+
+@otherDir:
+
+    cmp #PROJECTILE_DIR_DOWN
+    bne @checkUp
+
+    inx
+    inx
+    inx
+    lda Projectiles, x
+    clc
+    adc #SPEAR_SPEED
+    sta Projectiles, x
+    cmp #252
+    bcs @disable
+    jmp @next
+
+@checkUp:
+    cmp #PROJECTILE_DIR_UP
+    bne @next
+
+    inx
+    inx
+    inx
+    lda Projectiles, x
+
+    sec
+    sbc #SPEAR_SPEED
+    sta Projectiles, x
+
+    cmp #SPEAR_SPEED
+    bcc @disable
+
+    jmp @next
+
+
+@disable:
+
 @next:
     dec ProjectileIdx
     bpl @projectileLoop
