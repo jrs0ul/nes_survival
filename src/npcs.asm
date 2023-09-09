@@ -318,19 +318,11 @@ SingleNpcVSPlayerCollision:
     iny
     iny
     lda Npcs, y ; screen index where npc resides
-    jsr CalcItemMapScreenIndexes
     dey
     dey
 
-    lda ItemMapScreenIndex
-    beq @skipPrevScreen
-    lda CurrentMapSegmentIndex
-    cmp PrevItemMapScreenIndex
-    bcc @exit
-@skipPrevScreen:
-    lda CurrentMapSegmentIndex
-    cmp NextItemMapScreenIndex
-    bcs @exit
+    jsr ScreenFilter
+    bne @exit
 
     lda Npcs, y
     sta DropedItemX ; store this for item droping
@@ -492,19 +484,11 @@ CheckSingleNpcAgainstPlayerHit:
     iny
     iny
     lda Npcs, y ; screen index where npc resides
-    jsr CalcItemMapScreenIndexes
     dey
     dey
 
-    lda ItemMapScreenIndex
-    beq @skipPrevScreen
-    lda CurrentMapSegmentIndex
-    cmp PrevItemMapScreenIndex
-    bcc @exit
-@skipPrevScreen:
-    lda CurrentMapSegmentIndex
-    cmp NextItemMapScreenIndex
-    bcs @exit
+    jsr ScreenFilter
+    bne @exit
 
     lda Npcs, y
     sta DropedItemX ; store this for item droping
@@ -536,9 +520,61 @@ CheckSingleNpcAgainstPlayerHit:
     lda ItemMapScreenIndex
     sta KilledNpcScreenIdx
     jsr AttackBoxNpcsCollision
+
+    jsr CollisionWithProjectiles
 @exit:
 
     rts
+;-------------------------------------
+;TODO: finish me!
+CollisionWithProjectiles:
+
+    lda TempPointX
+    clc
+    adc #16
+    sta TempPointX2
+
+    lda TempPointY
+    ldx TempNpcRows
+@addRowsLoop:
+    clc
+;    adc #8
+;    dex
+;    bne @addRowsLoop
+;    sta TempPointY2
+
+
+    sty TempY
+
+    ldy ProjectileCount
+    beq @exit
+    dey
+
+    sty ProjectileIdx
+@loop:
+    lda ProjectileIdx
+    asl
+    asl
+    tay
+
+    lda Projectiles, y
+    lsr
+    bcc @next
+
+    iny
+    lda Projectiles, y ; x
+    iny
+    iny
+    lda Projectiles, y ; y
+
+@next:
+    dec ProjectileIdx
+    bpl @loop
+
+@exit:
+    ldy TempY
+    rts
+
 
 ;-------------------------------------
 AttackBoxNpcsCollision:
@@ -952,17 +988,9 @@ BuildSpearAttackSquare:
     beq @exit
 
     lda SpearScreen
-    jsr CalcItemMapScreenIndexes
 
-    lda ItemMapScreenIndex
-    beq @skipPrevScreen
-    lda CurrentMapSegmentIndex
-    cmp PrevItemMapScreenIndex
-    bcc @exit
-@skipPrevScreen:
-    lda CurrentMapSegmentIndex
-    cmp NextItemMapScreenIndex
-    bcs @exit
+    jsr ScreenFilter
+    bne @exit
 
     lda CurrentMapSegmentIndex
     cmp ItemMapScreenIndex
@@ -1413,17 +1441,9 @@ doNpcAI:
     lda Npcs, x; screen
     dex
     dex
-    jsr CalcItemMapScreenIndexes
 
-    lda ItemMapScreenIndex
-    beq @skipPrev
-    lda CurrentMapSegmentIndex
-    cmp PrevItemMapScreenIndex
-    bcc @nextNpc
-@skipPrev:
-    lda CurrentMapSegmentIndex
-    cmp NextItemMapScreenIndex
-    bcs @nextNpc
+    jsr ScreenFilter
+    bne @nextNpc
 
 ;final filter (could be removed)
     lda CurrentMapSegmentIndex
@@ -1637,19 +1657,12 @@ CalcNPCXYOnScreen:
     sta TempDir ; fetch npc's direction
     dex
     lda Npcs, x ; screen index where npc resides
-    jsr CalcItemMapScreenIndexes
     dex
     dex
 
-    lda ItemMapScreenIndex
-    beq @skipPrevScreen
-    lda CurrentMapSegmentIndex
-    cmp PrevItemMapScreenIndex
-    bcc @fail
-@skipPrevScreen:
-    lda CurrentMapSegmentIndex
-    cmp NextItemMapScreenIndex
-    bcs @fail
+
+    jsr ScreenFilter
+    bne @fail
 
     lda CurrentMapSegmentIndex
     cmp ItemMapScreenIndex

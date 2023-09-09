@@ -2409,22 +2409,8 @@ UpdateSingleProjectile:
 
 
 @filter:
-    lda ProjectileIdx
-    asl
-    asl
-    tax
-    inx
-    inx
-    lda Projectiles, x
-    jsr CalcItemMapScreenIndexes
-
-    ;lda ItemMapScreenIndex
-    ;beq @skipPrev
-    ;lda CurrentMapSegmentIndex
-    ;cmp PrevItemMapScreenIndex
-    ;bcc @disable
-;@skipPrev:
-
+    jsr FilterProjectiles
+    bne @disable
 
     jmp @exit
 
@@ -2477,6 +2463,80 @@ UpdateSingleProjectile:
 @exit:
 
     rts
+;-----------------------------
+;stores A as ItemMapScreenIndex
+;calculates screen indexes and filters out screens
+ScreenFilter:
+
+    sta ItemMapScreenIndex
+    clc
+    adc #1
+    sta NextItemMapScreenIndex
+    sec
+    sbc #2
+    sta PrevItemMapScreenIndex
+
+
+    lda ItemMapScreenIndex
+    beq @skipPrev
+    lda CurrentMapSegmentIndex
+    cmp PrevItemMapScreenIndex
+    bcc @disable
+@skipPrev:
+    lda CurrentMapSegmentIndex
+    cmp NextItemMapScreenIndex
+    bcs @disable
+    jmp @exit
+
+@disable:
+    lda #1
+    jmp @end
+@exit:
+    lda #0
+@end:
+    rts
+;------------------------------
+FilterProjectiles:
+
+    lda ProjectileIdx
+    asl
+    asl
+    tax
+    inx
+    inx
+    lda Projectiles, x
+
+    jsr ScreenFilter
+    bne @disable
+
+    lda CurrentMapSegmentIndex
+    cmp ItemMapScreenIndex
+    beq @ProjectileMatchesScreen
+
+    dex
+    lda Projectiles, x
+    sec
+    sbc GlobalScroll
+    bcs @disable
+    jmp @exit
+@ProjectileMatchesScreen:
+    dex
+    lda Projectiles, x ; x
+    cmp GlobalScroll
+    bcc @disable
+    
+    jmp @exit
+
+@disable:
+    lda #1
+    jmp @end
+@exit:
+    lda #0
+
+
+@end:
+
+    rts
 
 
 ;-------------------------------
@@ -2522,17 +2582,9 @@ UpdateSpear:
 
 @filter:
     lda SpearScreen
-    jsr CalcItemMapScreenIndexes
 
-    lda ItemMapScreenIndex
-    beq @skipPrev
-    lda CurrentMapSegmentIndex
-    cmp PrevItemMapScreenIndex
-    bcc @disable
-@skipPrev:
-    lda CurrentMapSegmentIndex
-    cmp NextItemMapScreenIndex
-    bcs @disable
+    jsr ScreenFilter
+    bne @disable
 
     lda CurrentMapSegmentIndex
     cmp ItemMapScreenIndex
@@ -5049,127 +5101,10 @@ WearWeapon:
     rts
 ;----------------------------------
 useHammerOnEnvironment:
-    ;TODO: copy paste code begins here
 
-    ;let's check if I can throw there
-
-    lda PlayerFrame
-    beq @horizontal ;player is facing left or right
-
-    lda PlayerX
-    clc
-    adc #4
-    jmp @cont
-
-@horizontal:
-    lda PlayerFlip
-    beq @left
-    ;right
-    lda PlayerX
-    clc
-    adc #20 ;two tiles and a half
-    jmp @cont
-@left:
-    lda PlayerX
-    sec
-    sbc #4
-
-
-@cont:
-    clc
-    adc GlobalScroll
-    sta TempX
-    bcs @mustIncrementScreen
-
-
-    lda LocationIndex
-    asl
-    asl
-    clc
-    adc CurrentMapSegmentIndex
-    tay ;store screen index to Y register
-    jmp @continueCalc
-
-@mustIncrementScreen:
-
-    lda LocationIndex
-    asl
-    asl
-    clc
-    adc CurrentMapSegmentIndex
-    clc
-    adc #1
-    tay; screen index goes to Y register
-    sty TempPointY2 ; store screen index
-
-@continueCalc:
-
-    lda TempX ; x / 8
-    lsr
-    lsr
-    lsr
-    sta TempX
-
-    lda PlayerFrame
-    bne @vertical
-    ;horizontal
-    lda PlayerY
-    clc
-    adc #8
-    jmp @divide
-@vertical:
-    cmp #1
-    bne @down
-
-    ;up
-    lda PlayerY
-    sec
-    sbc #4
-    jmp @divide
-
-@down:
-
-    lda PlayerY
-    clc
-    adc #20
-
-@divide:
-    ; y / 8
-    lsr
-    lsr
-    lsr
-    sta TempY
-
-
-    lda map_list_low, y
-    sta pointer
-    lda map_list_high, y
-    sta pointer + 1
-
-
-@calcaddress:
-    ldy TempY
-    beq @skip
-@addressLoop:
-
-    lda pointer
-    clc
-    adc #32
-    sta pointer
-    bcs @incrementUpper
-    jmp @nextRow
-@incrementUpper:
-    inc pointer + 1
-@nextRow:
-    dey
-    bne @addressLoop
-@skip:
-    lda TempX
-    tay
+    jsr CalcTileAddressInFrontOfPlayer
 
     lda (pointer), y
-
-;--end of copy paste
 
     cmp #$F7
     bne @check_other_tiles
@@ -5373,10 +5308,9 @@ ActivateFishingRod:
 @exit:
     rts
 
-;----------------------------------
-;A -> 0 = can, 1 = can't
-CanCastRodHere:
-    ;let's check if I can throw there
+;---------------------------------
+;Set the map [pointer] and calculate the offset and put it in [y] register
+CalcTileAddressInFrontOfPlayer:
 
     lda PlayerFrame
     beq @horizontal ;player is facing left or right
@@ -5492,6 +5426,17 @@ CanCastRodHere:
     lda TempX
     tay
 
+
+    rts
+
+
+;----------------------------------
+;A -> 0 = can, 1 = can't
+CanCastRodHere:
+    ;let's check if I can throw there
+
+    jsr CalcTileAddressInFrontOfPlayer
+
     lda (pointer), y
     cmp #$F0
     beq @throwThere
@@ -5536,6 +5481,25 @@ PullOutRod:
 ShootSlingshot:
 
     lda ProjectileCount
+    beq @isEmpty
+
+    ldy ProjectileCount
+    dey
+@checkLoop:
+
+    tya
+    asl
+    asl
+    tax
+    lda Projectiles, x
+    lsr
+    bcc @reuseProjectile
+    
+    dey
+    bpl @checkLoop
+
+@isEmpty:
+    lda ProjectileCount
     asl
     asl
     tax
@@ -5547,6 +5511,8 @@ ShootSlingshot:
     bcs @exit
     sta ProjectileCount
 
+
+@reuseProjectile:
 
     lda PlayerFrame
     bne @saveDir
@@ -6078,17 +6044,9 @@ UpdateSprites:
     beq @projectiles
 
     lda SpearScreen
-    jsr CalcItemMapScreenIndexes
 
-    lda ItemMapScreenIndex
-    beq @skipPrevScreen
-    lda CurrentMapSegmentIndex
-    cmp PrevItemMapScreenIndex
-    bcc @projectiles
-@skipPrevScreen:
-    lda CurrentMapSegmentIndex
-    cmp NextItemMapScreenIndex
-    bcs @projectiles
+    jsr ScreenFilter
+    bne @projectiles
 
     lda CurrentMapSegmentIndex
     cmp ItemMapScreenIndex
@@ -6455,16 +6413,8 @@ UpdateProjectileSprites:
     iny
     lda Projectiles, y ;screen
 
-    jsr CalcItemMapScreenIndexes
-    lda ItemMapScreenIndex
-    beq @skipPrevScreen
-    lda CurrentMapSegmentIndex
-    cmp PrevItemMapScreenIndex
-    bcc @next
-@skipPrevScreen:
-    lda CurrentMapSegmentIndex
-    cmp NextItemMapScreenIndex
-    bcs @next
+    jsr ScreenFilter
+    bne @next
 
     lda CurrentMapSegmentIndex
     cmp ItemMapScreenIndex

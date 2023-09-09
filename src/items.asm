@@ -105,19 +105,10 @@ ItemCollisionCheck:
     bcc @nextItem ; inactive
     inx
     lda Items, x ;screen index
-    jsr CalcItemMapScreenIndexes
     inx
 
-    lda ItemMapScreenIndex
-    beq @skipPrev; the item is in the 0 screen
-
-    lda CurrentMapSegmentIndex
-    cmp PrevItemMapScreenIndex
-    bcc @nextItem
-@skipPrev:
-    lda CurrentMapSegmentIndex
-    cmp NextItemMapScreenIndex
-    bcs @nextItem
+    jsr ScreenFilter
+    bne @nextItem
 
     jsr CheckItemsXY
 
@@ -257,17 +248,6 @@ ResetTimesWhenItemsWerePicked:
 
     rts
 
-;-----------------------------------
-CalcItemMapScreenIndexes:
-    sta ItemMapScreenIndex
-    clc
-    adc #1
-    sta NextItemMapScreenIndex
-    sec
-    sbc #2
-    sta PrevItemMapScreenIndex
-
-    rts
 ;-----------------------------------
 AddAndDeactivateItems:
 
