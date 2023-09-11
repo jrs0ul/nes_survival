@@ -593,6 +593,8 @@ collisionMapPtr:
     .res 2
 AnimalSpawnPointsPtr:
     .res 2
+ProjectilePtr:
+    .res 2
 
 tmpAttribAddress:
     .res 1
@@ -680,7 +682,7 @@ FlickerFrame: ;variable for alternating sprite update routines to achieve flicke
     .res 1
 
 ZPBuffer:
-    .res 120  ; I want to be aware of the free memory
+    .res 118  ; I want to be aware of the free memory
 
 ;--------------
 .segment "BSS" ; variables in ram
@@ -2320,7 +2322,7 @@ UpdateProjectiles:
     lda ProjectileIdx
     asl
     asl
-    tax
+    tay
 
     jsr UpdateSingleProjectile
 
@@ -2333,74 +2335,89 @@ UpdateProjectiles:
     rts
 ;-------------------------------
 UpdateSingleProjectile:
-    lda Projectiles, x
+
+    lda #<Projectiles
+    sta ProjectilePtr
+    lda #>Projectiles
+    sta ProjectilePtr + 1
+
+
+    lda Projectiles, y
     lsr
     bcs @continue
 
     rts
 
 @continue:
+
     cmp #PROJECTILE_DIR_LEFT
     bcc @otherDir
     beq @moveLeft
 
-    inx
-    lda Projectiles, x
+    iny
+    lda (ProjectilePtr), y
     cmp #255 - SPEAR_SPEED
     bcs @more
 
     clc
     adc #SPEAR_SPEED
-    sta Projectiles, x
+    sta (ProjectilePtr), y
     jmp @filter
+
 @more:
 
     lda #255
     sec
-    sbc Projectiles, x
+    sbc Projectiles, y
     sta Temp
     lda #SPEAR_SPEED
     sec
     sbc Temp
-    sta Projectiles, x
+    sta Projectiles, y
 
-    inx
-    lda Projectiles, x
+    iny
+    lda Projectiles, y
     clc
     adc #1
-    sta Projectiles, x
+    sta Projectiles, y
     jmp @filter
 
 @moveLeft:
-    inx
-    lda Projectiles, x
+    iny
+    lda Projectiles, y
     cmp #SPEAR_SPEED
     bcc @less
 
     sec
     sbc #SPEAR_SPEED
-    sta Projectiles, x
+    sta Projectiles, y
     jmp @filter
 
 @less:
-    
     lda #SPEAR_SPEED
     sec
-    sbc Projectiles, x
+    sbc Projectiles, y
     sta Temp
     lda #255
     sec
     sbc Temp
-    sta Projectiles, x
-    
-    inx
-    lda Projectiles, x
+    sta Projectiles, y
+
+    iny
+    lda Projectiles, y
     sec
     sbc #1
-    sta Projectiles, x
+    sta Projectiles, y
 
 
 @filter:
+
+    lda ProjectileIdx
+    asl
+    asl
+    tay
+
+
     jsr FilterProjectiles
     bne @disable
 
@@ -2408,35 +2425,12 @@ UpdateSingleProjectile:
 
 @otherDir:
 
-    cmp #PROJECTILE_DIR_DOWN
-    bne @checkUp
-
-    inx
-    inx
-    inx
-    lda Projectiles, x
-    clc
-    adc #SPEAR_SPEED
-    sta Projectiles, x
-    cmp #252
-    bcs @disable
-    jmp @exit
-
-@checkUp:
-    cmp #PROJECTILE_DIR_UP
-    bne @exit
-
-    inx
-    inx
-    inx
-    lda Projectiles, x
-
-    sec
-    sbc #SPEAR_SPEED
-    sta Projectiles, x
-
-    cmp #SPEAR_SPEED
-    bcc @disable
+    iny
+    iny
+    iny
+    jsr MoveProjectileVerticaly
+    cmp #1
+    beq @disable
 
     jmp @exit
 
@@ -2446,10 +2440,9 @@ UpdateSingleProjectile:
     lda ProjectileIdx
     asl
     asl
-    tax
-    lda Projectiles, x
-    and #%11111110
-    sta Projectiles, x
+    tay
+    lda #0
+    sta Projectiles, y
 
 
 @exit:
@@ -2490,13 +2483,11 @@ ScreenFilter:
 ;------------------------------
 FilterProjectiles:
 
-    lda ProjectileIdx
-    asl
-    asl
-    tax
-    inx
-    inx
-    lda Projectiles, x
+
+    iny
+    iny
+
+    lda (ProjectilePtr), y ; screen
 
     jsr ScreenFilter
     bne @disable
@@ -2505,18 +2496,18 @@ FilterProjectiles:
     cmp ItemMapScreenIndex
     beq @ProjectileMatchesScreen
 
-    dex
-    lda Projectiles, x
+    dey
+    lda (ProjectilePtr), y
     sec
     sbc GlobalScroll
     bcs @disable
     jmp @exit
 @ProjectileMatchesScreen:
-    dex
-    lda Projectiles, x ; x
+    dey
+    lda (ProjectilePtr), y ; x
     cmp GlobalScroll
     bcc @disable
-    
+
     jmp @exit
 
 @disable:
@@ -2534,67 +2525,91 @@ FilterProjectiles:
 ;-------------------------------
 UpdateSpear:
 
+    lda #<SpearData
+    sta ProjectilePtr
+    lda #>SpearData
+    sta ProjectilePtr + 1
+    ldy #0
+
+
     lda SpearData ; Dir + Active
     lsr
     bcc @exit
 
     cmp #PROJECTILE_DIR_LEFT
     bcc @otherDir
-
     beq @moveLeft
 
-    lda SpearData + 1
+    iny
+    lda (ProjectilePtr), y
     cmp #255 - SPEAR_SPEED
     bcs @more
 
     clc
     adc #SPEAR_SPEED
-    sta SpearData + 1
+    sta (ProjectilePtr), y
 
     jmp @filter
 
 
 @more:
-    inc SpearData + 2
     lda #255
     sec
-    sbc SpearData + 1
+    sbc (ProjectilePtr), y
     sta Temp
     lda #SPEAR_SPEED
     sec
     sbc Temp
-    sta SpearData + 1
+    sta (ProjectilePtr), y
+
+    iny
+    lda (ProjectilePtr), y
+    clc
+    adc #1
+    sta (ProjectilePtr), y
 
     jmp @filter
 
 @moveLeft:
 
-    jsr MoveSpearLeft
+
+    lda (ProjectilePtr), y
+    cmp #SPEAR_SPEED
+    bcc @less
+
+    sec
+    sbc #SPEAR_SPEED
+    sta (ProjectilePtr), y
+    jmp @filter
+
+@less:
+    lda #SPEAR_SPEED
+    sec
+    sbc (ProjectilePtr), y
+    sta Temp
+    lda #255
+    sec
+    sbc Temp
+    sta (ProjectilePtr), y
+
+    ;decrease screen idx
+    iny
+    lda (ProjectilePtr), y
+    sec
+    sbc #1
+    sta (ProjectilePtr), y
 
 
 @filter:
-    lda SpearData + 2
-
-    jsr ScreenFilter
+    jsr FilterProjectiles
     bne @disable
-
-    lda CurrentMapSegmentIndex
-    cmp ItemMapScreenIndex
-    beq @SpearMatchesScreen
-
-    lda SpearData + 1
-    sec
-    sbc GlobalScroll
-    bcs @disable
     jmp @exit
-@SpearMatchesScreen:
-    lda SpearData + 1 ; x
-    cmp GlobalScroll
-    bcc @disable
 
 @otherDir:
 
-    jsr MoveSpearVerticaly
+    ldy #3 ; set to Y
+
+    jsr MoveProjectileVerticaly
     cmp #1
     beq @disable
 
@@ -2610,39 +2625,14 @@ UpdateSpear:
 
     rts
 ;------------------------------
-MoveSpearLeft:
-    lda SpearData + 1
-    cmp #SPEAR_SPEED
-    bcc @less
-
-    sec
-    sbc #SPEAR_SPEED
-    sta SpearData + 1
-    jmp @exit
-
-@less:
-    dec SpearData + 2 ; screen
-    lda #SPEAR_SPEED
-    sec
-    sbc SpearData + 1
-    sta Temp
-    lda #255
-    sec
-    sbc Temp
-    sta SpearData + 1
-
-@exit:
-
-    rts
-;------------------------------
-MoveSpearVerticaly:
+MoveProjectileVerticaly:
     cmp #PROJECTILE_DIR_DOWN
     bne @checkUp
 
-    lda SpearData + 3 ; Y
+    lda (ProjectilePtr), y ; Y
     clc
     adc #SPEAR_SPEED
-    sta SpearData + 3 ; Y
+    sta (ProjectilePtr), y ; Y
     cmp #252
     bcs @return_disable
 
@@ -2651,11 +2641,11 @@ MoveSpearVerticaly:
     cmp #PROJECTILE_DIR_UP
     bne @exit
 
-    lda SpearData + 3 ; y
+    lda (ProjectilePtr), y ; y
 
     sec
     sbc #SPEAR_SPEED
-    sta SpearData + 3 ; Y
+    sta (ProjectilePtr), y ; Y
 
     cmp #SPEAR_SPEED
     bcc @return_disable

@@ -539,10 +539,10 @@ CollisionWithProjectiles:
     ldx TempNpcRows
 @addRowsLoop:
     clc
-;    adc #8
-;    dex
-;    bne @addRowsLoop
-;    sta TempPointY2
+    adc #8
+    dex
+    bne @addRowsLoop
+    sta TempPointY2
 
 
     sty TempY
