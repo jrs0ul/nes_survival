@@ -527,7 +527,6 @@ CheckSingleNpcAgainstPlayerHit:
 
     rts
 ;-------------------------------------
-;TODO: finish me!
 CollisionWithProjectiles:
 
     lda TempPointX
@@ -545,7 +544,7 @@ CollisionWithProjectiles:
     sta TempPointY2
 
 
-    sty TempY
+    sty TempY ;save Y register
 
     ldy ProjectileCount
     beq @exit
@@ -558,15 +557,59 @@ CollisionWithProjectiles:
     asl
     tay
 
-    lda Projectiles, y
+    lda Projectiles, y ; dir + status
     lsr
     bcc @next
 
     iny
+    iny
+
+    lda Projectiles, y ; screen
+    jsr ScreenFilter
+    bne @next
+
+    lda CurrentMapSegmentIndex
+    cmp ItemMapScreenIndex
+    beq @ProjectileMatchesScreen
+    ;don't match
+
+    dey
     lda Projectiles, y ; x
+    sec
+    sbc GlobalScroll
+    bcs @next
+
+    jmp @cont
+@ProjectileMatchesScreen:
+
+    dey
+    lda Projectiles, y ; x
+    cmp GlobalScroll
+    bcc @next
+    sec
+    sbc GlobalScroll
+
+@cont:
+    clc
+    adc #4
+    cmp TempPointX
+    bcc @next
+    cmp TempPointX2
+    bcs @next
     iny
     iny
     lda Projectiles, y ; y
+    clc
+    adc #4
+    cmp TempPointY
+    bcc @next
+    cmp TempPointY2
+    bcs @next
+
+    ldy TempY
+
+    jsr OnCollisionWithAttackRect
+
 
 @next:
     dec ProjectileIdx
