@@ -1180,6 +1180,8 @@ PlayerCenterY:
 DropedItemX: ;x coordinate of item droped by npc
     .res 1
 
+ShotWithProjectile:
+    .res 1
 
 SpritesUpdated:
     .res 1
@@ -1276,7 +1278,7 @@ SourceMapIdx:
     .res 1
 
 Buffer:
-    .res 402  ;must see how much is still available
+    .res 401  ;must see how much is still available
 
 ;====================================================================================
 

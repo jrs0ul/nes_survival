@@ -530,6 +530,9 @@ CheckSingleNpcAgainstPlayerHit:
 ;-------------------------------------
 CollisionWithProjectiles:
 
+    lda #0
+    sta ShotWithProjectile
+
     lda TempPointX
     clc
     adc #16
@@ -585,7 +588,11 @@ SingleProjectileCollision:
 
     lda Projectiles, y ; screen
     jsr ScreenFilter
-    bne @exit
+    beq @gogo
+
+    rts
+
+@gogo:
 
     lda CurrentMapSegmentIndex
     cmp ItemMapScreenIndex
@@ -653,13 +660,16 @@ SingleProjectileCollision:
 
 
 @collisionDetected:
-    
+
     lda ProjectileIdx
     asl
     asl
     tay
     lda #0
     sta Projectiles, y
+
+    lda #1
+    sta ShotWithProjectile
 
     ldy TempY
     jsr OnCollisionWithAttackRect
@@ -901,6 +911,19 @@ DropItemAfterDeath:
     rts
 ;-------------------------------------
 CalcPlayerDmg:
+    lda ShotWithProjectile
+    beq @cont
+
+    sty TempY
+
+    ldy #91 ;slingshot's power
+    lda item_data, y
+    sta TempPlayerAttk
+
+    ldy TempY
+    jmp @exit
+
+@cont:
     lda #1
     sta TempPlayerAttk
     lda EquipedItem
