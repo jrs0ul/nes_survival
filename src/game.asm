@@ -1156,6 +1156,13 @@ TempTextAddressLow:
 
 TempPlayerAttk:
     .res 1
+
+
+ProjectileX:
+    .res 1
+ProjectileY:
+    .res 1
+
                 ;for npc collision
 NewNpcX:
     .res 1
@@ -1268,7 +1275,7 @@ SourceMapIdx:
     .res 1
 
 Buffer:
-    .res 404  ;must see how much is still available
+    .res 402  ;must see how much is still available
 
 ;====================================================================================
 

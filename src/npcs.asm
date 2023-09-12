@@ -424,15 +424,6 @@ PlayerNpcCollision:
 ;Player's attack box collides with all the npcs
 PlayerHitsNpcs:
 
-    lda SpearData
-    lsr
-    bcs @ignoreTimer ;ignore attack timer and hit multiple npcs
-    lda AttackTimer
-    beq @exit
-    lda NpcsHitByPlayer
-    bne @exit
-
-@ignoreTimer:
     ldy NpcCount
     beq @exit ; no npcs
     dey
@@ -520,9 +511,19 @@ CheckSingleNpcAgainstPlayerHit:
 ;-------
     lda ItemMapScreenIndex
     sta KilledNpcScreenIdx
+    
+    jsr CollisionWithProjectiles
+
+    lda SpearData
+    lsr
+    bcs @ignoreTimer
+    lda AttackTimer
+    beq @exit
+    lda NpcsHitByPlayer
+    bne @exit
+@ignoreTimer:
     jsr AttackBoxNpcsCollision
 
-    jsr CollisionWithProjectiles
 @exit:
 
     rts
@@ -552,6 +553,21 @@ CollisionWithProjectiles:
 
     sty ProjectileIdx
 @loop:
+
+    jsr SingleProjectileCollision
+
+@next:
+    dec ProjectileIdx
+    bpl @loop
+
+@exit:
+    ldy TempY
+    rts
+
+;---------------------------------
+SingleProjectileCollision:
+
+
     lda ProjectileIdx
     asl
     asl
@@ -559,14 +575,14 @@ CollisionWithProjectiles:
 
     lda Projectiles, y ; dir + status
     lsr
-    bcc @next
+    bcc @exit
 
     iny
     iny
 
     lda Projectiles, y ; screen
     jsr ScreenFilter
-    bne @next
+    bne @exit
 
     lda CurrentMapSegmentIndex
     cmp ItemMapScreenIndex
@@ -577,7 +593,7 @@ CollisionWithProjectiles:
     lda Projectiles, y ; x
     sec
     sbc GlobalScroll
-    bcs @next
+    bcs @exit
 
     jmp @cont
 @ProjectileMatchesScreen:
@@ -585,40 +601,61 @@ CollisionWithProjectiles:
     dey
     lda Projectiles, y ; x
     cmp GlobalScroll
-    bcc @next
+    bcc @exit
     sec
     sbc GlobalScroll
 
 @cont:
-    clc
-    adc #4
-    cmp TempPointX
-    bcc @next
-    cmp TempPointX2
-    bcs @next
+    sta ProjectileX
     iny
     iny
     lda Projectiles, y ; y
+    sta ProjectileY
+
+    lda ProjectileX
     clc
-    adc #4
+    adc #8
+    cmp TempPointX
+    bcc @checkOtherPoint
+
+    cmp TempPointX
+    bcs @checkOtherPoint
+
+    lda ProjectileY
+    clc
+    adc #8
     cmp TempPointY
-    bcc @next
+    bcc @checkOtherPoint
+
     cmp TempPointY2
-    bcs @next
+    bcs @checkOtherPoint
 
+    jmp @collisionDetected
+
+@checkOtherPoint:
+
+    lda ProjectileX
+    cmp TempPointX
+    bcc @exit
+
+    cmp TempPointX2
+    bcs @exit
+
+    lda ProjectileY
+    cmp TempPointY
+    bcc @exit
+
+    cmp TempPointY2
+    bcs @exit
+
+
+@collisionDetected:
     ldy TempY
-
     jsr OnCollisionWithAttackRect
 
-
-@next:
-    dec ProjectileIdx
-    bpl @loop
-
 @exit:
-    ldy TempY
-    rts
 
+    rts
 
 ;-------------------------------------
 AttackBoxNpcsCollision:
@@ -682,6 +719,9 @@ AttackBoxNpcsCollision:
     jsr OnCollisionWithAttackRect
 @exit:
     rts
+
+
+
 ;-----------------------------------
 OnCollisionWithAttackRect:
 
