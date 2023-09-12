@@ -2323,7 +2323,7 @@ UpdateProjectiles:
 
 @continue:
     dey
-    sta ProjectileIdx
+    sty ProjectileIdx
 
 @projectileLoop:
     lda ProjectileIdx
@@ -2351,7 +2351,7 @@ UpdateSingleProjectile:
 
     lda Projectiles, y
     lsr
-    bcs @continue
+    bcs @continue   ;the projectile is active
 
     rts
 

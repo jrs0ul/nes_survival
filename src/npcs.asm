@@ -575,8 +575,11 @@ SingleProjectileCollision:
 
     lda Projectiles, y ; dir + status
     lsr
-    bcc @exit
+    bcs @proceed
+    
+    rts
 
+@proceed:
     iny
     iny
 
@@ -650,6 +653,14 @@ SingleProjectileCollision:
 
 
 @collisionDetected:
+    
+    lda ProjectileIdx
+    asl
+    asl
+    tay
+    lda #0
+    sta Projectiles, y
+
     ldy TempY
     jsr OnCollisionWithAttackRect
 
