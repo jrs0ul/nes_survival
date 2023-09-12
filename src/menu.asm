@@ -912,7 +912,7 @@ EquipmentInput:
 
     lda SpearData
     lsr
-    bcc @exit ; you've launched a spear can't unequip it now
+    bcs @exit ; you've launched a spear can't unequip it now
 
     ;let's simply unequip
 

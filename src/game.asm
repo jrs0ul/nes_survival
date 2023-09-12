@@ -486,6 +486,7 @@ player_sprites_flip:
     ITEM_COOKED_MEAT           = 3
     ITEM_ROWAN_BERRIES         = 4
     ITEM_JAM                   = 5
+    ITEM_ROCK                  = 6
     ITEM_SPEAR                 = 7
     ITEM_KNIFE                 = 8
     ITEM_POOP                  = 9
@@ -2425,6 +2426,8 @@ UpdateSingleProjectile:
     tay
 
 
+    iny
+    iny
     jsr FilterProjectiles
     bne @disable
 
@@ -2489,10 +2492,6 @@ ScreenFilter:
     rts
 ;------------------------------
 FilterProjectiles:
-
-
-    iny
-    iny
 
     lda (ProjectilePtr), y ; screen
 
@@ -2579,7 +2578,7 @@ UpdateSpear:
 
 @moveLeft:
 
-
+    iny
     lda (ProjectilePtr), y
     cmp #SPEAR_SPEED
     bcc @less
@@ -2608,6 +2607,7 @@ UpdateSpear:
 
 
 @filter:
+    ldy #2
     jsr FilterProjectiles
     bne @disable
     jmp @exit
@@ -5469,6 +5469,27 @@ PullOutRod:
     rts
 ;-----------------------------------
 ShootSlingshot:
+
+    ldy #INVENTORY_MAX_SIZE
+    dey
+    dey
+@itemLoop:
+
+    lda Inventory, y
+    cmp #ITEM_ROCK
+    beq @found
+
+    dey
+    dey
+    bpl @itemLoop
+
+    jmp @exit
+
+@found:
+
+    lda #0
+    sta Inventory, y
+
 
     lda ProjectileCount
     beq @isEmpty
