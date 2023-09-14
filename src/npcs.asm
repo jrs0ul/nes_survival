@@ -1315,7 +1315,13 @@ CollectSingleNpcData:
     iny
     iny
     lda Npcs, y ; screen index where npc resides
-    calculateItemMapScreenIndexes ; macro
+    sta ItemMapScreenIndex
+    clc
+    adc #1
+    sta NextItemMapScreenIndex
+    sec
+    sbc #2
+    sta PrevItemMapScreenIndex
     iny
     lda Npcs, y ; direction
     sta TempDir

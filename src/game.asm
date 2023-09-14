@@ -1288,18 +1288,6 @@ Buffer:
     sta banktable, y      ; and write it back, switching banks
 .endmacro
 
-.macro calculateItemMapScreenIndexes
-    sta ItemMapScreenIndex
-    clc
-    adc #1
-    sta NextItemMapScreenIndex
-    sec
-    sbc #2
-    sta PrevItemMapScreenIndex
-.endmacro
-
-
-
 .segment "CODE"
 
 bankswitch_y:
@@ -2066,12 +2054,18 @@ ActivateYouWin:
 Logics:
 
     lda NMIActive
-    beq @exit
+    bne @begin
 
+    rts
+
+@begin:
     lda GameState
     cmp #STATE_GAME
-    bne @exit
+    beq @gameOn
 
+    rts
+
+@gameOn:
     lda PlayerAlive
     bne @cont
 ;----activate fading out for the game over
@@ -2118,7 +2112,7 @@ Logics:
     jsr FoodLogics
 
     jsr RunTime
-
+   
     jsr RestoreStamina
 
 
@@ -3404,6 +3398,31 @@ OnExitVillagerHut:
 @exit:
     rts
 
+;------------------------------
+DoFoodSpoilage:
+    ldy current_bank
+    sty oldbank
+    ldy #1          ;RotFood is in the "menu" bank
+    jsr bankswitch_y
+
+    lda #<Inventory
+    sta pointer
+    lda #>Inventory
+    sta pointer + 1
+    jsr RotFood
+
+    lda #<Storage
+    sta pointer
+    lda #>Storage
+    sta pointer + 1
+    jsr RotFood
+
+    ldy oldbank
+    jsr bankswitch_y
+
+    rts
+
+
 ;-------------------------------
 ;skips a time interval 
 ;specified by ParamTimeValue
@@ -3424,18 +3443,7 @@ SkipTime:
     sta Hours
     jsr IncreaseDays
     jsr ResetTimesWhenItemsWerePicked
-
-    lda #<Inventory
-    sta pointer
-    lda #>Inventory
-    sta pointer + 1
-    jsr RotFood
-
-    lda #<Storage
-    sta pointer
-    lda #>Storage
-    sta pointer + 1
-    jsr RotFood
+    jsr DoFoodSpoilage
 
 @exit:
     rts
@@ -3458,20 +3466,7 @@ RunTime:
     lda #0
     sta Hours
     jsr ResetTimesWhenItemsWerePicked
-
-    lda #<Inventory
-    sta pointer
-    lda #>Inventory
-    sta pointer + 1
-    jsr RotFood
-
-    lda #<Storage
-    sta pointer
-    lda #>Storage
-    sta pointer + 1
-    jsr RotFood
-
-    
+    jsr DoFoodSpoilage
     jsr IncreaseDays
 
 @adaptPalette:
@@ -3485,6 +3480,7 @@ RunTime:
 
 @exit:
     rts
+
 ;-------------------------------
 ;PalettePtr - where to store the modified palette
 AdaptBackgroundPaletteByTime:

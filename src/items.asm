@@ -367,18 +367,8 @@ UpdateSpritesForSingleItem:
 
     iny
     lda Items, y; Item map screen index
-    calculateItemMapScreenIndexes ; macro
-
-    lda ItemMapScreenIndex
-    beq @skipPrev; the item is in the 0 screen
-
-    lda CurrentMapSegmentIndex
-    cmp PrevItemMapScreenIndex
-    bcc @exit
-@skipPrev:
-    lda CurrentMapSegmentIndex
-    cmp NextItemMapScreenIndex
-    bcs @exit
+    jsr ScreenFilter
+    bne @exit
 
     iny
     lda Items, y ; x coord
@@ -462,69 +452,4 @@ UpdateItemSprites:
 
     rts
 
-;---------------------------------
-;pointer - storage or inventory
-RotFood:
 
-    ldy #0
-@loop:
-    sty TempInventoryItemIndex
-    tya
-    asl ; y * 2
-    tay
-
-    lda (pointer), y
-    beq @nextItem       ;if empty
-
-    cmp #ITEM_RAW_MEAT
-    beq @setRaw
-    cmp #ITEM_RAW_JUMBO_MEAT
-    beq @setRaw
-    cmp #ITEM_RAW_FISH
-    beq @setRaw
-    jmp @checkCooked
-
-@setRaw:
-    lda #ROT_AMOUNT_RAW_MEAT
-    sta RotAmount
-    jmp @rot
-
-@checkCooked:
-    cmp #ITEM_COOKED_MEAT
-    beq @setCooked
-    cmp #ITEM_COOKED_JUMBO_MEAT
-    beq @setCooked
-    cmp #ITEM_COOKED_FISH
-    beq @setCooked
-
-    jmp @nextItem
-
-@setCooked:
-    lda #ROT_AMOUNT_COOKED_MEAT
-    sta RotAmount
-@rot:
-    iny
-    lda (pointer), y
-    cmp RotAmount
-    bcc @turnToPoop
-    beq @turnToPoop
-
-    sec
-    sbc RotAmount
-    sta (pointer), y
-    jmp @nextItem
-
-
-@turnToPoop:
-    dey
-    lda #ITEM_POOP
-    sta (pointer), y
-
-    
-@nextItem:
-    ldy TempInventoryItemIndex ; stored item index
-    iny
-    cpy #INVENTORY_MAX_ITEMS
-    bcc @loop
-
-    rts
