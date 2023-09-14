@@ -400,7 +400,7 @@ player_sprites_flip:
     NPC_AI_DELAY               = 133
     NPC_COLLISION_DELAY        = 250
     FISHING_DELAY              = 2
-    STAMINA_DELAY              = 5
+    STAMINA_DELAY              = 2
     NPC_ELIMINATION_DELAY      = 200
 
     COLLISION_MAP_SIZE         = 120 ; 4 columns * 30 rows
@@ -507,6 +507,7 @@ player_sprites_flip:
     ITEM_COUNT_LOC1            = 7
     ITEM_COUNT_LOC2            = 5
     ITEM_COUNT_LOC3            = 3
+    ITEM_COUNT_LOC8            = 1
 
     ITEM_NEVER_BEEN_PICKED     = 255
 
@@ -1242,6 +1243,8 @@ Item_Location2_Collection_times:
     .res ITEM_COUNT_LOC2
 Item_Location3_Collection_times:
     .res ITEM_COUNT_LOC3
+Item_Location8_Collection_times:
+    .res ITEM_COUNT_LOC8
 
 Npcs:   ;animals and stuff
     .res 128 ; max 16 npcs * 8 bytes:
@@ -4461,6 +4464,7 @@ ResetEntityVariables:
     sta StaminaDelay
 
     lda #0
+    sta ScrollDirection
     sta NpcCount
     sta ProjectileCount
     sta PlayerWins
@@ -4509,6 +4513,7 @@ ResetEntityVariables:
     sta FirstNametableAddr
     lda #$24
     sta SecondNametableAddr
+    sta DestScreenAddr
 
     lda #1
     sta RightCollisonMapIdx

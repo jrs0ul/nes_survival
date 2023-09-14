@@ -113,11 +113,11 @@ LocationScreenCountList:
     .byte OUTDOORS_LOC1_SCREEN_COUNT ; 0
     .byte OUTDOORS_LOC2_SCREEN_COUNT ; 1
     .byte OUTDOORS_LOC3_SCREEN_COUNT ; 2
-    .byte 1                          ; 3
-    .byte 1                          ; 4
-    .byte 1                          ; 5
+    .byte 1                          ; 3 Bjorn's house
+    .byte 1                          ; 4 Player's house
+    .byte 1                          ; 5 Hedgehog
     .byte OUTDOORS_LOC7_SCREEN_COUNT ; 6 cave
-    .byte 1                          ; 7
+    .byte 1                          ; 7 crashsite
 
 ;which location in which bank
 LocationBanks:
@@ -139,8 +139,8 @@ LocationItemIndexes:
     .byte ITEM_COUNT_LOC1 + ITEM_COUNT_LOC2 + ITEM_COUNT_LOC3
     .byte ITEM_COUNT_LOC1 + ITEM_COUNT_LOC2 + ITEM_COUNT_LOC3
     .byte ITEM_COUNT_LOC1 + ITEM_COUNT_LOC2 + ITEM_COUNT_LOC3
-    .byte 0
-    .byte 0
+    .byte ITEM_COUNT_LOC1 + ITEM_COUNT_LOC2 + ITEM_COUNT_LOC3
+    .byte ITEM_COUNT_LOC1 + ITEM_COUNT_LOC2 + ITEM_COUNT_LOC3
 
 LocationItemCounts:
     .byte ITEM_COUNT_LOC1
@@ -150,5 +150,5 @@ LocationItemCounts:
     .byte 0
     .byte 0
     .byte 0
-    .byte 0
+    .byte ITEM_COUNT_LOC8
 
