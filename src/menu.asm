@@ -160,6 +160,14 @@ DrawInventoryGrid:
     lda MustDrawInventoryGrid
     beq @exit
 
+    lda InHouse
+    bne @cont
+
+
+    jsr ColorDisabledMenuAttributes
+
+@cont:
+
     lda FirstNametableAddr
     clc
     adc #1
@@ -188,6 +196,14 @@ DrawInventoryGrid:
 DrawEquipmentGrid:
     lda MustDrawEquipmentGrid
     beq @exit
+
+lda InHouse
+    bne @cont
+
+    jsr ColorDisabledMenuAttributes
+
+@cont:
+
 
     lda FirstNametableAddr
     clc
@@ -645,7 +661,45 @@ UpdateMenuStats:
     bne @daysLoop
 
 
+    lda InHouse
+    beq @exit
+
+    jsr ColorDisabledMenuAttributes
+
+@exit:
+
+
     rts
+;-------------------------------------
+ColorDisabledMenuAttributes:
+
+    lda $2002
+    lda FirstNametableAddr
+    clc
+    adc #3
+    sta $2006
+    lda #$D9
+    sta $2006
+    lda $FF
+    sta $2007
+    sta $2007
+
+    lda $2002
+    lda FirstNametableAddr
+    clc
+    adc #3
+    sta $2006
+    lda #$E1
+    sta $2006
+    lda $FF
+    sta $2007
+    sta $2007
+
+
+
+    rts
+
+
 ;-------------------------------------
 MenuInput:
     lda Buttons
