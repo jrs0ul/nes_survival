@@ -505,8 +505,8 @@ player_sprites_flip:
     SPEAR_SPEED                = 3
 
     ITEM_COUNT_LOC1            = 7
-    ITEM_COUNT_LOC2            = 5
-    ITEM_COUNT_LOC3            = 3
+    ITEM_COUNT_LOC2            = 6
+    ITEM_COUNT_LOC3            = 4
     ITEM_COUNT_LOC8            = 1
 
     ITEM_NEVER_BEEN_PICKED     = 255
@@ -1281,7 +1281,7 @@ SourceMapIdx:
     .res 1
 
 Buffer:
-    .res 401  ;must see how much is still available
+    .res 399  ;must see how much is still available
 
 ;====================================================================================
 
