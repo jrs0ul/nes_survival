@@ -215,7 +215,7 @@ snow_palette_frames_1: ; white and blue
     .byte $11, $20
 
 sprites:
-    .byte $11, $FF, %00000011, $08   ; sprite 0 
+    .byte $11, $FF, %00000000, $08   ; sprite 0 
 
 
 ;position of knife sprite depending on the player frame
@@ -482,6 +482,7 @@ player_sprites_flip:
     ITEM_TYPE_TOOL             = 5
     ITEM_TYPE_CLOTHING         = 6
 
+    ITEM_STICK                 = 1
     ITEM_RAW_MEAT              = 2
     ITEM_COOKED_MEAT           = 3
     ITEM_ROWAN_BERRIES         = 4
@@ -1197,6 +1198,9 @@ TempItemScreen:
     .res 1
 ;--
 
+TempSpearSpriteCnt:
+    .res 1
+
 TempItemLoadY:
     .res 1
 TempItemLoadX:
@@ -1281,7 +1285,7 @@ SourceMapIdx:
     .res 1
 
 Buffer:
-    .res 399  ;must see how much is still available
+    .res 398  ;must see how much is still available
 
 ;====================================================================================
 
@@ -3243,7 +3247,7 @@ RoutinesAfterFadeOut:
     jsr PushCollisionMapLeft
     jsr PushCollisionMapLeft
     jsr PushCollisionMapLeft
-    
+
     lda #0
     sta CurrentMapSegmentIndex
 
@@ -3252,8 +3256,6 @@ RoutinesAfterFadeOut:
 
     lda #2
     sta ScrollDirection
-
-
 
 
 @next15:
@@ -3423,32 +3425,6 @@ DoFoodSpoilage:
     ldy oldbank
     jsr bankswitch_y
 
-    rts
-
-
-;-------------------------------
-;skips a time interval 
-;specified by ParamTimeValue
-SkipTime:
-    lda Hours
-    clc
-    adc ParamTimeValue
-    sta Hours
-    bcs @increaseDays
-    cmp #HOURS_MAX
-    bcs @increaseDays
-    jmp @exit
-
-@increaseDays:
-    lda Hours
-    sec
-    sbc #HOURS_MAX
-    sta Hours
-    jsr IncreaseDays
-    jsr ResetTimesWhenItemsWerePicked
-    jsr DoFoodSpoilage
-
-@exit:
     rts
 
 ;-------------------------------
@@ -4441,16 +4417,26 @@ ResetEntityVariables:
     dex
     bpl @clearInventoryLoop
 
-    sta CurrentMapSegmentIndex
+    ldx #0
+    lda #ITEM_WOOD_HAMMER
+    sta Storage, x
+    lda #ITEM_MAX_HP
+    ldx #1
+    sta Storage,x
+    ldx #2
+    lda #ITEM_STICK
+    sta Storage, x
+    ldx #4
+    sta Storage, x
+    ldx #6
+    sta Storage, x
+    ldx #8
 
     lda #OUTDOORS_LOC1_SCREEN_COUNT ;  screens in the outdoors map
     sta ScreenCount
 
-
     lda #BASE_MENU_MIN_Y
     sta InventoryPointerY
-    lda #0
-    sta InventoryItemIndex
 
     lda #MAX_WARMTH_DELAY
     sta WarmthDelay
@@ -4464,6 +4450,8 @@ ResetEntityVariables:
     sta StaminaDelay
 
     lda #0
+    sta InventoryItemIndex
+    sta CurrentMapSegmentIndex
     sta ScrollDirection
     sta NpcCount
     sta ProjectileCount
@@ -6304,6 +6292,10 @@ SetTwoSpearSprites:
     asl
     tay
 
+    lda #2
+    sta TempSpearSpriteCnt
+
+@spearLoop:
     inx
     lda SpearData + 3; Y
     clc
@@ -6323,28 +6315,10 @@ SetTwoSpearSprites:
     clc
     adc spearSprites, y
     sta FIRST_SPRITE, x
-    inx
-    iny
-    ;----
-    lda SpearData + 3 ; Y
-    clc
-    adc spearSprites, y
-    sta FIRST_SPRITE, x
-    inx
-    iny
-    lda spearSprites, y
-    sta FIRST_SPRITE, x
-    inx
-    iny
-    lda spearSprites, y
-    sta FIRST_SPRITE, x
-    inx
-    iny
-    lda TempPointX
-    clc
-    adc spearSprites, y
-    sta FIRST_SPRITE, x
 
+    iny
+    dec TempSpearSpriteCnt
+    bne @spearLoop
 
     rts
 ;---------------------------------

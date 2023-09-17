@@ -2626,6 +2626,32 @@ TwoTileLoop:
     rts
 
 ;---------------------------------
+;skips a time interval 
+;specified by ParamTimeValue
+SkipTime:
+    lda Hours
+    clc
+    adc ParamTimeValue
+    sta Hours
+    bcs @increaseDays
+    cmp #HOURS_MAX
+    bcs @increaseDays
+    jmp @exit
+
+@increaseDays:
+    lda Hours
+    sec
+    sbc #HOURS_MAX
+    sta Hours
+    jsr IncreaseDays
+    jsr ResetTimesWhenItemsWerePicked
+    jsr RotFood
+
+@exit:
+    rts
+
+
+;---------------------------------
 ;pointer - storage or inventory
 RotFood:
 
