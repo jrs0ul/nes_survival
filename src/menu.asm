@@ -2,8 +2,7 @@ LoadMenu:
 
     lda MustLoadMenu
     beq @exit
-    
-    
+
     lda #$00
     sta $2000
     sta $2001
@@ -622,6 +621,28 @@ UpdateMenuStats:
     cpy #3
     bne @warmthLoop
 
+    lda InHouse
+    bne @fuelcounter
+
+    lda $2002
+    lda FirstNametableAddr
+    clc
+    adc #1
+    sta $2006
+    lda #$D6
+    sta $2006
+
+    ldy #8
+@hideFuelLoop:
+
+    lda #0
+    sta $2007
+    dey
+    bne @hideFuelLoop
+
+    jmp @daysCounter
+
+@fuelcounter:
 
     lda $2002
     lda FirstNametableAddr
@@ -630,6 +651,7 @@ UpdateMenuStats:
     sta $2006
     lda #$DB
     sta $2006
+
 
     ldy #0
 @fuelLoop:
@@ -641,7 +663,7 @@ UpdateMenuStats:
     cpy #3
     bne @fuelLoop
 
-
+@daysCounter:
     lda $2002
     lda FirstNametableAddr
     clc
