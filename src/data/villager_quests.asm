@@ -152,6 +152,12 @@ quest_list_low:
     .byte <villager_bear_quest_1
     .byte <villager_bear_quest_2
     .byte <villager_bear_quest_3
+
+    .byte <dialog_quest_0
+    .byte <dialog_quest_1
+    .byte <dialog_quest_2
+    .byte <dialog_quest_3
+
     .byte <dialog_quest_0
     .byte <dialog_quest_1
     .byte <dialog_quest_2
@@ -162,6 +168,12 @@ quest_list_high:
     .byte >villager_bear_quest_1
     .byte >villager_bear_quest_2
     .byte >villager_bear_quest_3
+
+    .byte >dialog_quest_0
+    .byte >dialog_quest_1
+    .byte >dialog_quest_2
+    .byte >dialog_quest_3
+
     .byte >dialog_quest_0
     .byte >dialog_quest_1
     .byte >dialog_quest_2
@@ -178,11 +190,21 @@ thanks_list_low:
     .byte <dialog_thanks_2
     .byte <dialog_thanks_3
 
+    .byte <dialog_thanks_0
+    .byte <dialog_thanks_1
+    .byte <dialog_thanks_2
+    .byte <dialog_thanks_3
+
 thanks_list_high:
     .byte >villager_bear_thanks_0
     .byte >villager_bear_thanks_1
     .byte >villager_bear_thanks_2
     .byte >villager_bear_thanks_3
+
+    .byte >dialog_thanks_0
+    .byte >dialog_thanks_1
+    .byte >dialog_thanks_2
+    .byte >dialog_thanks_3
 
     .byte >dialog_thanks_0
     .byte >dialog_thanks_1
@@ -203,9 +225,11 @@ first_time_text: ;when player enters the hut for the first time
 goal_items_list:
     .byte ITEM_COOKED_MEAT, ITEM_SPEAR, ITEM_JAM, ITEM_COAT
     .byte ITEM_RAW_MEAT, ITEM_KNIFE, ITEM_COOKED_FISH, ITEM_HIDE
+    .byte ITEM_RAW_MEAT, ITEM_KNIFE, ITEM_COOKED_FISH, ITEM_HIDE
 
 reward_items_list:
     .byte 0, ITEM_HIDE, ITEM_FISHING_ROD, ITEM_HAMMER
+    .byte 0, ITEM_ROWAN_BERRIES, 0, ITEM_COAT
     .byte 0, ITEM_ROWAN_BERRIES, 0, ITEM_COAT
 
 .segment "RODATA"

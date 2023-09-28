@@ -8,43 +8,44 @@
 ;GlobalScrollMax,
 ;MinY,
 ;MaxY
-;<unused bytes>
 
 ;entry point count is stored in ENTRY_POINT_COUNT
 
 MapEntryPoints:
     ;Entry to player's house from outside
-    .byte 0, 0, 64,  88,  0,   255,   102, 110, 0, 0, 0, 0, 0, 0, 0, 0
+    .byte 0, 0, 64,  88,  0,   255,   102, 110
     ;Bear's house entrance
-    .byte 1, 0, 118, 122, 177, 190, $68, $6F, 0, 0, 0, 0, 0, 0, 0, 0
+    .byte 1, 0, 118, 122, 177, 190, $68, $6F
     ;Second location entry point
-    .byte 0, OUTDOORS_LOC1_SCREEN_COUNT - 1, 0, 255, 0, 255, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0
+    .byte 0, OUTDOORS_LOC1_SCREEN_COUNT - 1, 0, 255, 0, 255, 0, 32
     ;Third location entry point
-    .byte 0, 1, 0, 255, 0, 255, 225, 255, 0, 0, 0, 0, 0, 0, 0, 0
+    .byte 0, 1, 0, 255, 0, 255, 225, 255
     ;Exit point of second location
-    .byte 1, 0, 0, 255, 0, 255, 230, 255, 0, 0, 0, 0, 0, 0, 0, 0
+    .byte 1, 0, 0, 255, 0, 255, 230, 255
     ;Exit point of third location
-    .byte 2, 0, 0, 255, 0, 255, 0,   32,  0, 0, 0, 0, 0, 0, 0, 0
+    .byte 2, 0, 0, 255, 0, 255, 0,   32
     ;Bear's house exit
-    .byte 3, 0, 0, 255, 0, 255, 168, 255, 0, 0, 0, 0, 0, 0, 0, 0
+    .byte 3, 0, 0, 255, 0, 255, 168, 255
     ;Player's house exit
-    .byte 4, 0, 0, 255, 0, 255, 168, 255, 0, 0, 0, 0, 0, 0, 0, 0
+    .byte 4, 0, 0, 255, 0, 255, 168, 255
     ;Second villager's house
-    .byte 2, 0, 118, 121, 48, 66, 136, 142, 0, 0, 0, 0, 0, 0, 0, 0
+    .byte 2, 0, 118, 121, 48, 66, 136, 142
     ;Second villager house's exit
-    .byte 5, 0, 0, 255, 0, 255, 168, 255, 0, 0, 0, 0, 0, 0, 0, 0
+    .byte 5, 0, 0, 255, 0, 255, 168, 255
     ;cave entrance from location 2
-    .byte 1, 0, 118, 121, 20, 30, 40, 50, 0, 0, 0, 0, 0, 0, 0, 0
+    .byte 1, 0, 118, 121, 20, 30, 40, 50
     ;crashsite entrance from cave
-    .byte 6, 0, 0, 255, 0, 255, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0
+    .byte 6, 0, 0, 255, 0, 255, 0, 32
     ;crashsite exit to cave
-    .byte 7, 0, 0, 255, 0, 255, 230, 255, 0, 0, 0, 0, 0, 0, 0, 0
+    .byte 7, 0, 0, 255, 0, 255, 230, 255
     ;cave exit to second location
-    .byte 6, 0, 0, 255, 0, 255, 230, 255, 0, 0, 0, 0 ,0, 0, 0, 0
+    .byte 6, 0, 0, 255, 0, 255, 230, 255
     ;location to the south of the bear's location
-    .byte 0, OUTDOORS_LOC1_SCREEN_COUNT - 1, 0, 255, 0, 255, 225, 255, 0, 0, 0, 0, 0, 0, 0, 0
+    .byte 0, OUTDOORS_LOC1_SCREEN_COUNT - 1, 0, 255, 0, 255, 225, 255
     ;exit from granny's location to the main one
-    .byte 8, 0, 0, 255, 0, 255, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0
+    .byte 8, 0, 0, 255, 0, 255, 0, 32
+    ;granny's house
+    .byte 8, 0, 118, 121, 150, 154, 104, 111
 
 
 ;-----------------------------------------------------
@@ -63,8 +64,8 @@ MapEntryPoints:
 ;mapLow (only interrior maps work)
 ;mapHigh
 ;max generated npc count per screen
-;not generated Npcs Low
-;NpcsHigh
+;Premade Npcs Low
+;Premade NpcsHigh
 ;currentMapSegment we are entering (only used for animal generation now)
 
 MapSpawnPoint:
@@ -112,10 +113,13 @@ MapSpawnPoint:
     .byte 0, 0, 0, 3, 0, 0, 0
     ;granny location
     .byte 100, 100, 8, 2, <House_items, >House_items, 4,  <babloc1_collision, >babloc1_collision
-    .byte 0, 0, 0, 0, 0, 0, 0
+    .byte 0, 0, 0, 2, 0, 0, 0
     ;exit from granny's to main
     .byte 100, 200, 0, OUTDOORS_LOC1_SCREEN_COUNT,<Outside1_items, >Outside1_items, 0, <bg_collision4, >bg_collision4
     .byte 0, 0, 0, 3, 0, 0, 3
+    ;granny's house
+    .byte 100, 136, 9, 1, <House_items, >House_items, 0, <grannys_hut_collision, >grannys_hut_collision
+    .byte 1, <grannys_hut, >grannys_hut, 0, <villager2_npcs, >villager2_npcs, 0
 
 
 
@@ -130,6 +134,7 @@ LocationScreenCountList:
     .byte OUTDOORS_LOC7_SCREEN_COUNT ; 6 cave
     .byte 1                          ; 7 crashsite
     .byte 2                          ; 8 granny location
+    .byte 1                          ; 9 granny's hut
 
 ;which location in which bank
 LocationBanks:
@@ -142,6 +147,7 @@ LocationBanks:
     .byte 4
     .byte 4
     .byte 4
+    .byte 0
 
 
 ;indexes in Item_Location1_Collection_times
@@ -155,6 +161,7 @@ LocationItemIndexes:
     .byte ITEM_COUNT_LOC1 + ITEM_COUNT_LOC2 + ITEM_COUNT_LOC3
     .byte ITEM_COUNT_LOC1 + ITEM_COUNT_LOC2 + ITEM_COUNT_LOC3
     .byte 0
+    .byte 0
 
 LocationItemCounts:
     .byte ITEM_COUNT_LOC1
@@ -165,5 +172,6 @@ LocationItemCounts:
     .byte 0
     .byte 0
     .byte ITEM_COUNT_LOC8
+    .byte 0
     .byte 0
 

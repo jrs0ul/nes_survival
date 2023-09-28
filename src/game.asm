@@ -57,6 +57,7 @@ house_tiles_chr: .incbin "house.chr"
 .include "data/maps/house.asm"
 .include "data/maps/villager_hut.asm"
 .include "data/maps/villager2_hut.asm"
+.include "data/maps/grannys_hut.asm"
 
 
 ;============================================================
@@ -419,7 +420,7 @@ player_sprites_flip:
     MAX_TILE_SCROLL_RIGHT      = 8
 
 
-    ENTRY_POINT_COUNT          = 16
+    ENTRY_POINT_COUNT          = 17
 
     SLEEP_POS_X                = 100
     SLEEP_POS_Y                = 72
@@ -1298,14 +1299,14 @@ Buffer:
 .endmacro
 
 .segment "CODE"
-
+;---------------------------
 bankswitch_y:
     sty current_bank      ; save the current bank in RAM so the NMI handler can restore it
 bankswitch_nosave:
     lda banktable, y      ; read a byte from the banktable
     sta banktable, y      ; and write it back, switching banks 
     rts
-
+;----------------------------
 reset:
     sei
     cld
@@ -1360,7 +1361,7 @@ vblankwait2:      ; Second wait for vblank, PPU is ready after this
 
 ;---
     ldy #2
-    bankswitch ;switching to Title/Game Over bank
+    jsr bankswitch_y ;switching to Title/Game Over bank
 
     lda #<title_tiles_chr
     sta pointer
@@ -1369,7 +1370,7 @@ vblankwait2:      ; Second wait for vblank, PPU is ready after this
     jsr CopyCHRTiles
 
     ldy #5
-    bankswitch
+    jsr bankswitch_y
 
     jsr LoadTitleData ; from bank 5
 
@@ -1674,7 +1675,7 @@ WaitSprite0:
     and #%01000000
     beq WaitSprite0      ; wait until sprite 0 is hit
 
-    ldx #219
+    ldx #200
 WaitScanline:
     dex
     bne WaitScanline
@@ -2205,7 +2206,6 @@ CheckEntryPoints:
 
 
     txa
-    asl
     asl
     asl
     asl
@@ -3286,7 +3286,7 @@ RoutinesAfterFadeOut:
     sta TimesShiftedLeft
     sta TimesShiftedRight
 
-
+;from granny's location to map
 @next16:
     lda ActiveMapEntryIndex
     cmp #15
@@ -3311,8 +3311,28 @@ RoutinesAfterFadeOut:
     sta LeftCollisionColumnIndex
     jsr LoadLeftCollisionColumn
 
-
 @next17:
+    lda ActiveMapEntryIndex
+    cmp #16
+    bne @next18
+
+    lda #1
+    sta MustRestartIndoorsMusic
+    sta InVillagerHut
+    lda #2
+    sta VillagerIndex
+
+    lda #0
+    sta CurrentMapSegmentIndex
+
+    jsr ResetNameTableAdresses
+
+    lda #0
+    sta GlobalScroll
+    sta TilesScroll
+    sta ScrollDirection
+
+@next18:
 
     lda #1
     sta MustLoadSomething ; activate location loading in NMI
@@ -3358,7 +3378,7 @@ CommonLocationRoutine:
     cmp current_bank
     beq @continue
     tay
-    bankswitch
+    jsr bankswitch_y
 @continue:
     inx
     lda MapSpawnPoint, x
@@ -4415,7 +4435,7 @@ LoadGameOver:
     sta GameState
 
     ldy #5
-    bankswitch
+    jsr bankswitch_y
 
     jsr LoadGameOverData ; from bank 5
 
@@ -6301,7 +6321,7 @@ UpdateSprites:
     ldy current_bank
     sty oldbank
     ldy #3
-    bankswitch
+    jsr bankswitch_y
 
     jsr UpdateVillagerDialogSprites ;from bank 3
 

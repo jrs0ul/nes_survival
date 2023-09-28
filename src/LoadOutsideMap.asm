@@ -8,7 +8,7 @@ LoadOutsideMap:
     beq @startLoad
 
     tay ;transfer bank index to y
-    bankswitch
+    jsr bankswitch_y
 
 @startLoad:
     lda #$00
