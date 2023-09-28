@@ -70,6 +70,8 @@ main_tiles_chr2: .incbin "main.chr"
 .include "data/maps/cave1.asm"
 .include "data/maps/cave2.asm"
 .include "data/maps/crashsite.asm"
+.include "data/maps/babloc1.asm"
+.include "data/maps/babloc2.asm"
 
 ;=============================================================
 .segment "ROM5" ;title and intro data (?)
@@ -417,7 +419,7 @@ player_sprites_flip:
     MAX_TILE_SCROLL_RIGHT      = 8
 
 
-    ENTRY_POINT_COUNT          = 14
+    ENTRY_POINT_COUNT          = 16
 
     SLEEP_POS_X                = 100
     SLEEP_POS_Y                = 72
@@ -3258,7 +3260,59 @@ RoutinesAfterFadeOut:
     sta ScrollDirection
 
 
-@next15:
+@next15:; granny's location
+
+    lda ActiveMapEntryIndex
+    cmp #14
+    bne @next16
+
+    lda #0
+    sta CurrentMapSegmentIndex
+    sta RightCollisionColumnIndex
+
+    lda #1
+    sta RightCollisonMapIdx
+    jsr LoadRightCollisionColumn
+    lda #255
+    sta LeftCollisionColumnIndex
+
+
+    jsr ResetNameTableAdresses
+
+    lda #0
+    sta LeftCollisionMapIdx
+    sta GlobalScroll
+    sta TilesScroll
+    sta TimesShiftedLeft
+    sta TimesShiftedRight
+
+
+@next16:
+    lda ActiveMapEntryIndex
+    cmp #15
+    bne @next17
+
+    lda #0
+    sta TimesShiftedLeft
+    sta TimesShiftedRight
+    sta TilesScroll
+
+    lda #OUTDOORS_LOC1_SCREEN_COUNT - 1
+    sta CurrentMapSegmentIndex
+
+    lda #4
+    sta RightCollisonMapIdx
+    lda #0
+    sta RightCollisionColumnIndex
+
+    lda #2
+    sta LeftCollisionMapIdx
+    lda #3
+    sta LeftCollisionColumnIndex
+    jsr LoadLeftCollisionColumn
+
+
+@next17:
 
     lda #1
     sta MustLoadSomething ; activate location loading in NMI
@@ -5152,7 +5206,7 @@ useHammerOnEnvironment:
     bne @exit
 
     lda #%00001101
-    sta Temp
+    sta TempItemIndex
     jsr SpawnItem
     jmp @exit
 @spawn_wood:
@@ -5162,7 +5216,7 @@ useHammerOnEnvironment:
     bne @exit
 
     lda #%00000011
-    sta Temp
+    sta TempItemIndex
     jsr SpawnItem
 
 
@@ -5197,9 +5251,7 @@ IsTree:
     rts
 
 ;----------------------------------
-;Temp is the item
-SpawnItem:
-
+ItemSpawnPrep:
     inc ItemCount
     lda ItemCount
     sec
@@ -5207,36 +5259,37 @@ SpawnItem:
     asl
     asl
     tay
-
-    lda Temp ; item id and hp are in Temp
+    
+    lda TempItemIndex ; item id and hp are here
     sta Items, y
     iny
+
+    rts
+
+
+;----------------------------------
+;TempItemIndex is the item
+SpawnItem:
+
+    jsr ItemSpawnPrep
+
     lda PlayerX
+    clc
     adc GlobalScroll
     bcs @incrementScreen
-
-    sta TempPointX
-
-    lda CurrentMapSegmentIndex
-    sta Items, y
-    iny
-    lda TempPointX
-    sta Items, y
-    iny
-    lda PlayerY
-    clc
-    adc #FISHING_CATCH_OFFSET_Y
-    sta Items, y
-
-    jmp @exit
+    jmp @continue
 @incrementScreen:
+    lda #1
+    sta TempItemScreen
+@continue:
+
     sta TempPointX
 
     lda CurrentMapSegmentIndex
     clc
-    adc #1
+    adc TempItemScreen
     sta Items, y
-
+    iny
     lda TempPointX
     sta Items, y
     iny
@@ -5454,7 +5507,7 @@ PullOutRod:
     jsr WearWeapon
 
     lda #%00100011
-    sta Temp
+    sta TempItemIndex
     jsr SpawnItem
 @exit:
     rts

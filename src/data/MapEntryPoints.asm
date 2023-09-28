@@ -1,6 +1,6 @@
 ;where you enter a new location
 ;----------------------------------
-;location index,
+;location index, where this entry point is
 ;CurrentMapSegmentIndex value,
 ;MinX,
 ;MaxX,
@@ -41,6 +41,10 @@ MapEntryPoints:
     .byte 7, 0, 0, 255, 0, 255, 230, 255, 0, 0, 0, 0, 0, 0, 0, 0
     ;cave exit to second location
     .byte 6, 0, 0, 255, 0, 255, 230, 255, 0, 0, 0, 0 ,0, 0, 0, 0
+    ;location to the south of the bear's location
+    .byte 0, OUTDOORS_LOC1_SCREEN_COUNT - 1, 0, 255, 0, 255, 225, 255, 0, 0, 0, 0, 0, 0, 0, 0
+    ;exit from granny's location to the main one
+    .byte 8, 0, 0, 255, 0, 255, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0
 
 
 ;-----------------------------------------------------
@@ -106,6 +110,13 @@ MapSpawnPoint:
     ;cave exit to second location
     .byte 120, 63, 1, OUTDOORS_LOC2_SCREEN_COUNT, <Outside2_items, >Outside2_items, 4, <bg2_collision, >bg2_collision
     .byte 0, 0, 0, 3, 0, 0, 0
+    ;granny location
+    .byte 100, 100, 8, 2, <House_items, >House_items, 4,  <babloc1_collision, >babloc1_collision
+    .byte 0, 0, 0, 0, 0, 0, 0
+    ;exit from granny's to main
+    .byte 100, 200, 0, OUTDOORS_LOC1_SCREEN_COUNT,<Outside1_items, >Outside1_items, 0, <bg_collision4, >bg_collision4
+    .byte 0, 0, 0, 3, 0, 0, 3
+
 
 
 
@@ -118,6 +129,7 @@ LocationScreenCountList:
     .byte 1                          ; 5 Hedgehog
     .byte OUTDOORS_LOC7_SCREEN_COUNT ; 6 cave
     .byte 1                          ; 7 crashsite
+    .byte 2                          ; 8 granny location
 
 ;which location in which bank
 LocationBanks:
@@ -127,6 +139,7 @@ LocationBanks:
     .byte 0
     .byte 0
     .byte 0
+    .byte 4
     .byte 4
     .byte 4
 
@@ -141,6 +154,7 @@ LocationItemIndexes:
     .byte ITEM_COUNT_LOC1 + ITEM_COUNT_LOC2 + ITEM_COUNT_LOC3
     .byte ITEM_COUNT_LOC1 + ITEM_COUNT_LOC2 + ITEM_COUNT_LOC3
     .byte ITEM_COUNT_LOC1 + ITEM_COUNT_LOC2 + ITEM_COUNT_LOC3
+    .byte 0
 
 LocationItemCounts:
     .byte ITEM_COUNT_LOC1
@@ -151,4 +165,5 @@ LocationItemCounts:
     .byte 0
     .byte 0
     .byte ITEM_COUNT_LOC8
+    .byte 0
 

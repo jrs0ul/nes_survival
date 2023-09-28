@@ -41,6 +41,12 @@ map_list_low:
     .byte 0
     .byte 0
 
+    .byte <babloc1
+    .byte <babloc2
+    .byte 0
+    .byte 0
+
+
 
 
 map_list_high:
@@ -81,5 +87,10 @@ map_list_high:
 
     .byte >crashsite
     .byte 0
+    .byte 0
+    .byte 0
+
+    .byte >babloc1
+    .byte >babloc2
     .byte 0
     .byte 0

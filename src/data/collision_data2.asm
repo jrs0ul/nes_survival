@@ -4,3 +4,5 @@
 .include "maps/cave1_collision.asm"
 .include "maps/cave2_collision.asm"
 .include "maps/crashsite_collision.asm"
+.include "maps/babloc1_collision.asm"
+.include "maps/babloc2_collision.asm"

@@ -840,7 +840,7 @@ PlayDamageSfx:
 
 ;-------------------------------------
 DropItemAfterDeath:
-    
+
     lda TempNpcType
     cmp #NPC_TYPE_PREDATOR
     bne @continueDrop
@@ -852,14 +852,7 @@ DropItemAfterDeath:
 
 @continueDrop:
     ;drop item
-    inc ItemCount
-    lda ItemCount
 
-    sec
-    sbc #1
-    asl
-    asl
-    tay
 
     lda TempNpcType
     cmp #NPC_TYPE_PREDATOR
@@ -882,9 +875,13 @@ DropItemAfterDeath:
 @spawnHide:
     lda #%00010101
 @storeItem:
-    sta Items, y
-    iny
-    iny ; at item x
+
+    sta TempItemIndex
+
+
+    jsr ItemSpawnPrep
+
+
     lda DropedItemX
     clc
     adc #8
@@ -894,6 +891,7 @@ DropItemAfterDeath:
     lda #1
     sta TempItemScreen
 @continueSpawningItem:
+    iny ; at item x
     sta Items, y
     dey ;screen index
     lda KilledNpcScreenIdx

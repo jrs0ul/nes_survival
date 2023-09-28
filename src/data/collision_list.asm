@@ -40,6 +40,11 @@ collision_list_low:
     .byte 0
     .byte 0
 
+    .byte <babloc1_collision
+    .byte <babloc2_collision
+    .byte 0
+    .byte 0
+
 
 collision_list_high:
     .byte >bg_collision
@@ -81,3 +86,9 @@ collision_list_high:
     .byte 0
     .byte 0
     .byte 0
+
+    .byte >babloc1_collision
+    .byte >babloc2_collision
+    .byte 0
+    .byte 0
+
