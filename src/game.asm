@@ -3347,47 +3347,76 @@ CommonLocationRoutine:
     sta InCave
     sta IsLocationRoutine
     sta PaletteFadeAnimationState
+
+    lda #<MapSpawnPoint
+    sta pointer2
+    lda #>MapSpawnPoint
+    sta pointer2 + 1
+
+
     lda ActiveMapEntryIndex
-    asl
-    asl
-    asl
-    asl
+    beq @letsgo
+
     tax
-    lda MapSpawnPoint, x
+    lda pointer2
+@addressLoop:
+    clc
+    adc #16
+    sta pointer2
+    bcs @increaseUpper
+    jmp @contAddressCalc
+
+@increaseUpper:
+    inc pointer2 + 1
+@contAddressCalc:
+
+    dex
+    bne @addressLoop
+
+@letsgo:
+    ldy #0
+
+    lda (pointer2), y
     sta PlayerX
-    inx
-    lda MapSpawnPoint, x
+    iny
+    lda (pointer2), y
     sta PlayerY
-    inx
-    lda MapSpawnPoint, x
+    iny
+    lda (pointer2), y
     sta LocationIndex
-    inx
-    lda MapSpawnPoint, x
+    iny
+    lda (pointer2), y
     sta ScreenCount
-    inx
-    lda MapSpawnPoint, x
+    iny
+    lda (pointer2), y ; lower address to item data
     sta pointer
-    inx
-    lda MapSpawnPoint, x
+    iny
+    lda (pointer2), y ; upper address to item data
     sta pointer + 1
-    stx TempRegX
+
+    sty TempY
     jsr LoadItems
-    ldx TempRegX
-    inx
-    lda MapSpawnPoint, x
+    ldy TempY
+
+    iny
+    lda (pointer2), y ;rom bank for the location
     cmp current_bank
     beq @continue
+
+    sty TempY
     tay
     jsr bankswitch_y
+    ldy TempY
+
 @continue:
-    inx
-    lda MapSpawnPoint, x
+    iny
+    lda (pointer2), y ;lower address byte of the collision data
     sta pointer
-    inx
-    lda MapSpawnPoint, x
+    iny
+    lda (pointer2), y ; higher byte
     sta pointer + 1
-    inx
-    lda MapSpawnPoint, x
+    iny
+    lda (pointer2), y
     bne @itsAnIndoorMap
     lda #1
     sta MustLoadOutside
@@ -3396,37 +3425,40 @@ CommonLocationRoutine:
     lda #1
     sta MustLoadHouseInterior
 @loadMapptr:
-    inx
-    lda MapSpawnPoint, x
+    iny
+    lda (pointer2), y ;indoor map address (lower byte)
     sta MapPtr
-    inx
-    lda MapSpawnPoint, x
+    iny
+    lda (pointer2), y ;indoor map address (higher byte)
     sta MapPtr + 1
-
+;---
 @loadCollision:
+    sty TempY ; preserve y
     ldy #0
 @collisionLoop:
-    lda (pointer), y
+    lda (pointer), y ; pointer points to the collision data
     sta CollisionMap, y
     iny
     cpy #COLLISION_MAP_SIZE
     bne @collisionLoop
-
-    inx
+    ldy TempY
+;---
+    iny
 
     lda #0
     sta NpcCount
 
-    stx TempRegX
-    lda MapSpawnPoint, x ;generated npc count
+    sty TempY
+    lda (pointer2), y ;generated npc count
     sta TempScreenNpcCount
     beq @skipGeneration
     sta TempNpcCnt
-    inx
-    inx
-    inx
-    lda MapSpawnPoint, x
+    iny
+    iny
+    iny
+    lda (pointer2), y
     sta TempIndex ; map segment for generator
+
     jsr GenerateNpcs
     inc TempIndex
     lda TempIndex
@@ -3434,15 +3466,16 @@ CommonLocationRoutine:
     bcs @skipLoadingNpcs
     lda TempScreenNpcCount
     sta TempNpcCnt
+
     jsr GenerateNpcs
     jmp @skipLoadingNpcs ; we're generating, no need to load
 @skipGeneration:
-    ldx TempRegX
-    inx
-    lda MapSpawnPoint, x
+    ldy TempY
+    iny
+    lda (pointer2), y
     sta pointer
-    inx
-    lda MapSpawnPoint, x
+    iny
+    lda (pointer2), y
     sta pointer + 1
     lda pointer
     cmp #0
