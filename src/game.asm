@@ -420,7 +420,7 @@ player_sprites_flip:
     MAX_TILE_SCROLL_RIGHT      = 8
 
 
-    ENTRY_POINT_COUNT          = 17
+    ENTRY_POINT_COUNT          = 18
 
     SLEEP_POS_X                = 100
     SLEEP_POS_Y                = 72
@@ -2854,9 +2854,6 @@ RoutinesAfterFadeOut:
 
     lda #0
     sta VillagerIndex
-    sta GlobalScroll
-    sta TilesScroll
-    sta ScrollDirection
 
     lda #1
     sta MustRestartIndoorsMusic
@@ -2867,12 +2864,6 @@ RoutinesAfterFadeOut:
     lda ActiveMapEntryIndex
     cmp #6
     bne @next3
-
-    lda #0
-    sta InVillagerHut
-
-    lda #0
-    sta TilesScroll
 
     lda #0
     sta TimesShiftedLeft
@@ -2891,9 +2882,6 @@ RoutinesAfterFadeOut:
     lda #0
     sta CurrentMapSegmentIndex
 
-    lda #0 ;hack
-    sta GlobalScroll
-
     ;TODO: rework this
     jsr PushCollisionMapRight
     jsr PushCollisionMapRight
@@ -2909,8 +2897,6 @@ RoutinesAfterFadeOut:
     sta GlobalScroll
 
     jsr OnExitVillagerHut
-    lda #1
-    sta MustCopyMainChr
 
 ;--------------------------Second location
 @next3:
@@ -2934,9 +2920,6 @@ RoutinesAfterFadeOut:
 
     lda #0
     sta LeftCollisionMapIdx
-    lda #0
-    sta GlobalScroll
-    sta TilesScroll
     sta TimesShiftedLeft
     sta TimesShiftedRight
     ;--------------------------------------------
@@ -2962,8 +2945,6 @@ RoutinesAfterFadeOut:
 
     lda #0
     sta LeftCollisionMapIdx
-    sta GlobalScroll
-    sta TilesScroll
     sta TimesShiftedLeft
     sta TimesShiftedRight
     ;-----------------------------------------
@@ -2990,7 +2971,6 @@ RoutinesAfterFadeOut:
     lda #0
     sta TimesShiftedLeft
     sta TimesShiftedRight
-    sta TilesScroll
 
     lda #OUTDOORS_LOC1_SCREEN_COUNT - 1
     sta CurrentMapSegmentIndex
@@ -3061,7 +3041,6 @@ RoutinesAfterFadeOut:
     lda #103
     sta GlobalScroll
 
-
     lda #28
     sta BgColumnIdxToUpload
     lda #2
@@ -3086,11 +3065,6 @@ RoutinesAfterFadeOut:
 
     jsr ResetNameTableAdresses
 
-    lda #0
-    sta GlobalScroll
-    sta TilesScroll
-    sta ScrollDirection
-
     ;------------------------------------------
     ;second villager exit
 @next10:
@@ -3100,7 +3074,6 @@ RoutinesAfterFadeOut:
     bne @next11
 
     lda #0
-    sta InVillagerHut
     sta LeftCollisionMapIdx
 
     lda #1
@@ -3115,8 +3088,6 @@ RoutinesAfterFadeOut:
     sta LeftCollisionColumnIndex
 
 
-    lda #0 ;hack
-    sta TilesScroll
     lda #1
     sta CurrentMapSegmentIndex
 
@@ -3140,11 +3111,9 @@ RoutinesAfterFadeOut:
     lda #2
     sta ScrollDirection
 
-
     jsr OnExitVillagerHut
     lda #1
     sta TilesScroll
-    sta MustCopyMainChr
 ;-------cave entrance
 @next11:
     lda ActiveMapEntryIndex
@@ -3169,8 +3138,6 @@ RoutinesAfterFadeOut:
 
     lda #0
     sta LeftCollisionMapIdx
-    sta GlobalScroll
-    sta TilesScroll
     sta TimesShiftedLeft
     sta TimesShiftedRight
 
@@ -3182,11 +3149,8 @@ RoutinesAfterFadeOut:
     cmp #11
     bne @next13
 
-
     lda #0
     sta CurrentMapSegmentIndex
-    sta GlobalScroll
-    sta TilesScroll
 
 ;cave from crashsite
 @next13:
@@ -3208,13 +3172,10 @@ RoutinesAfterFadeOut:
     lda #255
     sta LeftCollisionColumnIndex
 
-
     jsr ResetNameTableAdresses
 
     lda #0
     sta LeftCollisionMapIdx
-    sta GlobalScroll
-    sta TilesScroll
     sta TimesShiftedLeft
     sta TimesShiftedRight
 
@@ -3223,7 +3184,6 @@ RoutinesAfterFadeOut:
     lda ActiveMapEntryIndex
     cmp #13
     bne @next15
-
 
     lda #255
     sta LeftCollisionMapIdx
@@ -3239,9 +3199,6 @@ RoutinesAfterFadeOut:
     lda #255
     sta LeftCollisionColumnIndex
 
-
-    lda #0 ;hack
-    sta TilesScroll
     lda #1
     sta CurrentMapSegmentIndex
 
@@ -3281,8 +3238,6 @@ RoutinesAfterFadeOut:
 
     lda #0
     sta LeftCollisionMapIdx
-    sta GlobalScroll
-    sta TilesScroll
     sta TimesShiftedLeft
     sta TimesShiftedRight
 
@@ -3295,7 +3250,6 @@ RoutinesAfterFadeOut:
     lda #0
     sta TimesShiftedLeft
     sta TimesShiftedRight
-    sta TilesScroll
 
     lda #OUTDOORS_LOC1_SCREEN_COUNT - 1
     sta CurrentMapSegmentIndex
@@ -3310,7 +3264,7 @@ RoutinesAfterFadeOut:
     lda #3
     sta LeftCollisionColumnIndex
     jsr LoadLeftCollisionColumn
-
+;enter granny's house
 @next17:
     lda ActiveMapEntryIndex
     cmp #16
@@ -3327,12 +3281,57 @@ RoutinesAfterFadeOut:
 
     jsr ResetNameTableAdresses
 
+;exiting granny's house
+@next18:
+    lda ActiveMapEntryIndex
+    cmp #17
+    bne @next19
+
     lda #0
+    sta LeftCollisionMapIdx
+
+    lda #1
+    sta RightCollisonMapIdx
+
+    lda #0
+    sta TimesShiftedLeft
+    sta TimesShiftedRight
+    sta RightCollisionColumnIndex
+    jsr LoadRightCollisionColumn
+    lda #255
+    sta LeftCollisionColumnIndex
+
+
+    lda #1
+    sta CurrentMapSegmentIndex
+
+    ;TODO: rework this
+    jsr PushCollisionMapLeft
+    jsr PushCollisionMapLeft
+    jsr PushCollisionMapLeft
+    jsr PushCollisionMapLeft
+    jsr PushCollisionMapLeft
+    jsr PushCollisionMapLeft
+    jsr PushCollisionMapLeft
+   
+    lda #0
+    sta CurrentMapSegmentIndex
+
+    lda #57
     sta GlobalScroll
-    sta TilesScroll
+
+    lda #23
+    sta BgColumnIdxToUpload
+    lda #2
     sta ScrollDirection
 
-@next18:
+
+    jsr OnExitVillagerHut
+    lda #1
+    sta TilesScroll
+
+
+@next19:
 
     lda #1
     sta MustLoadSomething ; activate location loading in NMI
@@ -3416,10 +3415,17 @@ CommonLocationRoutine:
     lda (pointer2), y ; higher byte
     sta pointer + 1
     iny
-    lda (pointer2), y
+    lda (pointer2), y ; is the location indoors or outdoors
     bne @itsAnIndoorMap
     lda #1
     sta MustLoadOutside
+    lda InVillagerHut  ;let's check if we previously were inside a villager house
+    beq @loadMapptr
+    lda #0              ;so we're leaving the villager house
+    sta InVillagerHut
+    lda #1
+    sta MustCopyMainChr
+
     jmp @loadMapptr
 @itsAnIndoorMap:
     lda #1
@@ -3487,6 +3493,11 @@ CommonLocationRoutine:
 @loadNpcs:
     jsr LoadNpcs
 @skipLoadingNpcs:
+
+    lda #0
+    sta TilesScroll
+    sta GlobalScroll ; reset both scroll variables
+    sta ScrollDirection
 
 
     rts

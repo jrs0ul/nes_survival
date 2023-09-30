@@ -46,6 +46,8 @@ MapEntryPoints:
     .byte 8, 0, 0, 255, 0, 255, 0, 32
     ;granny's house
     .byte 8, 0, 118, 121, 150, 154, 104, 111
+    ;exit from grannys house
+    .byte 9, 0, 0, 255, 0, 255, 168, 255
 
 
 ;-----------------------------------------------------
@@ -120,6 +122,10 @@ MapSpawnPoint:
     ;granny's house
     .byte 100, 136, 9, 1, <House_items, >House_items, 0, <grannys_hut_collision, >grannys_hut_collision
     .byte 1, <grannys_hut, >grannys_hut, 0, <villager2_npcs, >villager2_npcs, 0
+    ;granny's house exit to the location 8
+    .byte 119, 115, 8, 2, <House_items, >House_items, 4, <babloc1_collision, >babloc1_collision
+    .byte 0, 0, 0, 2, 0, 0, 0
+
 
 
 
