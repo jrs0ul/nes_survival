@@ -3,6 +3,13 @@ LoadMenu:
     lda MustLoadMenu
     beq @exit
 
+
+    lda current_bank
+    cmp #1
+    beq @cont
+    ;uh-oh, wrong bank!
+    jmp @exit
+@cont:
     lda #$00
     sta $2000
     sta $2001
@@ -2647,98 +2654,6 @@ TwoTileLoop:
 
     rts
 
-;---------------------------------
-;skips a time interval 
-;specified by ParamTimeValue
-SkipTime:
-    lda Hours
-    clc
-    adc ParamTimeValue
-    sta Hours
-    bcs @increaseDays
-    cmp #HOURS_MAX
-    bcs @increaseDays
-    jmp @exit
-
-@increaseDays:
-    lda Hours
-    sec
-    sbc #HOURS_MAX
-    sta Hours
-    jsr IncreaseDays
-    jsr ResetTimesWhenItemsWerePicked
-    jsr RotFood
-
-@exit:
-    rts
-
-
-;---------------------------------
-;pointer - storage or inventory
-RotFood:
-
-    ldy #0
-@loop:
-    sty TempInventoryItemIndex
-    tya
-    asl ; y * 2
-    tay
-
-    lda (pointer), y
-    beq @nextItem       ;if empty
-
-    cmp #ITEM_RAW_MEAT
-    beq @setRaw
-    cmp #ITEM_RAW_JUMBO_MEAT
-    beq @setRaw
-    cmp #ITEM_RAW_FISH
-    beq @setRaw
-    jmp @checkCooked
-
-@setRaw:
-    lda #ROT_AMOUNT_RAW_MEAT
-    sta RotAmount
-    jmp @rot
-
-@checkCooked:
-    cmp #ITEM_COOKED_MEAT
-    beq @setCooked
-    cmp #ITEM_COOKED_JUMBO_MEAT
-    beq @setCooked
-    cmp #ITEM_COOKED_FISH
-    beq @setCooked
-
-    jmp @nextItem
-
-@setCooked:
-    lda #ROT_AMOUNT_COOKED_MEAT
-    sta RotAmount
-@rot:
-    iny
-    lda (pointer), y
-    cmp RotAmount
-    bcc @turnToPoop
-    beq @turnToPoop
-
-    sec
-    sbc RotAmount
-    sta (pointer), y
-    jmp @nextItem
-
-
-@turnToPoop:
-    dey
-    lda #ITEM_POOP
-    sta (pointer), y
-
-    
-@nextItem:
-    ldy TempInventoryItemIndex ; stored item index
-    iny
-    cpy #INVENTORY_MAX_ITEMS
-    bcc @loop
-
-    rts
 ;----------------------------------
 
 .segment "CODE"
@@ -2750,6 +2665,8 @@ ExitMenuState:
     lda #0
     sta SubMenuActivated
     sta SubMenuIndex
+    sta MustLoadMenu
+
     lda OldInventoryPointerY
     sta InventoryPointerY
 
@@ -2797,7 +2714,7 @@ ExitMenuState:
 @exit:
     ldx LocationIndex
     ldy LocationBanks, x
-    bankswitch
+    jsr bankswitch_y
 
     rts
 ;-------------------------------------

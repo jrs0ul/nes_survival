@@ -50,6 +50,7 @@ MapEntryPoints:
     .byte 9, 0, 0, 255, 0, 255, 168, 255
 
 
+.segment "ROM0"
 ;-----------------------------------------------------
 ;The data of the new location the player has entered 
 ;---------------------------------------
@@ -128,7 +129,7 @@ MapSpawnPoint:
 
 
 
-
+.segment "RODATA"
 
 LocationScreenCountList:
     .byte OUTDOORS_LOC1_SCREEN_COUNT ; 0
@@ -144,16 +145,16 @@ LocationScreenCountList:
 
 ;which location in which bank
 LocationBanks:
-    .byte 0
-    .byte 4
-    .byte 0
-    .byte 0
-    .byte 0
-    .byte 0
-    .byte 4
-    .byte 4
-    .byte 4
-    .byte 0
+    .byte 0  ;0
+    .byte 4  ;1
+    .byte 0  ;2
+    .byte 0  ;3
+    .byte 0  ;4
+    .byte 0  ;5
+    .byte 4  ;6
+    .byte 4  ;7
+    .byte 4  ;8
+    .byte 0  ;10
 
 
 ;indexes in Item_Location1_Collection_times

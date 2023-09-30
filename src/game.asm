@@ -687,8 +687,14 @@ ActiveMapEntryIndex:
 FlickerFrame: ;variable for alternating sprite update routines to achieve flickerine
     .res 1
 
+LocationBankNo:
+    .res 1
+
+TestBank: ; DELETE ME
+    .res 1
+
 ZPBuffer:
-    .res 118  ; I want to be aware of the free memory
+    .res 116  ; I want to be aware of the free memory
 
 ;--------------
 .segment "BSS" ; variables in ram
@@ -3340,6 +3346,9 @@ RoutinesAfterFadeOut:
 ;------------------------------
 CommonLocationRoutine:
 
+    ldy #0 ;switch to bank where the MapSpawnPoint is
+    jsr bankswitch_y
+
     lda #NUM_OF_BUNNIES_BEFORE_DOG
     sta DogCounter
     lda #0
@@ -3399,13 +3408,7 @@ CommonLocationRoutine:
 
     iny
     lda (pointer2), y ;rom bank for the location
-    cmp current_bank
-    beq @continue
-
-    sty TempY
-    tay
-    jsr bankswitch_y
-    ldy TempY
+    sta LocationBankNo
 
 @continue:
     iny
@@ -3440,6 +3443,12 @@ CommonLocationRoutine:
 ;---
 @loadCollision:
     sty TempY ; preserve y
+    lda LocationBankNo
+    cmp current_bank
+    beq @continueLoad
+    tay
+    jsr bankswitch_y ; let's switch to the location's bank
+@continueLoad:
     ldy #0
 @collisionLoop:
     lda (pointer), y ; pointer points to the collision data
@@ -3447,6 +3456,8 @@ CommonLocationRoutine:
     iny
     cpy #COLLISION_MAP_SIZE
     bne @collisionLoop
+    ldy #0
+    jsr bankswitch_y ; switch back to bank 0
     ldy TempY
 ;---
     iny
@@ -3494,6 +3505,9 @@ CommonLocationRoutine:
     jsr LoadNpcs
 @skipLoadingNpcs:
 
+    ldy LocationBankNo
+    jsr bankswitch_y
+
     lda #0
     sta TilesScroll
     sta GlobalScroll ; reset both scroll variables
@@ -3523,10 +3537,6 @@ OnExitVillagerHut:
 
 ;------------------------------
 DoFoodSpoilage:
-    ldy current_bank
-    sty oldbank
-    ldy #1          ;RotFood is in the "menu" bank
-    jsr bankswitch_y
 
     lda #<Inventory
     sta pointer
@@ -3540,8 +3550,97 @@ DoFoodSpoilage:
     sta pointer + 1
     jsr RotFood
 
-    ldy oldbank
-    jsr bankswitch_y
+    rts
+;---------------------------------
+;skips a time interval 
+;specified by ParamTimeValue
+SkipTime:
+    lda Hours
+    clc
+    adc ParamTimeValue
+    sta Hours
+    bcs @increaseDays
+    cmp #HOURS_MAX
+    bcs @increaseDays
+    jmp @exit
+
+@increaseDays:
+    lda Hours
+    sec
+    sbc #HOURS_MAX
+    sta Hours
+    jsr IncreaseDays
+    jsr ResetTimesWhenItemsWerePicked
+    jsr DoFoodSpoilage
+
+@exit:
+    rts
+
+
+;---------------------------------
+;pointer - storage or inventory
+RotFood:
+
+    ldy #0
+@loop:
+    sty TempInventoryItemIndex
+    tya
+    asl ; y * 2
+    tay
+
+    lda (pointer), y
+    beq @nextItem       ;if empty
+
+    cmp #ITEM_RAW_MEAT
+    beq @setRaw
+    cmp #ITEM_RAW_JUMBO_MEAT
+    beq @setRaw
+    cmp #ITEM_RAW_FISH
+    beq @setRaw
+    jmp @checkCooked
+
+@setRaw:
+    lda #ROT_AMOUNT_RAW_MEAT
+    sta RotAmount
+    jmp @rot
+
+@checkCooked:
+    cmp #ITEM_COOKED_MEAT
+    beq @setCooked
+    cmp #ITEM_COOKED_JUMBO_MEAT
+    beq @setCooked
+    cmp #ITEM_COOKED_FISH
+    beq @setCooked
+
+    jmp @nextItem
+
+@setCooked:
+    lda #ROT_AMOUNT_COOKED_MEAT
+    sta RotAmount
+@rot:
+    iny
+    lda (pointer), y
+    cmp RotAmount
+    bcc @turnToPoop
+    beq @turnToPoop
+
+    sec
+    sbc RotAmount
+    sta (pointer), y
+    jmp @nextItem
+
+
+@turnToPoop:
+    dey
+    lda #ITEM_POOP
+    sta (pointer), y
+
+    
+@nextItem:
+    ldy TempInventoryItemIndex ; stored item index
+    iny
+    cpy #INVENTORY_MAX_ITEMS
+    bcc @loop
 
     rts
 
@@ -3553,7 +3652,6 @@ RunTime:
     cmp #MINUTES_MAX
     bcc @exit
 
-    
     lda #0
     sta Minutes
     inc Hours
@@ -4967,12 +5065,13 @@ CheckStartButton:
     jmp @exit
 @enterMenuScreen:
 
+    ldy #1
+    jsr bankswitch_y ; switch bank first
+    lda current_bank
+    sta TestBank
     lda #1
     sta MustLoadMenu
     sta MustLoadSomething
-    ldy #1
-    jsr bankswitch_y
-
 
 @exit:
     rts

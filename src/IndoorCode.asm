@@ -1,5 +1,6 @@
 .segment "ROM3"
 
+
 DoSleep:
     lda #SLEEP_POS_X
     sta PlayerY
@@ -12,6 +13,7 @@ DoSleep:
 
     lda #SLEEP_TIME
     sta ParamTimeValue
+
     jsr SkipTime
 
 @decreaseHp:
