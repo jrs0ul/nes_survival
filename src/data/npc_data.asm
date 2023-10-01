@@ -5,3 +5,4 @@ npc_data:
     .byte 138, 3, 17, 2, 255, 0, 0, 0      ;villager-bear
     .byte $7A, 2, 9,  1, 4,   3, 0 ,0      ;canid
     .byte 80, 3, 17, 2, 255, 0, 0, 0       ;villager-hedgehog
+    .byte 106, 2, 2, 2, 255, 0, 0, 0       ;villager-granny

@@ -8,6 +8,10 @@ LoadMenu:
     cmp #1
     beq @cont
     ;uh-oh, wrong bank!
+    ;probably the NMI switched back to previous bank
+    lda #0
+    sta MustLoadMenu
+    sta MustLoadSomething
     jmp @exit
 @cont:
     lda #$00

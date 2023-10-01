@@ -122,7 +122,7 @@ MapSpawnPoint:
     .byte 0, 0, 0, 3, 0, 0, 3
     ;granny's house
     .byte 100, 136, 9, 1, <House_items, >House_items, 0, <grannys_hut_collision, >grannys_hut_collision
-    .byte 1, <grannys_hut, >grannys_hut, 0, <villager2_npcs, >villager2_npcs, 0
+    .byte 1, <grannys_hut, >grannys_hut, 0, <villager3_npcs, >villager3_npcs, 0
     ;granny's house exit to the location 8
     .byte 119, 115, 8, 2, <House_items, >House_items, 4, <babloc1_collision, >babloc1_collision
     .byte 0, 0, 0, 2, 0, 0, 0

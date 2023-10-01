@@ -1,3 +1,5 @@
+;note npc type: 6 bits, state: 2 bits
+
 House_npcs:
     .byte 0
 
@@ -8,6 +10,11 @@ Hut_npcs:
 villager2_npcs:
     .byte 1
     .byte %00010001, 104, 94, 0, 100
+
+villager3_npcs:
+    .byte 1
+    .byte %00010101, 104, 94, 0, 100
+
 
 cave_npcs:
     .byte 6
