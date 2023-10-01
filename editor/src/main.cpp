@@ -65,6 +65,8 @@ const unsigned BUTTON_PALETTE_1 = 15;
 const unsigned BUTTON_PALETTE_2 = 16;
 const unsigned BUTTON_PALETTE_3 = 17;
 
+const unsigned BUTTON_SHOW_GRID = 2;
+
 const unsigned TILE_BUTTONS_ORIGIN_X = 300;
 
 
@@ -97,6 +99,7 @@ bool SHOW_COLISSION= true;
 bool SELECT_COLISSION= false;
 bool SHOW_ATTRIBUTES = true;
 bool SELECT_ATTRIBUTES = false;
+bool SHOW_GRID = true;
 
 
 unsigned char GlobalKey;
@@ -182,6 +185,7 @@ void DrawPanel(){
 
     sprintf ( buf,"tilex:%d tiley:%d ",tilex, tiley );
     DrawText ( 10,10,buf,pics,0, 0.7f );
+    DrawText (130, 92, "Grid", pics, 0, 0.7f);
 
     if ( SHOW_LEV1 )
     {
@@ -201,11 +205,11 @@ void DrawPanel(){
         mygtai[1].draw ( pics, 2, 4 );
     }
 
-    /*
-    if ( SHOW_LEV3 )
-        mygtai[2].draw ( pics,5,5 );
+    
+    if ( SHOW_GRID )
+        mygtai[BUTTON_SHOW_GRID].draw ( pics, 2, 5 );
     else
-        mygtai[2].draw ( pics,5,4 );*/
+        mygtai[BUTTON_SHOW_GRID].draw ( pics, 2, 4 );
 
     if ( SHOW_COLISSION )
     {
@@ -319,6 +323,60 @@ void DrawPanel(){
 
 }
 
+//---------------------------------------------
+
+void DrawGrid2D(Map& GMap, int shiftX, int shiftY){
+
+         int count = 0;
+
+         float * vertices = 0;
+
+
+         vertices = new float[(GMap.width() + 1) * 4 + (GMap.height() + 1) * 4];
+
+         glBindTexture(GL_TEXTURE_2D, 0);
+
+         for (unsigned i = 0; i < GMap.width() + 1; i++){
+
+            vertices[i * 4    ] = i * GMap.tileWidth() - shiftX;
+            vertices[i * 4 + 1] = -shiftY;
+
+            vertices[i * 4 + 2] = i * GMap.tileWidth() - shiftX;
+            vertices[i * 4 + 3] = GMap.height() * GMap.tileWidth() - shiftY;
+
+            count ++;
+         }
+
+         for (unsigned i = 0; i < GMap.height() + 1; i++){
+
+            int index = (GMap.width() + 1) * 4 + i * 4;
+            vertices[index] = -shiftX;
+            vertices[index + 1] = i * GMap.tileWidth() - shiftY;
+
+            vertices[index + 2] = GMap.width() * GMap.tileWidth() - shiftX;
+            vertices[index + 3] = i * GMap.tileWidth() - shiftY;
+
+            count ++;
+
+
+         }
+
+
+         glLoadIdentity();
+         glEnableClientState(GL_VERTEX_ARRAY);
+
+         glVertexPointer(2, GL_FLOAT, 0, vertices);
+
+         glDrawArrays(GL_LINES, 0, count*2 );
+
+         glDisableClientState(GL_VERTEX_ARRAY);
+
+         delete []vertices;
+
+    }
+
+
+
 //-----------------------------------------------------------
 
 static void RenderScreen ( void ){
@@ -339,14 +397,13 @@ static void RenderScreen ( void ){
                 unsigned index = map.getAttribute(i, a);
                 //printf("%u %u: index %u\n", i,a,index);
                 assert(index < 4);
-                
+
                 DrawBlock (pics, (int)(map.getMapPos().x()) - 16 + i * 32,
                             (int)(map.getMapPos().z()) - 16 + a * 32, 
                             64, 64,
                             tempAttributeColors[index],
                             tempAttributeColors[index]
                             );
-                
             }
         }
 
@@ -356,21 +413,33 @@ static void RenderScreen ( void ){
     if ( SHOW_COLISSION )
     {
         for (unsigned a = 0; a < map.height(); a++ )
+        {
             for (unsigned i = 0; i < map.width(); i++ )
+            {
                 if ( map.colide ( i,a ) )
+                {
                     DrawBlock (pics, (int)(map.getMapPos().x())-16+i*32,
                                 (int)(map.getMapPos().z())-16+a*32, 
                                 32, 32,
                                 COLOR(1.0f, 0, 0, 0.5f),
                                 COLOR(1.0f, 0, 0, 0.5f)
                                 );
+                }
+            }
+        }
     }
 
-    
+
+    if (SHOW_GRID)
+    {
+        pics.drawBatch(0, 0, 666);  //  draw sprite batch
+
+        DrawGrid2D(map, -1 * (int)map.getMapPos().x() + 16, -1 * (int)map.getMapPos().z() + 16);
+    }
 
     DrawPanel();
-    pics.draw ( 3, Cross.x(),Cross.z() );
 
+    pics.draw ( 3, Cross.x(),Cross.z() );
 
 
     pics.drawBatch(0, 0, 666);
@@ -384,9 +453,6 @@ static void RenderScreen ( void ){
 
     SDL_GL_SwapBuffers( );
 }
-
-
-
 
 
 
@@ -537,6 +603,12 @@ void CheckKeys()
                 SHOW_LEV1 = !SHOW_LEV1;
             }
 
+            if ( ( mygtai[BUTTON_SHOW_GRID].pointerOntop ( (int)Cross.x(), (int)Cross.z() ) ) )
+            {
+                SHOW_GRID = !SHOW_GRID;
+            }
+
+
             if ( ( mygtai[11].pointerOntop ( (int)Cross.x(), (int)Cross.z() ) ) )
             {
                 SHOW_COLISSION = !SHOW_COLISSION;
@@ -677,7 +749,7 @@ int main ( int argc, char* argv[] )
 
     mygtai[0].init ( 10,20,32,32 );
     mygtai[1].init ( 46,20,32,32 );
-    mygtai[2].init ( 82,20,32,32 );
+    mygtai[BUTTON_SHOW_GRID].init ( 130,55,32,32 );
     mygtai[BUTTON_SHOW_COLLISION].init ( 82,20,32,32 );
     mygtai[13].init ( 154,20,32,32 );
 

@@ -50,6 +50,7 @@ public:
     void            destroy();
     bool            colide(unsigned long x,unsigned long y);
     Vector3D        getMapPos(){return mappos;}
+    unsigned int    tileWidth(){return tilesize;}
     unsigned int    getAttribute(unsigned long x, unsigned long y);
     void            move(Vector3D dir, float d);
     unsigned char   tile(unsigned long x, unsigned long y);
