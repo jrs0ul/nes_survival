@@ -41,7 +41,7 @@ public:
         }
     unsigned long   width(){return _width;}
     unsigned long   height(){return _height;}
-    bool            load(const char* tilesPath, const char* collisionPath);
+    bool            load(const char* tilesPath);
     void            draw(PicsContainer &pics,
                          int layer, int screenh,
                          int screenw, 
@@ -57,7 +57,7 @@ public:
     void            setTile(unsigned long x, unsigned long y, unsigned char val);
     void            setCollision(unsigned long x, unsigned long y, bool val);
     void            setAttribute(unsigned long x, unsigned long y, unsigned value);
-    void            save(const char* tilePath, const char* collisionPath);
+    void            save(const char* tilePath);
 };
 
 
