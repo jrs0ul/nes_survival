@@ -4,8 +4,16 @@ CanPlayerGo:
     lda PlayerX
     clc
     adc #PLAYER_COLLISION_LINE_X1
-    adc TilesScroll
+    adc GlobalScroll
     sta TempPointX
+    bcs @increment
+    lda #0
+    sta ScreenAddition
+    jmp @cont
+@increment:
+    lda #1
+    sta ScreenAddition
+@cont:
 
     lda PlayerY
     clc
@@ -18,8 +26,16 @@ CanPlayerGo:
     lda PlayerX
     clc
     adc #PLAYER_COLLISION_LINE_X2
-    adc TilesScroll
+    adc GlobalScroll
     sta TempPointX
+    bcs @increment2
+    lda #0
+    sta ScreenAddition
+    jmp @cont2
+@increment2:
+    lda #1
+    sta ScreenAddition
+@cont2:
 
     jsr TestPointAgainstCollisionMap
     bne @collides
@@ -38,8 +54,16 @@ CanPlayerGoWithOldY:
     lda PlayerX
     clc
     adc #PLAYER_COLLISION_LINE_X1
-    adc TilesScroll
+    adc GlobalScroll
     sta TempPointX
+    bcs @increment
+    lda #0
+    sta ScreenAddition
+    jmp @cont
+@increment:
+    lda #1
+    sta ScreenAddition
+@cont:
 
     lda OldPlayerY
     clc
@@ -52,8 +76,16 @@ CanPlayerGoWithOldY:
     lda PlayerX
     clc
     adc #PLAYER_COLLISION_LINE_X2
-    adc TilesScroll
+    adc GlobalScroll
     sta TempPointX
+    bcs @increment2
+    lda #0
+    sta ScreenAddition
+    jmp @cont2
+@increment2:
+    lda #1
+    sta ScreenAddition
+@cont2:
 
     jsr TestPointAgainstCollisionMap
     bne @collides
@@ -72,9 +104,16 @@ CanPlayerGoWithOldX:
     lda OldPlayerX
     clc
     adc #PLAYER_COLLISION_LINE_X1
-    adc OldTileScroll
+    adc OldGlobalScroll
     sta TempPointX
-
+    bcs @increment
+    lda #0
+    sta ScreenAddition
+    jmp @cont
+@increment:
+    lda #1
+    sta ScreenAddition
+@cont:
     lda PlayerY
     clc
     adc #PLAYER_COLLISION_LINE_Y1
@@ -86,8 +125,16 @@ CanPlayerGoWithOldX:
     lda OldPlayerX
     clc
     adc #PLAYER_COLLISION_LINE_X2
-    adc OldTileScroll
+    adc OldGlobalScroll
     sta TempPointX
+    bcs @increment2
+    lda #0
+    sta ScreenAddition
+    jmp @cont2
+@increment2:
+    lda #1
+    sta ScreenAddition
+@cont2:
 
     jsr TestPointAgainstCollisionMap
     bne @collides
@@ -104,13 +151,14 @@ CanPlayerGoWithOldX:
 ;----------------------------------
 ;Set TempPointX and TempPointY as point to be tested
 ;sets A=1 if point collides
+;screenAddition contains 1 or 0
 TestPointAgainstCollisionMap:
 
     lda TempPointX
     lsr
     lsr
     lsr
-    sta TempX
+    sta CollisionX
 
 
     lda TempPointY
@@ -119,7 +167,7 @@ TestPointAgainstCollisionMap:
     lsr
     lsr
     lsr
-    sta TempY
+    sta CollisionY
 
 
     lda LocationIndex
@@ -127,6 +175,7 @@ TestPointAgainstCollisionMap:
     asl
     clc
     adc CurrentMapSegmentIndex
+    adc ScreenAddition
     tay
 
     lda map_list_low, y
@@ -135,7 +184,7 @@ TestPointAgainstCollisionMap:
     sta pointer + 1
 
 @calcaddress:
-    ldy TempY
+    ldy CollisionY
     beq @skip
 @addressLoop:
 
@@ -151,7 +200,7 @@ TestPointAgainstCollisionMap:
     dey
     bne @addressLoop
 @skip:
-    lda TempX
+    lda CollisionX
     tay
 
 

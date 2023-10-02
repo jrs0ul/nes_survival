@@ -651,7 +651,7 @@ FlickerFrame: ;variable for alternating sprite update routines to achieve flicke
 LocationBankNo:
     .res 1
 
-TestBank: ; DELETE ME
+ScreenAddition:
     .res 1
 
 ZPBuffer:
@@ -702,12 +702,6 @@ RightCollisonMapIdx:
     .res 1
 
 
-
-
-TilesScroll:
-    .res 1
-OldTileScroll:
-    .res 1
 ScrollDirection:
     .res 1
 OldScrollDirection:
@@ -1249,6 +1243,10 @@ Destructables:
 AttribHighAddress:
     .res 1
 SourceMapIdx:
+    .res 1
+CollisionX:
+    .res 1
+CollisionY:
     .res 1
 
 Buffer:
@@ -2957,8 +2955,6 @@ RoutinesAfterFadeOut:
     lda #3
     sta CurrentMapSegmentIndex
 
-    lda #7
-    sta TilesScroll
     lda #103
     sta GlobalScroll
 
@@ -3023,8 +3019,6 @@ RoutinesAfterFadeOut:
     sta ScrollDirection
 
     jsr OnExitVillagerHut
-    lda #1
-    sta TilesScroll
 ;-------cave entrance
 @next11:
     lda ActiveMapEntryIndex
@@ -3218,8 +3212,6 @@ RoutinesAfterFadeOut:
 
 
     jsr OnExitVillagerHut
-    lda #1
-    sta TilesScroll
 
 
 @next19:
@@ -3375,7 +3367,6 @@ CommonLocationRoutine:
     jsr bankswitch_y
 
     lda #0
-    sta TilesScroll
     sta GlobalScroll ; reset both scroll variables
     sta ScrollDirection
 
@@ -3925,9 +3916,6 @@ BackupMovement:
     lda GlobalScroll
     sta OldGlobalScroll
 
-    lda TilesScroll
-    sta OldTileScroll
-
     lda ScrollDirection
     sta OldScrollDirection
 
@@ -3978,8 +3966,6 @@ ResetPlayerXMovement:
     sta PlayerX
     lda OldGlobalScroll
     sta GlobalScroll
-    lda OldTileScroll
-    sta TilesScroll
     lda OldScrollDirection
     sta ScrollDirection
     lda #0
@@ -4456,7 +4442,6 @@ ResetEntityVariables:
     sta FadeIdx
     sta PaletteFadeTimer
     sta GlobalScroll
-    sta TilesScroll
     sta TimesShiftedLeft
     sta TimesShiftedRight
     sta BaseMenuIndex
@@ -4844,8 +4829,6 @@ CheckStartButton:
 
     ldy #1
     jsr bankswitch_y ; switch bank first
-    lda current_bank
-    sta TestBank
     lda #1
     sta MustLoadMenu
     sta MustLoadSomething
@@ -5607,11 +5590,6 @@ CheckLeft:
     lda CurrentMapSegmentIndex ; CurrentMapSegment < 1 -> do not scroll
     beq @firstScreen
 
-
-    lda TilesScroll
-    sec
-    sbc PlayerSpeed
-    sta TilesScroll
 ;--
 @ScrollGlobalyLeft:
     lda GlobalScroll
@@ -5635,12 +5613,6 @@ CheckLeft:
 
     lda GlobalScroll
     beq @moveLeft
-
-
-    lda TilesScroll
-    sec
-    sbc PlayerSpeed
-    sta TilesScroll
 
 
     lda GlobalScroll
@@ -5703,12 +5675,6 @@ CheckRight:
     cmp ScreenCount
     beq @moveRight
 
-;--
-    lda TilesScroll
-    clc
-    adc PlayerSpeed
-    sta TilesScroll
-;--
 
     lda GlobalScroll
     cmp #MAX_V_SCROLL
