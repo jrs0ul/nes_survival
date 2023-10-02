@@ -34,7 +34,6 @@ main_tiles_chr: .incbin "main.chr"
 .include "data/maps/field_bg4.asm"
 
 
-.include "data/collision_data.asm"
 
 ;===========================================================
 .segment "ROM1"
@@ -67,7 +66,6 @@ main_tiles_chr2: .incbin "main.chr"
 
 .include "data/maps/field2_bg.asm"
 .include "data/maps/field2_bg1.asm"
-.include "data/collision_data2.asm"
 .include "data/maps/cave1.asm"
 .include "data/maps/cave2.asm"
 .include "data/maps/crashsite.asm"
@@ -105,7 +103,6 @@ banktable:              ; Write to this table to switch banks.
     .byte $07, $08, $09, $0A, $0B, $0C, $0D, $0E
 
 .include "data/map_list.asm"
-.include "data/collision_list.asm"
 
 .include "data/item_data.asm"
 .include "data/npc_data.asm"
@@ -129,39 +126,6 @@ zerosprite:
     .byte $70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70
     .byte $70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70
 
-x_collision_pattern:
-    .byte %10000000
-    .byte %01000000
-    .byte %00100000
-    .byte %00010000
-    .byte %00001000
-    .byte %00000100
-    .byte %00000010
-    .byte %00000001
-    .byte %10000000
-    .byte %01000000
-    .byte %00100000
-    .byte %00010000
-    .byte %00001000
-    .byte %00000100
-    .byte %00000010
-    .byte %00000001
-    .byte %10000000
-    .byte %01000000
-    .byte %00100000
-    .byte %00010000
-    .byte %00001000
-    .byte %00000100
-    .byte %00000010
-    .byte %00000001
-    .byte %10000000
-    .byte %01000000
-    .byte %00100000
-    .byte %00010000
-    .byte %00001000
-    .byte %00000100
-    .byte %00000010
-    .byte %00000001
 
 stamina_sprite_lookup:
     .byte 168
@@ -406,7 +370,6 @@ player_sprites_flip:
     STAMINA_DELAY              = 2
     NPC_ELIMINATION_DELAY      = 200
 
-    COLLISION_MAP_SIZE         = 120 ; 4 columns * 30 rows
     COLLISION_MAP_COLUMN_COUNT = 4
     COLLISION_MAP_COLUMN_SIZE  = 8
 
@@ -595,8 +558,6 @@ pointer2:
     .res 2
 PalettePtr:
     .res 2
-collisionMapPtr:
-    .res 2
 AnimalSpawnPointsPtr:
     .res 2
 ProjectilePtr:
@@ -694,7 +655,7 @@ TestBank: ; DELETE ME
     .res 1
 
 ZPBuffer:
-    .res 116  ; I want to be aware of the free memory
+    .res 118  ; I want to be aware of the free memory
 
 ;--------------
 .segment "BSS" ; variables in ram
@@ -907,9 +868,6 @@ VillagerIndex:
 ActiveVillagerQuests:
     .res MAX_VILLAGERS
 
-
-CollisionMap:
-    .res COLLISION_MAP_SIZE
 
 ScrollCollisionColumnRight:  ;column of data from next collision screen
     .res SCREEN_ROW_COUNT
@@ -1294,7 +1252,7 @@ SourceMapIdx:
     .res 1
 
 Buffer:
-    .res 398  ;must see how much is still available
+    .res 518  ;must see how much is still available
 
 ;====================================================================================
 
@@ -2872,32 +2830,7 @@ RoutinesAfterFadeOut:
     bne @next3
 
     lda #0
-    sta TimesShiftedLeft
-    sta TimesShiftedRight
-    sta LeftCollisionMapIdx
-    lda #3
-    sta LeftCollisionColumnIndex
-    jsr LoadLeftCollisionColumn
-    lda #2
-    sta RightCollisonMapIdx
-    lda #0
-    sta RightCollisionColumnIndex
-    jsr LoadRightCollisionColumn
-
-
-    lda #0
     sta CurrentMapSegmentIndex
-
-    ;TODO: rework this
-    jsr PushCollisionMapRight
-    jsr PushCollisionMapRight
-    jsr PushCollisionMapRight
-    jsr PushCollisionMapRight
-    jsr PushCollisionMapRight
-    jsr PushCollisionMapRight
-    jsr PushCollisionMapRight
-    jsr PushCollisionMapRight
-    jsr PushCollisionMapRight
 
     lda #$B8 ;hack
     sta GlobalScroll
@@ -2920,7 +2853,6 @@ RoutinesAfterFadeOut:
     sta RightCollisonMapIdx
     lda #0      ;load the first column
     sta RightCollisionColumnIndex
-    jsr LoadRightCollisionColumn
     lda #255
     sta LeftCollisionColumnIndex
 
@@ -2943,7 +2875,6 @@ RoutinesAfterFadeOut:
     sta RightCollisonMapIdx
     lda #0      ;load the first column
     sta RightCollisionColumnIndex
-    jsr LoadRightCollisionColumn
     lda #255
     sta LeftCollisionColumnIndex
 
@@ -2990,7 +2921,6 @@ RoutinesAfterFadeOut:
     sta LeftCollisionMapIdx
     lda #3
     sta LeftCollisionColumnIndex
-    jsr LoadLeftCollisionColumn
     ;------------------------------------------------
     ;Outside of player's house
 @next7:
@@ -3019,28 +2949,13 @@ RoutinesAfterFadeOut:
     sta LeftCollisionMapIdx
     lda #3
     sta LeftCollisionColumnIndex
-    jsr LoadLeftCollisionColumn
     lda #2
     sta RightCollisonMapIdx
     lda #0
     sta RightCollisionColumnIndex
-    jsr LoadRightCollisionColumn
 
     lda #3
     sta CurrentMapSegmentIndex
-
-    jsr PushCollisionMapLeft
-    jsr PushCollisionMapLeft
-    jsr PushCollisionMapLeft
-    jsr PushCollisionMapLeft
-    jsr PushCollisionMapLeft
-    jsr PushCollisionMapLeft
-    jsr PushCollisionMapLeft
-    jsr PushCollisionMapLeft
-    jsr PushCollisionMapLeft
-    jsr PushCollisionMapLeft
-    jsr PushCollisionMapLeft
-    jsr PushCollisionMapLeft
 
     lda #7
     sta TilesScroll
@@ -3089,22 +3004,12 @@ RoutinesAfterFadeOut:
     sta TimesShiftedLeft
     sta TimesShiftedRight
     sta RightCollisionColumnIndex
-    jsr LoadRightCollisionColumn
     lda #255
     sta LeftCollisionColumnIndex
 
 
     lda #1
     sta CurrentMapSegmentIndex
-
-    ;TODO: rework this
-    jsr PushCollisionMapLeft
-    jsr PushCollisionMapLeft
-    jsr PushCollisionMapLeft
-    jsr PushCollisionMapLeft
-    jsr PushCollisionMapLeft
-    jsr PushCollisionMapLeft
-    jsr PushCollisionMapLeft
 
     lda #0
     sta CurrentMapSegmentIndex
@@ -3135,7 +3040,6 @@ RoutinesAfterFadeOut:
     sta RightCollisonMapIdx
     lda #0
     sta RightCollisionColumnIndex
-    jsr LoadRightCollisionColumn
     lda #255
     sta LeftCollisionColumnIndex
 
@@ -3174,7 +3078,6 @@ RoutinesAfterFadeOut:
     sta RightCollisonMapIdx
     lda #0      ;load the first column
     sta RightCollisionColumnIndex
-    jsr LoadRightCollisionColumn
     lda #255
     sta LeftCollisionColumnIndex
 
@@ -3201,17 +3104,11 @@ RoutinesAfterFadeOut:
     sta TimesShiftedLeft
     sta TimesShiftedRight
     sta RightCollisionColumnIndex
-    jsr LoadRightCollisionColumn
     lda #255
     sta LeftCollisionColumnIndex
 
     lda #1
     sta CurrentMapSegmentIndex
-
-    ;TODO: rework this
-    jsr PushCollisionMapLeft
-    jsr PushCollisionMapLeft
-    jsr PushCollisionMapLeft
 
     lda #0
     sta CurrentMapSegmentIndex
@@ -3235,7 +3132,6 @@ RoutinesAfterFadeOut:
 
     lda #1
     sta RightCollisonMapIdx
-    jsr LoadRightCollisionColumn
     lda #255
     sta LeftCollisionColumnIndex
 
@@ -3269,7 +3165,6 @@ RoutinesAfterFadeOut:
     sta LeftCollisionMapIdx
     lda #3
     sta LeftCollisionColumnIndex
-    jsr LoadLeftCollisionColumn
 ;enter granny's house
 @next17:
     lda ActiveMapEntryIndex
@@ -3303,7 +3198,6 @@ RoutinesAfterFadeOut:
     sta TimesShiftedLeft
     sta TimesShiftedRight
     sta RightCollisionColumnIndex
-    jsr LoadRightCollisionColumn
     lda #255
     sta LeftCollisionColumnIndex
 
@@ -3311,15 +3205,6 @@ RoutinesAfterFadeOut:
     lda #1
     sta CurrentMapSegmentIndex
 
-    ;TODO: rework this
-    jsr PushCollisionMapLeft
-    jsr PushCollisionMapLeft
-    jsr PushCollisionMapLeft
-    jsr PushCollisionMapLeft
-    jsr PushCollisionMapLeft
-    jsr PushCollisionMapLeft
-    jsr PushCollisionMapLeft
-   
     lda #0
     sta CurrentMapSegmentIndex
 
@@ -3440,25 +3325,6 @@ CommonLocationRoutine:
     iny
     lda (pointer2), y ;indoor map address (higher byte)
     sta MapPtr + 1
-;---
-@loadCollision:
-    sty TempY ; preserve y
-    lda LocationBankNo
-    cmp current_bank
-    beq @continueLoad
-    tay
-    jsr bankswitch_y ; let's switch to the location's bank
-@continueLoad:
-    ldy #0
-@collisionLoop:
-    lda (pointer), y ; pointer points to the collision data
-    sta CollisionMap, y
-    iny
-    cpy #COLLISION_MAP_SIZE
-    bne @collisionLoop
-    ldy #0
-    jsr bankswitch_y ; switch back to bank 0
-    ldy TempY
 ;---
     iny
 
@@ -4036,75 +3902,15 @@ HandleInput:
 
 @contInput:
     jsr SwitchScreenIdxIfNeeded
-    jsr PushCollisionMapIfNeeded
-
 
 @finishInput:
     lda Buttons
     sta OldButtons
 
     jsr CalcMapColumnToUpdate
-    jsr UpdateDestructableTilesCollision
 
     lda #INPUT_DELAY
     sta InputUpdateDelay
-    rts
-
-;Erase collision bits if tiles are destroyed
-;--------------------------------
-UpdateDestructableTilesCollision:
-
-    lda GlobalScroll ;this will limit destructable tiles to the very first screen
-    bne @exit
-
-    ldy #2
-@loop:
-    dey
-    bmi @exit
-    lda Destructables, y
-    beq @loop
-
-    tya
-    asl
-    asl
-    asl
-    tax
-    lda destructable_tiles_list, x
-    cmp LocationIndex
-    bne @loop
-
-
-    inx
-    inx
-    inx
-
-    lda destructable_tiles_list, x ; y
-    sta TempY
-
-
-    inx
-    lda destructable_tiles_list, x ; x
-    tax
-    lda x_collision_pattern, x
-    eor #%11111111 ; invert byte
-    sta Temp
-    txa 
-    lsr
-    lsr
-    lsr ; divide x by 8 again
-    clc
-    adc TempY
-    adc TempY
-    adc TempY
-    adc TempY
-    tax
-    lda CollisionMap, x
-    and Temp
-    sta CollisionMap, x
-
-    jmp @loop
-
-@exit:
     rts
 
 ;--------------------------------
@@ -4183,34 +3989,6 @@ ResetPlayerXMovement:
     rts
 
 
-;--------------------------------
-PushCollisionMapIfNeeded:
-
-    lda DirectionX
-    cmp #2
-    bne @checkAnother
-
-    lda TilesScroll
-    cmp #MAX_TILE_SCROLL_RIGHT
-    bcc @checkAnother
-    cmp #240
-    bcs @checkAnother
-    jsr PushCollisionMapLeft
-    jmp @finishInput
-@checkAnother:
-    lda DirectionX
-    cmp #1
-    bne @finishInput
-
-    lda TilesScroll
-    cmp #10
-    bcc @finishInput
-    cmp #MAX_TILE_SCROLL_LEFT + 1
-    bcs @finishInput
-    jsr PushCollisionMapRight
-@finishInput:
-
-    rts
 ;--------------------------------
 CalcMapColumnToUpdate:
 
@@ -4960,7 +4738,6 @@ StartGame:
     jsr GenerateNpcs
 
     ldx #0
-    jsr LoadCollisionMap
     jsr initZeroSprite
     lda #STATE_GAME
     sta GameState
@@ -5075,31 +4852,6 @@ CheckStartButton:
 
 @exit:
     rts
-;--------------------------------------
-LoadCollisionMap:
-@copyCollisionMapLoop:
-
-    lda LocationIndex
-    beq @location0
-    lda bg2_collision, x
-    jmp @start
-@location0:
-    lda bg_collision, x
-@start:
-    sta CollisionMap, x
-    inx
-    cpx #COLLISION_MAP_SIZE
-    bne @copyCollisionMapLoop
-
-    lda #0      ;load the first column
-    sta RightCollisionColumnIndex
-    jsr LoadRightCollisionColumn
-    lda #255;-1
-    sta LeftCollisionColumnIndex
-
-
-    rts
-
 
 ;--------------------------------------
 
