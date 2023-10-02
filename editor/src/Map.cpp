@@ -148,7 +148,7 @@ bool Map::load(const char* tilesPath){
         for (unsigned a = 0; a < _width; a++)
         {
 
-            colision[i][a] = tiles[i][a] > 128;
+            colision[i][a] = tiles[i][a] >= 128;
 
         }
     }
