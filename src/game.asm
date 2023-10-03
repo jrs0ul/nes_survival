@@ -370,8 +370,6 @@ player_sprites_flip:
     STAMINA_DELAY              = 2
     NPC_ELIMINATION_DELAY      = 200
 
-    COLLISION_MAP_COLUMN_COUNT = 4
-    COLLISION_MAP_COLUMN_SIZE  = 8
 
     PLAYER_COLLISION_LINE_X1    = 3
     PLAYER_COLLISION_LINE_X2    = 13 ;16 - 3
@@ -696,11 +694,6 @@ FirstNametableAddr: ; will store adresses in ram they will be filpped
 SecondNametableAddr:
     .res 1
 
-LeftCollisionMapIdx:
-    .res 1
-RightCollisonMapIdx:
-    .res 1
-
 
 ScrollDirection:
     .res 1
@@ -861,23 +854,6 @@ VillagerIndex:
 
 ActiveVillagerQuests:
     .res MAX_VILLAGERS
-
-
-ScrollCollisionColumnRight:  ;column of data from next collision screen
-    .res SCREEN_ROW_COUNT
-ScrollCollisionColumnLeft:
-    .res SCREEN_ROW_COUNT
-
-
-LeftCollisionColumnIndex:
-    .res 1
-RightCollisionColumnIndex:
-    .res 1
-
-TimesShiftedLeft:
-    .res 1
-TimesShiftedRight:
-    .res 1
 
 
 MustSleepAfterFadeOut:
@@ -1250,7 +1226,7 @@ CollisionY:
     .res 1
 
 Buffer:
-    .res 518  ;must see how much is still available
+    .res 584  ;must see how much is still available
 
 ;====================================================================================
 
@@ -1361,10 +1337,6 @@ vblankwait2:      ; Second wait for vblank, PPU is ready after this
     lda #$24
     sta SecondNametableAddr
 
-    lda #1
-    sta RightCollisonMapIdx
-    lda #0
-    sta LeftCollisionMapIdx
 
     lda #128
     sta RandomNumber
@@ -2847,17 +2819,6 @@ RoutinesAfterFadeOut:
     lda #0
     sta CurrentMapSegmentIndex
 
-    lda #1
-    sta RightCollisonMapIdx
-    lda #0      ;load the first column
-    sta RightCollisionColumnIndex
-    lda #255
-    sta LeftCollisionColumnIndex
-
-    lda #0
-    sta LeftCollisionMapIdx
-    sta TimesShiftedLeft
-    sta TimesShiftedRight
     ;--------------------------------------------
     ;Third location
 @next4:
@@ -2869,19 +2830,8 @@ RoutinesAfterFadeOut:
     lda #0
     sta CurrentMapSegmentIndex
 
-    lda #1
-    sta RightCollisonMapIdx
-    lda #0      ;load the first column
-    sta RightCollisionColumnIndex
-    lda #255
-    sta LeftCollisionColumnIndex
-
     jsr ResetNameTableAdresses
 
-    lda #0
-    sta LeftCollisionMapIdx
-    sta TimesShiftedLeft
-    sta TimesShiftedRight
     ;-----------------------------------------
     ;entered player's house
 @next5:
@@ -2903,22 +2853,9 @@ RoutinesAfterFadeOut:
     cmp #4
     bne @next7
 
-    lda #0
-    sta TimesShiftedLeft
-    sta TimesShiftedRight
-
     lda #OUTDOORS_LOC1_SCREEN_COUNT - 1
     sta CurrentMapSegmentIndex
 
-    lda #4
-    sta RightCollisonMapIdx
-    lda #0
-    sta RightCollisionColumnIndex
-
-    lda #2
-    sta LeftCollisionMapIdx
-    lda #3
-    sta LeftCollisionColumnIndex
     ;------------------------------------------------
     ;Outside of player's house
 @next7:
@@ -2940,20 +2877,6 @@ RoutinesAfterFadeOut:
     lda ActiveMapEntryIndex
     cmp #5
     bne @next9
-
-    lda #0
-    sta TimesShiftedLeft
-    sta TimesShiftedRight
-    sta LeftCollisionMapIdx
-    lda #3
-    sta LeftCollisionColumnIndex
-    lda #2
-    sta RightCollisonMapIdx
-    lda #0
-    sta RightCollisionColumnIndex
-
-    lda #3
-    sta CurrentMapSegmentIndex
 
     lda #103
     sta GlobalScroll
@@ -2991,23 +2914,6 @@ RoutinesAfterFadeOut:
     bne @next11
 
     lda #0
-    sta LeftCollisionMapIdx
-
-    lda #1
-    sta RightCollisonMapIdx
-
-    lda #0      ;load the first column
-    sta TimesShiftedLeft
-    sta TimesShiftedRight
-    sta RightCollisionColumnIndex
-    lda #255
-    sta LeftCollisionColumnIndex
-
-
-    lda #1
-    sta CurrentMapSegmentIndex
-
-    lda #0
     sta CurrentMapSegmentIndex
 
     lda #57
@@ -3030,20 +2936,7 @@ RoutinesAfterFadeOut:
     lda #0
     sta CurrentMapSegmentIndex
 
-    lda #1
-    sta RightCollisonMapIdx
-    lda #0
-    sta RightCollisionColumnIndex
-    lda #255
-    sta LeftCollisionColumnIndex
-
-
     jsr ResetNameTableAdresses
-
-    lda #0
-    sta LeftCollisionMapIdx
-    sta TimesShiftedLeft
-    sta TimesShiftedRight
 
 ;crashsite from cave
 
@@ -3068,41 +2961,14 @@ RoutinesAfterFadeOut:
     lda #0
     sta CurrentMapSegmentIndex
 
-    lda #1
-    sta RightCollisonMapIdx
-    lda #0      ;load the first column
-    sta RightCollisionColumnIndex
-    lda #255
-    sta LeftCollisionColumnIndex
 
     jsr ResetNameTableAdresses
-
-    lda #0
-    sta LeftCollisionMapIdx
-    sta TimesShiftedLeft
-    sta TimesShiftedRight
 
 ;location 2 from cave
 @next14:
     lda ActiveMapEntryIndex
     cmp #13
     bne @next15
-
-    lda #255
-    sta LeftCollisionMapIdx
-
-    lda #1
-    sta RightCollisonMapIdx
-
-    lda #0      ;load the first column
-    sta TimesShiftedLeft
-    sta TimesShiftedRight
-    sta RightCollisionColumnIndex
-    lda #255
-    sta LeftCollisionColumnIndex
-
-    lda #1
-    sta CurrentMapSegmentIndex
 
     lda #0
     sta CurrentMapSegmentIndex
@@ -3122,43 +2988,18 @@ RoutinesAfterFadeOut:
 
     lda #0
     sta CurrentMapSegmentIndex
-    sta RightCollisionColumnIndex
-
-    lda #1
-    sta RightCollisonMapIdx
-    lda #255
-    sta LeftCollisionColumnIndex
-
 
     jsr ResetNameTableAdresses
-
-    lda #0
-    sta LeftCollisionMapIdx
-    sta TimesShiftedLeft
-    sta TimesShiftedRight
 
 ;from granny's location to map
 @next16:
     lda ActiveMapEntryIndex
     cmp #15
     bne @next17
-
-    lda #0
-    sta TimesShiftedLeft
-    sta TimesShiftedRight
-
     lda #OUTDOORS_LOC1_SCREEN_COUNT - 1
     sta CurrentMapSegmentIndex
 
-    lda #4
-    sta RightCollisonMapIdx
-    lda #0
-    sta RightCollisionColumnIndex
 
-    lda #2
-    sta LeftCollisionMapIdx
-    lda #3
-    sta LeftCollisionColumnIndex
 ;enter granny's house
 @next17:
     lda ActiveMapEntryIndex
@@ -3182,30 +3023,14 @@ RoutinesAfterFadeOut:
     cmp #17
     bne @next19
 
-    lda #0
-    sta LeftCollisionMapIdx
-
-    lda #1
-    sta RightCollisonMapIdx
-
-    lda #0
-    sta TimesShiftedLeft
-    sta TimesShiftedRight
-    sta RightCollisionColumnIndex
-    lda #255
-    sta LeftCollisionColumnIndex
-
-
-    lda #1
-    sta CurrentMapSegmentIndex
 
     lda #0
     sta CurrentMapSegmentIndex
 
-    lda #57
+    lda #154
     sta GlobalScroll
 
-    lda #23
+    lda #3
     sta BgColumnIdxToUpload
     lda #2
     sta ScrollDirection
@@ -4442,8 +4267,6 @@ ResetEntityVariables:
     sta FadeIdx
     sta PaletteFadeTimer
     sta GlobalScroll
-    sta TimesShiftedLeft
-    sta TimesShiftedRight
     sta BaseMenuIndex
     sta InHouse
     sta InCave
@@ -4481,11 +4304,6 @@ ResetEntityVariables:
     lda #$24
     sta SecondNametableAddr
     sta DestScreenAddr
-
-    lda #1
-    sta RightCollisonMapIdx
-    lda #0
-    sta LeftCollisionMapIdx
 
     lda #255
     sta CurrentPaletteDecrementValue

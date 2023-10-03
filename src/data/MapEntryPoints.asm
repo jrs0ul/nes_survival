@@ -19,35 +19,35 @@ MapEntryPoints:
     ;Second location entry point
     .byte 0, OUTDOORS_LOC1_SCREEN_COUNT - 1, 0, 255, 0, 255, 0, 32
     ;Third location entry point
-    .byte 0, 1, 0, 255, 0, 255, 225, 255
+    .byte 0, 1, 0, 255, 0, 255, 222, 255
     ;Exit point of second location
     .byte 1, 0, 0, 255, 0, 255, 230, 255
     ;Exit point of third location
     .byte 2, 0, 0, 255, 0, 255, 0,   32
-    ;Bear's house exit
-    .byte 3, 0, 0, 255, 0, 255, 168, 255
+    ;Bjorn's house exit
+    .byte 3, 0, 0, 255, 0, 255, 152, 255
     ;Player's house exit
-    .byte 4, 0, 0, 255, 0, 255, 168, 255
+    .byte 4, 0, 0, 255, 0, 255, 160, 255
     ;Second villager's house
     .byte 2, 0, 118, 121, 48, 66, 136, 142
     ;Second villager house's exit
-    .byte 5, 0, 0, 255, 0, 255, 168, 255
+    .byte 5, 0, 0, 255, 0, 255, 152, 255
     ;cave entrance from location 2
     .byte 1, 0, 118, 121, 20, 30, 40, 50
     ;crashsite entrance from cave
     .byte 6, 0, 0, 255, 0, 255, 0, 32
     ;crashsite exit to cave
-    .byte 7, 0, 0, 255, 0, 255, 230, 255
+    .byte 7, 0, 0, 255, 0, 255, 222, 255
     ;cave exit to second location
-    .byte 6, 0, 0, 255, 0, 255, 230, 255
+    .byte 6, 0, 0, 255, 0, 255, 222, 255
     ;location to the south of the bear's location
-    .byte 0, OUTDOORS_LOC1_SCREEN_COUNT - 1, 0, 255, 0, 255, 225, 255
+    .byte 0, OUTDOORS_LOC1_SCREEN_COUNT - 1, 0, 255, 0, 255, 222, 255
     ;exit from granny's location to the main one
     .byte 8, 0, 0, 255, 0, 255, 0, 32
     ;granny's house
-    .byte 8, 0, 118, 121, 150, 154, 104, 111
+    .byte 8, 0, 118, 121, 150, 155, 104, 111
     ;exit from grannys house
-    .byte 9, 0, 0, 255, 0, 255, 168, 255
+    .byte 9, 0, 0, 255, 0, 255, 151, 255
 
 
 .segment "ROM0"
@@ -115,16 +115,16 @@ MapSpawnPoint:
     .byte 120, 63, 1, OUTDOORS_LOC2_SCREEN_COUNT, <Outside2_items, >Outside2_items, 4, 0, 0
     .byte 0, 0, 0, 3, 0, 0, 0
     ;granny location
-    .byte 100, 100, 8, 2, <House_items, >House_items, 4,  0, 0
+    .byte 77, 42, 8, 2, <House_items, >House_items, 4,  0, 0
     .byte 0, 0, 0, 2, 0, 0, 0
-    ;exit from granny's to main
-    .byte 100, 200, 0, OUTDOORS_LOC1_SCREEN_COUNT,<Outside1_items, >Outside1_items, 0, 0, 0
+    ;exit from granny's location to main
+    .byte 127, 205, 0, OUTDOORS_LOC1_SCREEN_COUNT,<Outside1_items, >Outside1_items, 0, 0, 0
     .byte 0, 0, 0, 3, 0, 0, 3
     ;granny's house
-    .byte 100, 136, 9, 1, <House_items, >House_items, 0, 0, 0
+    .byte 123, 148, 9, 1, <House_items, >House_items, 0, 0, 0
     .byte 1, <grannys_hut, >grannys_hut, 0, <villager3_npcs, >villager3_npcs, 0
     ;granny's house exit to the location 8
-    .byte 119, 115, 8, 2, <House_items, >House_items, 4, 0, 0
+    .byte 119, 126, 8, 2, <House_items, >House_items, 4, 0, 0
     .byte 0, 0, 0, 2, 0, 0, 0
 
 
