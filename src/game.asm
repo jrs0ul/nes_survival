@@ -377,6 +377,8 @@ player_sprites_flip:
     PLAYER_WIDTH                = 16
     PLAYER_STAMINA_SIZE         = 128
 
+    STAMINA_TILE                = $1A
+
     MAX_TILE_SCROLL_LEFT       = 248; -8
     MAX_TILE_SCROLL_RIGHT      = 8
 
@@ -3922,7 +3924,7 @@ UpdateStatusDigits:
 
     lda Stamina
     beq @fail1
-    lda #$F1
+    lda #STAMINA_TILE
     sta $2007
     jmp @segment2
 
@@ -3935,7 +3937,7 @@ UpdateStatusDigits:
     lda Stamina
     cmp #32
     bcc @fail2
-    lda #$F1
+    lda #STAMINA_TILE
     sta $2007
     jmp @segment3
 
@@ -3948,7 +3950,7 @@ UpdateStatusDigits:
     cmp #64
     bcc @fail3
 
-    lda #$F1
+    lda #STAMINA_TILE
     sta $2007
     jmp @segment4
 
@@ -3959,7 +3961,7 @@ UpdateStatusDigits:
     lda Stamina
     cmp #96
     bcc @fail4
-    lda #$F1
+    lda #STAMINA_TILE
     sta $2007
     jmp @Hp
 
