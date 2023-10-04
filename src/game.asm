@@ -651,7 +651,7 @@ FlickerFrame: ;variable for alternating sprite update routines to achieve flicke
 LocationBankNo:
     .res 1
 
-ScreenAddition:
+TempScreen:
     .res 1
 
 ZPBuffer:

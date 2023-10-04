@@ -7,12 +7,14 @@ CanPlayerGo:
     adc GlobalScroll
     sta TempPointX
     bcs @increment
-    lda #0
-    sta ScreenAddition
+    lda CurrentMapSegmentIndex
+    sta TempScreen
     jmp @cont
 @increment:
-    lda #1
-    sta ScreenAddition
+    lda CurrentMapSegmentIndex
+    clc
+    adc #1
+    sta TempScreen
 @cont:
 
     lda PlayerY
@@ -29,12 +31,14 @@ CanPlayerGo:
     adc GlobalScroll
     sta TempPointX
     bcs @increment2
-    lda #0
-    sta ScreenAddition
+    lda CurrentMapSegmentIndex
+    sta TempScreen
     jmp @cont2
 @increment2:
-    lda #1
-    sta ScreenAddition
+    lda CurrentMapSegmentIndex
+    clc
+    adc #1
+    sta TempScreen
 @cont2:
 
     jsr TestPointAgainstCollisionMap
@@ -57,12 +61,14 @@ CanPlayerGoWithOldY:
     adc GlobalScroll
     sta TempPointX
     bcs @increment
-    lda #0
-    sta ScreenAddition
+    lda CurrentMapSegmentIndex
+    sta TempScreen
     jmp @cont
 @increment:
-    lda #1
-    sta ScreenAddition
+    lda CurrentMapSegmentIndex
+    clc
+    adc #1
+    sta TempScreen
 @cont:
 
     lda OldPlayerY
@@ -79,12 +85,14 @@ CanPlayerGoWithOldY:
     adc GlobalScroll
     sta TempPointX
     bcs @increment2
-    lda #0
-    sta ScreenAddition
+    lda CurrentMapSegmentIndex
+    sta TempScreen
     jmp @cont2
 @increment2:
-    lda #1
-    sta ScreenAddition
+    lda CurrentMapSegmentIndex
+    clc
+    adc #1
+    sta TempScreen
 @cont2:
 
     jsr TestPointAgainstCollisionMap
@@ -107,12 +115,14 @@ CanPlayerGoWithOldX:
     adc OldGlobalScroll
     sta TempPointX
     bcs @increment
-    lda #0
-    sta ScreenAddition
+    lda CurrentMapSegmentIndex
+    sta TempScreen
     jmp @cont
 @increment:
-    lda #1
-    sta ScreenAddition
+    lda CurrentMapSegmentIndex
+    clc
+    adc #1
+    sta TempScreen
 @cont:
     lda PlayerY
     clc
@@ -128,12 +138,14 @@ CanPlayerGoWithOldX:
     adc OldGlobalScroll
     sta TempPointX
     bcs @increment2
-    lda #0
-    sta ScreenAddition
+    lda CurrentMapSegmentIndex
+    sta TempScreen
     jmp @cont2
 @increment2:
-    lda #1
-    sta ScreenAddition
+    lda CurrentMapSegmentIndex
+    clc
+    adc #1
+    sta TempScreen
 @cont2:
 
     jsr TestPointAgainstCollisionMap
@@ -150,8 +162,8 @@ CanPlayerGoWithOldX:
 
 ;----------------------------------
 ;Set TempPointX and TempPointY as point to be tested
+;Set TempScreen as screen of your entity
 ;sets A=1 if point collides
-;screenAddition contains 1 or 0
 TestPointAgainstCollisionMap:
 
     lda TempPointX
@@ -174,8 +186,7 @@ TestPointAgainstCollisionMap:
     asl
     asl
     clc
-    adc CurrentMapSegmentIndex
-    adc ScreenAddition
+    adc TempScreen
     tay
 
     lda map_list_low, y
