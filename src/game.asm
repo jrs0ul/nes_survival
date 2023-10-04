@@ -115,6 +115,12 @@ banktable:              ; Write to this table to switch banks.
 .include "data/MapEntryPoints.asm"
 .include "data/AnimalSpawnPositions.asm"
 
+row_table_screens:
+    .byte 0
+    .byte 60
+    .byte 120
+    .byte 180
+
 
 zerosprite:
     .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
@@ -347,6 +353,8 @@ player_sprites_flip:
 
 
     NUM_OF_BUNNIES_BEFORE_DOG  = 3
+
+    ROW_TABLE_SIZE             = 240
 
 
 
@@ -1227,8 +1235,14 @@ CollisionX:
 CollisionY:
     .res 1
 
+MapRowAddressTable:
+    .res ROW_TABLE_SIZE
+
+TempRowIndex:
+    .res 1
+
 Buffer:
-    .res 584  ;must see how much is still available
+    .res 343  ;must see how much is still available
 
 ;====================================================================================
 
@@ -3196,6 +3210,8 @@ CommonLocationRoutine:
     lda #0
     sta GlobalScroll ; reset both scroll variables
     sta ScrollDirection
+
+    jsr BuildRowTable
 
 
     rts

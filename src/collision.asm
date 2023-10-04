@@ -166,53 +166,32 @@ CanPlayerGoWithOldX:
 ;sets A=1 if point collides
 TestPointAgainstCollisionMap:
 
-    lda TempPointX
-    lsr
-    lsr
-    lsr
-    sta CollisionX
-
-
     lda TempPointY
     clc
     adc #8
     lsr
     lsr
-    lsr
-    sta CollisionY
+    lsr ; y / 8
 
+    asl  ;row * 2
 
-    lda LocationIndex
-    asl
-    asl
+    ldy TempScreen
     clc
-    adc TempScreen
+    adc row_table_screens, y
     tay
 
-    lda map_list_low, y
+    ;load map row address from ram
+    lda MapRowAddressTable, y 
     sta pointer
-    lda map_list_high, y
+    iny
+    lda MapRowAddressTable, y
     sta pointer + 1
 
-@calcaddress:
-    ldy CollisionY
-    beq @skip
-@addressLoop:
-
-    lda pointer
-    clc
-    adc #32
-    sta pointer
-    bcs @incrementUpper
-    jmp @nextRow
-@incrementUpper:
-    inc pointer + 1
-@nextRow:
-    dey
-    bne @addressLoop
-@skip:
-    lda CollisionX
-    tay
+    lda TempPointX
+    lsr
+    lsr
+    lsr
+    tay ;put X/8 to register y
 
 
     lda (pointer), y
@@ -227,4 +206,56 @@ TestPointAgainstCollisionMap:
 
 @exit_collision_check:
     rts
+;-----------------------------
+;Fill ram table with map row addresses
+BuildRowTable:
 
+    lda LocationIndex
+    asl
+    asl
+    tay
+
+    lda map_list_low, y
+    sta pointer
+    lda map_list_high, y
+    sta pointer + 1
+
+
+    lda #0
+    sta TempRowIndex
+@rowLoop: ; Loop through all 30 rows of the map screen
+
+    ldx TempRowIndex
+    beq @skipcalculation
+
+@addressLoop:
+
+    lda pointer
+    clc
+    adc #32
+    sta pointer
+    bcs @incrementUpper
+    jmp @nextRow
+@incrementUpper:
+    inc pointer + 1
+@nextRow:
+    dex
+    bne @addressLoop
+
+@skipcalculation:
+
+    lda TempRowIndex
+    asl
+    tay
+    lda pointer
+    sta MapRowAddressTable, y
+    iny
+    lda pointer + 1
+    sta MapRowAddressTable, y
+
+    inc TempRowIndex
+    lda TempRowIndex
+    cmp #SCREEN_ROW_COUNT
+    bcc @rowLoop
+
+    rts
