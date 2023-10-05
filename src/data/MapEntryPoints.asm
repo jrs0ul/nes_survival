@@ -17,13 +17,13 @@ MapEntryPoints:
     ;Bear's house entrance
     .byte 1, 0, 118, 122, 177, 190, $68, $6F
     ;Second location entry point
-    .byte 0, OUTDOORS_LOC1_SCREEN_COUNT - 1, 0, 255, 0, 255, 0, 32
+    .byte 0, OUTDOORS_LOC1_SCREEN_COUNT - 1, 0, 255, 0, 255, 0, 22
     ;Third location entry point
     .byte 0, 1, 0, 255, 0, 255, 222, 255
     ;Exit point of second location
     .byte 1, 0, 0, 255, 0, 255, 230, 255
     ;Exit point of third location
-    .byte 2, 0, 0, 255, 0, 255, 0,   32
+    .byte 2, 0, 0, 255, 0, 255, 0,   20
     ;Bjorn's house exit
     .byte 3, 0, 0, 255, 0, 255, 152, 255
     ;Player's house exit
@@ -60,7 +60,7 @@ MapEntryPoints:
 ;ScreenCount,
 ;ItemListLow,
 ;ItemListHigh
-;collision data bank
+;location bank number
 ;<UNUSED>
 ;<UNUSED>
 ;isInterrriorMap?

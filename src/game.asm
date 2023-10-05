@@ -1009,8 +1009,6 @@ CutsceneSprite2Y:
 CutsceneSpriteAnimFrame:
     .res 1
 
-CarrySet:
-    .res 1
 
 KilledNpcScreenIdx:
     .res 1
@@ -1228,10 +1226,6 @@ AttribHighAddress:
     .res 1
 SourceMapIdx:
     .res 1
-CollisionX:
-    .res 1
-CollisionY:
-    .res 1
 
 MapRowAddressTable:
     .res ROW_TABLE_SIZE
@@ -1240,7 +1234,7 @@ TempRowIndex:
     .res 1
 
 Buffer:
-    .res 343  ;must see how much is still available
+    .res 346  ;must see how much is still available
 
 ;====================================================================================
 
@@ -3126,13 +3120,11 @@ CommonLocationRoutine:
     lda (pointer2), y ;rom bank for the location
     sta LocationBankNo
 
-@continue:
+;@continue:
     iny
-    lda (pointer2), y ;lower address byte of the collision data
-    sta pointer
+    lda (pointer2), y ;
     iny
-    lda (pointer2), y ; higher byte
-    sta pointer + 1
+    lda (pointer2), y ;
     iny
     lda (pointer2), y ; is the location indoors or outdoors
     bne @itsAnIndoorMap
