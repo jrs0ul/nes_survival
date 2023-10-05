@@ -34,7 +34,6 @@ main_tiles_chr: .incbin "main.chr"
 .include "data/maps/field_bg4.asm"
 
 
-.include "data/collision_data.asm"
 
 ;===========================================================
 .segment "ROM1"
@@ -67,7 +66,6 @@ main_tiles_chr2: .incbin "main.chr"
 
 .include "data/maps/field2_bg.asm"
 .include "data/maps/field2_bg1.asm"
-.include "data/collision_data2.asm"
 .include "data/maps/cave1.asm"
 .include "data/maps/cave2.asm"
 .include "data/maps/crashsite.asm"
@@ -105,7 +103,6 @@ banktable:              ; Write to this table to switch banks.
     .byte $07, $08, $09, $0A, $0B, $0C, $0D, $0E
 
 .include "data/map_list.asm"
-.include "data/collision_list.asm"
 
 .include "data/item_data.asm"
 .include "data/npc_data.asm"
@@ -118,6 +115,13 @@ banktable:              ; Write to this table to switch banks.
 .include "data/MapEntryPoints.asm"
 .include "data/AnimalSpawnPositions.asm"
 
+;collision lookup table positions
+row_table_screens:
+    .byte 0
+    .byte 60
+    .byte 120
+    .byte 180
+
 
 zerosprite:
     .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
@@ -129,39 +133,6 @@ zerosprite:
     .byte $70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70
     .byte $70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70
 
-x_collision_pattern:
-    .byte %10000000
-    .byte %01000000
-    .byte %00100000
-    .byte %00010000
-    .byte %00001000
-    .byte %00000100
-    .byte %00000010
-    .byte %00000001
-    .byte %10000000
-    .byte %01000000
-    .byte %00100000
-    .byte %00010000
-    .byte %00001000
-    .byte %00000100
-    .byte %00000010
-    .byte %00000001
-    .byte %10000000
-    .byte %01000000
-    .byte %00100000
-    .byte %00010000
-    .byte %00001000
-    .byte %00000100
-    .byte %00000010
-    .byte %00000001
-    .byte %10000000
-    .byte %01000000
-    .byte %00100000
-    .byte %00010000
-    .byte %00001000
-    .byte %00000100
-    .byte %00000010
-    .byte %00000001
 
 stamina_sprite_lookup:
     .byte 168
@@ -260,9 +231,6 @@ fist_collision_pos:
 destructable_tiles_list:
     .byte 6, $20, $87, 4, 7, 0, 0, 0
     .byte 6, $20, $88, 4, 8, 0, 0, 0
-
-
-
 
 
 
@@ -384,6 +352,10 @@ player_sprites_flip:
 
     NUM_OF_BUNNIES_BEFORE_DOG  = 3
 
+    ROW_TABLE_SIZE             = 240
+
+
+    DESTRUCTED_TILE_VALUE      = $14
 
 
     INTRO_SCENE_MAX            = 7
@@ -406,15 +378,14 @@ player_sprites_flip:
     STAMINA_DELAY              = 2
     NPC_ELIMINATION_DELAY      = 200
 
-    COLLISION_MAP_SIZE         = 120 ; 4 columns * 30 rows
-    COLLISION_MAP_COLUMN_COUNT = 4
-    COLLISION_MAP_COLUMN_SIZE  = 8
 
     PLAYER_COLLISION_LINE_X1    = 3
     PLAYER_COLLISION_LINE_X2    = 13 ;16 - 3
     PLAYER_COLLISION_LINE_Y1    = 8
     PLAYER_WIDTH                = 16
     PLAYER_STAMINA_SIZE         = 128
+
+    STAMINA_TILE                = $1A
 
     MAX_TILE_SCROLL_LEFT       = 248; -8
     MAX_TILE_SCROLL_RIGHT      = 8
@@ -595,8 +566,6 @@ pointer2:
     .res 2
 PalettePtr:
     .res 2
-collisionMapPtr:
-    .res 2
 AnimalSpawnPointsPtr:
     .res 2
 ProjectilePtr:
@@ -690,11 +659,11 @@ FlickerFrame: ;variable for alternating sprite update routines to achieve flicke
 LocationBankNo:
     .res 1
 
-TestBank: ; DELETE ME
+TempScreen:
     .res 1
 
 ZPBuffer:
-    .res 116  ; I want to be aware of the free memory
+    .res 118  ; I want to be aware of the free memory
 
 ;--------------
 .segment "BSS" ; variables in ram
@@ -735,18 +704,7 @@ FirstNametableAddr: ; will store adresses in ram they will be filpped
 SecondNametableAddr:
     .res 1
 
-LeftCollisionMapIdx:
-    .res 1
-RightCollisonMapIdx:
-    .res 1
 
-
-
-
-TilesScroll:
-    .res 1
-OldTileScroll:
-    .res 1
 ScrollDirection:
     .res 1
 OldScrollDirection:
@@ -908,26 +866,6 @@ ActiveVillagerQuests:
     .res MAX_VILLAGERS
 
 
-CollisionMap:
-    .res COLLISION_MAP_SIZE
-
-ScrollCollisionColumnRight:  ;column of data from next collision screen
-    .res SCREEN_ROW_COUNT
-ScrollCollisionColumnLeft:
-    .res SCREEN_ROW_COUNT
-
-
-LeftCollisionColumnIndex:
-    .res 1
-RightCollisionColumnIndex:
-    .res 1
-
-TimesShiftedLeft:
-    .res 1
-TimesShiftedRight:
-    .res 1
-
-
 MustSleepAfterFadeOut:
     .res 1
 MustUpdateTextBaloon:
@@ -1073,8 +1011,6 @@ CutsceneSprite2Y:
 CutsceneSpriteAnimFrame:
     .res 1
 
-CarrySet:
-    .res 1
 
 KilledNpcScreenIdx:
     .res 1
@@ -1293,8 +1229,23 @@ AttribHighAddress:
 SourceMapIdx:
     .res 1
 
+MapRowAddressTable:
+    .res ROW_TABLE_SIZE
+
+TempRowIndex:
+    .res 1
+
+TempCollisionVar:
+    .res 1
+
+DestroyedTilesCount:
+    .res 1
+
+destructableIdx:
+    .res 1
+
 Buffer:
-    .res 398  ;must see how much is still available
+    .res 343  ;must see how much is still available
 
 ;====================================================================================
 
@@ -1405,10 +1356,6 @@ vblankwait2:      ; Second wait for vblank, PPU is ready after this
     lda #$24
     sta SecondNametableAddr
 
-    lda #1
-    sta RightCollisonMapIdx
-    lda #0
-    sta LeftCollisionMapIdx
 
     lda #128
     sta RandomNumber
@@ -1903,7 +1850,7 @@ UpdateDestructableTiles:
     lda destructable_tiles_list, x
     sta $2006
 
-    lda #$EF
+    lda #DESTRUCTED_TILE_VALUE
     sta $2007
 
 
@@ -2872,32 +2819,7 @@ RoutinesAfterFadeOut:
     bne @next3
 
     lda #0
-    sta TimesShiftedLeft
-    sta TimesShiftedRight
-    sta LeftCollisionMapIdx
-    lda #3
-    sta LeftCollisionColumnIndex
-    jsr LoadLeftCollisionColumn
-    lda #2
-    sta RightCollisonMapIdx
-    lda #0
-    sta RightCollisionColumnIndex
-    jsr LoadRightCollisionColumn
-
-
-    lda #0
     sta CurrentMapSegmentIndex
-
-    ;TODO: rework this
-    jsr PushCollisionMapRight
-    jsr PushCollisionMapRight
-    jsr PushCollisionMapRight
-    jsr PushCollisionMapRight
-    jsr PushCollisionMapRight
-    jsr PushCollisionMapRight
-    jsr PushCollisionMapRight
-    jsr PushCollisionMapRight
-    jsr PushCollisionMapRight
 
     lda #$B8 ;hack
     sta GlobalScroll
@@ -2916,18 +2838,6 @@ RoutinesAfterFadeOut:
     lda #0
     sta CurrentMapSegmentIndex
 
-    lda #1
-    sta RightCollisonMapIdx
-    lda #0      ;load the first column
-    sta RightCollisionColumnIndex
-    jsr LoadRightCollisionColumn
-    lda #255
-    sta LeftCollisionColumnIndex
-
-    lda #0
-    sta LeftCollisionMapIdx
-    sta TimesShiftedLeft
-    sta TimesShiftedRight
     ;--------------------------------------------
     ;Third location
 @next4:
@@ -2939,20 +2849,8 @@ RoutinesAfterFadeOut:
     lda #0
     sta CurrentMapSegmentIndex
 
-    lda #1
-    sta RightCollisonMapIdx
-    lda #0      ;load the first column
-    sta RightCollisionColumnIndex
-    jsr LoadRightCollisionColumn
-    lda #255
-    sta LeftCollisionColumnIndex
-
     jsr ResetNameTableAdresses
 
-    lda #0
-    sta LeftCollisionMapIdx
-    sta TimesShiftedLeft
-    sta TimesShiftedRight
     ;-----------------------------------------
     ;entered player's house
 @next5:
@@ -2974,23 +2872,9 @@ RoutinesAfterFadeOut:
     cmp #4
     bne @next7
 
-    lda #0
-    sta TimesShiftedLeft
-    sta TimesShiftedRight
-
     lda #OUTDOORS_LOC1_SCREEN_COUNT - 1
     sta CurrentMapSegmentIndex
 
-    lda #4
-    sta RightCollisonMapIdx
-    lda #0
-    sta RightCollisionColumnIndex
-
-    lda #2
-    sta LeftCollisionMapIdx
-    lda #3
-    sta LeftCollisionColumnIndex
-    jsr LoadLeftCollisionColumn
     ;------------------------------------------------
     ;Outside of player's house
 @next7:
@@ -3013,37 +2897,6 @@ RoutinesAfterFadeOut:
     cmp #5
     bne @next9
 
-    lda #0
-    sta TimesShiftedLeft
-    sta TimesShiftedRight
-    sta LeftCollisionMapIdx
-    lda #3
-    sta LeftCollisionColumnIndex
-    jsr LoadLeftCollisionColumn
-    lda #2
-    sta RightCollisonMapIdx
-    lda #0
-    sta RightCollisionColumnIndex
-    jsr LoadRightCollisionColumn
-
-    lda #3
-    sta CurrentMapSegmentIndex
-
-    jsr PushCollisionMapLeft
-    jsr PushCollisionMapLeft
-    jsr PushCollisionMapLeft
-    jsr PushCollisionMapLeft
-    jsr PushCollisionMapLeft
-    jsr PushCollisionMapLeft
-    jsr PushCollisionMapLeft
-    jsr PushCollisionMapLeft
-    jsr PushCollisionMapLeft
-    jsr PushCollisionMapLeft
-    jsr PushCollisionMapLeft
-    jsr PushCollisionMapLeft
-
-    lda #7
-    sta TilesScroll
     lda #103
     sta GlobalScroll
 
@@ -3080,33 +2933,6 @@ RoutinesAfterFadeOut:
     bne @next11
 
     lda #0
-    sta LeftCollisionMapIdx
-
-    lda #1
-    sta RightCollisonMapIdx
-
-    lda #0      ;load the first column
-    sta TimesShiftedLeft
-    sta TimesShiftedRight
-    sta RightCollisionColumnIndex
-    jsr LoadRightCollisionColumn
-    lda #255
-    sta LeftCollisionColumnIndex
-
-
-    lda #1
-    sta CurrentMapSegmentIndex
-
-    ;TODO: rework this
-    jsr PushCollisionMapLeft
-    jsr PushCollisionMapLeft
-    jsr PushCollisionMapLeft
-    jsr PushCollisionMapLeft
-    jsr PushCollisionMapLeft
-    jsr PushCollisionMapLeft
-    jsr PushCollisionMapLeft
-
-    lda #0
     sta CurrentMapSegmentIndex
 
     lda #57
@@ -3118,8 +2944,6 @@ RoutinesAfterFadeOut:
     sta ScrollDirection
 
     jsr OnExitVillagerHut
-    lda #1
-    sta TilesScroll
 ;-------cave entrance
 @next11:
     lda ActiveMapEntryIndex
@@ -3131,21 +2955,7 @@ RoutinesAfterFadeOut:
     lda #0
     sta CurrentMapSegmentIndex
 
-    lda #1
-    sta RightCollisonMapIdx
-    lda #0
-    sta RightCollisionColumnIndex
-    jsr LoadRightCollisionColumn
-    lda #255
-    sta LeftCollisionColumnIndex
-
-
     jsr ResetNameTableAdresses
-
-    lda #0
-    sta LeftCollisionMapIdx
-    sta TimesShiftedLeft
-    sta TimesShiftedRight
 
 ;crashsite from cave
 
@@ -3170,48 +2980,14 @@ RoutinesAfterFadeOut:
     lda #0
     sta CurrentMapSegmentIndex
 
-    lda #1
-    sta RightCollisonMapIdx
-    lda #0      ;load the first column
-    sta RightCollisionColumnIndex
-    jsr LoadRightCollisionColumn
-    lda #255
-    sta LeftCollisionColumnIndex
 
     jsr ResetNameTableAdresses
-
-    lda #0
-    sta LeftCollisionMapIdx
-    sta TimesShiftedLeft
-    sta TimesShiftedRight
 
 ;location 2 from cave
 @next14:
     lda ActiveMapEntryIndex
     cmp #13
     bne @next15
-
-    lda #255
-    sta LeftCollisionMapIdx
-
-    lda #1
-    sta RightCollisonMapIdx
-
-    lda #0      ;load the first column
-    sta TimesShiftedLeft
-    sta TimesShiftedRight
-    sta RightCollisionColumnIndex
-    jsr LoadRightCollisionColumn
-    lda #255
-    sta LeftCollisionColumnIndex
-
-    lda #1
-    sta CurrentMapSegmentIndex
-
-    ;TODO: rework this
-    jsr PushCollisionMapLeft
-    jsr PushCollisionMapLeft
-    jsr PushCollisionMapLeft
 
     lda #0
     sta CurrentMapSegmentIndex
@@ -3231,45 +3007,18 @@ RoutinesAfterFadeOut:
 
     lda #0
     sta CurrentMapSegmentIndex
-    sta RightCollisionColumnIndex
-
-    lda #1
-    sta RightCollisonMapIdx
-    jsr LoadRightCollisionColumn
-    lda #255
-    sta LeftCollisionColumnIndex
-
 
     jsr ResetNameTableAdresses
-
-    lda #0
-    sta LeftCollisionMapIdx
-    sta TimesShiftedLeft
-    sta TimesShiftedRight
 
 ;from granny's location to map
 @next16:
     lda ActiveMapEntryIndex
     cmp #15
     bne @next17
-
-    lda #0
-    sta TimesShiftedLeft
-    sta TimesShiftedRight
-
     lda #OUTDOORS_LOC1_SCREEN_COUNT - 1
     sta CurrentMapSegmentIndex
 
-    lda #4
-    sta RightCollisonMapIdx
-    lda #0
-    sta RightCollisionColumnIndex
 
-    lda #2
-    sta LeftCollisionMapIdx
-    lda #3
-    sta LeftCollisionColumnIndex
-    jsr LoadLeftCollisionColumn
 ;enter granny's house
 @next17:
     lda ActiveMapEntryIndex
@@ -3293,48 +3042,20 @@ RoutinesAfterFadeOut:
     cmp #17
     bne @next19
 
-    lda #0
-    sta LeftCollisionMapIdx
 
-    lda #1
-    sta RightCollisonMapIdx
-
-    lda #0
-    sta TimesShiftedLeft
-    sta TimesShiftedRight
-    sta RightCollisionColumnIndex
-    jsr LoadRightCollisionColumn
-    lda #255
-    sta LeftCollisionColumnIndex
-
-
-    lda #1
-    sta CurrentMapSegmentIndex
-
-    ;TODO: rework this
-    jsr PushCollisionMapLeft
-    jsr PushCollisionMapLeft
-    jsr PushCollisionMapLeft
-    jsr PushCollisionMapLeft
-    jsr PushCollisionMapLeft
-    jsr PushCollisionMapLeft
-    jsr PushCollisionMapLeft
-   
     lda #0
     sta CurrentMapSegmentIndex
 
-    lda #57
+    lda #154
     sta GlobalScroll
 
-    lda #23
+    lda #3
     sta BgColumnIdxToUpload
     lda #2
     sta ScrollDirection
 
 
     jsr OnExitVillagerHut
-    lda #1
-    sta TilesScroll
 
 
 @next19:
@@ -3410,13 +3131,11 @@ CommonLocationRoutine:
     lda (pointer2), y ;rom bank for the location
     sta LocationBankNo
 
-@continue:
+;@continue:
     iny
-    lda (pointer2), y ;lower address byte of the collision data
-    sta pointer
+    lda (pointer2), y ;
     iny
-    lda (pointer2), y ; higher byte
-    sta pointer + 1
+    lda (pointer2), y ;
     iny
     lda (pointer2), y ; is the location indoors or outdoors
     bne @itsAnIndoorMap
@@ -3440,25 +3159,6 @@ CommonLocationRoutine:
     iny
     lda (pointer2), y ;indoor map address (higher byte)
     sta MapPtr + 1
-;---
-@loadCollision:
-    sty TempY ; preserve y
-    lda LocationBankNo
-    cmp current_bank
-    beq @continueLoad
-    tay
-    jsr bankswitch_y ; let's switch to the location's bank
-@continueLoad:
-    ldy #0
-@collisionLoop:
-    lda (pointer), y ; pointer points to the collision data
-    sta CollisionMap, y
-    iny
-    cpy #COLLISION_MAP_SIZE
-    bne @collisionLoop
-    ldy #0
-    jsr bankswitch_y ; switch back to bank 0
-    ldy TempY
 ;---
     iny
 
@@ -3509,9 +3209,10 @@ CommonLocationRoutine:
     jsr bankswitch_y
 
     lda #0
-    sta TilesScroll
     sta GlobalScroll ; reset both scroll variables
     sta ScrollDirection
+
+    jsr BuildRowTable
 
 
     rts
@@ -3988,6 +3689,14 @@ HandleInput:
     bne @resetStuff
 
 
+    ;calc screen for collision
+    lda CurrentMapSegmentIndex
+    clc
+    adc MustIncrementScreenIndex
+    sec
+    sbc MustDecrementScreenIndex
+    sta TempCollisionVar
+
     ;first general check of newX and newY
     jsr CanPlayerGo
     beq @contInput; all good, no obstacles
@@ -4036,75 +3745,15 @@ HandleInput:
 
 @contInput:
     jsr SwitchScreenIdxIfNeeded
-    jsr PushCollisionMapIfNeeded
-
 
 @finishInput:
     lda Buttons
     sta OldButtons
 
     jsr CalcMapColumnToUpdate
-    jsr UpdateDestructableTilesCollision
 
     lda #INPUT_DELAY
     sta InputUpdateDelay
-    rts
-
-;Erase collision bits if tiles are destroyed
-;--------------------------------
-UpdateDestructableTilesCollision:
-
-    lda GlobalScroll ;this will limit destructable tiles to the very first screen
-    bne @exit
-
-    ldy #2
-@loop:
-    dey
-    bmi @exit
-    lda Destructables, y
-    beq @loop
-
-    tya
-    asl
-    asl
-    asl
-    tax
-    lda destructable_tiles_list, x
-    cmp LocationIndex
-    bne @loop
-
-
-    inx
-    inx
-    inx
-
-    lda destructable_tiles_list, x ; y
-    sta TempY
-
-
-    inx
-    lda destructable_tiles_list, x ; x
-    tax
-    lda x_collision_pattern, x
-    eor #%11111111 ; invert byte
-    sta Temp
-    txa 
-    lsr
-    lsr
-    lsr ; divide x by 8 again
-    clc
-    adc TempY
-    adc TempY
-    adc TempY
-    adc TempY
-    tax
-    lda CollisionMap, x
-    and Temp
-    sta CollisionMap, x
-
-    jmp @loop
-
-@exit:
     rts
 
 ;--------------------------------
@@ -4118,9 +3767,6 @@ BackupMovement:
 
     lda GlobalScroll
     sta OldGlobalScroll
-
-    lda TilesScroll
-    sta OldTileScroll
 
     lda ScrollDirection
     sta OldScrollDirection
@@ -4172,8 +3818,6 @@ ResetPlayerXMovement:
     sta PlayerX
     lda OldGlobalScroll
     sta GlobalScroll
-    lda OldTileScroll
-    sta TilesScroll
     lda OldScrollDirection
     sta ScrollDirection
     lda #0
@@ -4183,34 +3827,6 @@ ResetPlayerXMovement:
     rts
 
 
-;--------------------------------
-PushCollisionMapIfNeeded:
-
-    lda DirectionX
-    cmp #2
-    bne @checkAnother
-
-    lda TilesScroll
-    cmp #MAX_TILE_SCROLL_RIGHT
-    bcc @checkAnother
-    cmp #240
-    bcs @checkAnother
-    jsr PushCollisionMapLeft
-    jmp @finishInput
-@checkAnother:
-    lda DirectionX
-    cmp #1
-    bne @finishInput
-
-    lda TilesScroll
-    cmp #10
-    bcc @finishInput
-    cmp #MAX_TILE_SCROLL_LEFT + 1
-    bcs @finishInput
-    jsr PushCollisionMapRight
-@finishInput:
-
-    rts
 ;--------------------------------
 CalcMapColumnToUpdate:
 
@@ -4333,7 +3949,7 @@ UpdateStatusDigits:
 
     lda Stamina
     beq @fail1
-    lda #$F1
+    lda #STAMINA_TILE
     sta $2007
     jmp @segment2
 
@@ -4346,7 +3962,7 @@ UpdateStatusDigits:
     lda Stamina
     cmp #32
     bcc @fail2
-    lda #$F1
+    lda #STAMINA_TILE
     sta $2007
     jmp @segment3
 
@@ -4359,7 +3975,7 @@ UpdateStatusDigits:
     cmp #64
     bcc @fail3
 
-    lda #$F1
+    lda #STAMINA_TILE
     sta $2007
     jmp @segment4
 
@@ -4370,7 +3986,7 @@ UpdateStatusDigits:
     lda Stamina
     cmp #96
     bcc @fail4
-    lda #$F1
+    lda #STAMINA_TILE
     sta $2007
     jmp @Hp
 
@@ -4678,9 +4294,6 @@ ResetEntityVariables:
     sta FadeIdx
     sta PaletteFadeTimer
     sta GlobalScroll
-    sta TilesScroll
-    sta TimesShiftedLeft
-    sta TimesShiftedRight
     sta BaseMenuIndex
     sta InHouse
     sta InCave
@@ -4695,6 +4308,7 @@ ResetEntityVariables:
 
     sta Destructables
     sta Destructables + 1
+    sta DestroyedTilesCount
 
     lda #PLAYER_START_X
     sta PlayerX
@@ -4718,11 +4332,6 @@ ResetEntityVariables:
     lda #$24
     sta SecondNametableAddr
     sta DestScreenAddr
-
-    lda #1
-    sta RightCollisonMapIdx
-    lda #0
-    sta LeftCollisionMapIdx
 
     lda #255
     sta CurrentPaletteDecrementValue
@@ -4960,7 +4569,6 @@ StartGame:
     jsr GenerateNpcs
 
     ldx #0
-    jsr LoadCollisionMap
     jsr initZeroSprite
     lda #STATE_GAME
     sta GameState
@@ -4969,6 +4577,8 @@ StartGame:
     sta MustLoadOutside
     sta MustLoadSomething
     sta MustCopyMainChr
+
+    jsr BuildRowTable
 
 
     rts
@@ -5067,39 +4677,12 @@ CheckStartButton:
 
     ldy #1
     jsr bankswitch_y ; switch bank first
-    lda current_bank
-    sta TestBank
     lda #1
     sta MustLoadMenu
     sta MustLoadSomething
 
 @exit:
     rts
-;--------------------------------------
-LoadCollisionMap:
-@copyCollisionMapLoop:
-
-    lda LocationIndex
-    beq @location0
-    lda bg2_collision, x
-    jmp @start
-@location0:
-    lda bg_collision, x
-@start:
-    sta CollisionMap, x
-    inx
-    cpx #COLLISION_MAP_SIZE
-    bne @copyCollisionMapLoop
-
-    lda #0      ;load the first column
-    sta RightCollisionColumnIndex
-    jsr LoadRightCollisionColumn
-    lda #255;-1
-    sta LeftCollisionColumnIndex
-
-
-    rts
-
 
 ;--------------------------------------
 
@@ -5338,6 +4921,7 @@ useHammerOnEnvironment:
 
     lda #1
     sta Destructables, y
+    inc DestroyedTilesCount
 
 
     ;TODO: update destructabe tiles
@@ -5348,13 +4932,13 @@ useHammerOnEnvironment:
 @check_other_tiles:
 ;rock
     lda (pointer), y
-    cmp #$1C
+    cmp #$DE
     beq @spawn_rock
-    cmp #$1D
+    cmp #$DF
     beq @spawn_rock
-    cmp #$0C
+    cmp #$EE
     beq @spawn_rock
-    cmp #$0D
+    cmp #$EF
     beq @spawn_rock
 ;wood
     jsr IsTree
@@ -5388,17 +4972,17 @@ useHammerOnEnvironment:
     rts
 ;---------------------------------
 IsTree:
-    cmp #$0A
+    cmp #$AE
     beq @yes
-    cmp #$0B
+    cmp #$AF
     beq @yes
-    cmp #$1A
+    cmp #$BE
     beq @yes
-    cmp #$1B
+    cmp #$BF
     beq @yes
-    cmp #$2A
+    cmp #$CE
     beq @yes
-    cmp #$2B
+    cmp #$CF
     beq @yes
     cmp #$87
     beq @yes
@@ -5530,29 +5114,19 @@ CalcTileAddressInFrontOfPlayer:
     sec
     sbc #4
 
-
 @cont:
     clc
     adc GlobalScroll
     sta TempX
     bcs @mustIncrementScreen
 
-
-    lda LocationIndex
-    asl
-    asl
-    clc
-    adc CurrentMapSegmentIndex
+    lda CurrentMapSegmentIndex
     tay ;store screen index to Y register
     jmp @continueCalc
 
 @mustIncrementScreen:
 
-    lda LocationIndex
-    asl
-    asl
-    clc
-    adc CurrentMapSegmentIndex
+    lda CurrentMapSegmentIndex
     clc
     adc #1
     tay; screen index goes to Y register
@@ -5595,38 +5169,23 @@ CalcTileAddressInFrontOfPlayer:
     lsr
     sta TempY
 
-@activateRod:
+    asl
+    clc
+    adc row_table_screens, y
+    tay
 
-    lda map_list_low, y
+    ;load map row address from ram
+    lda MapRowAddressTable, y 
     sta pointer
-    lda map_list_high, y
+    iny
+    lda MapRowAddressTable, y
     sta pointer + 1
 
-
-@calcaddress:
-    ldy TempY
-    beq @skip
-@addressLoop:
-
-    lda pointer
-    clc
-    adc #32
-    sta pointer
-    bcs @incrementUpper
-    jmp @nextRow
-@incrementUpper:
-    inc pointer + 1
-@nextRow:
-    dey
-    bne @addressLoop
-@skip:
     lda TempX
-    tay
+    tay ;put X/8 to register y
 
 
     rts
-
-
 ;----------------------------------
 ;A -> 0 = can, 1 = can't
 CanCastRodHere:
@@ -5635,9 +5194,9 @@ CanCastRodHere:
     jsr CalcTileAddressInFrontOfPlayer
 
     lda (pointer), y
-    cmp #$F0
+    cmp #$1A
     beq @throwThere
-    cmp #$F1
+    cmp #$0A
     bne @exit
 
 @throwThere:
@@ -5855,11 +5414,6 @@ CheckLeft:
     lda CurrentMapSegmentIndex ; CurrentMapSegment < 1 -> do not scroll
     beq @firstScreen
 
-
-    lda TilesScroll
-    sec
-    sbc PlayerSpeed
-    sta TilesScroll
 ;--
 @ScrollGlobalyLeft:
     lda GlobalScroll
@@ -5883,12 +5437,6 @@ CheckLeft:
 
     lda GlobalScroll
     beq @moveLeft
-
-
-    lda TilesScroll
-    sec
-    sbc PlayerSpeed
-    sta TilesScroll
 
 
     lda GlobalScroll
@@ -5951,12 +5499,6 @@ CheckRight:
     cmp ScreenCount
     beq @moveRight
 
-;--
-    lda TilesScroll
-    clc
-    adc PlayerSpeed
-    sta TilesScroll
-;--
 
     lda GlobalScroll
     cmp #MAX_V_SCROLL

@@ -6,7 +6,7 @@
 #include "Map.h"
 
 //----------------------------------------------
-bool Map::load(const char* tilesPath, const char* collisionPath){
+bool Map::load(const char* tilesPath){
     FILE * file;
     file = fopen(tilesPath,"rt");
     
@@ -134,67 +134,26 @@ bool Map::load(const char* tilesPath, const char* collisionPath){
 
     fclose(file);
 
-    file = fopen(collisionPath,"rt");
-
-    if (!file)
-    {
-        return false;
-    }
-
-    
-    if (!fscanf(file, "%s\n", collisionMapName))
-    {
-        fclose(file);
-        return false;
-    }
-    printf("%s\n", collisionMapName);
-
 
     colision = new bool*[_height];
 
     for (unsigned i = 0; i<_height; i++)
+    {
         colision[i] = new bool[_width];
+    }
 
     for (unsigned i = 0; i <_height; i++)
     {
-        if (!fscanf(file, "%s ", dname))
+
+        for (unsigned a = 0; a < _width; a++)
         {
-            fclose(file);
-            return false;
-        }
-        printf("%s\n", dname);
 
-        for (unsigned a = 0; a < _width / 8; a++)
-        {
-            char tmp;
-            if (!fscanf(file, "%c", &tmp))
-            {
-                fclose(file);
-                return false;
-            }
-
-            for (unsigned b = 0; b < 8; ++b)
-            {
-                if (!fscanf(file, "%c", &tmp))
-                {
-                    fclose(file);
-                    return false;
-                }
-                colision[i][a*8 + b] = (bool)(tmp - '0');
-                printf("%d ", tmp);
-            }
-
-            if (!fscanf(file, "%c", &tmp))
-            {
-                fclose(file);
-                return false;
-            }
+            colision[i][a] = tiles[i][a] >= 128;
 
         }
     }
 
 
-    fclose(file);
     return true;
 }
 
@@ -331,7 +290,7 @@ unsigned int Map::getAttribute(unsigned long x, unsigned long y)
 }
 
 //----------------------------------------------------------
-void Map::save(const char *tilesPath, const char* collisionPath){
+void Map::save(const char *tilesPath){
     FILE* f = 0;
 
     f = fopen(tilesPath,"wt+");
@@ -427,43 +386,7 @@ void Map::save(const char *tilesPath, const char* collisionPath){
         f = 0;
     }
 
-
-    f = fopen(collisionPath,"wt+");
-
-    if (f)
-    {
-        fprintf(f, "%s\n", collisionMapName);
-
-        for (unsigned int i = 0; i<_height; i++)
-        {
-            int counter = 0;
-            char thebyte[9];
-            int byteCounter = 0;
-            fprintf(f, "    %s", ".byte ");
-
-            for (unsigned int a = 0; a <_width; a++)
-            {
-                thebyte[counter] = '0' + colision[i][a];
-                ++counter;
-
-                if (counter == 8)
-                {
-                    thebyte[counter] = 0;
-                    fprintf(f,"%c%s", '%', thebyte);
-                    counter = 0;
-                    ++byteCounter;
-                    if (byteCounter < 4)
-                    {
-                        fprintf(f, "%s", ",");
-                    }
-                }
-            }
-            fprintf(f,"\n");
-        }
-
-        fclose(f);
-    }
-
+ 
 }
 
 

@@ -2427,17 +2427,27 @@ SetDirectionForTimidNpc:
 TestCollisionGoingRight:
     sta TempX ; save modified x
     clc
-    adc #16
-    sec
-    sbc GlobalScroll
+    adc #16 ; npc width
     sta TempPointX
+    bcs @incrementScreen ; it's more than 256
 
+    lda NewNpcScreen
+    sta TempScreen ; screen idx for collision test
+
+    jmp @cont
+@incrementScreen:
+    lda NewNpcScreen
+    clc
+    adc #1
+    sta TempScreen ; screen idx for collision test
+@cont:
     ldx NpcXPosition
     inx
     lda Npcs, x ;y
     clc
     adc TempYOffset
     sta TempPointY
+
     jsr TestPointAgainstCollisionMap
     ldx NpcXPosition
     inx
@@ -2449,14 +2459,14 @@ TestCollisionGoingRight:
 TestCollisionGoingLeft:
     stx TempIndex ; save x reg
     sta TempX
-    sec
-    sbc GlobalScroll
     sta TempPointX
     inx
     lda Npcs, x ; y
     clc
     adc TempYOffset
     sta TempPointY
+    lda NewNpcScreen
+    sta TempScreen
     jsr TestPointAgainstCollisionMap
     ldx TempIndex
     inx
@@ -2473,11 +2483,11 @@ TestCollisionGoingUp:
     sta TempPointY
 
     lda NewNpcX
-    sec
-    sbc GlobalScroll
     clc
     adc #2
     sta TempPointX
+    lda NewNpcScreen
+    sta TempScreen
     jsr TestPointAgainstCollisionMap
     cmp #1
     beq @exit
@@ -2486,6 +2496,8 @@ TestCollisionGoingUp:
     clc
     adc #12
     sta TempPointX
+    lda NewNpcScreen
+    sta TempScreen
     jsr TestPointAgainstCollisionMap
 @exit:
 
@@ -2503,9 +2515,9 @@ TestCollisionGoingDown:
     adc TempYOffset
     sta TempPointY
     lda NewNpcX
-    sec
-    sbc GlobalScroll
     sta TempPointX
+    lda NewNpcScreen
+    sta TempScreen
     jsr TestPointAgainstCollisionMap
     cmp #1
     beq @exit
@@ -2514,6 +2526,8 @@ TestCollisionGoingDown:
     clc
     adc #12
     sta TempPointX
+    lda NewNpcScreen
+    sta TempScreen
     jsr TestPointAgainstCollisionMap
 
 @exit:

@@ -1,322 +1,22 @@
-;--------------------------------------
-;Loads collision data where CurrentCollisionColumnIndex is the column index
-LoadRightCollisionColumn:
-
-    lda LocationIndex
-    asl
-    asl
-    clc
-    adc RightCollisonMapIdx
-    tay
-
-    lda collision_list_low, y
-    sta collisionMapPtr
-    lda collision_list_high, y
-    sta collisionMapPtr + 1
-
-    lda RightCollisionColumnIndex
-    cmp #COLLISION_MAP_COLUMN_COUNT
-    bcs @exit
-
-
-    ldx #0
-@loadColumn:
-    txa
-    asl
-    asl
-    clc
-    adc RightCollisionColumnIndex
-    tay ; x * 4 move to y
-
-    lda (collisionMapPtr), y
-    sta ScrollCollisionColumnRight, x
-    inx
-    cpx #SCREEN_ROW_COUNT
-    bcc @loadColumn
-
-@exit:
-    rts
-;--------------------------------------
-;copy-paste hack
-LoadLeftCollisionColumn:
-
-    lda LocationIndex
-    asl
-    asl
-    clc
-    adc LeftCollisionMapIdx
-    tay
-
-    lda collision_list_low, y
-    sta collisionMapPtr
-    lda collision_list_high, y
-    sta collisionMapPtr + 1
-
-    lda LeftCollisionColumnIndex
-    cmp #COLLISION_MAP_COLUMN_COUNT
-    bcs @exit
-
-    ldx #0
-@loadColumn:
-    txa
-    asl
-    asl 
-    clc
-    adc LeftCollisionColumnIndex
-    tay ; x * 4 move to y
-
-    lda (collisionMapPtr), y
-    sta ScrollCollisionColumnLeft, x
-    inx
-    cpx #SCREEN_ROW_COUNT
-    bcc @loadColumn
-
-@exit:
-    rts
-
-;----------------------------------
-;Pushing collision map right when moving left
-PushCollisionMapRight:
-    clc
-    ldx #0
-    stx TempY
-    stx CarrySet
-
-    lda ScrollCollisionColumnLeft
-    lsr
-    sta ScrollCollisionColumnLeft
-
-    ldx #0
-    ldy #COLLISION_MAP_COLUMN_COUNT
-
-@loop:
-
-    lda CarrySet
-    bne @RestoreCarry
-    jmp @ShiftBits
-@RestoreCarry:
-    sec
-
-@ShiftBits:
-    lda CollisionMap, x
-    ror ;shifts right and inserts carry as least significant bit
-    sta CollisionMap, x
-    dey
-    bne @cont ; continue with the next element in the row
-
-    ;push bits in the Right column as well
-    stx Temp ; save x
-    ldx TempY ; load collision column cell position
-    lda ScrollCollisionColumnRight, x
-    ror
-    sta ScrollCollisionColumnRight, x
-
-    ;new row
-    ldy #COLLISION_MAP_COLUMN_COUNT
-    inc TempY
-    ldx TempY
-    cpx #SCREEN_ROW_COUNT
-    bcs @restoreX
-    lda ScrollCollisionColumnLeft, x
-    lsr
-    sta ScrollCollisionColumnLeft, x
-@restoreX:
-    ldx Temp ; restore prev X
-
-@cont:
-
-    ;gotta save carry for ror
-    bcs @saveCarry
-    lda #0
-    jmp @next_element
-@saveCarry:
-    lda #1
-@next_element:
-    sta CarrySet
-    inx
-    cpx #COLLISION_MAP_SIZE
-    bcc @loop
-
-;----- reset tilescroll var
-    lda CurrentMapSegmentIndex
-    bne @regularReset
-    lda GlobalScroll
-    beq @firstScreen
-
-@regularReset:
-    lda #MAX_TILE_SCROLL_LEFT
-    sec
-    sbc TilesScroll
-    sta TilesScroll
-    lda #0
-    sec
-    sbc TilesScroll
-    jmp @saveTileScroll
-@firstScreen:
-    lda #0
-@saveTileScroll:
-    sta TilesScroll
-;-----
-
-    lda TimesShiftedLeft
-    bne @revert         ;TimesShiftedLeft > 0
-
-    inc TimesShiftedRight
-    lda TimesShiftedRight
-    cmp #COLLISION_MAP_COLUMN_SIZE
-    beq @update_columns
-    jmp @exit
-
-@revert:
-    dec TimesShiftedLeft
-    lda TimesShiftedLeft
-    beq @reloadLeftColumn ;TimesShiftedLeft = 0, reload left column
-    jmp @exit
-
-@update_columns: ;update left and right side columns
-    dec LeftCollisionColumnIndex
-    lda LeftCollisionColumnIndex
-    cmp #255
-    bne @loadLeftColumn
-    lda #COLLISION_MAP_COLUMN_COUNT - 1
-    sta LeftCollisionColumnIndex
-    dec LeftCollisionMapIdx
-@loadLeftColumn:
-    jsr LoadLeftCollisionColumn
-
-    dec RightCollisionColumnIndex
-    lda RightCollisionColumnIndex
-    cmp #255
-    bne @loadRightColumn
-    lda #COLLISION_MAP_COLUMN_COUNT - 1
-    sta RightCollisionColumnIndex
-    dec RightCollisonMapIdx
-@loadRightColumn:
-    jsr LoadRightCollisionColumn
-
-    lda #0
-    sta TimesShiftedRight
-    jmp @exit
-@reloadLeftColumn:
-    jsr LoadLeftCollisionColumn
-@exit:
-    rts
-;----------------------------------
-;Pushing collision map left when moving right
-PushCollisionMapLeft:
-    ;starting from the bottom row
-    clc
-    ldx #SCREEN_ROW_COUNT - 1
-    stx TempY; save row index
-
-    lda ScrollCollisionColumnRight, x
-    asl
-    sta ScrollCollisionColumnRight, x
-
-    ldx #COLLISION_MAP_SIZE - 1
-    ldy #COLLISION_MAP_COLUMN_COUNT
-@loop:
-
-    lda CollisionMap,x
-    rol ;shift collision map and add carry
-    sta CollisionMap,x
-    dey
-    bne @cont
-
-    ;scroll left column
-
-    stx Temp
-    ldx TempY
-    lda ScrollCollisionColumnLeft, x
-    rol
-    sta ScrollCollisionColumnLeft, x
-
-    ;new row
-    ldy #COLLISION_MAP_COLUMN_COUNT
-    dec TempY
-    ldx TempY
-    cpx #255
-    beq @restoreX
-    lda ScrollCollisionColumnRight, x
-    asl
-    sta ScrollCollisionColumnRight, x
-@restoreX:
-    ldx Temp
-@cont:
-    dex
-    bpl @loop
-
-;-------------------reset tilescroll
-    lda CurrentMapSegmentIndex
-    clc
-    adc #1
-    cmp ScreenCount
-    beq @atLastScreen
-
-    lda TilesScroll
-    sec
-    sbc #MAX_TILE_SCROLL_RIGHT
-    jmp @saveTileScroll
-@atLastScreen:
-    lda #0
-@saveTileScroll:
-    sta TilesScroll
-;-----------------
-
-    lda TimesShiftedRight
-    bne @revert
-
-    inc TimesShiftedLeft
-    lda TimesShiftedLeft
-    cmp #COLLISION_MAP_COLUMN_SIZE
-    beq @update_columns
-    jmp @exit
-
-@revert:
-    dec TimesShiftedRight
-    lda TimesShiftedRight
-    beq @reloadRightColumn
-    jmp @exit
-
-@update_columns:
-    inc RightCollisionColumnIndex
-    lda RightCollisionColumnIndex
-    cmp #COLLISION_MAP_COLUMN_COUNT
-    bcc @loadRightColumn
-    lda #0
-    sta RightCollisionColumnIndex
-    inc RightCollisonMapIdx
-
-@loadRightColumn:
-    jsr LoadRightCollisionColumn
-
-    inc LeftCollisionColumnIndex
-    lda LeftCollisionColumnIndex
-    cmp #COLLISION_MAP_COLUMN_COUNT
-    bcc @LoadLeftColumn
-    lda #0
-    sta LeftCollisionColumnIndex
-    inc LeftCollisionMapIdx
-@LoadLeftColumn:
-    jsr LoadLeftCollisionColumn
-
-    lda #0
-    sta TimesShiftedLeft
-    jmp @exit
-@reloadRightColumn:
-    jsr LoadRightCollisionColumn
-
-@exit:
-    rts
-;----------------------------------
 ;Checks 2 points against the collision map
 CanPlayerGo:
 
     lda PlayerX
     clc
     adc #PLAYER_COLLISION_LINE_X1
-    adc TilesScroll
+    adc GlobalScroll
     sta TempPointX
+    bcs @increment
+
+    lda TempCollisionVar
+    jmp @cont
+@increment:
+    lda TempCollisionVar
+    clc
+    adc #1
+
+@cont:
+    sta TempScreen
 
     lda PlayerY
     clc
@@ -325,12 +25,21 @@ CanPlayerGo:
 
     jsr TestPointAgainstCollisionMap
     bne @collides
-
+;------------ 
     lda PlayerX
     clc
     adc #PLAYER_COLLISION_LINE_X2
-    adc TilesScroll
+    adc GlobalScroll
     sta TempPointX
+    bcs @increment2
+    lda TempCollisionVar
+    jmp @cont2
+@increment2:
+    lda TempCollisionVar
+    clc
+    adc #1
+@cont2:
+    sta TempScreen
 
     jsr TestPointAgainstCollisionMap
     bne @collides
@@ -349,8 +58,18 @@ CanPlayerGoWithOldY:
     lda PlayerX
     clc
     adc #PLAYER_COLLISION_LINE_X1
-    adc TilesScroll
+    adc GlobalScroll
     sta TempPointX
+    bcs @increment
+
+    lda TempCollisionVar
+    jmp @cont
+@increment:
+    lda TempCollisionVar
+    clc
+    adc #1
+@cont:
+    sta TempScreen
 
     lda OldPlayerY
     clc
@@ -359,13 +78,25 @@ CanPlayerGoWithOldY:
 
     jsr TestPointAgainstCollisionMap
     bne @collides
+;----------- 
 
     lda PlayerX
     clc
     adc #PLAYER_COLLISION_LINE_X2
-    adc TilesScroll
+    adc GlobalScroll
     sta TempPointX
+    bcs @increment2
 
+    lda TempCollisionVar
+    jmp @cont2
+@increment2:
+
+    lda TempCollisionVar
+    clc
+    adc #1
+@cont2:
+
+    sta TempScreen
     jsr TestPointAgainstCollisionMap
     bne @collides
 
@@ -383,8 +114,17 @@ CanPlayerGoWithOldX:
     lda OldPlayerX
     clc
     adc #PLAYER_COLLISION_LINE_X1
-    adc OldTileScroll
+    adc OldGlobalScroll
     sta TempPointX
+    bcs @increment
+    lda TempCollisionVar
+    jmp @cont
+@increment:
+    lda TempCollisionVar
+    clc
+    adc #1
+@cont:
+    sta TempScreen
 
     lda PlayerY
     clc
@@ -393,12 +133,22 @@ CanPlayerGoWithOldX:
 
     jsr TestPointAgainstCollisionMap
     bne @collides
+;----
 
     lda OldPlayerX
     clc
     adc #PLAYER_COLLISION_LINE_X2
-    adc OldTileScroll
+    adc OldGlobalScroll
     sta TempPointX
+    bcs @increment2
+    lda TempCollisionVar
+    jmp @cont2
+@increment2:
+    lda TempCollisionVar
+    clc
+    adc #1
+@cont2:
+    sta TempScreen
 
     jsr TestPointAgainstCollisionMap
     bne @collides
@@ -414,53 +164,89 @@ CanPlayerGoWithOldX:
 
 ;----------------------------------
 ;Set TempPointX and TempPointY as point to be tested
+;Set TempScreen as screen of your entity
 ;sets A=1 if point collides
 TestPointAgainstCollisionMap:
 
-    lda TempPointX
-
-    ; X / 8
-
-    lsr
-    lsr
-    lsr
-    tax
-
-    lda x_collision_pattern, x ;which bit is wich x cell
-    sta Temp        ;save the pattern
-
-    txa
-
-    ; X / 8 one more time
-    lsr
-    lsr
-    lsr
-    tax
-
-    ;divide point Y by 8
     lda TempPointY
+    clc
+    adc #8
+    lsr
+    lsr
+    lsr ; y / 8
 
-    lsr
-    lsr
-    lsr
+    asl  ;row * 2
 
-    sta TempY
+    ldy TempScreen
+    clc
+    adc row_table_screens, y
+    tay
+
+    ;load map row address from ram
+    lda MapRowAddressTable, y 
+    sta pointer
+    iny
+    lda MapRowAddressTable, y
+    sta pointer + 1
+
+    lda TempPointX
+    lsr
+    lsr
+    lsr
+    tay ;put X/8 to register y
+
+    lda DestroyedTilesCount
+    beq @cont
+
+;--- ok, this -is- UGLY------------
+    tax
+    stx destructableIdx
+@destructablesLoop:
+    ldx destructableIdx
+    dex
+    stx destructableIdx
+    bmi @cont
+
+    lda Destructables, x
+    beq @destructablesLoop
 
     txa
-    clc
-    adc TempY ;add y four times, because there are 4 one byte collision segments in one row
-    adc TempY
-    adc TempY
-    adc TempY
+    asl
+    asl
+    asl
     tax
 
-    cpx #COLLISION_MAP_SIZE
-    bcs @colliding
+    inx
+    inx
+    inx
 
-    lda CollisionMap, x
-    and Temp
-    beq @not_Colliding
-@colliding:
+    lda TempPointY
+    clc
+    adc #8
+    lsr
+    lsr
+    lsr
+    cmp destructable_tiles_list, x ; compare with y
+    bne @destructablesLoop
+
+    inx ; move to x
+    lda TempPointX
+    lsr
+    lsr
+    lsr
+    cmp destructable_tiles_list, x
+    bne @destructablesLoop
+
+    lda #DESTRUCTED_TILE_VALUE
+    jmp @compare
+
+;----------------------------
+@cont:
+    lda (pointer), y
+@compare:
+    cmp #128
+    bcc @not_Colliding
+
     lda #1
     jmp @exit_collision_check
 
@@ -469,4 +255,65 @@ TestPointAgainstCollisionMap:
 
 @exit_collision_check:
     rts
+;-----------------------------
+;Fill ram table with map row addresses
+BuildRowTable:
 
+    ldx #0
+@screenLoop:
+
+    lda LocationIndex
+    asl
+    asl ; locationindex * 4
+    sta Temp
+    txa
+    clc
+    adc Temp
+    tay
+
+    lda map_list_low, y
+    sta pointer
+    lda map_list_high, y
+    sta pointer + 1
+
+
+    lda #0
+    sta TempRowIndex
+@rowLoop: ; Loop through all 30 rows of the map screen
+
+    lda TempRowIndex
+    beq @skipcalculation
+
+
+    lda pointer
+    clc
+    adc #32
+    sta pointer
+    bcs @incrementUpper
+    jmp @skipcalculation
+@incrementUpper:
+    inc pointer + 1
+
+@skipcalculation:
+
+    lda TempRowIndex
+    asl
+    clc
+    adc row_table_screens, x
+    tay
+    lda pointer
+    sta MapRowAddressTable, y
+    iny
+    lda pointer + 1
+    sta MapRowAddressTable, y
+
+    inc TempRowIndex
+    lda TempRowIndex
+    cmp #SCREEN_ROW_COUNT
+    bcc @rowLoop
+
+    inx
+    cpx #4
+    bcc @screenLoop
+
+    rts

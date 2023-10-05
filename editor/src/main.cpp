@@ -58,7 +58,6 @@ const unsigned BUTTON_TILES_INC = 26;
 const unsigned BUTTON_FIRST_TILE = 27;
 const unsigned BUTTON_SAVE = 18;
 const unsigned BUTTON_SHOW_COLLISION = 11;
-const unsigned BUTTON_SELECT_COLLISION = 12;
 
 const unsigned BUTTON_PALETTE_0 = 8;
 const unsigned BUTTON_PALETTE_1 = 15;
@@ -117,7 +116,6 @@ int charsIDs[]={1,4,7,8};
 CIniFile INI;
 
 char MapTiles[255];
-char MapCollision[255];
 
 //=======================================================================
 
@@ -585,10 +583,6 @@ void CheckKeys()
                 map.setAttribute(tilex, tiley, 0);
             }
 
-            if ( SELECT_COLISSION )
-            {
-                map.setCollision ( tilex,tiley,false );
-            }
         }
 
     }
@@ -701,7 +695,7 @@ void CheckKeys()
            
             if ( ( mygtai[BUTTON_SAVE].pointerOntop ( (int)Cross.x(),(int)Cross.z() ) ) )
             {
-                map.save (MapTiles, MapCollision);
+                map.save (MapTiles);
             }
 
         }
@@ -743,8 +737,6 @@ int main ( int argc, char* argv[] )
 
     INI.get ( L"mapTiles",buf );
     wcstombs ( MapTiles, buf, 255 );
-    INI.get ( L"mapCollision",buf );
-    wcstombs ( MapCollision, buf, 255 );
 
 
     mygtai[0].init ( 10,20,32,32 );
@@ -755,7 +747,6 @@ int main ( int argc, char* argv[] )
 
     mygtai[6].init ( 10,55,32,32 );
     mygtai[7].init ( 46,55,32,32 );
-    mygtai[BUTTON_SELECT_COLLISION].init ( 82,55,32,32 );
     mygtai[14].init ( 154,55,32,32 );
 
 
@@ -848,10 +839,10 @@ int main ( int argc, char* argv[] )
 
 
 
-    if ( !map.load(MapTiles, MapCollision) )
+    if ( !map.load(MapTiles) )
     {
         _QuitApp = true;
-        printf("Error loading maps %s %s !\n", MapTiles, MapCollision);
+        printf("Error loading map %s !\n", MapTiles);
     }
 
     printf("\nStarting loop\n");
