@@ -234,9 +234,6 @@ destructable_tiles_list:
 
 
 
-
-
-
 npc_direction_list:
     .byte 0
     .byte %00000100 ; Up
@@ -4922,13 +4919,13 @@ useHammerOnEnvironment:
 @check_other_tiles:
 ;rock
     lda (pointer), y
-    cmp #$1C
+    cmp #$DE
     beq @spawn_rock
-    cmp #$1D
+    cmp #$DF
     beq @spawn_rock
-    cmp #$0C
+    cmp #$EE
     beq @spawn_rock
-    cmp #$0D
+    cmp #$EF
     beq @spawn_rock
 ;wood
     jsr IsTree
@@ -4962,17 +4959,17 @@ useHammerOnEnvironment:
     rts
 ;---------------------------------
 IsTree:
-    cmp #$0A
+    cmp #$AE
     beq @yes
-    cmp #$0B
+    cmp #$AF
     beq @yes
-    cmp #$1A
+    cmp #$BE
     beq @yes
-    cmp #$1B
+    cmp #$BF
     beq @yes
-    cmp #$2A
+    cmp #$CE
     beq @yes
-    cmp #$2B
+    cmp #$CF
     beq @yes
     cmp #$87
     beq @yes
@@ -5104,29 +5101,19 @@ CalcTileAddressInFrontOfPlayer:
     sec
     sbc #4
 
-
 @cont:
     clc
     adc GlobalScroll
     sta TempX
     bcs @mustIncrementScreen
 
-
-    lda LocationIndex
-    asl
-    asl
-    clc
-    adc CurrentMapSegmentIndex
+    lda CurrentMapSegmentIndex
     tay ;store screen index to Y register
     jmp @continueCalc
 
 @mustIncrementScreen:
 
-    lda LocationIndex
-    asl
-    asl
-    clc
-    adc CurrentMapSegmentIndex
+    lda CurrentMapSegmentIndex
     clc
     adc #1
     tay; screen index goes to Y register
@@ -5169,38 +5156,23 @@ CalcTileAddressInFrontOfPlayer:
     lsr
     sta TempY
 
-@activateRod:
+    asl
+    clc
+    adc row_table_screens, y
+    tay
 
-    lda map_list_low, y
+    ;load map row address from ram
+    lda MapRowAddressTable, y 
     sta pointer
-    lda map_list_high, y
+    iny
+    lda MapRowAddressTable, y
     sta pointer + 1
 
-
-@calcaddress:
-    ldy TempY
-    beq @skip
-@addressLoop:
-
-    lda pointer
-    clc
-    adc #32
-    sta pointer
-    bcs @incrementUpper
-    jmp @nextRow
-@incrementUpper:
-    inc pointer + 1
-@nextRow:
-    dey
-    bne @addressLoop
-@skip:
     lda TempX
-    tay
+    tay ;put X/8 to register y
 
 
     rts
-
-
 ;----------------------------------
 ;A -> 0 = can, 1 = can't
 CanCastRodHere:
@@ -5209,9 +5181,9 @@ CanCastRodHere:
     jsr CalcTileAddressInFrontOfPlayer
 
     lda (pointer), y
-    cmp #$F0
+    cmp #$1A
     beq @throwThere
-    cmp #$F1
+    cmp #$0A
     bne @exit
 
 @throwThere:
