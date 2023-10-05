@@ -355,6 +355,8 @@ player_sprites_flip:
     ROW_TABLE_SIZE             = 240
 
 
+    DESTRUCTED_TILE_VALUE      = $14
+
 
     INTRO_SCENE_MAX            = 7
     OUTRO_SCENE_MAX            = 4
@@ -1236,8 +1238,14 @@ TempRowIndex:
 TempCollisionVar:
     .res 1
 
+DestroyedTilesCount:
+    .res 1
+
+destructableIdx:
+    .res 1
+
 Buffer:
-    .res 345  ;must see how much is still available
+    .res 343  ;must see how much is still available
 
 ;====================================================================================
 
@@ -1842,7 +1850,7 @@ UpdateDestructableTiles:
     lda destructable_tiles_list, x
     sta $2006
 
-    lda #$EF
+    lda #DESTRUCTED_TILE_VALUE
     sta $2007
 
 
@@ -4300,6 +4308,7 @@ ResetEntityVariables:
 
     sta Destructables
     sta Destructables + 1
+    sta DestroyedTilesCount
 
     lda #PLAYER_START_X
     sta PlayerX
@@ -4912,6 +4921,7 @@ useHammerOnEnvironment:
 
     lda #1
     sta Destructables, y
+    inc DestroyedTilesCount
 
 
     ;TODO: update destructabe tiles

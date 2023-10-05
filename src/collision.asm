@@ -195,8 +195,55 @@ TestPointAgainstCollisionMap:
     lsr
     tay ;put X/8 to register y
 
+    lda DestroyedTilesCount
+    beq @cont
 
+;--- ok, this -is- UGLY------------
+    tax
+    stx destructableIdx
+@destructablesLoop:
+    ldx destructableIdx
+    dex
+    stx destructableIdx
+    bmi @cont
+
+    lda Destructables, x
+    beq @destructablesLoop
+
+    txa
+    asl
+    asl
+    asl
+    tax
+
+    inx
+    inx
+    inx
+
+    lda TempPointY
+    clc
+    adc #8
+    lsr
+    lsr
+    lsr
+    cmp destructable_tiles_list, x ; compare with y
+    bne @destructablesLoop
+
+    inx ; move to x
+    lda TempPointX
+    lsr
+    lsr
+    lsr
+    cmp destructable_tiles_list, x
+    bne @destructablesLoop
+
+    lda #DESTRUCTED_TILE_VALUE
+    jmp @compare
+
+;----------------------------
+@cont:
     lda (pointer), y
+@compare:
     cmp #128
     bcc @not_Colliding
 
