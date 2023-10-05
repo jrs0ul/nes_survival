@@ -7,15 +7,16 @@ CanPlayerGo:
     adc GlobalScroll
     sta TempPointX
     bcs @increment
-    lda CurrentMapSegmentIndex
-    sta TempScreen
+
+    lda TempCollisionVar
     jmp @cont
 @increment:
-    lda CurrentMapSegmentIndex
+    lda TempCollisionVar
     clc
     adc #1
-    sta TempScreen
+
 @cont:
+    sta TempScreen
 
     lda PlayerY
     clc
@@ -24,22 +25,21 @@ CanPlayerGo:
 
     jsr TestPointAgainstCollisionMap
     bne @collides
-
+;------------ 
     lda PlayerX
     clc
     adc #PLAYER_COLLISION_LINE_X2
     adc GlobalScroll
     sta TempPointX
     bcs @increment2
-    lda CurrentMapSegmentIndex
-    sta TempScreen
+    lda TempCollisionVar
     jmp @cont2
 @increment2:
-    lda CurrentMapSegmentIndex
+    lda TempCollisionVar
     clc
     adc #1
-    sta TempScreen
 @cont2:
+    sta TempScreen
 
     jsr TestPointAgainstCollisionMap
     bne @collides
@@ -61,15 +61,15 @@ CanPlayerGoWithOldY:
     adc GlobalScroll
     sta TempPointX
     bcs @increment
-    lda CurrentMapSegmentIndex
-    sta TempScreen
+
+    lda TempCollisionVar
     jmp @cont
 @increment:
-    lda CurrentMapSegmentIndex
+    lda TempCollisionVar
     clc
     adc #1
-    sta TempScreen
 @cont:
+    sta TempScreen
 
     lda OldPlayerY
     clc
@@ -78,6 +78,7 @@ CanPlayerGoWithOldY:
 
     jsr TestPointAgainstCollisionMap
     bne @collides
+;----------- 
 
     lda PlayerX
     clc
@@ -85,16 +86,17 @@ CanPlayerGoWithOldY:
     adc GlobalScroll
     sta TempPointX
     bcs @increment2
-    lda CurrentMapSegmentIndex
-    sta TempScreen
+
+    lda TempCollisionVar
     jmp @cont2
 @increment2:
-    lda CurrentMapSegmentIndex
+
+    lda TempCollisionVar
     clc
     adc #1
-    sta TempScreen
 @cont2:
 
+    sta TempScreen
     jsr TestPointAgainstCollisionMap
     bne @collides
 
@@ -115,15 +117,15 @@ CanPlayerGoWithOldX:
     adc OldGlobalScroll
     sta TempPointX
     bcs @increment
-    lda CurrentMapSegmentIndex
-    sta TempScreen
+    lda TempCollisionVar
     jmp @cont
 @increment:
-    lda CurrentMapSegmentIndex
+    lda TempCollisionVar
     clc
     adc #1
-    sta TempScreen
 @cont:
+    sta TempScreen
+
     lda PlayerY
     clc
     adc #PLAYER_COLLISION_LINE_Y1
@@ -131,6 +133,7 @@ CanPlayerGoWithOldX:
 
     jsr TestPointAgainstCollisionMap
     bne @collides
+;----
 
     lda OldPlayerX
     clc
@@ -138,15 +141,14 @@ CanPlayerGoWithOldX:
     adc OldGlobalScroll
     sta TempPointX
     bcs @increment2
-    lda CurrentMapSegmentIndex
-    sta TempScreen
+    lda TempCollisionVar
     jmp @cont2
 @increment2:
-    lda CurrentMapSegmentIndex
+    lda TempCollisionVar
     clc
     adc #1
-    sta TempScreen
 @cont2:
+    sta TempScreen
 
     jsr TestPointAgainstCollisionMap
     bne @collides

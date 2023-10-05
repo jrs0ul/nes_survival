@@ -35,7 +35,7 @@ MapEntryPoints:
     ;cave entrance from location 2
     .byte 1, 0, 118, 121, 20, 30, 40, 50
     ;crashsite entrance from cave
-    .byte 6, 0, 0, 255, 0, 255, 0, 32
+    .byte 6, 0, 0, 255, 0, 255, 0, 22
     ;crashsite exit to cave
     .byte 7, 0, 0, 255, 0, 255, 222, 255
     ;cave exit to second location

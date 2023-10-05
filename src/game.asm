@@ -1233,8 +1233,11 @@ MapRowAddressTable:
 TempRowIndex:
     .res 1
 
+TempCollisionVar:
+    .res 1
+
 Buffer:
-    .res 346  ;must see how much is still available
+    .res 345  ;must see how much is still available
 
 ;====================================================================================
 
@@ -3677,6 +3680,14 @@ HandleInput:
     jsr IsPlayerCollidingWithNpcs
     bne @resetStuff
 
+
+    ;calc screen for collision
+    lda CurrentMapSegmentIndex
+    clc
+    adc MustIncrementScreenIndex
+    sec
+    sbc MustDecrementScreenIndex
+    sta TempCollisionVar
 
     ;first general check of newX and newY
     jsr CanPlayerGo
