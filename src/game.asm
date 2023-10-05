@@ -529,7 +529,7 @@ player_sprites_flip:
     FADE_DELAY_GAME_OVER       = 3
     FADE_DELAY_GENERIC         = 2
     FADE_DELAY_SLEEP           = 10
-    MAX_VILLAGERS              = 2
+    MAX_VILLAGERS              = 3
 
     MAX_LOCATIONS              = 6
 
@@ -1245,7 +1245,7 @@ destructableIdx:
     .res 1
 
 Buffer:
-    .res 343  ;must see how much is still available
+    .res 342  ;must see how much is still available
 
 ;====================================================================================
 
