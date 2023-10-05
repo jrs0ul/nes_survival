@@ -115,6 +115,7 @@ banktable:              ; Write to this table to switch banks.
 .include "data/MapEntryPoints.asm"
 .include "data/AnimalSpawnPositions.asm"
 
+;collision lookup table positions
 row_table_screens:
     .byte 0
     .byte 60
@@ -4567,6 +4568,8 @@ StartGame:
     sta MustLoadOutside
     sta MustLoadSomething
     sta MustCopyMainChr
+
+    jsr BuildRowTable
 
 
     rts

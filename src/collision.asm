@@ -210,9 +210,16 @@ TestPointAgainstCollisionMap:
 ;Fill ram table with map row addresses
 BuildRowTable:
 
+    ldx #0
+@screenLoop:
+
     lda LocationIndex
     asl
-    asl
+    asl ; locationindex * 4
+    sta Temp
+    txa
+    clc
+    adc Temp
     tay
 
     lda map_list_low, y
@@ -225,27 +232,25 @@ BuildRowTable:
     sta TempRowIndex
 @rowLoop: ; Loop through all 30 rows of the map screen
 
-    ldx TempRowIndex
+    lda TempRowIndex
     beq @skipcalculation
 
-@addressLoop:
 
     lda pointer
     clc
     adc #32
     sta pointer
     bcs @incrementUpper
-    jmp @nextRow
+    jmp @skipcalculation
 @incrementUpper:
     inc pointer + 1
-@nextRow:
-    dex
-    bne @addressLoop
 
 @skipcalculation:
 
     lda TempRowIndex
     asl
+    clc
+    adc row_table_screens, x
     tay
     lda pointer
     sta MapRowAddressTable, y
@@ -257,5 +262,9 @@ BuildRowTable:
     lda TempRowIndex
     cmp #SCREEN_ROW_COUNT
     bcc @rowLoop
+
+    inx
+    cpx #4
+    bcc @screenLoop
 
     rts
