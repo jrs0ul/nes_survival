@@ -63,15 +63,48 @@ dialog_quest_3: ;animal hide
     .byte $47,$40,$00,$46,$3e,$00,$00,$00,$00,$5a,$00,$00,$00,$00,$00,$00
     .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
     .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
+;----
+granny_quest_0:
+    .byte $00,$41,$3e,$45,$45,$48,$00,$3d,$3e,$3a,$4b,$42,$3e,$59,$00,$50
+    .byte $41,$48,$00,$46,$42,$40,$41,$4d,$00,$52,$48,$4e,$00,$3b,$3e,$5a
+    .byte $00,$46,$52,$00,$4c,$4d,$48,$4f,$3e,$00,$42,$4c,$00,$40,$3e,$4d
+    .byte $4d,$42,$47,$40,$00,$3c,$48,$45,$3d,$82,$82,$82,$00,$00,$00,$00
+    .byte $00,$3c,$48,$4e,$45,$3d,$00,$52,$48,$4e,$00,$3b,$4b,$42,$47,$40
+    .byte $00,$46,$3e,$00,$3a,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
+
+granny_quest_1:
+    .byte $00,$41,$3e,$45,$45,$48,$00,$3d,$3e,$3a,$4b,$42,$3e,$59,$00,$50
+    .byte $41,$48,$00,$46,$42,$40,$41,$4d,$00,$52,$48,$4e,$00,$3b,$3e,$5a
+    .byte $00,$46,$52,$00,$4c,$4d,$48,$4f,$3e,$00,$42,$4c,$00,$40,$3e,$4d
+    .byte $4d,$42,$47,$40,$00,$3c,$48,$45,$3d,$82,$82,$82,$00,$00,$00,$00
+    .byte $00,$3c,$48,$4e,$45,$3d,$00,$52,$48,$4e,$00,$3b,$4b,$42,$47,$40
+    .byte $00,$46,$3e,$00,$3a,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
+
+granny_quest_2:
+    .byte $00,$41,$3e,$45,$45,$48,$00,$3d,$3e,$3a,$4b,$42,$3e,$59,$00,$50
+    .byte $41,$48,$00,$46,$42,$40,$41,$4d,$00,$52,$48,$4e,$00,$3b,$3e,$5a
+    .byte $00,$46,$52,$00,$4c,$4d,$48,$4f,$3e,$00,$42,$4c,$00,$40,$3e,$4d
+    .byte $4d,$42,$47,$40,$00,$3c,$48,$45,$3d,$82,$82,$82,$00,$00,$00,$00
+    .byte $00,$3c,$48,$4e,$45,$3d,$00,$52,$48,$4e,$00,$3b,$4b,$42,$47,$40
+    .byte $00,$46,$3e,$00,$3a,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
+
+granny_quest_3:
+    .byte $00,$41,$3e,$45,$45,$48,$00,$3d,$3e,$3a,$4b,$42,$3e,$59,$00,$50
+    .byte $41,$48,$00,$46,$42,$40,$41,$4d,$00,$52,$48,$4e,$00,$3b,$3e,$5a
+    .byte $00,$46,$52,$00,$4c,$4d,$48,$4f,$3e,$00,$42,$4c,$00,$40,$3e,$4d
+    .byte $4d,$42,$47,$40,$00,$3c,$48,$45,$3d,$82,$82,$82,$00,$00,$00,$00
+    .byte $00,$3c,$48,$4e,$45,$3d,$00,$52,$48,$4e,$00,$3b,$4b,$42,$47,$40
+    .byte $00,$46,$3e,$00,$3a,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
+
 
 ;=====================
 villager_bear_thanks_0: ;after cooked meat
-    .byte $00,$52,$4e,$46,$59,$ad,$52,$48,$4e,$ad,$3c,$3a,$47,$ad,$4b,$3e
-    .byte $3a,$3c,$41,$ad,$4d,$41,$3e,$ad,$49,$45,$3a,$47,$3e,$ad,$ad,$ad
-    .byte $00,$4d,$41,$4b,$48,$4e,$40,$41,$ad,$4d,$41,$3e,$ad,$3c,$3a,$4f
-    .byte $3e,$59,$ad,$3a,$45,$4d,$41,$48,$4e,$40,$41,$ad,$42,$54,$ad,$ad
-    .byte $00,$50,$48,$4e,$45,$3d,$47,$7d,$4d,$ad,$4b,$3e,$3c,$48,$46,$46
-    .byte $3e,$47,$3d,$ad,$3d,$48,$42,$47,$40,$ad,$4d,$41,$3a,$4d,$82,$00
+    .byte $00,$52,$4e,$46,$59,$00,$52,$48,$4e,$00,$3c,$3a,$47,$00,$4b,$3e
+    .byte $3a,$3c,$41,$00,$4d,$41,$3e,$00,$49,$45,$3a,$47,$3e,$00,$00,$00
+    .byte $00,$4d,$41,$4b,$48,$4e,$40,$41,$00,$4d,$41,$3e,$00,$3c,$3a,$4f
+    .byte $3e,$59,$00,$3a,$45,$4d,$41,$48,$4e,$40,$41,$00,$42,$54,$00,$00
+    .byte $00,$50,$48,$4e,$45,$3d,$47,$7d,$4d,$00,$4b,$3e,$3c,$48,$46,$46
+    .byte $3e,$47,$3d,$00,$3d,$48,$42,$47,$40,$00,$4d,$41,$3a,$4d,$82,$00
 
 villager_bear_thanks_1: ;thanks for spear -->hide
     .byte $00,$00,$00,$00,$00,$00,$00,$41,$3e,$4b,$3e,$00,$4d,$3a,$44,$3e
@@ -131,9 +164,19 @@ dialog_thanks_3: ;hide_thanks - > coat
     .byte $00,$00,$00,$3f,$4b,$48,$46,$00,$3c,$48,$45,$3d,$00,$3d,$4e,$4b
     .byte $42,$47,$40,$00,$4d,$41,$3e,$00,$3d,$3a,$52,$82,$00,$00,$00,$00
 
+;-----
+granny_thanks_0:
+    .byte $00,$00,$00,$00,$00,$00,$00,$4d,$41,$3a,$47,$44,$00,$52,$48,$4e
+    .byte $00,$3d,$3e,$3a,$4b,$00,$59,$00,$00,$00,$00,$00,$00,$00,$00,$00
+    .byte $00,$00,$00,$4d,$41,$3a,$47,$44,$4c,$00,$4d,$48,$00,$52,$48,$4e
+    .byte $00,$46,$52,$00,$41,$48,$46,$3e,$00,$50,$42,$45,$45,$00,$00,$00
+    .byte $00,$00,$00,$00,$4c,$4d,$3a,$52,$00,$50,$3a,$4b,$46,$00,$3a,$47
+    .byte $3d,$00,$3c,$48,$53,$52,$59,$00,$00,$00,$00,$00,$00,$00,$00,$00
+
+;==============================
 
 QuestSpritesCount:
-    .byte 0, 4, 4, 0,  0, 4, 0, 2,  0, 4, 0, 2
+    .byte 0, 4, 4, 0,  0, 4, 0, 2,  2, 2, 2, 2
 
 QuestSprites:
     .byte 0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
@@ -146,10 +189,10 @@ QuestSprites:
     .byte 0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     .byte 191,$86,0,176, 191,$87,0,184, 0,0,0,0, 0,0,0,0
 
-    .byte 0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-    .byte 200,$36,3,136, 200,$37,3,144, 200,$36,3,176, 200,$37,3,184
-    .byte 0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-    .byte 191,$86,0,176, 191,$87,0,184, 0,0,0,0, 0,0,0,0
+    .byte 200,  6, 0, 208, 200, 7, 0, 216, 0, 0, 0, 0, 0, 0, 0
+    .byte 200,  6, 0, 208, 200, 7, 0, 216, 0, 0, 0, 0, 0, 0, 0
+    .byte 200,  6, 0, 208, 200, 7, 0, 216, 0, 0, 0, 0, 0, 0, 0
+    .byte 200,  6, 0, 208, 200, 7, 0, 216, 0, 0, 0, 0, 0, 0, 0
 
 
 
@@ -164,10 +207,10 @@ quest_list_low:
     .byte <dialog_quest_2
     .byte <dialog_quest_3
 
-    .byte <dialog_quest_0
-    .byte <dialog_quest_1
-    .byte <dialog_quest_2
-    .byte <dialog_quest_3
+    .byte <granny_quest_0
+    .byte <granny_quest_1
+    .byte <granny_quest_2
+    .byte <granny_quest_3
 
 quest_list_high:
     .byte >villager_bear_quest_0
@@ -180,10 +223,10 @@ quest_list_high:
     .byte >dialog_quest_2
     .byte >dialog_quest_3
 
-    .byte >dialog_quest_0
-    .byte >dialog_quest_1
-    .byte >dialog_quest_2
-    .byte >dialog_quest_3
+    .byte >granny_quest_0
+    .byte >granny_quest_1
+    .byte >granny_quest_2
+    .byte >granny_quest_3
 
 thanks_list_low:
     .byte <villager_bear_thanks_0
@@ -196,10 +239,10 @@ thanks_list_low:
     .byte <dialog_thanks_2
     .byte <dialog_thanks_3
 
-    .byte <dialog_thanks_0
-    .byte <dialog_thanks_1
-    .byte <dialog_thanks_2
-    .byte <dialog_thanks_3
+    .byte <granny_thanks_0
+    .byte <granny_thanks_0
+    .byte <granny_thanks_0
+    .byte <granny_thanks_0
 
 thanks_list_high:
     .byte >villager_bear_thanks_0
@@ -212,10 +255,10 @@ thanks_list_high:
     .byte >dialog_thanks_2
     .byte >dialog_thanks_3
 
-    .byte >dialog_thanks_0
-    .byte >dialog_thanks_1
-    .byte >dialog_thanks_2
-    .byte >dialog_thanks_3
+    .byte >granny_thanks_0
+    .byte >granny_thanks_0
+    .byte >granny_thanks_0
+    .byte >granny_thanks_0
 
 
 first_time_text: ;when player enters the hut for the first time
@@ -231,12 +274,12 @@ first_time_text: ;when player enters the hut for the first time
 goal_items_list:
     .byte ITEM_COOKED_MEAT, ITEM_SPEAR, ITEM_JAM, ITEM_COAT
     .byte ITEM_RAW_MEAT, ITEM_KNIFE, ITEM_COOKED_FISH, ITEM_HIDE
-    .byte ITEM_RAW_MEAT, ITEM_KNIFE, ITEM_COOKED_FISH, ITEM_HIDE
+    .byte ITEM_STICK, ITEM_STICK, ITEM_STICK, ITEM_STICK
 
 reward_items_list:
     .byte 0, ITEM_HIDE, ITEM_FISHING_ROD, ITEM_HAMMER
     .byte 0, ITEM_ROWAN_BERRIES, 0, ITEM_COAT
-    .byte 0, ITEM_ROWAN_BERRIES, 0, ITEM_COAT
+    .byte 0, 0, 0, 0
 
 .segment "RODATA"
 

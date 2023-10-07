@@ -456,15 +456,27 @@ DrawItemMenu:
     lda #MENU_SUBMENU_ADDRESS_LOW
     sta TempX
 
+
     lda #9
     sta TempPointX
     lda #9
     sta TempPointY
 
+    lda InVillagerHut
+    beq @regularMenu
+
+    lda #<ItemMenuVillager
+    sta pointer
+    lda #>ItemMenuVillager
+    sta pointer + 1
+    jmp @transfer
+
+@regularMenu:
     lda #<ItemMenu
     sta pointer
     lda #>ItemMenu
     sta pointer + 1
+@transfer:
     jsr TransferTiles
 
     lda #0
@@ -1858,6 +1870,43 @@ EquipItem:
     rts
 
 ;-------------------------------------
+GiveItem:
+    stx TempRegX
+    jsr GetPaletteFadeValueForHour
+    cmp #$40
+    bne @continue
+
+    lda VillagerIndex
+    beq @exit  ; no giving at night to bear
+@continue:
+    lda ItemIGave
+    bne @exit ; already gave item
+
+    ldx TempRegX
+    lda VillagerIndex
+    tay
+    asl
+    asl
+    clc
+    adc ActiveVillagerQuests, y
+    tay
+    lda Inventory, x
+    cmp goal_items_list, y
+    bne @exit
+
+
+    jsr SpawnRewardItem
+
+    lda #1
+    jmp @done
+
+@exit:
+    lda #0
+@done:
+
+    rts
+
+;-------------------------------------
 ItemMenuInput:
 
     lda #16
@@ -1905,7 +1954,17 @@ ItemMenuInput:
     jmp @clearItem
 @checkIfStash:
     cmp #1
-    bne @clearItem ; DROP
+    bne @clearItem ; go to DROP
+
+    lda InVillagerHut
+    beq @stashStuff ; not in a villager house
+
+    jsr GiveItem
+    beq @exit
+
+    jmp @clearItem
+
+@stashStuff:
     lda StashActivated
     bne @take_from_stash
     jsr StoreItemInStash
