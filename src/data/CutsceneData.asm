@@ -4,10 +4,10 @@
 .include "data/intro_bg_mowdens_base_comp.asm"
 .include "data/intro_bg_mowdens_top_comp.asm"
 
-.include "data/outro_bg_sos.asm"
-.include "data/outro_bg_that_same_day.asm"
-.include "data/outro_bg_chopper_comes.asm"
-.include "data/outro_bg_victory.asm"
+.include "data/outro_bg_sos_comp.asm"
+.include "data/outro_bg_that_same_day_comp.asm"
+.include "data/outro_bg_chopper_comes_comp.asm"
+.include "data/outro_bg_victory_comp.asm"
 
 
 intro_scenes_low:
@@ -29,16 +29,16 @@ intro_scenes_high:
     .byte >intro_bg_mowdens_top_comp
 
 outro_scenes_low:
-    .byte <outro_bg_sos
-    .byte <outro_bg_that_same_day
-    .byte <outro_bg_chopper_comes
-    .byte <outro_bg_victory
+    .byte <outro_bg_sos_comp
+    .byte <outro_bg_that_same_day_comp
+    .byte <outro_bg_chopper_comes_comp
+    .byte <outro_bg_victory_comp
 
 outro_scenes_high:
-    .byte >outro_bg_sos
-    .byte >outro_bg_that_same_day
-    .byte >outro_bg_chopper_comes
-    .byte >outro_bg_victory
+    .byte >outro_bg_sos_comp
+    .byte >outro_bg_that_same_day_comp
+    .byte >outro_bg_chopper_comes_comp
+    .byte >outro_bg_victory_comp
 
 intro_scenes_delay:
     .byte 5
@@ -592,7 +592,7 @@ intro_sprite_dir_y:
 ;backround scrolling directions for the scenes
 
 intro_scroll_dir_x:
-    .byte 0;1
+    .byte 1
     .byte 0
     .byte 1
     .byte 0

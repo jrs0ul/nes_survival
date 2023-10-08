@@ -546,7 +546,6 @@ LoadIntroScene:
 
     lda #$24
     sta NametableAddress
-    ;jsr LoadNametable
 
     jsr DecompressRLE
 
@@ -558,7 +557,6 @@ LoadIntroScene:
 
     lda #$20
     sta NametableAddress
-    ;jsr LoadNametable
     jsr DecompressRLE
 
     jsr ClearPalette
@@ -592,7 +590,7 @@ LoadOutroScene:
     sta pointer+1
     lda #$24
     sta NametableAddress
-    jsr LoadNametable
+    jsr DecompressRLE
     ldy CutsceneSceneIdx
     lda outro_scenes_low, y
     sta pointer
@@ -601,7 +599,7 @@ LoadOutroScene:
 
     lda #$20
     sta NametableAddress
-    jsr LoadNametable
+    jsr DecompressRLE
 
     jsr ClearPalette
 
