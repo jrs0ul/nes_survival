@@ -1244,8 +1244,11 @@ DestroyedTilesCount:
 destructableIdx:
     .res 1
 
+RLETag:
+    .res 1
+
 Buffer:
-    .res 342  ;must see how much is still available
+    .res 341  ;must see how much is still available
 
 ;====================================================================================
 
@@ -1663,6 +1666,7 @@ noBankSwitch:
     rti        ; return from interrupt
 
 ;#############################| Subroutines |#############################################
+.include "decompress_rle.asm"
 .include "graphics.asm"
 .include "collision.asm"
 .include "items.asm"

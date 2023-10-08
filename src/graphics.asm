@@ -88,19 +88,19 @@ LoadNametable:
 
     ldx #$00
     ldy #$00
-OutsideLoop:
+@OutsideLoop:
 
-InsideLoop:
+@InsideLoop:
 
     lda (pointer),y       ;
     sta $2007             ; write to PPU
     iny
     cpy #0
-    bne InsideLoop
+    bne @InsideLoop
 
     inc pointer + 1
     inx
     cpx #4
-    bne OutsideLoop
+    bne @OutsideLoop
 
     rts

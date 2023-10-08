@@ -1,8 +1,8 @@
-.include "data/intro_bg_mowdens.asm"
-.include "data/intro_bg_cockpit.asm"
-.include "data/intro_bg_boom.asm"
-.include "data/intro_bg_mowdens_base.asm"
-.include "data/intro_bg_mowdens_top.asm"
+.include "data/intro_bg_mowdens_comp.asm"
+.include "data/intro_bg_cockpit_comp.asm"
+.include "data/intro_bg_boom_comp.asm"
+.include "data/intro_bg_mowdens_base_comp.asm"
+.include "data/intro_bg_mowdens_top_comp.asm"
 
 .include "data/outro_bg_sos.asm"
 .include "data/outro_bg_that_same_day.asm"
@@ -11,22 +11,22 @@
 
 
 intro_scenes_low:
-    .byte <intro_bg_mowdens
-    .byte <intro_bg_cockpit
-    .byte <intro_bg_mowdens
-    .byte <intro_bg_boom
-    .byte <intro_bg_mowdens
-    .byte <intro_bg_mowdens_base
-    .byte <intro_bg_mowdens_top
+    .byte <intro_bg_mowdens_comp
+    .byte <intro_bg_cockpit_comp
+    .byte <intro_bg_mowdens_comp
+    .byte <intro_bg_boom_comp
+    .byte <intro_bg_mowdens_comp
+    .byte <intro_bg_mowdens_base_comp
+    .byte <intro_bg_mowdens_top_comp
 
 intro_scenes_high:
-    .byte >intro_bg_mowdens
-    .byte >intro_bg_cockpit
-    .byte >intro_bg_mowdens
-    .byte >intro_bg_boom
-    .byte >intro_bg_mowdens
-    .byte >intro_bg_mowdens_base
-    .byte >intro_bg_mowdens_top
+    .byte >intro_bg_mowdens_comp
+    .byte >intro_bg_cockpit_comp
+    .byte >intro_bg_mowdens_comp
+    .byte >intro_bg_boom_comp
+    .byte >intro_bg_mowdens_comp
+    .byte >intro_bg_mowdens_base_comp
+    .byte >intro_bg_mowdens_top_comp
 
 outro_scenes_low:
     .byte <outro_bg_sos
@@ -592,7 +592,7 @@ intro_sprite_dir_y:
 ;backround scrolling directions for the scenes
 
 intro_scroll_dir_x:
-    .byte 1
+    .byte 0;1
     .byte 0
     .byte 1
     .byte 0
