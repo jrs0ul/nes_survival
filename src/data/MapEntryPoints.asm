@@ -45,7 +45,7 @@ MapEntryPoints:
     ;exit from granny's location to the main one
     .byte 8, 0, 0, 255, 0, 255, 0, 32
     ;granny's house
-    .byte 8, 0, 118, 121, 150, 155, 104, 111
+    .byte 8, 0, 118, 122, 150, 155, 104, 111
     ;exit from grannys house
     .byte 9, 0, 0, 255, 0, 255, 151, 255
 
