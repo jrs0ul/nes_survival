@@ -8,7 +8,7 @@ LoadMenu:
     cmp #1
     beq @cont
     ;uh-oh, wrong bank!
-    ;probably the NMI switched back to previous bank
+    ;probably the NMI switched back to a previous bank
     lda #0
     sta MustLoadMenu
     sta MustLoadSomething
@@ -18,15 +18,15 @@ LoadMenu:
     sta $2000
     sta $2001
 
-    lda #<menu_screen
+    lda #<menu_screen_comp
     sta pointer
-    lda #>menu_screen
+    lda #>menu_screen_comp
     sta pointer + 1
 
     lda FirstNametableAddr
     sta NametableAddress
 
-    jsr LoadNametable
+    jsr DecompressRLE
 
     lda #<menu_palette
     sta pointer

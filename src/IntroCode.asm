@@ -700,15 +700,15 @@ LoadTitleData:
     jsr LoadPalette
 
 
-    lda #<title
+    lda #<title_comp
     sta pointer
-    lda #>title
+    lda #>title_comp
     sta pointer+1
 
     lda #$20
     sta NametableAddress
 
-    jsr LoadNametable
+    jsr DecompressRLE
 
     lda #STATE_TITLE
     sta GameState
@@ -718,16 +718,16 @@ LoadTitleData:
 ;same with this one
 LoadGameOverData:
 
-    lda #<game_over
+    lda #<game_over_comp
     sta pointer
-    lda #>game_over
+    lda #>game_over_comp
     sta pointer+1
     lda PPUCTRL
     and #%11111110
     sta PPUCTRL
     lda #$20
     sta NametableAddress
-    jsr LoadNametable
+    jsr DecompressRLE
 
 
     jsr SetDaysInGameOver

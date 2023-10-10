@@ -40,7 +40,7 @@ main_tiles_chr: .incbin "main.chr"
 
 .include "data/menu_data.asm"
 .include "data/recipes.asm"
-.include "data/menu_screen.asm"
+.include "data/menu_screen_comp.asm"
 
 ;============================================================
 .segment "ROM2"
@@ -83,8 +83,8 @@ intro_palette:
     .byte $0C,$00,$31,$30, $0C,$01,$31,$30, $0C,$16,$31,$36, $0C,$18,$07,$30 ; background
     .byte $0C,$06,$16,$30, $0C,$0c,$35,$21, $0C,$0c,$16,$36, $0C,$01,$07,$21 ; sprites
 
-.include "data/title.asm"
-.include "data/game_over.asm"
+.include "data/title_comp.asm"
+.include "data/game_over_comp.asm"
 .include "data/CutsceneData.asm"
 
 ;=============================================================
