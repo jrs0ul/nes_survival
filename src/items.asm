@@ -316,6 +316,7 @@ AddAndDeactivateItems:
     rts
 
 ;===================================================
+.SEGMENT "ROM1"
 ;update sprites from ItemCount-1 to 0
 UpdateItemSpritesInWorldZtoA:
 
@@ -452,4 +453,5 @@ UpdateItemSprites:
 
     rts
 
+.SEGMENT "CODE"
 

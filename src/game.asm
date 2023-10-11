@@ -5965,6 +5965,11 @@ UpdateSprites:
 ;--------------------
 @no_stamina_bar:
 
+    ldy current_bank
+    sty oldbank
+    ldy #1
+    jsr bankswitch_y
+
     lda FlickerFrame
     beq @doZtoA
     lda #0
@@ -5981,6 +5986,10 @@ UpdateSprites:
     jsr UpdateItemSpritesInWorldZtoA
 
 @updateTextdialog:
+
+    ldy oldbank
+    jsr bankswitch_y
+
 ;-----------TEXT DIALOG SPRITES
 
     lda InVillagerHut
@@ -6345,3 +6354,4 @@ spriteLoadLoop:
 
     rts
 
+;dpcm: .incbin "data/music.dmc"

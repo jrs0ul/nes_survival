@@ -5,14 +5,16 @@
 ;.endif
 
 music_data_untitled:
-	.byte 3
+	.byte 4
 	.word @instruments
-	.word @samples-4
+	.word @samples-52
 	.word @song0ch0,@song0ch1,@song0ch2,@song0ch3,@song0ch4 ; 00 : Outside
 	.byte .lobyte(@tempo_env_1_mid), .hibyte(@tempo_env_1_mid), 0, 0
 	.word @song1ch0,@song1ch1,@song1ch2,@song1ch3,@song1ch4 ; 01 : Indoors
 	.byte .lobyte(@tempo_env_1_mid), .hibyte(@tempo_env_1_mid), 0, 0
 	.word @song2ch0,@song2ch1,@song2ch2,@song2ch3,@song2ch4 ; 02 : Title
+	.byte .lobyte(@tempo_env_1_mid), .hibyte(@tempo_env_1_mid), 0, 0
+	.word @song3ch0,@song3ch1,@song3ch2,@song3ch3,@song3ch4 ; 03 : GameOver
 	.byte .lobyte(@tempo_env_1_mid), .hibyte(@tempo_env_1_mid), 0, 0
 
 .export music_data_untitled
@@ -22,6 +24,7 @@ music_data_untitled:
 	.word @env1,@env2,@env3,@env0 ; 00 : Instrument 1
 
 @samples:
+	.byte $00+.lobyte(FAMISTUDIO_DPCM_PTR),$ff,$0f,$40	;13 (game_over)
 
 @env0:
 	.byte $00,$c0,$7f,$00,$02
@@ -391,3 +394,56 @@ music_data_untitled:
 	.word @song2ref300
 	.byte $42
 	.word @song2ch4loop
+@song3ch0:
+@song3ch0loop:
+	.byte $46, .lobyte(@tempo_env_1_mid), .hibyte(@tempo_env_1_mid)
+@song3ref5:
+	.byte $ff, $ff, $bf, $47, $ff, $ff, $bf, $47, $ff, $ff, $bf, $47, $ff, $ff, $bf, $47, $ff, $ff, $bf, $47
+	.byte $41, $0f
+	.word @song3ref5
+	.byte $47
+	.byte $41, $0f
+	.word @song3ref5
+	.byte $47, $ff, $ff, $bf, $42
+	.word @song3ch0loop
+@song3ch1:
+@song3ch1loop:
+@song3ref40:
+	.byte $ff, $ff, $bf, $ff, $ff, $bf, $ff, $ff, $bf, $ff, $ff, $bf, $ff, $ff, $bf
+	.byte $41, $0f
+	.word @song3ref40
+	.byte $41, $0f
+	.word @song3ref40
+	.byte $ff, $ff, $bf, $42
+	.word @song3ch1loop
+@song3ch2:
+@song3ch2loop:
+	.byte $41, $0f
+	.word @song3ref40
+	.byte $41, $0f
+	.word @song3ref40
+	.byte $41, $0f
+	.word @song3ref40
+	.byte $ff, $ff, $bf, $42
+	.word @song3ch2loop
+@song3ch3:
+@song3ch3loop:
+	.byte $41, $0f
+	.word @song3ref40
+	.byte $41, $0f
+	.word @song3ref40
+	.byte $41, $0f
+	.word @song3ref40
+	.byte $ff, $ff, $bf, $42
+	.word @song3ch3loop
+@song3ch4:
+@song3ch4loop:
+	.byte $0d, $ff, $9d, $00, $ff, $9d
+	.byte $41, $0f
+	.word @song3ref40
+	.byte $41, $0f
+	.word @song3ref40
+	.byte $41, $0f
+	.word @song3ref40
+	.byte $42
+	.word @song3ch4loop

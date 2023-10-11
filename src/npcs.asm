@@ -1180,6 +1180,7 @@ BuildSpearAttackSquare:
     rts
 
 ;-------------------------------------
+.SEGMENT "ROM1"
 UpdateNpcSpritesInWorldZtoA:
 
     ldy NpcCount
@@ -1520,7 +1521,7 @@ UpdateNpcRow:
 
     rts
 
-
+.SEGMENT "CODE"
 ;----------------------------------
 doNpcAI:
 
@@ -1601,6 +1602,7 @@ doNpcAI:
     sta NpcAIUpdateDelay
 @exit:
     rts
+
 ;-----------------------------------
 FetchNpcVars:
     lda Npcs, x
