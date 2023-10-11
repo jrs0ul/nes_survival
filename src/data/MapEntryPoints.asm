@@ -61,7 +61,7 @@ MapEntryPoints:
 ;ItemListLow,
 ;ItemListHigh
 ;location bank number
-;<UNUSED>
+;scroll X
 ;<UNUSED>
 ;isInterrriorMap?
 ;mapLow (only interrior maps work)
@@ -88,10 +88,10 @@ MapSpawnPoint:
     .byte 128, 32, 0, OUTDOORS_LOC1_SCREEN_COUNT, <Outside1_items, >Outside1_items, 0, 0, 0
     .byte 0, 0, 0, 3, 0, 0, 3
     ;Exit point of third location
-    .byte 120, 209, 0, OUTDOORS_LOC1_SCREEN_COUNT, <Outside1_items, >Outside1_items, 0, 0, 0
+    .byte 120, 209, 0, OUTDOORS_LOC1_SCREEN_COUNT, <Outside1_items, >Outside1_items, 0, 103, 0
     .byte 0, 0, 0, 3, 0, 0, 1
     ;Bear's house exit
-    .byte $76, $80, 1, OUTDOORS_LOC2_SCREEN_COUNT, <Outside2_items, >Outside2_items, 4, 0, 0
+    .byte $76, $80, 1, OUTDOORS_LOC2_SCREEN_COUNT, <Outside2_items, >Outside2_items, 4, $B8, 0
     .byte 0, 0, 0, 3, 0, 0, 1
     ;Player's house exit
     .byte 72, 120, 0, OUTDOORS_LOC1_SCREEN_COUNT, <Outside1_items, >Outside1_items, 0, 0, 0
@@ -100,7 +100,7 @@ MapSpawnPoint:
     .byte 128, 136, 5, 1, <House_items, >House_items, 0, 0, 0
     .byte 1, <villager2_hut, >villager2_hut, 0, <villager2_npcs, >villager2_npcs, 0
     ;Second villager house's exit
-    .byte 119, 151, 2, OUTDOORS_LOC3_SCREEN_COUNT, <Outside3_items, >Outside3_items, 0, 0, 0
+    .byte 119, 151, 2, OUTDOORS_LOC3_SCREEN_COUNT, <Outside3_items, >Outside3_items, 0, 57, 0
     .byte 0, 0, 0, 2, 0, 0, 0
     ;cave entrance
     .byte 56, 207, 6, OUTDOORS_LOC7_SCREEN_COUNT, <House_items, >House_items, 4, 0, 0
@@ -112,7 +112,7 @@ MapSpawnPoint:
     .byte 57, 34, 6, OUTDOORS_LOC7_SCREEN_COUNT, <House_items, >House_items, 4, 0, 0
     .byte 0, 0, 0, 0, <cave_npcs, >cave_npcs, 0
     ;cave exit to second location
-    .byte 120, 63, 1, OUTDOORS_LOC2_SCREEN_COUNT, <Outside2_items, >Outside2_items, 4, 0, 0
+    .byte 120, 63, 1, OUTDOORS_LOC2_SCREEN_COUNT, <Outside2_items, >Outside2_items, 4, 24, 0
     .byte 0, 0, 0, 3, 0, 0, 0
     ;granny location
     .byte 77, 42, 8, 2, <House_items, >House_items, 4,  0, 0
@@ -124,7 +124,7 @@ MapSpawnPoint:
     .byte 123, 148, 9, 1, <House_items, >House_items, 0, 0, 0
     .byte 1, <grannys_hut, >grannys_hut, 0, <villager3_npcs, >villager3_npcs, 0
     ;granny's house exit to the location 8
-    .byte 119, 126, 8, 2, <House_items, >House_items, 4, 0, 0
+    .byte 119, 126, 8, 2, <House_items, >House_items, 4, 154, 0
     .byte 0, 0, 0, 2, 0, 0, 0
 
 

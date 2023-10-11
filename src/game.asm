@@ -2825,9 +2825,6 @@ RoutinesAfterFadeOut:
     lda #0
     sta CurrentMapSegmentIndex
 
-    lda #$B8 ;hack
-    sta GlobalScroll
-
     jsr OnExitVillagerHut
 
 ;--------------------------Second location
@@ -2901,9 +2898,6 @@ RoutinesAfterFadeOut:
     cmp #5
     bne @next9
 
-    lda #103
-    sta GlobalScroll
-
     lda #28
     sta BgColumnIdxToUpload
     lda #2
@@ -2939,9 +2933,6 @@ RoutinesAfterFadeOut:
     lda #0
     sta CurrentMapSegmentIndex
 
-    lda #57
-    sta GlobalScroll
-
     lda #23
     sta BgColumnIdxToUpload
     lda #2
@@ -2962,7 +2953,6 @@ RoutinesAfterFadeOut:
     jsr ResetNameTableAdresses
 
 ;crashsite from cave
-
 @next12:
 
     lda ActiveMapEntryIndex
@@ -2984,7 +2974,6 @@ RoutinesAfterFadeOut:
     lda #0
     sta CurrentMapSegmentIndex
 
-
     jsr ResetNameTableAdresses
 
 ;location 2 from cave
@@ -2996,12 +2985,8 @@ RoutinesAfterFadeOut:
     lda #0
     sta CurrentMapSegmentIndex
 
-    lda #24
-    sta GlobalScroll
-
     lda #2
     sta ScrollDirection
-
 
 @next15:; granny's location
 
@@ -3021,7 +3006,6 @@ RoutinesAfterFadeOut:
     bne @next17
     lda #OUTDOORS_LOC1_SCREEN_COUNT - 1
     sta CurrentMapSegmentIndex
-
 
 ;enter granny's house
 @next17:
@@ -3050,17 +3034,12 @@ RoutinesAfterFadeOut:
     lda #0
     sta CurrentMapSegmentIndex
 
-    lda #154
-    sta GlobalScroll
-
     lda #3
     sta BgColumnIdxToUpload
     lda #2
     sta ScrollDirection
 
-
     jsr OnExitVillagerHut
-
 
 @next19:
 
@@ -3138,6 +3117,7 @@ CommonLocationRoutine:
 ;@continue:
     iny
     lda (pointer2), y ;
+    sta GlobalScroll
     iny
     lda (pointer2), y ;
     iny
@@ -3213,7 +3193,6 @@ CommonLocationRoutine:
     jsr bankswitch_y
 
     lda #0
-    sta GlobalScroll ; reset both scroll variables
     sta ScrollDirection
 
     jsr BuildRowTable
