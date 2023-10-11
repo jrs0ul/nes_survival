@@ -1424,7 +1424,7 @@ nextIteration:
     sty oldbank
 
     ldy #6
-    bankswitch ; macro
+    jsr bankswitch_y
 
     lda MustPlayNewSong
     beq doSoundUpdate
@@ -1438,12 +1438,15 @@ doSoundUpdate:
     jsr famistudio_update
 
     ldy oldbank
-    bankswitch
+    jsr bankswitch_y
 
     lda GameState
     cmp #STATE_GAME
     bne checkMenuState
-    jsr UpdateSprites
+
+
+    jsr RunSpriteUpdate
+
     jmp runrandom
 checkMenuState:
     cmp #STATE_MENU
@@ -1490,8 +1493,6 @@ hide_sprites:
 
 runrandom:
     jsr UpdateRandomNumber
-
-
 
 
     lda #0
@@ -1676,6 +1677,23 @@ noBankSwitch:
 .include "menu.asm"
 .include "IntroCode.asm"
 .include "IndoorCode.asm"
+
+;---------------------------------
+RunSpriteUpdate:
+    ldy current_bank
+    sty oldbank
+    ldy #1
+    jsr bankswitch_y
+
+
+    jsr UpdateSprites ; bank 1
+
+
+    ldy oldbank
+    jsr bankswitch_y
+
+    rts
+
 
 ;---------------------------------
 doIntro:
@@ -5688,6 +5706,8 @@ LoadInteriorMap:
     rts
 
 ;-----------------------------------
+.segment "ROM1"
+
 UpdateSprites:
 
     lda #0
@@ -5965,11 +5985,7 @@ UpdateSprites:
 ;--------------------
 @no_stamina_bar:
 
-    ldy current_bank
-    sty oldbank
-    ldy #1
-    jsr bankswitch_y
-
+    
     lda FlickerFrame
     beq @doZtoA
     lda #0
@@ -5987,20 +6003,13 @@ UpdateSprites:
 
 @updateTextdialog:
 
-    ldy oldbank
-    jsr bankswitch_y
 
 ;-----------TEXT DIALOG SPRITES
 
     lda InVillagerHut
     beq @hidesprites
 
-    ldy current_bank
-    sty oldbank
-    ldy #3
-    jsr bankswitch_y
-
-    jsr UpdateVillagerDialogSprites ;from bank 3
+    jsr UpdateVillagerDialogSprites 
 
 ;------------------- hide unused sprites
 @hidesprites:
@@ -6029,6 +6038,78 @@ UpdateSprites:
 
     rts
 ;==============================================================
+
+UpdateVillagerDialogSprites:
+
+    lda ItemIGave
+    bne @exit ;works for the quest dialogs so far
+
+    lda MustUpdateTextBaloon
+    bne @exit
+
+    stx TempRegX
+    jsr GetPaletteFadeValueForHour
+    cmp #$40
+    bne @continue
+
+    lda VillagerIndex  ;don't show sprites if bear
+    beq @restoreXAndExit
+
+@continue:
+    ldx TempRegX
+    jmp @updateSprites
+@restoreXAndExit:
+    ldx TempRegX
+    jmp @exit
+
+@updateSprites:
+    lda VillagerIndex
+    tay
+    asl
+    asl ; index * 4
+    clc
+    adc ActiveVillagerQuests, y
+    tay
+    lda QuestSpritesCount, y
+    beq @exit ;no sprites
+    sta TempFrame ;store sprite count
+
+    tya
+    asl
+    asl
+    asl
+    asl
+    tay
+
+@spriteLoop:
+
+    lda QuestSprites, y
+    sta FIRST_SPRITE, x
+    inx
+    iny
+    lda QuestSprites, y
+    sta FIRST_SPRITE, x
+    inx
+    iny
+    lda QuestSprites, y
+    sta FIRST_SPRITE, x
+    inx
+    iny
+    lda QuestSprites, y
+    sta FIRST_SPRITE, x
+    inx
+    iny
+
+
+    inc TempSpriteCount
+
+    dec TempFrame
+    bne @spriteLoop
+
+@exit:
+
+    rts
+;-----------------------------------
 
 SetTwoSpearSprites:
 
@@ -6339,6 +6420,8 @@ UpdateHammerSprites:
 
 @exit:
     rts
+
+.segment "CODE"
 ;----------------------------------
 initZeroSprite:
     ldx #$00
