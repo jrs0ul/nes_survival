@@ -90,9 +90,10 @@ intro_palette:
 ;=============================================================
 .segment "ROM6"
 
+FAMISTUDIO_DPCM_OFF = $F860
+FAMISTUDIO_CFG_C_BINDINGS = 0
 .include "data/music.s"
 .include "data/sfx.s"
-
 .include "famistudio_ca65.asm"
 ;=============================================================
 
@@ -646,6 +647,11 @@ MustLoadOutside:
     .res 1
 MustPlayNewSong:
     .res 1
+MustPlaySample:
+    .res 1
+
+SampleTimer:
+    .res 1
 SongName:
     .res 1
 IsLocationRoutine:
@@ -663,7 +669,7 @@ TempScreen:
     .res 1
 
 ZPBuffer:
-    .res 118  ; I want to be aware of the free memory
+    .res 116  ; I want to be aware of the free memory
 
 ;--------------
 .segment "BSS" ; variables in ram
@@ -1315,6 +1321,7 @@ clrmem:
     lda #2
     jsr famistudio_music_play
 
+
 vblankwait2:      ; Second wait for vblank, PPU is ready after this
     bit $2002
     bpl vblankwait2
@@ -1419,26 +1426,7 @@ nextIteration:
 
     jsr DoPaletteFades
 
-    ;famistudio update
-    ldy current_bank
-    sty oldbank
-
-    ldy #6
-    jsr bankswitch_y
-
-    lda MustPlayNewSong
-    beq doSoundUpdate
-
-    lda SongName
-    jsr famistudio_music_play
-    lda #0
-    sta MustPlayNewSong
-
-doSoundUpdate:
-    jsr famistudio_update
-
-    ldy oldbank
-    jsr bankswitch_y
+    jsr famistudioupdate
 
     lda GameState
     cmp #STATE_GAME
@@ -1677,6 +1665,50 @@ noBankSwitch:
 .include "menu.asm"
 .include "IntroCode.asm"
 .include "IndoorCode.asm"
+
+famistudioupdate:
+
+    ;famistudio update
+    ldy current_bank
+    sty oldbank
+
+    ldy #6
+    jsr bankswitch_y
+
+@checkNewSample:
+    lda MustPlaySample
+    beq @checkNewSong
+
+    jsr SamplePlay
+    jmp @doSoundUpdate
+
+@checkNewSong:
+    lda MustPlayNewSong
+    beq @doSoundUpdate
+
+    lda SongName
+    jsr famistudio_music_play
+    lda #0
+    sta MustPlayNewSong
+
+@doSoundUpdate:
+    jsr famistudio_update
+
+    ldy oldbank
+    jsr bankswitch_y
+
+    rts
+
+;----------------------------------
+SamplePlay:
+    jsr famistudio_music_stop
+    lda #13
+    jsr famistudio_sfx_sample_play
+    lda #0
+    sta MustPlaySample
+    lda #255
+    sta SampleTimer
+    rts
 
 ;---------------------------------
 RunSpriteUpdate:
@@ -4119,13 +4151,16 @@ LoadTitle:
     lda MustLoadTitle
     beq @exit
 
-    lda MustLoadTitleCHR
-    beq @loadJustData
 
     lda #2
     sta SongName
     lda #1
     sta MustPlayNewSong
+
+
+    lda MustLoadTitleCHR
+    beq @loadJustData
+
 
     ldy #2
     jsr bankswitch_y
@@ -4168,10 +4203,9 @@ LoadGameOver:
     lda MustLoadGameOver
     beq @exit
 
-    lda #2
-    sta SongName
+
     lda #1
-    sta MustPlayNewSong
+    sta MustPlaySample
 
     ldy #2
     jsr bankswitch_y
@@ -4283,6 +4317,7 @@ ResetEntityVariables:
     sta StaminaDelay
 
     lda #0
+    sta MustPlaySample
     sta InventoryItemIndex
     sta CurrentMapSegmentIndex
     sta ScrollDirection
@@ -6436,5 +6471,6 @@ spriteLoadLoop:
     sta SpritesUpdated
 
     rts
-
-;dpcm: .incbin "data/music.dmc"
+;--------------------------
+.segment "DPCM"
+dpcm: .incbin "data/music.dmc"
