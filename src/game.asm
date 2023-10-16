@@ -90,7 +90,7 @@ intro_palette:
 ;=============================================================
 .segment "ROM6"
 
-FAMISTUDIO_DPCM_OFF = $F860
+FAMISTUDIO_DPCM_OFF = $F920
 FAMISTUDIO_CFG_C_BINDINGS = 0
 .include "data/music.s"
 .include "data/sfx.s"
@@ -1701,9 +1701,8 @@ famistudioupdate:
 
 ;----------------------------------
 SamplePlay:
-    jsr famistudio_music_stop
-    lda #13
-    jsr famistudio_sfx_sample_play
+    lda #3
+    jsr famistudio_music_play
     lda #0
     sta MustPlaySample
     lda #255
