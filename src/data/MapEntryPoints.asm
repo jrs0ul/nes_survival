@@ -49,13 +49,13 @@ MapEntryPoints:
     ;exit from grannys house
     .byte 9, 0, 0, 255, 0, 255, 151, 255
     ;alien base entrance bottom
-    .byte 6, 1, 250, 255, 0, 255, 160, 200
+    .byte 6, 1, 232, 255, 0, 255, 160, 199
     ;alien base entrance top
-    .byte 6, 1, 250, 255, 0, 255, 80, 100
+    .byte 6, 1, 232, 255, 0, 255, 80, 100
     ;alien base exit top
-    .byte 10, 0, 0, 20, 0, 0, 80, 100
+    .byte 10, 0, 0, 5, 0, 255, 88, 111
     ;alien base exit bottom
-    .byte 10, 0, 0, 20, 0, 0, 160, 200
+    .byte 10, 0, 0, 5, 0, 255, 160, 200
 
 
 .segment "ROM0"
@@ -70,7 +70,7 @@ MapEntryPoints:
 ;ItemListHigh
 ;location bank number
 ;scroll X
-;<UNUSED>
+;active screen
 ;isInterrriorMap?
 ;mapLow (only interrior maps work)
 ;mapHigh
@@ -135,16 +135,16 @@ MapSpawnPoint:
     .byte 119, 126, 8, 2, <House_items, >House_items, 5, 154, 0
     .byte 0, 0, 0, 2, 0, 0, 0
     ;alien base entrance bottom
-    .byte 10, 60, 10, 2, <House_items, >House_items, 4, 0, 0
+    .byte 15, 170, 10, 2, <House_items, >House_items, 4, 0, 0
     .byte 0, 0, 0, 0, 0, 0, 0
     ;alien base entrance top
-    .byte 10, 60, 10, 2, <House_items, >House_items, 4, 0, 0
+    .byte 15, 60, 10, 2, <House_items, >House_items, 4, 0, 0
     .byte 0, 0, 0, 0, 0, 0, 0
     ;alien base exit top
-    .byte 6, 230, 60, 2, <House_items, >House_items, 5, 255, 0
+    .byte 6, 230, 60, 2, <House_items, >House_items, 5, 0, 1
     .byte 0, 0, 0, 0, 0, 0, 0
     ;alien base exit bottom
-    .byte 6, 230, 160, 2, <House_items, >House_items, 5, 255, 0
+    .byte 6, 230, 160, 2, <House_items, >House_items, 5, 0, 1
     .byte 0, 0, 0, 0, 0, 0, 0
 
 

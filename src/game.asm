@@ -3170,10 +3170,11 @@ CommonLocationRoutine:
 
 ;@continue:
     iny
-    lda (pointer2), y ;
+    lda (pointer2), y ; scroll X
     sta GlobalScroll
     iny
-    lda (pointer2), y ;
+    lda (pointer2), y ; active screen
+    sta CurrentMapSegmentIndex
     iny
     lda (pointer2), y ; is the location indoors or outdoors
     bne @itsAnIndoorMap
