@@ -48,6 +48,14 @@ MapEntryPoints:
     .byte 8, 0, 118, 122, 150, 155, 104, 111
     ;exit from grannys house
     .byte 9, 0, 0, 255, 0, 255, 151, 255
+    ;alien base entrance bottom
+    .byte 6, 1, 250, 255, 0, 255, 160, 200
+    ;alien base entrance top
+    .byte 6, 1, 250, 255, 0, 255, 80, 100
+    ;alien base exit top
+    .byte 10, 0, 0, 20, 0, 0, 80, 100
+    ;alien base exit bottom
+    .byte 10, 0, 0, 20, 0, 0, 160, 200
 
 
 .segment "ROM0"
@@ -76,10 +84,10 @@ MapSpawnPoint:
     .byte 128, 152, 4, 1, <House_items, >House_items, 0, 0, 0
     .byte 1, <house, >house, 0, <House_npcs, >House_npcs, 0
     ;Bear's house entrance
-    .byte 128, 136, 3, 1, <House_items, >House_items, 4, 0, 0
+    .byte 128, 136, 3, 1, <House_items, >House_items, 5, 0, 0
     .byte 1, <villager_hut, >villager_hut, 0, <Hut_npcs, >Hut_npcs, 0
     ;Second location entry point
-    .byte 80, 208, 1, OUTDOORS_LOC2_SCREEN_COUNT, <Outside2_items, >Outside2_items, 4, 0, 0
+    .byte 80, 208, 1, OUTDOORS_LOC2_SCREEN_COUNT, <Outside2_items, >Outside2_items, 5, 0, 0
     .byte 0, 0, 0, 3, 0, 0, 0
     ;Third location entry point
     .byte 100, 48, 2, OUTDOORS_LOC3_SCREEN_COUNT, <Outside3_items, >Outside3_items, 0, 0, 0
@@ -91,7 +99,7 @@ MapSpawnPoint:
     .byte 120, 209, 0, OUTDOORS_LOC1_SCREEN_COUNT, <Outside1_items, >Outside1_items, 0, 103, 0
     .byte 0, 0, 0, 3, 0, 0, 1
     ;Bear's house exit
-    .byte $76, $80, 1, OUTDOORS_LOC2_SCREEN_COUNT, <Outside2_items, >Outside2_items, 4, $B8, 0
+    .byte $76, $80, 1, OUTDOORS_LOC2_SCREEN_COUNT, <Outside2_items, >Outside2_items, 5, $B8, 0
     .byte 0, 0, 0, 3, 0, 0, 1
     ;Player's house exit
     .byte 72, 120, 0, OUTDOORS_LOC1_SCREEN_COUNT, <Outside1_items, >Outside1_items, 0, 0, 0
@@ -103,19 +111,19 @@ MapSpawnPoint:
     .byte 119, 151, 2, OUTDOORS_LOC3_SCREEN_COUNT, <Outside3_items, >Outside3_items, 0, 57, 0
     .byte 0, 0, 0, 2, 0, 0, 0
     ;cave entrance
-    .byte 56, 207, 6, OUTDOORS_LOC7_SCREEN_COUNT, <House_items, >House_items, 4, 0, 0
+    .byte 56, 207, 6, OUTDOORS_LOC7_SCREEN_COUNT, <House_items, >House_items, 5, 0, 0
     .byte 0, 0, 0, 0, <cave_npcs, >cave_npcs, 0
     ;entrance to place where the plane is
-    .byte 57, 210, 7, 1, <Crashsite_items, >Crashsite_items, 4, 0, 0
+    .byte 57, 210, 7, 1, <Crashsite_items, >Crashsite_items, 5, 0, 0
     .byte 0, 0, 0, 0, 0, 0, 0
     ;crashsite exit to cave
-    .byte 57, 34, 6, OUTDOORS_LOC7_SCREEN_COUNT, <House_items, >House_items, 4, 0, 0
+    .byte 57, 34, 6, OUTDOORS_LOC7_SCREEN_COUNT, <House_items, >House_items, 5, 0, 0
     .byte 0, 0, 0, 0, <cave_npcs, >cave_npcs, 0
     ;cave exit to second location
-    .byte 120, 63, 1, OUTDOORS_LOC2_SCREEN_COUNT, <Outside2_items, >Outside2_items, 4, 24, 0
+    .byte 120, 63, 1, OUTDOORS_LOC2_SCREEN_COUNT, <Outside2_items, >Outside2_items, 5, 24, 0
     .byte 0, 0, 0, 3, 0, 0, 0
     ;granny location
-    .byte 77, 42, 8, 2, <House_items, >House_items, 4,  0, 0
+    .byte 77, 42, 8, 2, <House_items, >House_items, 5,  0, 0
     .byte 0, 0, 0, 2, 0, 0, 0
     ;exit from granny's location to main
     .byte 127, 205, 0, OUTDOORS_LOC1_SCREEN_COUNT,<Outside1_items, >Outside1_items, 0, 0, 0
@@ -124,8 +132,21 @@ MapSpawnPoint:
     .byte 123, 148, 9, 1, <House_items, >House_items, 0, 0, 0
     .byte 1, <grannys_hut, >grannys_hut, 0, <villager3_npcs, >villager3_npcs, 0
     ;granny's house exit to the location 8
-    .byte 119, 126, 8, 2, <House_items, >House_items, 4, 154, 0
+    .byte 119, 126, 8, 2, <House_items, >House_items, 5, 154, 0
     .byte 0, 0, 0, 2, 0, 0, 0
+    ;alien base entrance bottom
+    .byte 10, 60, 10, 2, <House_items, >House_items, 4, 0, 0
+    .byte 0, 0, 0, 0, 0, 0, 0
+    ;alien base entrance top
+    .byte 10, 60, 10, 2, <House_items, >House_items, 4, 0, 0
+    .byte 0, 0, 0, 0, 0, 0, 0
+    ;alien base exit top
+    .byte 6, 230, 60, 2, <House_items, >House_items, 5, 255, 0
+    .byte 0, 0, 0, 0, 0, 0, 0
+    ;alien base exit bottom
+    .byte 6, 230, 160, 2, <House_items, >House_items, 5, 255, 0
+    .byte 0, 0, 0, 0, 0, 0, 0
+
 
 
 
@@ -142,19 +163,21 @@ LocationScreenCountList:
     .byte 1                          ; 7 crashsite
     .byte 2                          ; 8 granny location
     .byte 1                          ; 9 granny's hut
+    .byte 2                          ; 10 alien base
 
 ;which location in which bank
 LocationBanks:
     .byte 0  ;0
-    .byte 4  ;1
+    .byte 5  ;1
     .byte 0  ;2
     .byte 0  ;3
     .byte 0  ;4
     .byte 0  ;5
-    .byte 4  ;6
-    .byte 4  ;7
-    .byte 4  ;8
-    .byte 0  ;10
+    .byte 5  ;6
+    .byte 5  ;7
+    .byte 5  ;8
+    .byte 0  ;9
+    .byte 4  ;10
 
 
 ;indexes in Item_Location1_Collection_times
@@ -169,6 +192,7 @@ LocationItemIndexes:
     .byte ITEM_COUNT_LOC1 + ITEM_COUNT_LOC2 + ITEM_COUNT_LOC3
     .byte 0
     .byte 0
+    .byte 0
 
 LocationItemCounts:
     .byte ITEM_COUNT_LOC1
@@ -179,6 +203,7 @@ LocationItemCounts:
     .byte 0
     .byte 0
     .byte ITEM_COUNT_LOC8
+    .byte 0
     .byte 0
     .byte 0
 

@@ -62,15 +62,11 @@ house_tiles_chr: .incbin "house.chr"
 ;============================================================
 .segment "ROM4" ; other location
 
-main_tiles_chr2: .incbin "main.chr"
+main_tiles_chr2: .incbin "alien.chr"
 
-.include "data/maps/field2_bg.asm"
-.include "data/maps/field2_bg1.asm"
-.include "data/maps/cave1.asm"
-.include "data/maps/cave2.asm"
-.include "data/maps/crashsite.asm"
-.include "data/maps/babloc1.asm"
-.include "data/maps/babloc2.asm"
+.include "data/maps/alien_base1.asm"
+.include "data/maps/alien_base2.asm"
+
 
 ;=============================================================
 .segment "ROM5" ;title and intro data (?)
@@ -86,6 +82,15 @@ intro_palette:
 .include "data/title_comp.asm"
 .include "data/game_over_comp.asm"
 .include "data/CutsceneData.asm"
+
+
+.include "data/maps/field2_bg.asm"
+.include "data/maps/field2_bg1.asm"
+.include "data/maps/cave1.asm"
+.include "data/maps/cave2.asm"
+.include "data/maps/crashsite.asm"
+.include "data/maps/babloc1.asm"
+.include "data/maps/babloc2.asm"
 
 ;=============================================================
 .segment "ROM6"
@@ -392,7 +397,7 @@ player_sprites_flip:
     MAX_TILE_SCROLL_RIGHT      = 8
 
 
-    ENTRY_POINT_COUNT          = 18
+    ENTRY_POINT_COUNT          = 22
 
     SLEEP_POS_X                = 100
     SLEEP_POS_Y                = 72
