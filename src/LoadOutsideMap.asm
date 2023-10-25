@@ -18,7 +18,7 @@ LoadOutsideMap:
     lda MustCopyMainChr
     beq @continueLoad ;nope we don't need to load CHR
 
-    ldy LocationBankNo;bank where the outdoor tiles are
+    ldy MapTilesetBankNo;bank where the outdoor tiles are
     jsr bankswitch_y
 
     lda #<main_tiles_chr

@@ -2878,9 +2878,6 @@ RoutinesAfterFadeOut:
     cmp #6
     bne @next3
 
-    lda #0
-    sta CurrentMapSegmentIndex
-
     jsr OnExitVillagerHut
 
 ;--------------------------Second location
@@ -2892,8 +2889,6 @@ RoutinesAfterFadeOut:
 
     jsr ResetNameTableAdresses
 
-    lda #0
-    sta CurrentMapSegmentIndex
 
     ;--------------------------------------------
     ;Third location
@@ -2902,9 +2897,6 @@ RoutinesAfterFadeOut:
     lda ActiveMapEntryIndex
     cmp #3
     bne @next5
-
-    lda #0
-    sta CurrentMapSegmentIndex
 
     jsr ResetNameTableAdresses
 
@@ -2973,9 +2965,6 @@ RoutinesAfterFadeOut:
     sta InVillagerHut
     sta VillagerIndex
 
-    lda #0
-    sta CurrentMapSegmentIndex
-
     jsr ResetNameTableAdresses
 
     ;------------------------------------------
@@ -2985,9 +2974,6 @@ RoutinesAfterFadeOut:
     lda ActiveMapEntryIndex
     cmp #9
     bne @next11
-
-    lda #0
-    sta CurrentMapSegmentIndex
 
     lda #23
     sta BgColumnIdxToUpload
@@ -3003,8 +2989,6 @@ RoutinesAfterFadeOut:
 
     lda #1
     sta InCave
-    ;lda #0
-    ;sta CurrentMapSegmentIndex
 
     jsr ResetNameTableAdresses
 
@@ -3027,8 +3011,6 @@ RoutinesAfterFadeOut:
 
     lda #1
     sta InCave
-    lda #0
-    sta CurrentMapSegmentIndex
 
     jsr ResetNameTableAdresses
 
@@ -3037,9 +3019,6 @@ RoutinesAfterFadeOut:
     lda ActiveMapEntryIndex
     cmp #13
     bne @next15
-
-    lda #0
-    sta CurrentMapSegmentIndex
 
     lda #2
     sta ScrollDirection
@@ -3105,7 +3084,7 @@ RoutinesAfterFadeOut:
     sta MapTilesetBankNo
     lda #1
     sta MustCopyMainChr
-
+;exit from base to cave 1
 @next21:
 
     lda ActiveMapEntryIndex
@@ -3115,7 +3094,7 @@ RoutinesAfterFadeOut:
     lda #1
     sta InCave
 
-
+;exit from base to cave 2
 @next22:
 
     lda ActiveMapEntryIndex
@@ -3453,11 +3432,15 @@ AdaptBackgroundPaletteByTime:
     bne @exit
     lda InVillagerHut
     bne @exit
+    lda LocationIndex
+    cmp #10 ; alien base
+    beq @exit
 
     ldy #$01 ;keeps the outline for the background objects
 
     lda InCave
     beq @calc ; if not in cave, we need to use lookup table to get certain fade level
+
 
     ldx #0 ; night time index
     lda palette_fade_for_periods, x
@@ -4353,6 +4336,7 @@ ResetEntityVariables:
     sta StaminaDelay
 
     lda #0
+    sta MapTilesetBankNo
     sta MustPlaySample
     sta InventoryItemIndex
     sta CurrentMapSegmentIndex

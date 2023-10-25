@@ -136,10 +136,10 @@ MapSpawnPoint:
     .byte 0, 0, 0, 2, 0, 0, 0
     ;alien base entrance bottom
     .byte 15, 170, 10, 2, <House_items, >House_items, 4, 0, 0
-    .byte 0, 0, 0, 0, 0, 0, 0
+    .byte 0, 0, 0, 0, <alien_base_npcs, >alien_base_npcs, 0
     ;alien base entrance top
     .byte 15, 90, 10, 2, <House_items, >House_items, 4, 0, 0
-    .byte 0, 0, 0, 0, 0, 0, 0
+    .byte 0, 0, 0, 0, <alien_base_npcs, >alien_base_npcs, 0
     ;alien base exit top
     .byte 230, 100, 6, 2, <House_items, >House_items, 5, 0, 1
     .byte 0, 0, 0, 0, <cave_npcs, >cave_npcs, 0
