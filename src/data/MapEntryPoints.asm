@@ -51,7 +51,7 @@ MapEntryPoints:
     ;alien base entrance bottom
     .byte 6, 1, 232, 255, 0, 255, 160, 199
     ;alien base entrance top
-    .byte 6, 1, 232, 255, 0, 255, 80, 100
+    .byte 6, 1, 232, 255, 0, 255, 88, 111
     ;alien base exit top
     .byte 10, 0, 0, 5, 0, 255, 88, 111
     ;alien base exit bottom
@@ -126,7 +126,7 @@ MapSpawnPoint:
     .byte 77, 42, 8, 2, <House_items, >House_items, 5,  0, 0
     .byte 0, 0, 0, 2, 0, 0, 0
     ;exit from granny's location to main
-    .byte 127, 205, 0, OUTDOORS_LOC1_SCREEN_COUNT,<Outside1_items, >Outside1_items, 0, 0, 0
+    .byte 127, 205, 0, OUTDOORS_LOC1_SCREEN_COUNT,<Outside1_items, >Outside1_items, 0, 0, OUTDOORS_LOC1_SCREEN_COUNT - 1
     .byte 0, 0, 0, 3, 0, 0, 3
     ;granny's house
     .byte 123, 148, 9, 1, <House_items, >House_items, 0, 0, 0
@@ -138,14 +138,14 @@ MapSpawnPoint:
     .byte 15, 170, 10, 2, <House_items, >House_items, 4, 0, 0
     .byte 0, 0, 0, 0, 0, 0, 0
     ;alien base entrance top
-    .byte 15, 60, 10, 2, <House_items, >House_items, 4, 0, 0
+    .byte 15, 90, 10, 2, <House_items, >House_items, 4, 0, 0
     .byte 0, 0, 0, 0, 0, 0, 0
     ;alien base exit top
-    .byte 6, 230, 60, 2, <House_items, >House_items, 5, 0, 1
-    .byte 0, 0, 0, 0, 0, 0, 0
+    .byte 230, 100, 6, 2, <House_items, >House_items, 5, 0, 1
+    .byte 0, 0, 0, 0, <cave_npcs, >cave_npcs, 0
     ;alien base exit bottom
-    .byte 6, 230, 160, 2, <House_items, >House_items, 5, 0, 1
-    .byte 0, 0, 0, 0, 0, 0, 0
+    .byte 230, 180, 6, 2, <House_items, >House_items, 5, 0, 1
+    .byte 0, 0, 0, 0, <cave_npcs, >cave_npcs, 0
 
 
 

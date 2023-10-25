@@ -82,7 +82,7 @@ intro_palette:
 .include "data/title_comp.asm"
 .include "data/game_over_comp.asm"
 .include "data/CutsceneData.asm"
-
+;--------- maps
 
 .include "data/maps/field2_bg.asm"
 .include "data/maps/field2_bg1.asm"
@@ -669,12 +669,14 @@ FlickerFrame: ;variable for alternating sprite update routines to achieve flicke
 
 LocationBankNo:
     .res 1
+MapTilesetBankNo: ; in which bank is located the tileset for map tiles and sprites
+    .res 1
 
 TempScreen:
     .res 1
 
 ZPBuffer:
-    .res 116  ; I want to be aware of the free memory
+    .res 115  ; I want to be aware of the free memory
 
 ;--------------
 .segment "BSS" ; variables in ram
@@ -3001,8 +3003,8 @@ RoutinesAfterFadeOut:
 
     lda #1
     sta InCave
-    lda #0
-    sta CurrentMapSegmentIndex
+    ;lda #0
+    ;sta CurrentMapSegmentIndex
 
     jsr ResetNameTableAdresses
 
@@ -3046,20 +3048,12 @@ RoutinesAfterFadeOut:
 
     lda ActiveMapEntryIndex
     cmp #14
-    bne @next16
+    bne @next17
 
     lda #0
     sta CurrentMapSegmentIndex
 
     jsr ResetNameTableAdresses
-
-;from granny's location to map
-@next16:
-    lda ActiveMapEntryIndex
-    cmp #15
-    bne @next17
-    lda #OUTDOORS_LOC1_SCREEN_COUNT - 1
-    sta CurrentMapSegmentIndex
 
 ;enter granny's house
 @next17:
@@ -3073,9 +3067,6 @@ RoutinesAfterFadeOut:
     lda #2
     sta VillagerIndex
 
-    lda #0
-    sta CurrentMapSegmentIndex
-
     jsr ResetNameTableAdresses
 
 ;exiting granny's house
@@ -3084,10 +3075,6 @@ RoutinesAfterFadeOut:
     cmp #17
     bne @next19
 
-
-    lda #0
-    sta CurrentMapSegmentIndex
-
     lda #3
     sta BgColumnIdxToUpload
     lda #2
@@ -3095,7 +3082,50 @@ RoutinesAfterFadeOut:
 
     jsr OnExitVillagerHut
 
+;entrance to alien base 1
 @next19:
+
+    lda ActiveMapEntryIndex
+    cmp #18
+    bne @next20
+
+    lda #4
+    sta MapTilesetBankNo
+    lda #1
+    sta MustCopyMainChr
+
+;entrance to alien base 2
+@next20:
+
+    lda ActiveMapEntryIndex
+    cmp #19
+    bne @next21
+
+    lda #4
+    sta MapTilesetBankNo
+    lda #1
+    sta MustCopyMainChr
+
+@next21:
+
+    lda ActiveMapEntryIndex
+    cmp #20
+    bne @next22
+
+    lda #1
+    sta InCave
+
+
+@next22:
+
+    lda ActiveMapEntryIndex
+    cmp #21
+    bne @next23
+
+    lda #1
+    sta InCave
+
+@next23:
 
     lda #1
     sta MustLoadSomething ; activate location loading in NMI
@@ -3249,6 +3279,7 @@ CommonLocationRoutine:
 
     lda #0
     sta ScrollDirection
+    sta MapTilesetBankNo ; let's say the main tileset is in the bank 0
 
     jsr BuildRowTable
 

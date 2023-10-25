@@ -18,12 +18,21 @@ LoadOutsideMap:
     lda MustCopyMainChr
     beq @continueLoad ;nope we don't need to load CHR
 
+    ldy LocationBankNo;bank where the outdoor tiles are
+    jsr bankswitch_y
+
     lda #<main_tiles_chr
     sta pointer
     lda #>main_tiles_chr
     sta pointer + 1
 
     jsr CopyCHRTiles
+
+    ldy LocationIndex
+    lda LocationBanks, y
+    tay
+    jsr bankswitch_y
+
     lda #0
     sta MustCopyMainChr
     sta SongName; let's play song 0
