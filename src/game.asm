@@ -91,6 +91,7 @@ intro_palette:
 .include "data/maps/crashsite.asm"
 .include "data/maps/babloc1.asm"
 .include "data/maps/babloc2.asm"
+.include "data/maps/location_with_cave.asm"
 
 ;=============================================================
 .segment "ROM6"
@@ -397,7 +398,7 @@ player_sprites_flip:
     MAX_TILE_SCROLL_RIGHT      = 8
 
 
-    ENTRY_POINT_COUNT          = 22
+    ENTRY_POINT_COUNT          = 24
 
     SLEEP_POS_X                = 100
     SLEEP_POS_Y                = 72

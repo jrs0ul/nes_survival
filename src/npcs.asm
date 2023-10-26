@@ -205,6 +205,9 @@ EliminateInactiveNpcs:
 
     lda InCave
     bne @exit
+    lda LocationIndex
+    cmp #10 ; alien base
+    beq @exit
 
     ldy NpcCount
     beq @exit ; no npcs

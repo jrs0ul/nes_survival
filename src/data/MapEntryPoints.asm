@@ -33,12 +33,12 @@ MapEntryPoints:
     ;Second villager house's exit
     .byte 5, 0, 0, 255, 0, 255, 152, 255
     ;cave entrance from location 2
-    .byte 1, 0, 118, 121, 20, 30, 40, 50
+    .byte 11, 0, 118, 121, 0, 255, 40, 50
     ;crashsite entrance from cave
     .byte 6, 0, 0, 255, 0, 255, 0, 22
     ;crashsite exit to cave
     .byte 7, 0, 0, 255, 0, 255, 222, 255
-    ;cave exit to second location
+    ;cave exit to cave location
     .byte 6, 0, 0, 255, 0, 255, 222, 255
     ;location to the south of the bear's location
     .byte 0, OUTDOORS_LOC1_SCREEN_COUNT - 1, 0, 255, 0, 255, 222, 255
@@ -56,7 +56,10 @@ MapEntryPoints:
     .byte 10, 0, 0, 5, 0, 255, 88, 111
     ;alien base exit bottom
     .byte 10, 0, 0, 5, 0, 255, 160, 200
-
+    ;entrance to cave location
+    .byte 1, 0, 0, 255, 0, 255, 0, 38
+    ;exit from cave location to bjorn's location
+    .byte 11, 0, 0, 255, 0,255, 222, 255
 
 .segment "ROM0"
 ;-----------------------------------------------------
@@ -119,9 +122,9 @@ MapSpawnPoint:
     ;crashsite exit to cave
     .byte 57, 34, 6, OUTDOORS_LOC7_SCREEN_COUNT, <House_items, >House_items, 5, 0, 0
     .byte 0, 0, 0, 0, <cave_npcs, >cave_npcs, 0
-    ;cave exit to second location
-    .byte 120, 63, 1, OUTDOORS_LOC2_SCREEN_COUNT, <Outside2_items, >Outside2_items, 5, 24, 0
-    .byte 0, 0, 0, 3, 0, 0, 0
+    ;cave exit to cave location
+    .byte 120, 63, 11, 1, 0, 0, 5, 0, 0
+    .byte 0, 0, 0, 0, 0, 0, 0
     ;granny location
     .byte 77, 42, 8, 2, <House_items, >House_items, 5,  0, 0
     .byte 0, 0, 0, 2, 0, 0, 0
@@ -146,6 +149,14 @@ MapSpawnPoint:
     ;alien base exit bottom
     .byte 230, 180, 6, 2, <House_items, >House_items, 5, 0, 1
     .byte 0, 0, 0, 0, <cave_npcs, >cave_npcs, 0
+    ;entrance to cave location
+    .byte 150, 200, 11, 1, 0, 0, 5, 0, 0
+    .byte 0, 0, 0, 3, 0, 0, 0
+    ;exit from cave location to bjorn's location
+    .byte 150, 45, 1, OUTDOORS_LOC2_SCREEN_COUNT, <Outside2_items, >Outside2_items, 5, 0, 0
+    .byte 0, 0, 0, 3, 0, 0, 0
+
+
 
 
 
@@ -164,6 +175,7 @@ LocationScreenCountList:
     .byte 2                          ; 8 granny location
     .byte 1                          ; 9 granny's hut
     .byte 2                          ; 10 alien base
+    .byte 1                          ; 11 location where cave is
 
 ;which location in which bank
 LocationBanks:
@@ -178,6 +190,7 @@ LocationBanks:
     .byte 5  ;8
     .byte 0  ;9
     .byte 4  ;10
+    .byte 5  ;11
 
 
 ;indexes in Item_Location1_Collection_times
@@ -193,6 +206,7 @@ LocationItemIndexes:
     .byte 0
     .byte 0
     .byte 0
+    .byte 0
 
 LocationItemCounts:
     .byte ITEM_COUNT_LOC1
@@ -203,6 +217,7 @@ LocationItemCounts:
     .byte 0
     .byte 0
     .byte ITEM_COUNT_LOC8
+    .byte 0
     .byte 0
     .byte 0
     .byte 0
