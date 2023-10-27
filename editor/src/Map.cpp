@@ -190,7 +190,7 @@ void Map::draw(PicsContainer &pics, int layer, int screenw, int screenh, COLOR c
                 for (unsigned long a = 0;a <_width; a++)
                 {
 
-                    pics.draw(1,
+                    pics.draw(3,
                               a*32+mappos.x(),
                               i*32+mappos.z(), 
                               tiles[i][a], true, 4.0f, 4.0f, 0.0, c, c);

@@ -69,6 +69,11 @@ const unsigned BUTTON_SHOW_GRID = 2;
 const unsigned TILE_BUTTONS_ORIGIN_X = 300;
 
 
+const unsigned BUTTON_IMG = 1;
+
+const char CHR_BASEPATH[] = "../src/";
+
+
 Uint32 tick = 0;
 
 
@@ -115,7 +120,8 @@ int charsIDs[]={1,4,7,8};
 
 CIniFile INI;
 
-char MapTiles[255];
+char MapTiles[256];
+char Tileset[256];
 
 //=======================================================================
 
@@ -187,35 +193,35 @@ void DrawPanel(){
 
     if ( SHOW_LEV1 )
     {
-        mygtai[0].draw ( pics,2, 5 );
+        mygtai[0].draw ( pics, BUTTON_IMG, 5 );
     }
     else
     {
-        mygtai[0].draw ( pics,2, 4 );
+        mygtai[0].draw ( pics, BUTTON_IMG, 4 );
     }
 
     if ( SHOW_ATTRIBUTES )
     {
-        mygtai[1].draw ( pics, 2, 5 );
+        mygtai[1].draw ( pics, BUTTON_IMG, 5 );
     }
     else
     {
-        mygtai[1].draw ( pics, 2, 4 );
+        mygtai[1].draw ( pics, BUTTON_IMG, 4 );
     }
 
     
     if ( SHOW_GRID )
-        mygtai[BUTTON_SHOW_GRID].draw ( pics, 2, 5 );
+        mygtai[BUTTON_SHOW_GRID].draw ( pics, BUTTON_IMG, 5 );
     else
-        mygtai[BUTTON_SHOW_GRID].draw ( pics, 2, 4 );
+        mygtai[BUTTON_SHOW_GRID].draw ( pics, BUTTON_IMG, 4 );
 
     if ( SHOW_COLISSION )
     {
-        mygtai[BUTTON_SHOW_COLLISION].draw ( pics,2, 5 );
+        mygtai[BUTTON_SHOW_COLLISION].draw ( pics, BUTTON_IMG, 5 );
     }
     else
     {
-        mygtai[BUTTON_SHOW_COLLISION].draw ( pics,2, 4 );
+        mygtai[BUTTON_SHOW_COLLISION].draw ( pics, BUTTON_IMG, 4 );
     }
 
    /* if ( SHOW_DUDE )
@@ -275,17 +281,17 @@ void DrawPanel(){
 
 
     if ( SELECT_LEV1 )
-        mygtai[6].draw ( pics, 2, 0, 1.0f, 0,0 );
+        mygtai[6].draw ( pics, BUTTON_IMG, 0, 1.0f, 0,0 );
     else
-        mygtai[6].draw ( pics,2, 0 );
+        mygtai[6].draw ( pics, BUTTON_IMG, 0 );
 
     if ( SELECT_ATTRIBUTES )
     {
-        mygtai[7].draw ( pics, 2,1,1.0f,0,0 );
+        mygtai[7].draw ( pics, BUTTON_IMG,1,1.0f,0,0 );
     }
     else
     {
-        mygtai[7].draw ( pics, 2,1 );
+        mygtai[7].draw ( pics, BUTTON_IMG,1 );
     }
 
     /*if ( SELECT_LEV3 )
@@ -294,9 +300,9 @@ void DrawPanel(){
         mygtai[8].draw ( pics,5,2 );*/
 
     if ( SELECT_COLISSION )
-        mygtai[12].draw ( pics, 2, 3, 1.0f, 0, 0 );
+        mygtai[12].draw ( pics, BUTTON_IMG, 3, 1.0f, 0, 0 );
     else
-        mygtai[12].draw ( pics, 2, 3 );
+        mygtai[12].draw ( pics, BUTTON_IMG, 3 );
 
    /* if ( SELECT_ENT )
         mygtai[14].draw ( pics,5,8,1.0f,0,0 );
@@ -305,11 +311,11 @@ void DrawPanel(){
 
     for (unsigned i = BUTTON_FIRST_TILE; i < BUTTON_FIRST_TILE + TILE_STEP; ++i)
     {
-        mygtai[i].draw ( pics, 1, firsttile + (i - BUTTON_FIRST_TILE));
+        mygtai[i].draw ( pics, 3, firsttile + (i - BUTTON_FIRST_TILE));
     }
 
-    mygtai[BUTTON_TILES_DEC].draw ( pics,2,6 );
-    mygtai[BUTTON_TILES_INC].draw ( pics,2,7 );
+    mygtai[BUTTON_TILES_DEC].draw ( pics, BUTTON_IMG, 6 );
+    mygtai[BUTTON_TILES_INC].draw ( pics, BUTTON_IMG, 7 );
 
 
     /*mygtai[15].draw ( pics,5,6 );
@@ -317,7 +323,7 @@ void DrawPanel(){
     mygtai[17].draw ( pics,5,7 );*/
 
 
-    mygtai[BUTTON_SAVE].draw ( pics, 2, 9 );
+    mygtai[BUTTON_SAVE].draw ( pics, BUTTON_IMG, 9 );
 
 }
 
@@ -383,7 +389,7 @@ static void RenderScreen ( void ){
     glClear ( GL_COLOR_BUFFER_BIT );
 
     if ( SHOW_LEV1 )
-        map.draw ( pics, 1, SCREENW, SCREENH);
+        map.draw ( pics, 3, SCREENW, SCREENH);
 
     if (SHOW_ATTRIBUTES)
     {
@@ -437,7 +443,7 @@ static void RenderScreen ( void ){
 
     DrawPanel();
 
-    pics.draw ( 3, Cross.x(),Cross.z() );
+    pics.draw ( 2, Cross.x(),Cross.z() );
 
 
     pics.drawBatch(0, 0, 666);
@@ -488,6 +494,12 @@ static void SetupOpengl ( int width, int height )
         puts("Cannot find picture list!");
         _QuitApp = true;
     }
+
+
+    pics.loadFile(Tileset, 3, 1, 8, CHR_BASEPATH);
+    pics.loadFile(Tileset, 4, 1, 8, CHR_BASEPATH);
+    pics.loadFile(Tileset, 5, 1, 8, CHR_BASEPATH);
+    pics.loadFile(Tileset, 6, 1, 8, CHR_BASEPATH);
 
 
 }
@@ -734,6 +746,9 @@ int main ( int argc, char* argv[] )
     {
         SCREENH = 480;
     }
+
+    INI.get(L"tileSet", buf);
+    wcstombs(Tileset, buf, 255);
 
     INI.get ( L"mapTiles",buf );
     wcstombs ( MapTiles, buf, 255 );

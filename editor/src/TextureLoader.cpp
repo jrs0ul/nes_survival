@@ -1,6 +1,7 @@
 #include <cstdio>
 #include <cstring>
 #include <cmath>
+#include <cassert>
 #include "TextureLoader.h"
 #include "Vectors.h"
 
@@ -435,27 +436,47 @@ void PicsContainer::drawBatch(ShaderProgram * justcolor,
     }
 
 //-----------------------------------------------------
-bool PicsContainer::loadFile(const char* file, unsigned long index,
-                             int tsize, int filter){
+bool PicsContainer::loadFile(const char* file, 
+                             unsigned long index,
+                             unsigned imageType,
+                             int tsize,
+                             int filter){
 
 
         Image naujas;
 
-        unsigned short imageBits=0;
+        unsigned short imageBits = 0;
 
-        if (!naujas.loadTga(file, imageBits)){
-            printf("%s not found or corrupted by M$\n", file);
-            return false;
+        if (imageType == 0)
+        {
+
+            if (!naujas.loadTga(file, imageBits)){
+                printf("%s not found or corrupted by M$\n", file);
+                return false;
+            }
+        }
+        else
+        {
+            if (!naujas.loadChr(file))
+            {
+                printf("%s not found or corrupted by M$\n", file);
+                return false;
+            }
         }
 
+        printf("Loaded image data, tile size = %d\n", tsize);
 
         if (PicInfo.count() < index + 1){
+
+            printf("Idx %lu is a new texture.\n", index);
 
             GLuint glui = 0;
             PicData p;
             p.twidth = tsize;
             p.theight = tsize;
             p.filter = filter;
+            p.type = imageType;
+
             for (unsigned i = PicInfo.count(); i < index + 1; i++){
                 PicInfo.add(p);
                 TexNames.add(glui);
@@ -463,6 +484,7 @@ bool PicsContainer::loadFile(const char* file, unsigned long index,
 
             glGenTextures(1, ((GLuint *)TexNames.getData()) + index);
 
+            printf("copying name... \n");
             char * copy = (char*)malloc(strlen(file)+1);
             strcpy(copy, file);
             char * res = 0;
@@ -472,9 +494,13 @@ bool PicsContainer::loadFile(const char* file, unsigned long index,
                 res = strtok(0, "/");
             }
             free(copy);
+            printf("done\n");
 
         }
         else{
+
+            printf("texture already exists.\n");
+
             PicData * pp = &PicInfo[index];
             pp->twidth = tsize;
             pp->theight = tsize;
@@ -495,22 +521,32 @@ bool PicsContainer::loadFile(const char* file, unsigned long index,
 
         }
 
+
+        printf("generating texture, tile width %d tile height %d\n", PicInfo[index].twidth, PicInfo[index].theight);
+
        
         PicInfo[index].width = naujas.width;
         PicInfo[index].height = naujas.height;
 
 
-        PicInfo[index].htilew =PicInfo[index].twidth/2.0f;
-        PicInfo[index].htileh =PicInfo[index].theight/2.0f;
-        PicInfo[index].vframes=PicInfo[index].height/PicInfo[index].theight;
-        PicInfo[index].hframes=PicInfo[index].width/PicInfo[index].twidth;
+        PicInfo[index].htilew = PicInfo[index].twidth / 2.0f;
+        PicInfo[index].htileh = PicInfo[index].theight / 2.0f;
+
+        assert(PicInfo[index].twidth > 0);
+        assert(PicInfo[index].theight > 0);
+
+        PicInfo[index].vframes = PicInfo[index].height / PicInfo[index].theight;
+        PicInfo[index].hframes = PicInfo[index].width / PicInfo[index].twidth;
 
         int filtras = GL_NEAREST;
-        if (PicInfo[index].filter){
+
+        if (PicInfo[index].filter)
+        {
             filtras = GL_LINEAR;
         }
 
 
+        printf("performing glBindTexture\n");
         glBindTexture(GL_TEXTURE_2D, TexNames[index]);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP );
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP );
@@ -528,26 +564,33 @@ bool PicsContainer::loadFile(const char* file, unsigned long index,
 
         naujas.destroy();
 
+        printf("LoadFile done.\n");
+
         return true;
 
     }
 
 //-----------------------------------------------------
-bool PicsContainer::loadFile(const char* file, unsigned long index,
+bool PicsContainer::loadFile(const char* file, 
+                             unsigned long index,
+                             unsigned imageType,
                              int tsize,
                              const char* basePath, int filter){
 
     
 
     char buf[255];
-    sprintf(buf, "%s/pics/%s", basePath, file);
+    sprintf(buf, "%s%s", basePath, file);
 
-    if (!loadFile(buf, index, tsize, filter)){
+    if (!loadFile(buf, index, imageType, tsize, filter)){
         sprintf(buf, "base/pics/%s", file);
         puts("Let's try base/");
 
-        if (!loadFile(buf, index, tsize, filter))
+        if (!loadFile(buf, index, imageType, tsize, filter))
+        {
+            printf("ERROR\n");
             return false;
+        }
 
     }
 
@@ -564,7 +607,7 @@ bool PicsContainer::loadFile(unsigned long index,
 
 
     char dir[50];
-    char buf[214];
+    char buf[512];
 
     sprintf(dir, "%spics/", BasePath);
     sprintf(buf, "%s%s", dir, PicInfo[index].name);
@@ -633,27 +676,42 @@ int PicsContainer::findByName(const char* picname, bool debug){
     return start;
 }
 //---------------------------------------
-bool PicsContainer::initContainer(const char *list){
-    FILE* failas=fopen(list,"rt");
+bool PicsContainer::initContainer(const char *list)
+{
+    FILE* file = fopen(list,"rt");
 
-    int result = 0;
 
-    if (!failas)
+    if (!file)
+    {
         return false;
+    }
 
-    while (!feof(failas)){
+    while (!feof(file))
+    {
         PicData data;
         data.name[0] = 0;
-        result = fscanf(failas,"%s\n",data.name);
-        result = fscanf(failas,"%d %d %d %d\n",
+
+        if (fscanf(file, "%s\n",data.name) < 1)
+        {
+            fclose(file);
+            return false;
+        }
+
+        if (fscanf(file,"%d %d %d %d\n",
                         &data.theight, &data.twidth,
-                        &data.filter, &data.type);
+                        &data.filter, &data.type) < 4)
+        {
+            fclose(file);
+            return false;
+        }
+
         PicInfo.add(data);
     }
 
-    fclose(failas);
+    fclose(file);
 
-    for (unsigned long i = 0; i < PicInfo.count(); i++ ){
+    for (unsigned long i = 0; i < PicInfo.count(); i++ )
+    {
         GLuint glui = 0;
         TexNames.add(glui);
     }

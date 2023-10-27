@@ -1,22 +1,4 @@
-/***************************************************************************
- *   Copyright (C) 2008 by jrs0ul   *
- *   jrs0ul@gmail.com   *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
+
 #include <cstdio>
 #include <cstdlib>
 #include <cmath>
@@ -268,15 +250,23 @@ bool Image::loadChr(const char* name)
 
     ChrFile = fopen(name, "rb");
 
+    printf("LOADING CHR: %s\n", name);
+
     if (!ChrFile)
     {
+        printf("FAIL OPENING\n");
         return false;
     }
 
     data = (unsigned char*)malloc(CHR_HEIGHT * CHR_WIDTH * 3);
 
 
-    fseek(ChrFile, 4096, SEEK_SET);
+    if (fseek(ChrFile, 4096, SEEK_SET))
+    {
+        printf("FAIL FSEEK\n");
+        free(data);
+        return false;
+    }
 
     unsigned char firstBytes[TILE_WIDTH];
     unsigned char secondBytes[TILE_WIDTH];
@@ -285,7 +275,9 @@ bool Image::loadChr(const char* name)
     unsigned x = 0;
     unsigned y = 0;
 
-    for (unsigned i = 255; i >= 0; --i)
+    printf("LOOP\n");
+
+    for (int i = 255; i >= 0; --i)
     {
         y = floor(i / 16.f) * 8 + 7;
         x = (i - (floor(i / 16.f) * 16)) * 8 + 8;
@@ -296,6 +288,8 @@ bool Image::loadChr(const char* name)
             if (!fread(&firstBytes[j], sizeof(unsigned char), 1, ChrFile))
             {
                 fclose(ChrFile);
+                free(data);
+                printf("FAIL first bytes FREAD at %u\n", j);
                 return false;
             }
         }
@@ -305,6 +299,8 @@ bool Image::loadChr(const char* name)
             if (!fread(&secondBytes[j], sizeof(unsigned char), 1, ChrFile))
             {
                 fclose(ChrFile);
+                free(data);
+                printf("FAIL second bytes FREAD\n");
                 return false;
             }
 
@@ -337,6 +333,7 @@ bool Image::loadChr(const char* name)
     }
 
     fclose(ChrFile);
+    printf("DONE loading\n");
     return true;
 }
 
