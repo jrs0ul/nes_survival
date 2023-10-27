@@ -32,8 +32,8 @@ MapEntryPoints:
     .byte 2, 0, 118, 121, 48, 66, 136, 142
     ;Second villager house's exit
     .byte 5, 0, 0, 255, 0, 255, 152, 255
-    ;cave entrance from location 2
-    .byte 11, 0, 118, 121, 0, 255, 40, 50
+    ;cave entrance from location 11
+    .byte 11, 0, 140, 151, 0, 255, 40, 50
     ;crashsite entrance from cave
     .byte 6, 0, 0, 255, 0, 255, 0, 22
     ;crashsite exit to cave
@@ -57,7 +57,7 @@ MapEntryPoints:
     ;alien base exit bottom
     .byte 10, 0, 0, 5, 0, 255, 160, 200
     ;entrance to cave location
-    .byte 1, 0, 0, 255, 0, 255, 0, 38
+    .byte 1, 0, 0, 255, 0, 255, 0, 20
     ;exit from cave location to bjorn's location
     .byte 11, 0, 0, 255, 0,255, 222, 255
 
@@ -123,7 +123,7 @@ MapSpawnPoint:
     .byte 57, 34, 6, OUTDOORS_LOC7_SCREEN_COUNT, <House_items, >House_items, 5, 0, 0
     .byte 0, 0, 0, 0, <cave_npcs, >cave_npcs, 0
     ;cave exit to cave location
-    .byte 120, 63, 11, 1, 0, 0, 5, 0, 0
+    .byte 144, 63, 11, 1, <House_items, >House_items, 5, 0, 0
     .byte 0, 0, 0, 0, 0, 0, 0
     ;granny location
     .byte 77, 42, 8, 2, <House_items, >House_items, 5,  0, 0
@@ -150,10 +150,10 @@ MapSpawnPoint:
     .byte 230, 180, 6, 2, <House_items, >House_items, 5, 0, 1
     .byte 0, 0, 0, 0, <cave_npcs, >cave_npcs, 0
     ;entrance to cave location
-    .byte 150, 200, 11, 1, 0, 0, 5, 0, 0
-    .byte 0, 0, 0, 3, 0, 0, 0
+    .byte 138, 210, 11, 1, <House_items, >House_items, 5, 0, 0
+    .byte 0, 0, 0, 0, 0, 0, 0
     ;exit from cave location to bjorn's location
-    .byte 150, 45, 1, OUTDOORS_LOC2_SCREEN_COUNT, <Outside2_items, >Outside2_items, 5, 0, 0
+    .byte 135, 38, 1, OUTDOORS_LOC2_SCREEN_COUNT, <Outside2_items, >Outside2_items, 5, 0, 0
     .byte 0, 0, 0, 3, 0, 0, 0
 
 

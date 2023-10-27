@@ -261,8 +261,6 @@ bool Image::loadChr(const char* name)
     const unsigned TILE_WIDTH = 8;
 
 
-
-
     width = 128;
     height = 128;
 
@@ -279,7 +277,7 @@ bool Image::loadChr(const char* name)
 
 
     fseek(ChrFile, 4096, SEEK_SET);
-    
+
     unsigned char firstBytes[TILE_WIDTH];
     unsigned char secondBytes[TILE_WIDTH];
 
@@ -312,37 +310,30 @@ bool Image::loadChr(const char* name)
 
         }
 
-
-
         for (unsigned j = 0; j < 8; ++j)
         {
-
-            unsigned shift = 0;
-
             for (unsigned k = 0; k < 8; ++k)
             {
-                unsigned shr = 7u - shift + shift;
 
                 unsigned char firstPart = firstBytes[j];
 
-                firstPart = firstPart << shift;
-                firstPart = firstPart >> shr;
+                firstPart = ((firstPart << k) & 128) >> 7;
 
                 unsigned char secondPart = secondBytes[j];
 
-                secondPart = secondPart << shift;
-                secondPart = secondPart >> shr;
+                secondPart = ((secondPart << k) & 128) >> 6;
 
-                data[(y * 128 + (128 - x)) * 3]     = 85 * (firstPart + secondPart);
-                data[(y * 128 + (128 - x)) * 3 + 1] = 85 * firstPart;
-                data[(y * 128 + (128 - x)) * 3 + 2] = 85 * (firstPart + secondPart);
-                ++shift;
+                unsigned idx = (y * 128 + (128 - x)) * 3;
+                unsigned paletteColorIdx = firstPart | secondPart;
+
+                data[idx]     = 85 * paletteColorIdx;
+                data[idx + 1] = 85 * paletteColorIdx;
+                data[idx + 2] = 85 * paletteColorIdx;
                 --x;
             }
             x = (i - (floor(i / 16.f) * 16)) * 8 + 8;
             --y;
         }
-       
     }
 
     fclose(ChrFile);
