@@ -123,6 +123,13 @@ CIniFile INI;
 char MapTiles[256];
 char Tileset[256];
 
+unsigned char Palettes[48] = {
+                              0,0,0, 50,50,50, 50,50,255, 128,128,255,
+                              0,0,0, 0,128,128, 50,50,255, 128,128,255,
+                              0,0,0, 180,128,50, 50,50,128, 128,128,255,
+                              255,0,0, 255,128,0, 0,0,128, 255,255,255,
+                             };
+
 //=======================================================================
 
 static void QuitApp()
@@ -311,7 +318,7 @@ void DrawPanel(){
 
     for (unsigned i = BUTTON_FIRST_TILE; i < BUTTON_FIRST_TILE + TILE_STEP; ++i)
     {
-        mygtai[i].draw ( pics, 3, firsttile + (i - BUTTON_FIRST_TILE));
+        mygtai[i].draw ( pics, 3 + currentPalette, firsttile + (i - BUTTON_FIRST_TILE));
     }
 
     mygtai[BUTTON_TILES_DEC].draw ( pics, BUTTON_IMG, 6 );
@@ -496,10 +503,10 @@ static void SetupOpengl ( int width, int height )
     }
 
 
-    pics.loadFile(Tileset, 3, 1, 8, CHR_BASEPATH);
-    pics.loadFile(Tileset, 4, 1, 8, CHR_BASEPATH);
-    pics.loadFile(Tileset, 5, 1, 8, CHR_BASEPATH);
-    pics.loadFile(Tileset, 6, 1, 8, CHR_BASEPATH);
+    pics.loadFile(Tileset, 3, 1, 8, CHR_BASEPATH, 0, Palettes, 0);
+    pics.loadFile(Tileset, 4, 1, 8, CHR_BASEPATH, 0, Palettes, 1);
+    pics.loadFile(Tileset, 5, 1, 8, CHR_BASEPATH, 0, Palettes, 2);
+    pics.loadFile(Tileset, 6, 1, 8, CHR_BASEPATH, 0, Palettes, 3);
 
 
 }

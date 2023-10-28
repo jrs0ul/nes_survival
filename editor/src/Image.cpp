@@ -236,11 +236,17 @@ bool Image::saveTga(const char *name){
    return true;
 }
 //-------------------------------------
-bool Image::loadChr(const char* name)
+bool Image::loadChr(const char* name, unsigned char* palette, unsigned char paletteIdx)
 {
     const unsigned CHR_HEIGHT = 128;
     const unsigned CHR_WIDTH = 128;
     const unsigned TILE_WIDTH = 8;
+
+    if (palette)
+    {
+        printf("go:\n");
+        printf("PAL1 %u\n", palette[3]);
+    }
 
 
     width = 128;
@@ -322,9 +328,9 @@ bool Image::loadChr(const char* name)
                 unsigned idx = (y * 128 + (128 - x)) * 3;
                 unsigned paletteColorIdx = firstPart | secondPart;
 
-                data[idx]     = 85 * paletteColorIdx;
-                data[idx + 1] = 85 * paletteColorIdx;
-                data[idx + 2] = 85 * paletteColorIdx;
+                data[idx]     = palette[12 * paletteIdx + paletteColorIdx * 3];
+                data[idx + 1] = palette[12 * paletteIdx + paletteColorIdx * 3 + 1];
+                data[idx + 2] = palette[12 * paletteIdx + paletteColorIdx * 3 + 2];
                 --x;
             }
             x = (i - (floor(i / 16.f) * 16)) * 8 + 8;

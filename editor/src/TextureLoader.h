@@ -32,6 +32,8 @@ struct PicData{
     int hframes;
     float partX;
     float partY;
+
+    unsigned char ** palette;
 };
 //-------------------------
 struct SpriteBatchItem{
@@ -109,14 +111,20 @@ public:
                   unsigned long index,
                   unsigned imageType, // 0 - TGA, 1 - Nes CHR
                   int tsize,
-                  const char * basePath, int filter = 0);
+                  const char * basePath, 
+                  int filter = 0,
+                  unsigned char* palette = 0,
+                  unsigned char paletteIdx = 0);
     //loads images using special array loaded from file
     bool loadFile(unsigned long index, const char * BasePath);
     //no need for base folder
     bool loadFile(const char* file, 
                   unsigned long index,
                   unsigned imageType, // 0 - TGA, 1 - Nes CHR
-                  int tsize, int filter = 0);
+                  int tsize, 
+                  int filter = 0,
+                  unsigned char* palette = 0,
+                  unsigned char paletteIdx = 0);
     void remove(unsigned long index);
 
 };

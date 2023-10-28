@@ -39,7 +39,7 @@ bool PicsContainer::load(const char *list){
         }
         else
         {
-            if (!naujas.loadChr(PicInfo[i].name))
+            if (!naujas.loadChr(PicInfo[i].name, *PicInfo[i].palette, 0))
             {
                 printf("%s not loaded\n", PicInfo[i].name);
             }
@@ -440,7 +440,9 @@ bool PicsContainer::loadFile(const char* file,
                              unsigned long index,
                              unsigned imageType,
                              int tsize,
-                             int filter){
+                             int filter,
+                             unsigned char* palette,
+                             unsigned char paletteIdx){
 
 
         Image naujas;
@@ -457,7 +459,7 @@ bool PicsContainer::loadFile(const char* file,
         }
         else
         {
-            if (!naujas.loadChr(file))
+            if (!naujas.loadChr(file, palette, paletteIdx))
             {
                 printf("%s not found or corrupted by M$\n", file);
                 return false;
@@ -575,18 +577,21 @@ bool PicsContainer::loadFile(const char* file,
                              unsigned long index,
                              unsigned imageType,
                              int tsize,
-                             const char* basePath, int filter){
+                             const char* basePath,
+                             int filter,
+                             unsigned char * palette,
+                             unsigned char paletteIdx){
 
     
 
     char buf[255];
     sprintf(buf, "%s%s", basePath, file);
 
-    if (!loadFile(buf, index, imageType, tsize, filter)){
+    if (!loadFile(buf, index, imageType, tsize, filter, palette, paletteIdx)){
         sprintf(buf, "base/pics/%s", file);
         puts("Let's try base/");
 
-        if (!loadFile(buf, index, imageType, tsize, filter))
+        if (!loadFile(buf, index, imageType, tsize, filter, palette, paletteIdx))
         {
             printf("ERROR\n");
             return false;
