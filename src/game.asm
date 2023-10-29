@@ -184,6 +184,11 @@ main_palette:
     .byte $0C,$00,$21,$31, $0C,$1B,$21,$31, $0C,$18,$21,$31, $0C,$20,$37,$16    ;background
     .byte $0C,$0f,$17,$20, $0C,$0C,$16,$39, $0C,$0f,$16,$39, $0C,$0f,$37,$16    ;OAM sprites
 
+alien_palette:
+    .byte $0c,$01,$0c,$1c, $0c,$2d,$0c,$1c, $0c,$02,$11,$27, $0c,$20,$37,$16    ;background
+    .byte $0C,$0f,$17,$20, $0C,$0C,$16,$39, $0C,$0f,$16,$39, $0C,$0f,$37,$16    ;OAM sprites
+
+
 game_over_palette:
     .byte $0f,$10,$20,$30,$0f,$0c,$35,$21,$0f,$0c,$16,$21,$0f,$01,$07,$21
     .byte $0f,$10,$20,$30,$0f,$0c,$35,$21,$0f,$0c,$16,$21,$0f,$01,$07,$21
@@ -2938,7 +2943,6 @@ RoutinesAfterFadeOut:
     sta FirstTime
 
     lda #1
-    sta MustLoadOutside
     sta MustCopyMainChr
     ;-----------------------------------------
 @next8: ;third location exit to the 0
@@ -3073,6 +3077,12 @@ RoutinesAfterFadeOut:
     sta MapTilesetBankNo
     lda #1
     sta MustCopyMainChr
+    ;TODO: perhaps it would be good to create a table for location - palette
+    lda #<alien_palette
+    sta PalettePtr
+    lda #>alien_palette
+    sta PalettePtr + 1
+
 
 ;entrance to alien base 2
 @next20:
@@ -3083,6 +3093,11 @@ RoutinesAfterFadeOut:
 
     lda #4
     sta MapTilesetBankNo
+    lda #<alien_palette
+    sta PalettePtr
+    lda #>alien_palette
+    sta PalettePtr + 1
+
     lda #1
     sta MustCopyMainChr
 ;exit from base to cave 1
@@ -3260,6 +3275,12 @@ CommonLocationRoutine:
     lda #0
     sta ScrollDirection
     sta MapTilesetBankNo ; let's say the main tileset is in the bank 0
+
+    lda #<main_palette
+    sta PalettePtr
+    lda #>main_palette
+    sta PalettePtr + 1
+
 
     jsr BuildRowTable
 
@@ -4629,6 +4650,12 @@ StartGame:
     jsr initZeroSprite
     lda #STATE_GAME
     sta GameState
+
+    lda #<main_palette
+    sta PalettePtr
+    lda #>main_palette
+    sta PalettePtr + 1
+
     lda #1
     sta FirstTime
     sta MustLoadOutside

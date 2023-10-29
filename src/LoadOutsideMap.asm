@@ -123,7 +123,7 @@ LoadOutsideMap:
     ;copy outside map palette to ram
     ldy #0
 @paletteCopy:
-    lda main_palette, y
+    lda (PalettePtr), y
     sta TempPalette, y
     iny
     cpy #32
