@@ -123,12 +123,79 @@ CIniFile INI;
 char MapTiles[256];
 char Tileset[256];
 
-unsigned char Palettes[48] = {
-                              0,0,0, 50,50,50, 50,50,255, 128,128,255,
-                              0,0,0, 0,128,128, 50,50,255, 128,128,255,
-                              0,0,0, 180,128,50, 50,50,128, 128,128,255,
-                              255,0,0, 255,128,0, 0,0,128, 255,255,255,
-                             };
+const unsigned char NESColors[] = {
+                            124,124,124,
+                            0,0,252,
+                            0,0,188,
+                            68,40,188,
+                            148,0,132,
+                            168,0,32,
+                            168,16,0,
+                            136,20,0,
+                            80,48,0,
+                            0,120,0,
+                            0,104,0,
+                            0,88,0,
+                            0,64,88,
+                            0,0,0,
+
+                            188,188,188,
+                            0,120,248,
+                            0,88,248,
+                            104,68,252,
+                            216,0,204,
+                            228,0,88,
+                            248,56,0,
+                            228,92,16,
+                            172,124,0,
+                            0,184,0,
+                            0,168,0,
+                            0,168,68,
+                            0,136,136,
+
+                            248,248,248,
+                            60,188,252,
+                            104,136,252,
+                            152,120,248,
+                            248,120,248,
+                            248,88,152,
+                            248,120,88,
+                            252,160,68,
+                            248,184,0,
+                            184,248,24,
+                            88,216,84,
+                            88,248,152,
+                            0,232,216,
+                            120,120,120,
+
+                            252,252,252,
+                            164,228,252,
+                            184,184,248,
+                            216,184,248,
+                            248,184,248,
+                            248,164,192,
+                            240,208,176,
+                            252,224,168,
+                            248,216,120,
+                            216,248,120,
+                            184,248,184,
+                            184,248,216,
+                            0,252,252,
+                            248,216,248,
+                        };
+const unsigned char ColorIndexes[55] = {
+                                     0,    3,    6,    9,   12,   15,   18,   21,   24,   27,   30,   33,   36,   39,
+                                    42,   45,   48,   51,   54,   57,   60,   63,   66,   69,   72,   75,   78,
+                                    81,   84,   87,   90,   93,   96,   99,  102,  105,  108,  111,  114,  117,  120,
+                                   123,  126,  129,  132,  135,  138,  141,  144,  147,  150,  153,  156,  159,  162
+                                 };
+const char* ColorNames[] =       {"00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "0A", "0B", "0C", "0F",
+                                  "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "1A", "1B", "1C",
+                                  "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "2A", "2B", "2C", "2D"
+                                  "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "3A", "3B", "3C", "3D"};
+
+unsigned char Palettes[48] = {0};
+
 
 //=======================================================================
 
@@ -503,6 +570,10 @@ static void SetupOpengl ( int width, int height )
     }
 
 
+    
+
+
+
     pics.loadFile(Tileset, 3, 1, 8, CHR_BASEPATH, 0, Palettes, 0);
     pics.loadFile(Tileset, 4, 1, 8, CHR_BASEPATH, 0, Palettes, 1);
     pics.loadFile(Tileset, 5, 1, 8, CHR_BASEPATH, 0, Palettes, 2);
@@ -728,6 +799,52 @@ void CheckKeys()
 }
 
 //-----------------------------------------------------------------
+void DecodePaletteFromINI(const wchar_t* param, unsigned palIdx)
+{
+    wchar_t buf[255];
+    char abuf[255];
+    INI.get(param, buf);
+    wcstombs(abuf, buf, 255);
+    char* token = strtok(abuf,"$");
+
+    unsigned cIdx = 0;
+    unsigned colorStartIdx = 0;
+
+    while (token != NULL)
+    {
+        //printf("TOKEN:%s\n", token);
+
+        for (unsigned i = 0; i < 56; ++i)
+        {
+            if (strcmp(token, ColorNames[i]) == 0)
+            {
+                //printf("color index: %d\n", i);
+                colorStartIdx = ColorIndexes[i];
+
+                for (unsigned a = 0; a < 3; ++a)
+                {
+                    //printf("%d ", NESColors[colorStartIdx + a]);
+                    const unsigned finalColorIdx = palIdx * 12 + cIdx * 3 + a;
+                    assert(finalColorIdx < 48);
+                    Palettes[finalColorIdx] = NESColors[colorStartIdx + a];
+                }
+                printf("\n");
+
+                break;
+            }
+
+        }
+        
+        ++cIdx;
+
+        token = strtok(NULL, "$");
+    }
+
+
+}
+
+
+//-----------------------------------------------------------------
 int main ( int argc, char* argv[] )
 {
 
@@ -759,6 +876,13 @@ int main ( int argc, char* argv[] )
 
     INI.get ( L"mapTiles",buf );
     wcstombs ( MapTiles, buf, 255 );
+    printf("%s\n", MapTiles);
+
+    DecodePaletteFromINI(L"palette0", 0);
+    DecodePaletteFromINI(L"palette1", 1);
+    DecodePaletteFromINI(L"palette2", 2);
+    DecodePaletteFromINI(L"palette3", 3);
+    printf("%s\n", MapTiles);
 
 
     mygtai[0].init ( 10,20,32,32 );
