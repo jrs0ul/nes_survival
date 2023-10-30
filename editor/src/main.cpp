@@ -191,7 +191,7 @@ const unsigned char ColorIndexes[55] = {
                                  };
 const char* ColorNames[] =       {"00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "0A", "0B", "0C", "0F",
                                   "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "1A", "1B", "1C",
-                                  "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "2A", "2B", "2C", "2D"
+                                  "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "2A", "2B", "2C", "2D",
                                   "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "3A", "3B", "3C", "3D"};
 
 unsigned char Palettes[48] = {0};
@@ -799,48 +799,85 @@ void CheckKeys()
 }
 
 //-----------------------------------------------------------------
-void DecodePaletteFromINI(const wchar_t* param, unsigned palIdx)
+bool LoadPalette()
 {
     wchar_t buf[255];
     char abuf[255];
-    INI.get(param, buf);
+    INI.get(L"palette", buf);
     wcstombs(abuf, buf, 255);
-    char* token = strtok(abuf,"$");
 
-    unsigned cIdx = 0;
-    unsigned colorStartIdx = 0;
+    FILE* file;
 
-    while (token != NULL)
+    printf("Loading %s\n", abuf);
+    file = fopen(abuf, "rt");
+
+    if (!file)
     {
-        //printf("TOKEN:%s\n", token);
+        return false;
+    }
 
-        for (unsigned i = 0; i < 56; ++i)
-        {
-            if (strcmp(token, ColorNames[i]) == 0)
-            {
-                //printf("color index: %d\n", i);
-                colorStartIdx = ColorIndexes[i];
+    char palette_name[255];
+    char dname[255];
+    int num;
+    int colorStartIdx = 0;
 
-                for (unsigned a = 0; a < 3; ++a)
-                {
-                    //printf("%d ", NESColors[colorStartIdx + a]);
-                    const unsigned finalColorIdx = palIdx * 12 + cIdx * 3 + a;
-                    assert(finalColorIdx < 48);
-                    Palettes[finalColorIdx] = NESColors[colorStartIdx + a];
-                }
-                printf("\n");
+    if (!fscanf(file,"%s\n", palette_name))
+    {
+        fclose(file);
+        return false;
+    }
+    printf("%s\n", palette_name);
 
-                break;
-            }
-
-        }
-        
-        ++cIdx;
-
-        token = strtok(NULL, "$");
+    if (!fscanf(file, "%s ", dname))
+    {
+        fclose(file);
+        return false;
     }
 
 
+    for (unsigned i = 0; i < 4; ++i)
+    {
+
+        for (unsigned j = 0; j < 4; ++j)
+        {
+            if (!fscanf(file,"$%X,", &num))
+            {
+                fclose(file);
+                return false;
+            }
+
+            sprintf(abuf, "%02X", num);
+            printf("%s ", abuf);
+
+
+            for (unsigned k = 0; k < 55; ++k)
+            {
+                if (strcmp(abuf, ColorNames[k]) == 0)
+                {
+                    colorStartIdx = ColorIndexes[k];
+
+                    for (unsigned a = 0; a < 3; ++a)
+                    {
+                        const unsigned finalColorIdx = i * 12 + j * 3 + a;
+                        assert(finalColorIdx < 48);
+                        Palettes[finalColorIdx] = NESColors[colorStartIdx + a];
+                    }
+
+                    break;
+                }
+
+            }
+
+        }
+
+
+    }
+
+    printf("\n OK\n");
+
+    fclose(file);
+
+    return true;
 }
 
 
@@ -876,13 +913,18 @@ int main ( int argc, char* argv[] )
 
     INI.get ( L"mapTiles",buf );
     wcstombs ( MapTiles, buf, 255 );
-    printf("%s\n", MapTiles);
+    //printf("%s\n", MapTiles);
 
-    DecodePaletteFromINI(L"palette0", 0);
-    DecodePaletteFromINI(L"palette1", 1);
-    DecodePaletteFromINI(L"palette2", 2);
-    DecodePaletteFromINI(L"palette3", 3);
-    printf("%s\n", MapTiles);
+    //DecodePaletteFromINI(L"palette0", 0);
+    //DecodePaletteFromINI(L"palette1", 1);
+    //DecodePaletteFromINI(L"palette2", 2);
+    //DecodePaletteFromINI(L"palette3", 3);
+    //printf("%s\n", MapTiles);
+
+    if (!LoadPalette())
+    {
+        printf("ERROR LOADING PALETTE!\n");
+    }
 
 
     mygtai[0].init ( 10,20,32,32 );

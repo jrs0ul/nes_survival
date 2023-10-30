@@ -176,18 +176,9 @@ hammerSprites:
     .byte   9,   $99, %01000000, 8,  17,  $98, %01000000, 8 ;down-flipped
 
 
-house_palette:
-    .byte $0C,$16,$27,$37, $0C,$07,$00,$31, $0C,$17,$27,$31, $0C,$20,$37,$16    ;background
-    .byte $0C,$0f,$17,$20, $0C,$0C,$16,$39, $0C,$0f,$16,$39, $0C,$0f,$37,$16    ;OAM sprites
-
-main_palette:
-    .byte $0C,$00,$21,$31, $0C,$1B,$21,$31, $0C,$18,$21,$31, $0C,$20,$37,$16    ;background
-    .byte $0C,$0f,$17,$20, $0C,$0C,$16,$39, $0C,$0f,$16,$39, $0C,$0f,$37,$16    ;OAM sprites
-
-alien_palette:
-    .byte $0c,$01,$0c,$1c, $0c,$2d,$0c,$1c, $0c,$02,$11,$27, $0c,$20,$37,$16    ;background
-    .byte $0C,$0f,$17,$20, $0C,$0C,$16,$39, $0C,$0f,$16,$39, $0C,$0f,$37,$16    ;OAM sprites
-
+.include "data/house_palette.asm"
+.include "data/main_palette.asm"
+.include "data/alien_palette.asm"
 
 game_over_palette:
     .byte $0f,$10,$20,$30,$0f,$0c,$35,$21,$0f,$0c,$16,$21,$0f,$01,$07,$21
