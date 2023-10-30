@@ -14,12 +14,12 @@
 MapEntryPoints:
     ;Entry to player's house from outside
     .byte 0, 0, 64,  88,  0,   255,   102, 110
-    ;Bear's house entrance
-    .byte 1, 0, 118, 122, 177, 190, $68, $6F
     ;Second location entry point
     .byte 0, OUTDOORS_LOC1_SCREEN_COUNT - 1, 0, 255, 0, 255, 0, 22
     ;Third location entry point
     .byte 0, 1, 0, 255, 0, 255, 222, 255
+    ;Bear's house entrance
+    .byte 1, 0, 118, 122, 177, 190, $68, $6F
     ;Exit point of second location
     .byte 1, 0, 0, 255, 0, 255, 230, 255
     ;Exit point of third location
@@ -86,15 +86,15 @@ MapSpawnPoint:
     ;Entry to player's house from outside
     .byte 128, 152, 4, 1, <House_items, >House_items, 0, 0, 0
     .byte 1, <house, >house, 0, <House_npcs, >House_npcs, 0
-    ;Bear's house entrance
-    .byte 128, 136, 3, 1, <House_items, >House_items, 5, 0, 0
-    .byte 1, <villager_hut, >villager_hut, 0, <Hut_npcs, >Hut_npcs, 0
     ;Second location entry point
     .byte 80, 208, 1, OUTDOORS_LOC2_SCREEN_COUNT, <Outside2_items, >Outside2_items, 5, 0, 0
     .byte 0, 0, 0, 3, 0, 0, 0
     ;Third location entry point
     .byte 100, 48, 2, OUTDOORS_LOC3_SCREEN_COUNT, <Outside3_items, >Outside3_items, 0, 0, 0
     .byte 0, 0, 0, 2, 0, 0, 0
+    ;Bear's house entrance
+    .byte 128, 136, 3, 1, <House_items, >House_items, 5, 0, 0
+    .byte 1, <villager_hut, >villager_hut, 0, <Hut_npcs, >Hut_npcs, 0
     ;Exit point of second location
     .byte 128, 32, 0, OUTDOORS_LOC1_SCREEN_COUNT, <Outside1_items, >Outside1_items, 0, 0, 0
     .byte 0, 0, 0, 3, 0, 0, 3

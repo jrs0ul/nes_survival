@@ -569,6 +569,8 @@ pointer2:
     .res 2
 PalettePtr:
     .res 2
+CurrentMapPalettePtr:
+    .res 2
 AnimalSpawnPointsPtr:
     .res 2
 ProjectilePtr:
@@ -673,7 +675,7 @@ TempScreen:
     .res 1
 
 ZPBuffer:
-    .res 115  ; I want to be aware of the free memory
+    .res 113  ; I want to be aware of the free memory
 
 ;--------------
 .segment "BSS" ; variables in ram
@@ -2845,7 +2847,7 @@ RoutinesAfterFadeOut:
     ;Entered bear's hut
 @next1:
     lda ActiveMapEntryIndex
-    cmp #1
+    cmp #3
     bne @next2
 
     jsr GetPaletteFadeValueForHour
@@ -2859,8 +2861,6 @@ RoutinesAfterFadeOut:
     jsr LoadNpcs
 
 @skip_night:
-
-    jsr ResetNameTableAdresses
 
     lda #0
     sta VillagerIndex
@@ -2881,22 +2881,8 @@ RoutinesAfterFadeOut:
 @next3:
 
     lda ActiveMapEntryIndex
-    cmp #2
-    bne @next4
-
-    jsr ResetNameTableAdresses
-
-
-    ;--------------------------------------------
-    ;Third location
-@next4:
-
-    lda ActiveMapEntryIndex
-    cmp #3
+    cmp #1
     bne @next5
-
-    jsr ResetNameTableAdresses
-
     ;-----------------------------------------
     ;entered player's house
 @next5:
@@ -2904,8 +2890,6 @@ RoutinesAfterFadeOut:
     lda ActiveMapEntryIndex
     cmp #0
     bne @next6
-
-    jsr ResetNameTableAdresses
 
     lda #1
     sta MustRestartIndoorsMusic
@@ -2942,10 +2926,6 @@ RoutinesAfterFadeOut:
     cmp #5
     bne @next9
 
-    lda #28
-    sta BgColumnIdxToUpload
-    lda #2
-    sta ScrollDirection
     lda #1
     sta CurrentMapSegmentIndex
     ;------------------------------------------
@@ -2960,8 +2940,6 @@ RoutinesAfterFadeOut:
     sta MustRestartIndoorsMusic
     sta InVillagerHut
     sta VillagerIndex
-
-    jsr ResetNameTableAdresses
 
     ;------------------------------------------
     ;second villager exit
@@ -2981,22 +2959,10 @@ RoutinesAfterFadeOut:
 @next11:
     lda ActiveMapEntryIndex
     cmp #10
-    bne @next12
+    bne @next13
 
     lda #1
     sta InCave
-
-    jsr ResetNameTableAdresses
-
-;crashsite from cave
-@next12:
-
-    lda ActiveMapEntryIndex
-    cmp #11
-    bne @next13
-
-    lda #0
-    sta CurrentMapSegmentIndex
 
 ;cave from crashsite
 @next13:
@@ -3008,27 +2974,15 @@ RoutinesAfterFadeOut:
     lda #1
     sta InCave
 
-    jsr ResetNameTableAdresses
-
 ;location 2 from cave
 @next14:
     lda ActiveMapEntryIndex
     cmp #13
-    bne @next15
+    bne @next17
 
     lda #2
     sta ScrollDirection
 
-@next15:; granny's location
-
-    lda ActiveMapEntryIndex
-    cmp #14
-    bne @next17
-
-    lda #0
-    sta CurrentMapSegmentIndex
-
-    jsr ResetNameTableAdresses
 
 ;enter granny's house
 @next17:
@@ -3042,7 +2996,6 @@ RoutinesAfterFadeOut:
     lda #2
     sta VillagerIndex
 
-    jsr ResetNameTableAdresses
 
 ;exiting granny's house
 @next18:
@@ -3070,9 +3023,9 @@ RoutinesAfterFadeOut:
     sta MustCopyMainChr
     ;TODO: perhaps it would be good to create a table for location - palette
     lda #<alien_palette
-    sta PalettePtr
+    sta CurrentMapPalettePtr
     lda #>alien_palette
-    sta PalettePtr + 1
+    sta CurrentMapPalettePtr + 1
 
 
 ;entrance to alien base 2
@@ -3085,9 +3038,9 @@ RoutinesAfterFadeOut:
     lda #4
     sta MapTilesetBankNo
     lda #<alien_palette
-    sta PalettePtr
+    sta CurrentMapPalettePtr
     lda #>alien_palette
-    sta PalettePtr + 1
+    sta CurrentMapPalettePtr + 1
 
     lda #1
     sta MustCopyMainChr
@@ -3113,6 +3066,7 @@ RoutinesAfterFadeOut:
 
 @next23:
 
+    jsr ResetNameTableAdresses
     lda #1
     sta MustLoadSomething ; activate location loading in NMI
 
@@ -3268,9 +3222,9 @@ CommonLocationRoutine:
     sta MapTilesetBankNo ; let's say the main tileset is in the bank 0
 
     lda #<main_palette
-    sta PalettePtr
+    sta CurrentMapPalettePtr
     lda #>main_palette
-    sta PalettePtr + 1
+    sta CurrentMapPalettePtr + 1
 
 
     jsr BuildRowTable
@@ -4643,9 +4597,9 @@ StartGame:
     sta GameState
 
     lda #<main_palette
-    sta PalettePtr
+    sta CurrentMapPalettePtr
     lda #>main_palette
-    sta PalettePtr + 1
+    sta CurrentMapPalettePtr + 1
 
     lda #1
     sta FirstTime
