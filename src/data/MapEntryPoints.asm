@@ -96,10 +96,11 @@ MapSpawnPoint:
     .byte 128, 136, 3, 1, <House_items, >House_items, 5, 0, 0
     .byte 1, <villager_hut, >villager_hut, 0, <Hut_npcs, >Hut_npcs, 0
     ;Exit point of second location
-    .byte 128, 32, 0, OUTDOORS_LOC1_SCREEN_COUNT, <Outside1_items, >Outside1_items, 0, 0, 0
+    .byte 128, 32, 0, OUTDOORS_LOC1_SCREEN_COUNT, <Outside1_items, >Outside1_items, 0, 0, OUTDOORS_LOC1_SCREEN_COUNT - 1
+
     .byte 0, 0, 0, 3, 0, 0, 3
     ;Exit point of third location
-    .byte 120, 209, 0, OUTDOORS_LOC1_SCREEN_COUNT, <Outside1_items, >Outside1_items, 0, 103, 0
+    .byte 120, 209, 0, OUTDOORS_LOC1_SCREEN_COUNT, <Outside1_items, >Outside1_items, 0, 103, 1
     .byte 0, 0, 0, 3, 0, 0, 1
     ;Bear's house exit
     .byte $76, $80, 1, OUTDOORS_LOC2_SCREEN_COUNT, <Outside2_items, >Outside2_items, 5, $B8, 0

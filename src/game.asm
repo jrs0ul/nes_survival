@@ -2873,39 +2873,22 @@ RoutinesAfterFadeOut:
 @next2:
     lda ActiveMapEntryIndex
     cmp #6
-    bne @next3
+    bne @next5
 
     jsr OnExitVillagerHut
 
-;--------------------------Second location
-@next3:
-
-    lda ActiveMapEntryIndex
-    cmp #1
-    bne @next5
     ;-----------------------------------------
     ;entered player's house
 @next5:
 
     lda ActiveMapEntryIndex
     cmp #0
-    bne @next6
+    bne @next7
 
     lda #1
     sta MustRestartIndoorsMusic
     sta InHouse
     ;---------------------------------------------
-    ;Entering first location from second
-@next6:
-
-    lda ActiveMapEntryIndex
-    cmp #4
-    bne @next7
-
-    lda #OUTDOORS_LOC1_SCREEN_COUNT - 1
-    sta CurrentMapSegmentIndex
-
-    ;------------------------------------------------
     ;Outside of player's house
 @next7:
 
@@ -2926,8 +2909,10 @@ RoutinesAfterFadeOut:
     cmp #5
     bne @next9
 
-    lda #1
-    sta CurrentMapSegmentIndex
+    lda #28
+    sta BgColumnIdxToUpload
+    lda #2
+    sta ScrollDirection
     ;------------------------------------------
     ;second villager
 @next9:
