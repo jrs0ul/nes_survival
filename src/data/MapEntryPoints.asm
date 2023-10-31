@@ -12,54 +12,66 @@
 ;entry point count is stored in ENTRY_POINT_COUNT
 
 MapEntryPoints:
-    ;Entry to player's house from outside
+    ;0.Entry to player's house from outside
     .byte 0, 0, 64,  88,  0,   255,   102, 110
-    ;Second location entry point
+    ;1.Second location entry point
     .byte 0, OUTDOORS_LOC1_SCREEN_COUNT - 1, 0, 255, 0, 255, 0, 22
-    ;Third location entry point
+    ;2.Third location entry point
     .byte 0, 1, 0, 255, 0, 255, 222, 255
-    ;Bear's house entrance
-    .byte 1, 0, 118, 122, 177, 190, $68, $6F
-    ;Exit point of second location
-    .byte 1, 0, 0, 255, 0, 255, 230, 255
-    ;Exit point of third location
-    .byte 2, 0, 0, 255, 0, 255, 0,   20
-    ;Bjorn's house exit
-    .byte 3, 0, 0, 255, 0, 255, 152, 255
-    ;Player's house exit
-    .byte 4, 0, 0, 255, 0, 255, 160, 255
-    ;Second villager's house
-    .byte 2, 0, 118, 121, 48, 66, 136, 142
-    ;Second villager house's exit
-    .byte 5, 0, 0, 255, 0, 255, 152, 255
-    ;cave entrance from location 11
-    .byte 11, 0, 140, 151, 0, 255, 40, 50
-    ;crashsite entrance from cave
-    .byte 6, 0, 0, 255, 0, 255, 0, 22
-    ;crashsite exit to cave
-    .byte 7, 0, 0, 255, 0, 255, 222, 255
-    ;cave exit to cave location
-    .byte 6, 0, 0, 255, 0, 255, 222, 255
-    ;location to the south of the bear's location
+    ;3.granny location
     .byte 0, OUTDOORS_LOC1_SCREEN_COUNT - 1, 0, 255, 0, 255, 222, 255
-    ;exit from granny's location to the main one
-    .byte 8, 0, 0, 255, 0, 255, 0, 32
-    ;granny's house
-    .byte 8, 0, 118, 122, 150, 155, 104, 111
-    ;exit from grannys house
-    .byte 9, 0, 0, 255, 0, 255, 151, 255
-    ;alien base entrance bottom
-    .byte 6, 1, 232, 255, 0, 255, 160, 199
-    ;alien base entrance top
-    .byte 6, 1, 232, 255, 0, 255, 88, 111
-    ;alien base exit top
-    .byte 10, 0, 0, 5, 0, 255, 88, 111
-    ;alien base exit bottom
-    .byte 10, 0, 0, 5, 0, 255, 160, 200
-    ;entrance to cave location
+    ;---------------------------------------
+    ;4.Bear's house entrance
+    .byte 1, 0, 118, 122, 177, 190, $68, $6F
+    ;5.Exit point of second location
+    .byte 1, 0, 0, 255, 0, 255, 230, 255
+    ;6.entrance to cave location
     .byte 1, 0, 0, 255, 0, 255, 0, 20
-    ;exit from cave location to bjorn's location
+    ;----------------------------------------
+    ;7.Exit point of third location
+    .byte 2, 0, 0, 255, 0, 255, 0,   20
+    ;8.Second villager's house
+    .byte 2, 0, 118, 122, 48, 66, 122, 142
+    ;------------------------
+    ;9.Bjorn's house exit
+    .byte 3, 0, 0, 255, 0, 255, 152, 255
+    ;-----------------------
+    ;10.Player's house exit
+    .byte 4, 0, 0, 255, 0, 255, 160, 255
+    ;-----------------------
+    ;11.Second villager house's exit
+    .byte 5, 0, 0, 255, 0, 255, 152, 255
+    ;------------------------
+    ;12.crashsite entrance from cave
+    .byte 6, 0, 0, 255, 0, 255, 0, 22
+    ;13.cave exit to cave location
+    .byte 6, 0, 0, 255, 0, 255, 222, 255
+    ;14.alien base entrance bottom
+    .byte 6, 1, 232, 255, 0, 255, 160, 199
+    ;15.alien base entrance top
+    .byte 6, 1, 232, 255, 0, 255, 88, 111
+    ;--------------------------
+    ;16.crashsite exit to cave
+    .byte 7, 0, 0, 255, 0, 255, 222, 255
+    ;--------------------------
+    ;17.exit from granny's location to the main one
+    .byte 8, 0, 0, 255, 0, 255, 0, 32
+    ;18.granny's house
+    .byte 8, 0, 118, 122, 150, 155, 104, 111
+    ;-------------------
+    ;19.exit from grannys house
+    .byte 9, 0, 0, 255, 0, 255, 151, 255
+    ;--------------------
+    ;20.alien base exit top
+    .byte 10, 0, 0, 5, 0, 255, 88, 111
+    ;21.alien base exit bottom
+    .byte 10, 0, 0, 5, 0, 255, 160, 200
+    ;--------------------------
+    ;22.exit from cave location to bjorn's location
     .byte 11, 0, 0, 255, 0,255, 222, 255
+    ;23.cave entrance from location 11
+    .byte 11, 0, 140, 151, 0, 255, 40, 50
+
 
 .segment "ROM0"
 ;-----------------------------------------------------
@@ -92,70 +104,81 @@ MapSpawnPoint:
     ;Third location entry point
     .byte 100, 48, 2, OUTDOORS_LOC3_SCREEN_COUNT, <Outside3_items, >Outside3_items, 0, 0, 0
     .byte 0, 0, 0, 2, 0, 0, 0
+    ;granny location
+    .byte 77, 42, 8, 2, <House_items, >House_items, 5,  0, 0
+    .byte 0, 0, 0, 2, 0, 0, 0
+    ;---------------------
     ;Bear's house entrance
     .byte 128, 136, 3, 1, <House_items, >House_items, 5, 0, 0
     .byte 1, <villager_hut, >villager_hut, 0, <Hut_npcs, >Hut_npcs, 0
     ;Exit point of second location
     .byte 128, 32, 0, OUTDOORS_LOC1_SCREEN_COUNT, <Outside1_items, >Outside1_items, 0, 0, OUTDOORS_LOC1_SCREEN_COUNT - 1
-
     .byte 0, 0, 0, 3, 0, 0, 3
+    ;entrance to cave location
+    .byte 138, 210, 11, 1, <House_items, >House_items, 5, 0, 0
+    .byte 0, 0, 0, 0, 0, 0, 0
+    ;-----------------
     ;Exit point of third location
     .byte 120, 209, 0, OUTDOORS_LOC1_SCREEN_COUNT, <Outside1_items, >Outside1_items, 0, 103, 1
     .byte 0, 0, 0, 3, 0, 0, 1
-    ;Bear's house exit
-    .byte $76, $80, 1, OUTDOORS_LOC2_SCREEN_COUNT, <Outside2_items, >Outside2_items, 5, $B8, 0
-    .byte 0, 0, 0, 3, 0, 0, 1
-    ;Player's house exit
-    .byte 72, 120, 0, OUTDOORS_LOC1_SCREEN_COUNT, <Outside1_items, >Outside1_items, 0, 0, 0
-    .byte 0, 0, 0, 3, 0, 0, 0
     ;Second villager's house
     .byte 128, 136, 5, 1, <House_items, >House_items, 0, 0, 0
     .byte 1, <villager2_hut, >villager2_hut, 0, <villager2_npcs, >villager2_npcs, 0
+    ;------------------
+    ;Bear's house exit
+    .byte $76, $80, 1, OUTDOORS_LOC2_SCREEN_COUNT, <Outside2_items, >Outside2_items, 5, $B8, 0
+    .byte 0, 0, 0, 3, 0, 0, 1
+    ;-----------------
+    ;Player's house exit
+    .byte 72, 120, 0, OUTDOORS_LOC1_SCREEN_COUNT, <Outside1_items, >Outside1_items, 0, 0, 0
+    .byte 0, 0, 0, 3, 0, 0, 0
+    ;-----------------
     ;Second villager house's exit
     .byte 119, 151, 2, OUTDOORS_LOC3_SCREEN_COUNT, <Outside3_items, >Outside3_items, 0, 57, 0
     .byte 0, 0, 0, 2, 0, 0, 0
-    ;cave entrance
-    .byte 56, 207, 6, OUTDOORS_LOC7_SCREEN_COUNT, <House_items, >House_items, 5, 0, 0
-    .byte 0, 0, 0, 0, <cave_npcs, >cave_npcs, 0
+    ;---------------
     ;entrance to place where the plane is
     .byte 57, 210, 7, 1, <Crashsite_items, >Crashsite_items, 5, 0, 0
     .byte 0, 0, 0, 0, 0, 0, 0
-    ;crashsite exit to cave
-    .byte 57, 34, 6, OUTDOORS_LOC7_SCREEN_COUNT, <House_items, >House_items, 5, 0, 0
-    .byte 0, 0, 0, 0, <cave_npcs, >cave_npcs, 0
     ;cave exit to cave location
     .byte 144, 63, 11, 1, <House_items, >House_items, 5, 0, 0
     .byte 0, 0, 0, 0, 0, 0, 0
-    ;granny location
-    .byte 77, 42, 8, 2, <House_items, >House_items, 5,  0, 0
-    .byte 0, 0, 0, 2, 0, 0, 0
-    ;exit from granny's location to main
-    .byte 127, 205, 0, OUTDOORS_LOC1_SCREEN_COUNT,<Outside1_items, >Outside1_items, 0, 0, OUTDOORS_LOC1_SCREEN_COUNT - 1
-    .byte 0, 0, 0, 3, 0, 0, 3
-    ;granny's house
-    .byte 123, 148, 9, 1, <House_items, >House_items, 0, 0, 0
-    .byte 1, <grannys_hut, >grannys_hut, 0, <villager3_npcs, >villager3_npcs, 0
-    ;granny's house exit to the location 8
-    .byte 119, 126, 8, 2, <House_items, >House_items, 5, 154, 0
-    .byte 0, 0, 0, 2, 0, 0, 0
     ;alien base entrance bottom
     .byte 15, 170, 10, 2, <House_items, >House_items, 4, 0, 0
     .byte 0, 0, 0, 0, <alien_base_npcs, >alien_base_npcs, 0
     ;alien base entrance top
     .byte 15, 90, 10, 2, <House_items, >House_items, 4, 0, 0
     .byte 0, 0, 0, 0, <alien_base_npcs, >alien_base_npcs, 0
+    ;---------------------
+    ;crashsite exit to cave
+    .byte 57, 34, 6, OUTDOORS_LOC7_SCREEN_COUNT, <House_items, >House_items, 5, 0, 0
+    .byte 0, 0, 0, 0, <cave_npcs, >cave_npcs, 0
+    ;---------------------
+    ;exit from granny's location to main
+    .byte 127, 205, 0, OUTDOORS_LOC1_SCREEN_COUNT,<Outside1_items, >Outside1_items, 0, 0, OUTDOORS_LOC1_SCREEN_COUNT - 1
+    .byte 0, 0, 0, 3, 0, 0, 3
+    ;granny's house
+    .byte 123, 148, 9, 1, <House_items, >House_items, 0, 0, 0
+    .byte 1, <grannys_hut, >grannys_hut, 0, <villager3_npcs, >villager3_npcs, 0
+    ;--------------------
+    ;granny's house exit to the location 8
+    .byte 119, 126, 8, 2, <House_items, >House_items, 5, 154, 0
+    .byte 0, 0, 0, 2, 0, 0, 0
+    ;------------
     ;alien base exit top
     .byte 230, 100, 6, 2, <House_items, >House_items, 5, 0, 1
     .byte 0, 0, 0, 0, <cave_npcs, >cave_npcs, 0
     ;alien base exit bottom
     .byte 230, 180, 6, 2, <House_items, >House_items, 5, 0, 1
     .byte 0, 0, 0, 0, <cave_npcs, >cave_npcs, 0
-    ;entrance to cave location
-    .byte 138, 210, 11, 1, <House_items, >House_items, 5, 0, 0
-    .byte 0, 0, 0, 0, 0, 0, 0
+    ;--------------
     ;exit from cave location to bjorn's location
     .byte 135, 38, 1, OUTDOORS_LOC2_SCREEN_COUNT, <Outside2_items, >Outside2_items, 5, 0, 0
     .byte 0, 0, 0, 3, 0, 0, 0
+    ;cave entrance
+    .byte 56, 207, 6, OUTDOORS_LOC7_SCREEN_COUNT, <House_items, >House_items, 5, 0, 0
+    .byte 0, 0, 0, 0, <cave_npcs, >cave_npcs, 0
+
 
 
 
@@ -177,6 +200,22 @@ LocationScreenCountList:
     .byte 1                          ; 9 granny's hut
     .byte 2                          ; 10 alien base
     .byte 1                          ; 11 location where cave is
+
+;what is index for entry points for each location
+LocationEntryPointsPos:
+    .byte 0   ;0
+    .byte 4   ;1
+    .byte 7   ;2
+    .byte 9   ;3
+    .byte 10  ;4
+    .byte 11  ;5
+    .byte 12  ;6
+    .byte 16  ;7
+    .byte 17  ;8
+    .byte 19  ;9
+    .byte 20  ;10
+    .byte 22  ;11
+
 
 ;which location in which bank
 LocationBanks:

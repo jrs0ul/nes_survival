@@ -2213,19 +2213,22 @@ RestoreStamina:
 ;------------------------------
 CheckEntryPoints:
 
-    ldx #ENTRY_POINT_COUNT - 1
-@entryPointLoop:
 
+    ldx LocationIndex
+    lda LocationEntryPointsPos, x
+    tax
+@entryPointLoop:
 
     txa
     asl
     asl
-    asl
+    asl ; entry index * 8
     tay
 
     lda MapEntryPoints, y ; location index
     cmp LocationIndex
-    bne @nextEntry
+    bcc @exit ; location from list is less than current, we're done
+    bne @nextEntry ; not equal? next!
     iny
     lda MapEntryPoints, y ; CurrentMapSegmentIndex
     cmp CurrentMapSegmentIndex
@@ -2275,9 +2278,9 @@ CheckEntryPoints:
 
 
 @nextEntry:
-    dex
-    bpl @entryPointLoop
-
+    inx
+    cpx #ENTRY_POINT_COUNT
+    bcc @entryPointLoop
 
 @exit:
     rts
@@ -2844,10 +2847,10 @@ RoutinesAfterFadeOut:
     ;--some general location code----
     jsr CommonLocationRoutine
     ;-----------------------------
-    ;Entered bear's hut
+    ;4.Bear's house entrance
 @next1:
     lda ActiveMapEntryIndex
-    cmp #3
+    cmp #4
     bne @next2
 
     jsr GetPaletteFadeValueForHour
@@ -2869,10 +2872,10 @@ RoutinesAfterFadeOut:
     sta MustRestartIndoorsMusic
     sta InVillagerHut
     ;------------------------------------
-    ; load the outdoors of bear's hut
+    ;9.Bjorn's house exit
 @next2:
     lda ActiveMapEntryIndex
-    cmp #6
+    cmp #9
     bne @next5
 
     jsr OnExitVillagerHut
@@ -2889,11 +2892,11 @@ RoutinesAfterFadeOut:
     sta MustRestartIndoorsMusic
     sta InHouse
     ;---------------------------------------------
-    ;Outside of player's house
+    ;10.Player's house exit
 @next7:
 
     lda ActiveMapEntryIndex
-    cmp #7
+    cmp #10
     bne @next8
 
     lda #0
@@ -2903,10 +2906,11 @@ RoutinesAfterFadeOut:
     lda #1
     sta MustCopyMainChr
     ;-----------------------------------------
-@next8: ;third location exit to the 0
+    ;7.Exit point of third location
+@next8:
 
     lda ActiveMapEntryIndex
-    cmp #5
+    cmp #7
     bne @next9
 
     lda #28
@@ -2914,7 +2918,7 @@ RoutinesAfterFadeOut:
     lda #2
     sta ScrollDirection
     ;------------------------------------------
-    ;second villager
+    ;8.Second villager's house
 @next9:
 
     lda ActiveMapEntryIndex
@@ -2927,11 +2931,11 @@ RoutinesAfterFadeOut:
     sta VillagerIndex
 
     ;------------------------------------------
-    ;second villager exit
+    ;11.Second villager house's exit
 @next10:
 
     lda ActiveMapEntryIndex
-    cmp #9
+    cmp #11
     bne @next11
 
     lda #23
@@ -2940,26 +2944,27 @@ RoutinesAfterFadeOut:
     sta ScrollDirection
 
     jsr OnExitVillagerHut
-;-------cave entrance
+    ;----------------------------
+    ;23.cave entrance from location 11
 @next11:
     lda ActiveMapEntryIndex
-    cmp #10
+    cmp #23
     bne @next13
 
     lda #1
     sta InCave
-
-;cave from crashsite
+    ;------------------------------
+    ;16.crashsite exit to cave
 @next13:
 
     lda ActiveMapEntryIndex
-    cmp #12
+    cmp #16
     bne @next14
 
     lda #1
     sta InCave
-
-;location 2 from cave
+    ;-------------------------
+    ;13.cave exit to cave location
 @next14:
     lda ActiveMapEntryIndex
     cmp #13
@@ -2968,11 +2973,11 @@ RoutinesAfterFadeOut:
     lda #2
     sta ScrollDirection
 
-
-;enter granny's house
+    ;----------------------------
+    ;18.granny's house
 @next17:
     lda ActiveMapEntryIndex
-    cmp #16
+    cmp #18
     bne @next18
 
     lda #1
@@ -2981,11 +2986,11 @@ RoutinesAfterFadeOut:
     lda #2
     sta VillagerIndex
 
-
-;exiting granny's house
+    ;-------------------------------
+    ;19.exit from grannys house
 @next18:
     lda ActiveMapEntryIndex
-    cmp #17
+    cmp #19
     bne @next19
 
     lda #3
@@ -2994,12 +2999,12 @@ RoutinesAfterFadeOut:
     sta ScrollDirection
 
     jsr OnExitVillagerHut
-
-;entrance to alien base 1
+    ;-----------------------------
+    ;14.alien base entrance bottom
 @next19:
 
     lda ActiveMapEntryIndex
-    cmp #18
+    cmp #14
     bne @next20
 
     lda #4
@@ -3012,12 +3017,12 @@ RoutinesAfterFadeOut:
     lda #>alien_palette
     sta CurrentMapPalettePtr + 1
 
-
-;entrance to alien base 2
+    ;------------------------
+    ;15.alien base entrance top
 @next20:
 
     lda ActiveMapEntryIndex
-    cmp #19
+    cmp #15
     bne @next21
 
     lda #4
@@ -3029,7 +3034,8 @@ RoutinesAfterFadeOut:
 
     lda #1
     sta MustCopyMainChr
-;exit from base to cave 1
+    ;--------------------
+    ;20.alien base exit top
 @next21:
 
     lda ActiveMapEntryIndex
@@ -3038,8 +3044,8 @@ RoutinesAfterFadeOut:
 
     lda #1
     sta InCave
-
-;exit from base to cave 2
+    ;--------------------------
+    ;21.alien base exit bottom
 @next22:
 
     lda ActiveMapEntryIndex
