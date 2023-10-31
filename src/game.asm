@@ -358,7 +358,13 @@ player_sprites_flip:
     ROW_TABLE_SIZE             = 240
 
 
+    DESTRUCTABLE_TILE_VALUE    = $F7
     DESTRUCTED_TILE_VALUE      = $14
+
+    ROCK_TILE_1                = $DE
+    ROCK_TILE_2                = $DF
+    ROCK_TILE_3                = $EE
+    ROCK_TILE_4                = $EF
 
 
     INTRO_SCENE_MAX            = 7
@@ -4907,7 +4913,7 @@ useHammerOnEnvironment:
 
     lda (pointer), y
 
-    cmp #$F7
+    cmp #DESTRUCTABLE_TILE_VALUE
     bne @check_other_tiles
 
     lda EquipedItem
@@ -4952,13 +4958,13 @@ useHammerOnEnvironment:
 @check_other_tiles:
 ;rock
     lda (pointer), y
-    cmp #$DE
+    cmp #ROCK_TILE_1
     beq @spawn_rock
-    cmp #$DF
+    cmp #ROCK_TILE_2
     beq @spawn_rock
-    cmp #$EE
+    cmp #ROCK_TILE_3
     beq @spawn_rock
-    cmp #$EF
+    cmp #ROCK_TILE_4
     beq @spawn_rock
 ;wood
     jsr IsTree
@@ -5040,9 +5046,13 @@ SpawnItem:
 
     jsr ItemSpawnPrep
 
+    lda #0
+    sta TempItemScreen
+
     lda PlayerX
     clc
     adc GlobalScroll
+    sta TempPointX
     bcs @incrementScreen
     jmp @continue
 @incrementScreen:
@@ -5050,7 +5060,6 @@ SpawnItem:
     sta TempItemScreen
 @continue:
 
-    sta TempPointX
 
     lda CurrentMapSegmentIndex
     clc
