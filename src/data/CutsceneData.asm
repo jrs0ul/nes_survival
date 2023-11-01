@@ -594,7 +594,7 @@ intro_sprite_dir_y:
 intro_scroll_dir_x:
     .byte 1
     .byte 0
-    .byte 1
+    .byte 0
     .byte 0
     .byte 0
     .byte 0
@@ -608,6 +608,37 @@ intro_scroll_dir_y:
     .byte 0
     .byte 0
     .byte 0
+
+
+;scenes that do some kind of animation with background tiles are 1
+screens_that_do_tile_anim:
+    .byte 0
+    .byte 0
+    .byte 1
+    .byte 0
+    .byte 0
+    .byte 0
+    .byte 0
+
+tile_anim_adresses:
+
+    .byte $20, $C8
+    .byte $20, $C8
+    .byte $20, $C8
+    .byte $20, $C8
+    .byte $20, $C8
+    .byte $20, $C8
+    .byte $20, $E7
+    .byte $21, $06
+    .byte $21, $25
+    .byte $21, $44
+    .byte $21, $63
+    .byte $21, $82
+    .byte $21, $A1
+    .byte $21, $C0
+    .byte $21, $E0
+    .byte $22, $00
+
 
 
 intro_sprites_low:
@@ -757,7 +788,7 @@ intro_sprites_2_high:
 intro_meta_sprite_count:
     .byte 1
     .byte 2
-    .byte 2
+    .byte 1
     .byte 0
     .byte 2
     .byte 1

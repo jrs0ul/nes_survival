@@ -1560,7 +1560,7 @@ ReadControllerLoop:
 DoneLoadingMaps:
     lda GameState
     cmp #STATE_GAME
-    bne UpdatePalette
+    bne otherState
 
     jsr UpdateTextBaloon
     lda MustUpdatePalette
@@ -1570,6 +1570,12 @@ DoneLoadingMaps:
     jsr UploadBgColumns
     jsr UpdateDestructableTiles
     jsr UpdateStatusDigits
+    jmp UpdatePalette
+otherState:
+    cmp #STATE_INTRO
+    bne UpdatePalette
+
+    jsr IntroNametableAnimations
 
 UpdatePalette:
     lda MustUpdatePalette
@@ -3905,6 +3911,18 @@ CalcMapColumnToUpdate:
     sta AttribColumnIdxToUpdate ; attribute id, bg_column / 4
 
     rts
+;--------------------------------
+IntroNametableAnimations:
+
+
+    ldy #5
+    jsr bankswitch_y
+
+    jsr IntroNameTableUpdate
+
+    rts
+
+
 ;--------------------------------
 UpdateTextBaloon:
 

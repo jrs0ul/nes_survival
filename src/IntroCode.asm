@@ -63,7 +63,46 @@ TitleLogics:
 @exit:
 
     rts
+;-----------------------------
+IntroNameTableUpdate:
 
+    ldx CutsceneSceneIdx
+    lda screens_that_do_tile_anim, x
+    beq @exit
+
+
+    lda CutsceneTimer
+    sta Temp
+    asl
+    tax
+
+    lda $2002
+    lda tile_anim_adresses, x
+    sta $2006
+    inx
+    lda tile_anim_adresses, x
+    sta $2006
+
+    lda Temp
+    cmp #15
+    beq @first
+    cmp #14
+    beq @second
+    lda #$F9
+    sta $2007
+@second:
+    lda #$CF
+    sta $2007
+@first:
+    lda #$65
+    sta $2007
+
+
+
+
+@exit:
+
+    rts
 
 ;-----------------------------
 IntroLogics:
