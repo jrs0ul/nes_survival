@@ -5032,13 +5032,12 @@ ItemSpawnPrep:
     asl
     asl
     tay
-    
+
     lda TempItemIndex ; item id and hp are here
     sta Items, y
     iny
 
     rts
-
 
 ;----------------------------------
 ;TempItemIndex is the item

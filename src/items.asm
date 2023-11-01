@@ -136,7 +136,7 @@ CheckItemsXY:
     sta TempPointX
     lda PlayerX
     clc
-    adc #8
+    adc #12
     cmp TempPointX
     bcs @checkX2
     jmp @exit
@@ -151,7 +151,7 @@ CheckItemsXY:
     sta TempPointX
     lda PlayerX
     clc
-    adc #8
+    adc #4
     cmp TempPointX
     bcs @exit
     jmp @checkY
@@ -165,7 +165,7 @@ CheckItemsXY:
     sta TempPointX
     lda PlayerX
     clc
-    adc #8
+    adc #12
     cmp TempPointX
     bcs @CheckX2Match
     jmp @exit
@@ -180,7 +180,7 @@ CheckItemsXY:
     sta TempPointX
     lda PlayerX
     clc
-    adc #8
+    adc #4
     cmp TempPointX
     bcs @exit
 @checkY:
@@ -191,7 +191,7 @@ CheckItemsXY:
 CheckYPoints:
 
     inx
-    lda Items, x ;y
+    lda Items, x ;y coordinate
     sta TempPointY
     lda PlayerY
     clc
@@ -208,7 +208,7 @@ CheckYPoints:
     sta TempPointY
     lda PlayerY
     clc
-    adc #16
+    adc #10
     cmp TempPointY
     bcs @exit
 
