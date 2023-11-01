@@ -50,9 +50,9 @@ intro_scenes_delay:
     .byte 25
 
 intro_scenes_duration:
-    .byte 90
+    .byte 80
     .byte 10
-    .byte 15
+    .byte 11
     .byte 20
     .byte 20
     .byte 12
@@ -389,7 +389,7 @@ intro_sprite_pos_y:
     .byte 80
 
     .byte 50
-    .byte 100
+    .byte 135
 
     .byte 0
     .byte 0
@@ -411,7 +411,7 @@ intro_sprite_pos_x:
     .byte 125
 
     .byte 90
-    .byte 20
+    .byte 0
 
     .byte 0
     .byte 0
@@ -527,10 +527,10 @@ intro_sprite_dir_x:
     .byte 250
 ;--
     .byte 1
-    .byte 4
+    .byte 8
 
     .byte 1
-    .byte 4
+    .byte 8
 ;--
 
     .byte 0
@@ -565,9 +565,9 @@ intro_sprite_dir_y:
     .byte 0
 
     .byte 0
-    .byte 253
+    .byte 248
     .byte 0
-    .byte 253
+    .byte 248
 
     .byte 0
     .byte 0
@@ -622,22 +622,18 @@ screens_that_do_tile_anim:
 
 tile_anim_adresses:
 
-    .byte $20, $C8
-    .byte $20, $C8
-    .byte $20, $C8
-    .byte $20, $C8
-    .byte $20, $C8
-    .byte $20, $C8
-    .byte $20, $E7
-    .byte $21, $06
-    .byte $21, $25
-    .byte $21, $44
-    .byte $21, $63
-    .byte $21, $82
-    .byte $21, $A1
-    .byte $21, $C0
+    .byte $20, $C9
+    .byte $20, $E8
+    .byte $21, $07
+    .byte $21, $26
+    .byte $21, $45
+    .byte $21, $64
+    .byte $21, $83
+    .byte $21, $A2
+    .byte $21, $C1
     .byte $21, $E0
     .byte $22, $00
+    .byte $22, $20
 
 
 
@@ -788,7 +784,7 @@ intro_sprites_2_high:
 intro_meta_sprite_count:
     .byte 1
     .byte 2
-    .byte 1
+    .byte 2
     .byte 0
     .byte 2
     .byte 1

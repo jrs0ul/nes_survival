@@ -84,9 +84,9 @@ IntroNameTableUpdate:
     sta $2006
 
     lda Temp
-    cmp #15
+    cmp #11
     beq @first
-    cmp #14
+    cmp #10
     beq @second
     lda #$F9
     sta $2007
