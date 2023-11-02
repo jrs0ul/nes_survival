@@ -2648,7 +2648,7 @@ UpdateSpear:
 
     ldy #3 ; set to Y
 
-    jsr MoveProjectileVerticaly
+    jsr MoveSpearVerticaly
     cmp #1
     beq @disable
 
@@ -2663,6 +2663,89 @@ UpdateSpear:
 @exit:
 
     rts
+
+;-----------------------------
+DoesSpearCollideWithMap:
+
+
+    sty TempYOffset
+
+    sta TempPointY  ; y coord
+    dey
+    lda (ProjectilePtr), y
+    sta TempScreen
+    dey
+    lda (ProjectilePtr), y
+    sta TempPointX
+
+    jsr TestPointAgainstCollisionMap
+    beq @not
+
+    ldy TempYOffset
+    lda #1
+    jmp @exit
+
+
+@not:
+    ldy TempYOffset
+    lda #0
+@exit:
+    rts
+
+
+;------------------------------
+MoveSpearVerticaly:
+    cmp #PROJECTILE_DIR_DOWN
+    bne @checkUp
+
+    lda (ProjectilePtr), y ; Y
+    clc
+    adc #SPEAR_SPEED
+
+    sta TempY
+
+    jsr DoesSpearCollideWithMap
+    bne @return_disable ;it does
+
+    lda TempY
+    sta (ProjectilePtr), y ; Y
+    cmp #252
+    bcs @return_disable
+
+
+@checkUp:
+    cmp #PROJECTILE_DIR_UP
+    bne @exit
+
+    lda (ProjectilePtr), y ; y
+
+    sec
+    sbc #SPEAR_SPEED
+
+    sta TempY
+
+    jsr DoesSpearCollideWithMap
+    bne @return_disable
+
+    lda TempY
+
+    sta (ProjectilePtr), y ; Y
+    cmp #SPEAR_SPEED
+    bcc @return_disable
+
+
+    lda #0
+    jmp @exit
+
+@return_disable:
+    lda #1
+
+
+@exit:
+
+    rts
+
+
 ;------------------------------
 MoveProjectileVerticaly:
     cmp #PROJECTILE_DIR_DOWN
@@ -2671,6 +2754,7 @@ MoveProjectileVerticaly:
     lda (ProjectilePtr), y ; Y
     clc
     adc #SPEAR_SPEED
+
     sta (ProjectilePtr), y ; Y
     cmp #252
     bcs @return_disable
