@@ -67,7 +67,7 @@ TitleLogics:
 IntroNameTableUpdate:
 
     ldx CutsceneSceneIdx
-    lda screens_that_do_tile_anim, x
+    lda Scenes_that_do_tile_anim, x
     beq @exit
 
 
@@ -103,6 +103,42 @@ IntroNameTableUpdate:
 @exit:
 
     rts
+;-----------------------------
+DoPaletteAnim:
+
+    ldx CutsceneSceneIdx
+    lda Scenes_that_do_palette_anim, x
+    beq @exit
+
+    lda PaletteFadeAnimationState
+    bne @exit
+
+
+    ldx CutsceneTimer
+    lda intro_palette_changes, x
+    ldx #9
+    sta RamPalette, x
+
+    lda #1
+    sta MustUpdatePalette
+
+@exit:
+    rts
+
+;-----------------------------
+DoScrolling:
+    ;do some scrolling
+    lda GlobalScroll
+    clc
+    adc intro_scroll_dir_x, x
+    sta GlobalScroll
+
+    lda GlobalScrollY
+    clc
+    adc intro_scroll_dir_y, x
+    sta GlobalScrollY
+
+    rts
 
 ;-----------------------------
 IntroLogics:
@@ -120,16 +156,7 @@ IntroLogics:
     bcs @exit
     tax
 
-    ;do some scrolling
-    lda GlobalScroll
-    clc
-    adc intro_scroll_dir_x, x
-    sta GlobalScroll
-
-    lda GlobalScrollY
-    clc
-    adc intro_scroll_dir_y, x
-    sta GlobalScrollY
+    jsr DoScrolling
 
 
     lda intro_scenes_duration, x
@@ -150,6 +177,7 @@ IntroLogics:
 
 @cont:
     jsr MoveIntroSprites
+    jsr DoPaletteAnim
 
     dec CutsceneTimer
     beq @increaseScene

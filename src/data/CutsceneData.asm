@@ -50,7 +50,7 @@ intro_scenes_delay:
     .byte 25
 
 intro_scenes_duration:
-    .byte 80
+    .byte 70
     .byte 10
     .byte 11
     .byte 20
@@ -609,9 +609,41 @@ intro_scroll_dir_y:
     .byte 0
     .byte 0
 
+Scenes_that_do_palette_anim:
+    .byte 0
+    .byte 0
+    .byte 0
+    .byte 1
+    .byte 0
+    .byte 0
+    .byte 0
+
+intro_palette_changes:
+    .byte $38
+    .byte $16
+    .byte $38
+    .byte $16
+    .byte $38
+    .byte $16
+    .byte $38
+    .byte $16
+    .byte $38
+    .byte $16
+    .byte $38
+    .byte $16
+    .byte $38
+    .byte $16
+    .byte $38
+    .byte $16
+    .byte $38
+    .byte $16
+    .byte $38
+    .byte $16
+
+
 
 ;scenes that do some kind of animation with background tiles are 1
-screens_that_do_tile_anim:
+Scenes_that_do_tile_anim:
     .byte 0
     .byte 0
     .byte 1
