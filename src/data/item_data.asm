@@ -34,7 +34,7 @@ item_wear:
     .byte 0   ;rowan berries
     .byte 0   ;jam
     .byte 0   ;rock
-    .byte 0   ;spear
+    .byte 1   ;spear
     .byte 10  ;knife
     .byte 0   ;poop
     .byte 0   ;hide
