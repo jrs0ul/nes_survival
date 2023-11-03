@@ -2725,8 +2725,6 @@ UpdateSpear:
 
 @filter:
     ldy #2
-    ;jsr FilterProjectiles
-    ;bne @disable
     jmp @exit
 
 @otherDir:
@@ -2740,12 +2738,35 @@ UpdateSpear:
     jmp @exit
 
 @disable:
-    lda #0
-    sta EquipedItem
-    sta SpearData
+    jsr DisableSpear
 
 
 @exit:
+
+    rts
+;-------------------------------
+DisableSpear:
+
+    lda EquipedItem + 1
+    cmp #ITEM_MAX_HP
+    bne @simplyRemove
+
+    lda #%00001111 ; 7 + active bit
+    sta TempItemIndex
+    jsr ItemSpawnPrep
+    lda SpearData + 2
+    sta Items, y
+    iny
+    lda SpearData + 1
+    sta Items, y
+    iny
+    lda SpearData + 3
+    sta Items, y
+
+@simplyRemove:
+    lda #0
+    sta EquipedItem
+    sta SpearData
 
     rts
 
