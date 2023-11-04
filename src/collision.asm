@@ -168,6 +168,12 @@ CanPlayerGoWithOldX:
 ;sets A=1 if point collides
 TestPointAgainstCollisionMap:
 
+    ldy LocationIndex
+    lda TempScreen
+    cmp LocationScreenCountList, y
+    bcs @collides
+    tay ; let's put screen to Y reg
+
     lda TempPointY
     clc
     adc #8
@@ -175,15 +181,19 @@ TestPointAgainstCollisionMap:
     lsr
     lsr ; y / 8
 
+    cmp #4
+    bcc @collides
+    cmp #30
+    bcs @collides
+
     asl  ;row * 2
 
-    ldy TempScreen
     clc
-    adc row_table_screens, y
+    adc row_table_screens, y ; screen is in Y
     tay
 
     ;load map row address from ram
-    lda MapRowAddressTable, y 
+    lda MapRowAddressTable, y
     sta pointer
     iny
     lda MapRowAddressTable, y
@@ -246,7 +256,7 @@ TestPointAgainstCollisionMap:
 @compare:
     cmp #128
     bcc @not_Colliding
-
+@collides:
     lda #1
     jmp @exit_collision_check
 
