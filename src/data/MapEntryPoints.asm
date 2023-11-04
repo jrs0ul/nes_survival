@@ -24,7 +24,7 @@ MapEntryPoints:
     ;4.Bear's house entrance
     .byte 1, 0, 118, 122, 177, 190, $68, $6F
     ;5.Exit point of second location
-    .byte 1, 0, 0, 255, 0, 255, 230, 255
+    .byte 1, 0, 0, 255, 0, 255, 222, 255
     ;6.entrance to cave location
     .byte 1, 0, 0, 255, 0, 255, 0, 20
     ;----------------------------------------

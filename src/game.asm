@@ -3758,6 +3758,12 @@ DecreaseLife:
     jsr DecreaseDigits
     lda #1
     sta HpUpdated
+    sta MustUpdatePalette
+    lda #$16
+    ldy #0
+    sta RamPalette, y
+    lda #1
+    sta PaletteUpdateSize
     rts
 ;-------------------------------
 IncreaseWarmth:
