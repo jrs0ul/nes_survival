@@ -174,6 +174,11 @@ CheckItemsXY:
     lda TempX
     clc
     adc #16
+    bcs @clamp
+    jmp @cont
+@clamp:
+    lda #255
+@cont:
     sec
     sbc GlobalScroll
 
