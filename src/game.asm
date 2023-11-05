@@ -429,6 +429,10 @@ player_sprites_flip:
     PLAYER_START_Y             = 200
 
 
+    DAMAGE_RED_BLINK_DURATION  = 5
+    COLOR_RED                  = $16
+
+
     SCREEN_ROW_COUNT           = 30
 
     CHARACTER_ZERO             = $30
@@ -1265,8 +1269,11 @@ destructableIdx:
 RLETag:
     .res 1
 
+RedCounter:
+    .res 1
+
 Buffer:
-    .res 341  ;must see how much is still available
+    .res 340  ;must see how much is still available
 
 ;====================================================================================
 
@@ -2883,6 +2890,29 @@ MoveProjectileVerticaly:
 ;-------------------------------
 DoPaletteFades:
 
+    
+    lda GameState
+    cmp #STATE_GAME
+    bne @continue
+    lda RamPalette
+    cmp #$0C
+    beq @checkFade
+@checkFade:
+    lda PaletteFadeAnimationState
+    bne @continue
+
+    dec RedCounter
+    lda RedCounter
+    bne @exit
+
+    lda #$0C
+    sta RamPalette
+    lda #1
+    sta MustUpdatePalette
+    sta PaletteUpdateSize
+    jmp @exit
+
+@continue:
     lda PaletteFadeAnimationState
     beq @exit
 
@@ -3759,11 +3789,13 @@ DecreaseLife:
     lda #1
     sta HpUpdated
     sta MustUpdatePalette
-    lda #$16
+    lda #COLOR_RED
     ldy #0
     sta RamPalette, y
     lda #1
     sta PaletteUpdateSize
+    lda #DAMAGE_RED_BLINK_DURATION
+    sta RedCounter
     rts
 ;-------------------------------
 IncreaseWarmth:
