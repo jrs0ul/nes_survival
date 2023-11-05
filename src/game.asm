@@ -617,7 +617,6 @@ LastDigit:
 TempDigit:
     .res 1
 
-
 Buttons:
     .res 1
 ButtonsP3:
@@ -651,6 +650,9 @@ Food:
 FoodUpdated:
     .res 1
 
+PlayerDamagedCounter:
+    .res 1
+
 Warmth:
     .res 3
 WarmthUpdated:
@@ -663,6 +665,8 @@ MustPlayNewSong:
     .res 1
 MustPlaySample:
     .res 1
+
+
 
 SampleTimer:
     .res 1
@@ -685,7 +689,7 @@ TempScreen:
     .res 1
 
 ZPBuffer:
-    .res 113  ; I want to be aware of the free memory
+    .res 112  ; I want to be aware of the free memory
 
 ;--------------
 .segment "BSS" ; variables in ram
@@ -2890,7 +2894,6 @@ MoveProjectileVerticaly:
 ;-------------------------------
 DoPaletteFades:
 
-    
     lda GameState
     cmp #STATE_GAME
     bne @continue
@@ -2901,6 +2904,20 @@ DoPaletteFades:
     lda PaletteFadeAnimationState
     bne @continue
 
+    dec PlayerDamagedCounter
+    lda PlayerDamagedCounter
+    bne @checkRed
+
+    ldy #29
+    lda #$0F
+    sta RamPalette, y
+    lda #32
+    sta PaletteUpdateSize
+    lda #1
+    sta MustUpdatePalette
+
+
+@checkRed:
     dec RedCounter
     lda RedCounter
     bne @exit

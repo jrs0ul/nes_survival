@@ -2693,6 +2693,15 @@ DamagePlayer:
     jsr DecreaseDigits
     lda #1
     sta HpUpdated
+    sta MustUpdatePalette
+    ldy #29
+    lda #07
+    sta RamPalette, y
+    sta PlayerDamagedCounter
+    lda #32
+    sta PaletteUpdateSize
+
+
 @exit:
 
     rts
