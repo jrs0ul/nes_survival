@@ -428,6 +428,8 @@ player_sprites_flip:
     PLAYER_START_X             = $50
     PLAYER_START_Y             = 200
 
+    LOCATION_ALIEN_BASE        = 10
+
 
     DAMAGE_RED_BLINK_DURATION  = 5
     COLOR_RED                  = $16
@@ -3629,7 +3631,7 @@ AdaptBackgroundPaletteByTime:
     lda InVillagerHut
     bne @exit
     lda LocationIndex
-    cmp #10 ; alien base
+    cmp #LOCATION_ALIEN_BASE
     beq @exit
 
     ldy #$01 ;keeps the outline for the background objects
@@ -5161,6 +5163,17 @@ WearWeapon:
 ;----------------------------------
 useHammerOnEnvironment:
 
+    lda InHouse
+    beq @checkBase
+    rts
+
+@checkBase:
+    lda LocationIndex
+    cmp #LOCATION_ALIEN_BASE
+    bne @cont
+    rts
+
+@cont:
     jsr CalcTileAddressInFrontOfPlayer
 
     lda (pointer), y
