@@ -1454,6 +1454,9 @@ FoodMenuInputVillager:
 
     ;give item
 
+    lda EnteredBeforeNightfall
+    bne @continue
+
     jsr GetPaletteFadeValueForHour
     cmp #$40
     bne @continue
@@ -1575,6 +1578,10 @@ MaterialMenuInput:
 
 @giveItem:
     stx TempRegX
+
+    lda EnteredBeforeNightfall
+    bne @continue
+
     jsr GetPaletteFadeValueForHour
     cmp #$40
     bne @continue
@@ -1746,6 +1753,10 @@ ToolMenuInputVillager:
 
 
     stx TempRegX
+
+    lda EnteredBeforeNightfall
+    bne @continue
+
     jsr GetPaletteFadeValueForHour
     cmp #$40
     bne @continue
@@ -1872,6 +1883,10 @@ EquipItem:
 ;-------------------------------------
 GiveItem:
     stx TempRegX
+
+    lda EnteredBeforeNightfall
+    bne @continue
+
     jsr GetPaletteFadeValueForHour
     cmp #$40
     bne @continue

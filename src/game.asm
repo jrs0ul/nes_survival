@@ -440,7 +440,7 @@ player_sprites_flip:
     CHARACTER_ZERO             = $30
 
     MAX_WARMTH_DELAY           = $40
-    MAX_FOOD_DELAY             = $60
+    MAX_FOOD_DELAY             = $70
     MAX_FUEL_DELAY             = $55
 
     DECREMENT_FOOD_DEFAULT     = $3
@@ -1278,8 +1278,11 @@ RLETag:
 RedCounter:
     .res 1
 
+EnteredBeforeNightfall:
+    .res 1
+
 Buffer:
-    .res 340  ;must see how much is still available
+    .res 339  ;must see how much is still available
 
 ;====================================================================================
 
@@ -3097,6 +3100,9 @@ RoutinesAfterFadeOut:
     cmp #$40
     bne @skip_night
 
+    lda #0
+    sta EnteredBeforeNightfall
+
     lda #<Hut_npcs_night
     sta pointer
     lda #>Hut_npcs_night
@@ -3111,6 +3117,7 @@ RoutinesAfterFadeOut:
     lda #1
     sta MustRestartIndoorsMusic
     sta InVillagerHut
+    sta EnteredBeforeNightfall
     ;------------------------------------
     ;9.Bjorn's house exit
 @next2:

@@ -164,6 +164,9 @@ SetupVillagerText:
     lda VillagerIndex
     bne @skipNightCheck
 
+    lda EnteredBeforeNightfall
+    bne @skipNightCheck
+
     jsr GetPaletteFadeValueForHour
     cmp #$40
     beq @exit
