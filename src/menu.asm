@@ -1479,9 +1479,18 @@ FoodMenuInputVillager:
     tay
     lda Inventory, x
     cmp goal_items_list, y
-    bne @exit
+    beq @reward
+    ldy VillagerIndex
+    cmp special_goal_items, y
+    beq @special_reward
+    jmp @exit
 
+@reward:
     jsr SpawnRewardItem
+    jmp @clear
+
+@special_reward:
+    jsr SpawnSpecialReward
 
 @clear:
     jsr ClearThatItem
@@ -1822,6 +1831,34 @@ SpawnRewardItem:
 
 
     rts
+;------------------------------------
+SpawnSpecialReward:
+
+    sta SpecialItemIGave
+
+    lda special_reward_items, y
+    beq @no_item
+    asl
+    ora #%00000001
+    sta Items
+    lda #0
+    sta Items + 1
+    lda #120
+    sta Items + 2
+    lda #108
+    sta Items + 3
+
+    lda #1
+    sta ItemCount
+
+
+@no_item:
+    lda #1
+    sta MustExitMenuState
+
+
+    rts
+
 
 ;-------------------------------------
 ;pointer - EquipedItem or EquipedClothing

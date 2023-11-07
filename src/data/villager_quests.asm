@@ -179,6 +179,15 @@ granny_thanks_1:
     .byte $00,$3f,$48,$4b,$00,$52,$48,$4e,$4b,$00,$00,$00,$00,$00,$00,$00
     .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$3e,$3f,$3f,$48,$4b
     .byte $4d,$59,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
+
+granny_thanks_special:
+    .byte $00,$00,$00,$00,$00,$00,$4d,$41,$42,$4c,$00,$46,$4e,$4c,$4d,$00
+    .byte $41,$3a,$4f,$3e,$00,$3b,$3e,$3e,$47,$00,$00,$00,$00,$00,$00,$00
+    .byte $00,$3f,$4b,$48,$46,$00,$46,$52,$00,$40,$4b,$3a,$47,$3d,$00,$3d
+    .byte $3a,$4e,$40,$41,$4d,$3e,$4b,$59,$01,$4d,$41,$3a,$47,$44,$00,$00
+    .byte $00,$52,$48,$4e,$59,$00,$41,$3e,$4b,$3e,$7d,$4c,$00,$3a,$00,$4b
+    .byte $3e,$50,$3a,$4b,$3d,$59,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
+
 ;==============================
 
 .segment "ROM1"
@@ -269,6 +278,18 @@ thanks_list_high:
     .byte >granny_thanks_0
 
 
+special_thanks_list_low:
+    .byte 0
+    .byte 0
+    .byte <granny_thanks_special
+
+special_thanks_list_high:
+    .byte 0
+    .byte 0
+    .byte >granny_thanks_special
+
+
+
 first_time_text: ;when player enters the hut for the first time
     .byte $00,$00,$00,$00,$00,$00,$00,$47,$48,$3b,$48,$3d,$52,$7d,$4c,$00
     .byte $41,$48,$46,$3e,$82,$82,$82,$00,$00,$00,$00,$00,$00,$00,$00,$00
@@ -278,6 +299,17 @@ first_time_text: ;when player enters the hut for the first time
     .byte $4d,$48,$00,$42,$47,$4d,$3e,$4b,$3a,$3c,$4d,$58,$58,$00,$00,$00
 
 .segment "ROM1" ; menu
+
+special_goal_items:
+    .byte 0                 ;Bjorn
+    .byte 0                 ;Hedgehog
+    .byte ITEM_COOKED_MEAT  ;Grandma
+
+special_reward_items:
+    .byte 0
+    .byte 0
+    .byte ITEM_JAM
+
 
 goal_items_list:
     .byte ITEM_COOKED_MEAT, ITEM_SPEAR, ITEM_JAM, ITEM_COAT

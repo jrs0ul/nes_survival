@@ -168,8 +168,10 @@ SetupVillagerText:
     bne @skipNightCheck
 
     jsr GetPaletteFadeValueForHour
-    cmp #$40
-    beq @exit
+    cmp #DAYTIME_NIGHT
+    bne @skipNightCheck
+    
+    rts
 
 @skipNightCheck:
     lda #1
@@ -179,6 +181,9 @@ SetupVillagerText:
 
     lda ItemIGave
     bne @thanks
+
+    lda SpecialItemIGave
+    bne @specialthanks
 
     lda VillagerIndex
     tay
@@ -214,6 +219,20 @@ SetupVillagerText:
     sta TextPtr + 1
     lda #DIALOG_TEXT_LENGTH
     sta TextLength
+    jmp @exit
+
+@specialthanks:
+
+    ldx VillagerIndex
+
+    lda special_thanks_list_low, x
+    sta TextPtr
+    lda special_thanks_list_high, x
+    sta TextPtr + 1
+    lda #DIALOG_TEXT_LENGTH
+    sta TextLength
+
+    lda VillagerIndex
     jmp @exit
 
 @checkPlayersHouse:

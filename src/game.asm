@@ -252,10 +252,10 @@ PaletteTransitions:
     .byte $40
 
 palette_fade_for_periods: ; each period is 1h 30 mins
-    .byte $40 ;00:00 period start
-    .byte $40 ;01:30
-    .byte $40 ;03:00
-    .byte $40 ;04:30
+    .byte DAYTIME_NIGHT ;00:00 period start
+    .byte DAYTIME_NIGHT ;01:30
+    .byte DAYTIME_NIGHT ;03:00
+    .byte DAYTIME_NIGHT ;04:30
     .byte $30 ;06:00
     .byte $20 ;07:30
     .byte $10 ;09:00
@@ -265,9 +265,9 @@ palette_fade_for_periods: ; each period is 1h 30 mins
     .byte $10 ;15:00
     .byte $20 ;16:30
     .byte $30 ;18:00
-    .byte $40 ;19:30
-    .byte $40 ;21:00
-    .byte $40 ;22:30
+    .byte DAYTIME_NIGHT ;19:30
+    .byte DAYTIME_NIGHT ;21:00
+    .byte DAYTIME_NIGHT ;22:30
 
 sun_moon_sprites_for_periods:
     .byte 232, 246, 0, 0 ;$40
@@ -371,6 +371,8 @@ player_sprites_flip:
     OUTRO_SCENE_MAX            = 4
 
 
+    DAYTIME_NIGHT              = $40
+
     HOURS_MAX                  = 240
     MINUTES_MAX                = 60
     SLEEP_TIME                 = 60
@@ -439,7 +441,8 @@ player_sprites_flip:
 
     CHARACTER_ZERO             = $30
 
-    MAX_WARMTH_DELAY           = $40
+    MAX_WARMTH_DELAY_OUTSIDE   = $50 ; how fast you lose warmth
+    MAX_WARMTH_DELAY_INDOORS   = $10 ; how fast you gain warmth
     MAX_FOOD_DELAY             = $70
     MAX_FUEL_DELAY             = $55
 
@@ -842,6 +845,8 @@ EquipedClothing:
 
 ItemIGave:
     .res 1  ;item index i gave to villager
+SpecialItemIGave:
+    .res 1
 
 Inventory:
     .res INVENTORY_MAX_SIZE
@@ -1282,7 +1287,7 @@ EnteredBeforeNightfall:
     .res 1
 
 Buffer:
-    .res 339  ;must see how much is still available
+    .res 338  ;must see how much is still available
 
 ;====================================================================================
 
@@ -3097,7 +3102,7 @@ RoutinesAfterFadeOut:
     bne @next2
 
     jsr GetPaletteFadeValueForHour
-    cmp #$40
+    cmp #DAYTIME_NIGHT
     bne @skip_night
 
     lda #0
@@ -3473,6 +3478,7 @@ CommonLocationRoutine:
 OnExitVillagerHut:
     lda ItemIGave
     beq @exit
+
     lda #0
     sta ItemIGave
 @incrementQuest:
@@ -3698,8 +3704,6 @@ WarmthLogics:
     jmp @exit
 
 @resetWarmthDelay:
-    lda #MAX_WARMTH_DELAY
-    sta WarmthDelay
     lda InHouse
     bne @increaseWarmth
     lda InVillagerHut
@@ -3713,11 +3717,15 @@ WarmthLogics:
     cmp #0
     beq @decreaseWarmth
 @ignoreFuel: ; for other places than player's hut
+    lda #MAX_WARMTH_DELAY_INDOORS
+    sta WarmthDelay
     jsr IncreaseWarmth
     jmp @exit
 @decreaseWarmth:
+    lda #MAX_WARMTH_DELAY_OUTSIDE
+    sta WarmthDelay
     jsr GetPaletteFadeValueForHour
-    cmp #$40    ; is it night ?
+    cmp #DAYTIME_NIGHT    ; is it night ?
     beq @nightFreeze
     lda #WARMTH_DAY_DECREASE
     jmp @saveTempDecrease
@@ -4549,7 +4557,7 @@ ResetEntityVariables:
     lda #BASE_MENU_MIN_Y
     sta InventoryPointerY
 
-    lda #MAX_WARMTH_DELAY
+    lda #MAX_WARMTH_DELAY_OUTSIDE
     sta WarmthDelay
     lda #MAX_FOOD_DELAY
     sta FoodDelay
@@ -4571,6 +4579,7 @@ ResetEntityVariables:
     sta PlayerWins
     sta FoodToStamina
     sta ItemIGave
+    sta SpecialItemIGave
     sta PaletteFadeAnimationState
     sta FadeIdx
     sta PaletteFadeTimer
@@ -6342,13 +6351,19 @@ UpdateVillagerDialogSprites:
 
     lda ItemIGave
     bne @exit ;works for the quest dialogs so far
+    lda SpecialItemIGave
+    bne @exit
 
     lda MustUpdateTextBaloon
     bne @exit
 
     stx TempRegX
+
+    lda EnteredBeforeNightfall
+    bne @continue
+
     jsr GetPaletteFadeValueForHour
-    cmp #$40
+    cmp #DAYTIME_NIGHT
     bne @continue
 
     lda VillagerIndex  ;don't show sprites if bear
