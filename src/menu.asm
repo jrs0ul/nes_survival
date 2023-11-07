@@ -1480,6 +1480,21 @@ FoodMenuInputVillager:
     lda Inventory, x
     cmp goal_items_list, y
     beq @reward
+
+    lda VillagerIndex
+    asl
+    tay
+    lda special_quests, y ;the person
+    sta TempSpearX
+    iny
+    lda special_quests, y ;the quest index of that person
+    sta TempFrame
+    ldy TempSpearX ; that person index
+    lda ActiveVillagerQuests, y
+    cmp TempFrame
+    bne @exit
+
+
     ldy VillagerIndex
     cmp special_goal_items, y
     beq @special_reward

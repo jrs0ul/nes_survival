@@ -494,6 +494,7 @@ player_sprites_flip:
     ITEM_HAMMER                = 20
     ITEM_WOOD_HAMMER           = 21
     ITEM_SLINGSHOT             = 22
+    ITEM_PIE                   = 23
 
     SPEAR_SPEED                = 3
 

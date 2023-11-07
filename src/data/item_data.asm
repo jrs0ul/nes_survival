@@ -25,6 +25,7 @@ item_data:
     .byte 24 , 2, 5, 5  ; 20 hammer
     .byte 24 , 0, 5, 1  ; 21 wooden hammer
     .byte 40 , 2, 5, 3  ; 22 slingshot
+    .byte 56, 0, 1, 4   ; 23 pie
 
 item_wear:
     .byte 0   ;empty
@@ -50,3 +51,4 @@ item_wear:
     .byte 25  ;hammer
     .byte 15  ;wooden hammer
     .byte 5   ;slingshot
+    .byte 0   ;pie

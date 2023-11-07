@@ -10,3 +10,5 @@ recipes:
     .byte 1 , 1 , 21  ;  stick + stick = wooden hammer
     .byte 10, 1 , 22  ;  hide + stick  = slingshot
     .byte 1 , 10, 22  ;  stick + hide  = slingshot
+    .byte 3 , 4 , 23  ;  cooked meat + berries = pie
+    .byte 4 , 3 , 23  ;  berries + cooked meat = pie
