@@ -221,8 +221,8 @@ QuestSprites:
     .byte 200,  6, 0, 216, 200, 7, 0, 224, 0, 0, 0, 0, 0, 0, 0, 0
     .byte 200,  6, 0, 216, 200, 7, 0, 224, 0, 0, 0, 0, 0, 0, 0, 0
 
-.segment "ROM3"
 
+.segment "ROM0"
 ;items that are spawned by a villager for that quest
 quest_items:
     .byte 0, 0, 0, 0
@@ -230,6 +230,7 @@ quest_items:
     .byte 0, 0, 0, 0
 
 
+.segment "ROM3"
 quest_list_low:
     .byte <villager_bear_quest_0
     .byte <villager_bear_quest_1

@@ -898,6 +898,8 @@ VillagerIndex:
 
 ActiveVillagerQuests:
     .res MAX_VILLAGERS
+TakenQuestItems:
+    .res MAX_VILLAGERS
 
 
 MustSleepAfterFadeOut:
@@ -1288,7 +1290,7 @@ EnteredBeforeNightfall:
     .res 1
 
 Buffer:
-    .res 338  ;must see how much is still available
+    .res 335  ;must see how much is still available
 
 ;====================================================================================
 
@@ -3182,6 +3184,7 @@ RoutinesAfterFadeOut:
     sta MustRestartIndoorsMusic
     sta InVillagerHut
     sta VillagerIndex
+    jsr SpawnQuestItems
 
     ;------------------------------------------
     ;11.Second villager house's exit
@@ -3533,6 +3536,41 @@ SkipTime:
     jsr IncreaseDays
     jsr ResetTimesWhenItemsWerePicked
     jsr DoFoodSpoilage
+
+@exit:
+    rts
+
+;---------------------------------
+;spawn items needed for the villager quest
+SpawnQuestItems:
+
+    ldy VillagerIndex
+    lda TakenQuestItems, y
+    bne @exit
+    lda ActiveVillagerQuests, y
+    sta Temp
+    tya
+    asl
+    asl
+    clc
+    adc Temp
+    tay
+    lda quest_items, y
+
+    beq @exit
+
+    asl
+    ora #%00000001
+    sta Items
+    lda #0
+    sta Items + 1
+    lda #120
+    sta Items + 2
+    lda #108
+    sta Items + 3
+
+    lda #1
+    sta ItemCount
 
 @exit:
     rts
@@ -4509,6 +4547,11 @@ ResetEntityVariables:
     lda #0
     sta ActiveVillagerQuests
     sta ActiveVillagerQuests + 1
+    sta ActiveVillagerQuests + 2
+    sta TakenQuestItems
+    sta TakenQuestItems + 1
+    sta TakenQuestItems + 2
+
     sta HP + 1
     sta HP + 2
     sta Warmth + 1

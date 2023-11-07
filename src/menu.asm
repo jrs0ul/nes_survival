@@ -1496,6 +1496,7 @@ FoodMenuInputVillager:
 
 
     ldy VillagerIndex
+    lda Inventory, x
     cmp special_goal_items, y
     beq @special_reward
     jmp @exit
