@@ -203,7 +203,7 @@ granny_thanks_special:
 
 .segment "ROM1"
 QuestSpritesCount:
-    .byte 0, 4, 4, 0,  0, 4, 0, 2,  2, 2, 2, 2
+    .byte 0, 4, 4, 0,  0, 4, 0, 2,  2, 2, 0, 2
 
 QuestSprites:
     .byte 0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
@@ -218,7 +218,7 @@ QuestSprites:
 
     .byte 200,  6, 0, 176, 200, 7, 0, 184, 0, 0, 0, 0, 0, 0, 0, 0
     .byte 200,  6, 0, 216, 200, 7, 0, 224, 0, 0, 0, 0, 0, 0, 0, 0
-    .byte 200,  6, 0, 216, 200, 7, 0, 224, 0, 0, 0, 0, 0, 0, 0, 0
+    .byte 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     .byte 200,  6, 0, 216, 200, 7, 0, 224, 0, 0, 0, 0, 0, 0, 0, 0
 
 
@@ -334,14 +334,14 @@ special_reward_items:
 
 goal_items_list:
     .byte ITEM_COOKED_MEAT, ITEM_SPEAR, ITEM_JAM, ITEM_COAT
-    .byte ITEM_RAW_MEAT, ITEM_KNIFE, ITEM_COOKED_FISH, ITEM_HIDE
-    .byte ITEM_STICK, ITEM_STICK, ITEM_STICK, ITEM_STICK
+    .byte ITEM_RAW_MEAT, ITEM_KNIFE, 255, ITEM_HIDE
+    .byte ITEM_STICK, ITEM_STICK, ITEM_COOKED_FISH, ITEM_STICK
 
 .segment "RODATA"
 reward_items_list:
     .byte 0, ITEM_HIDE, ITEM_FISHING_ROD, ITEM_HAMMER
     .byte 0, ITEM_ROWAN_BERRIES, ITEM_PIE, ITEM_COAT
-    .byte 0, 0, ITEM_JAM, 0
+    .byte 0, ITEM_JAM, 0, 0
 
 
 ;Villager Id, quest Id
