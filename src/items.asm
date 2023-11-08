@@ -308,6 +308,7 @@ AddAndDeactivateItems:
     lda Items, x
     lsr
     ldy Temp
+    sta TempItemIndex
     sta Inventory, y
     iny
     lda #ITEM_MAX_HP
@@ -316,6 +317,19 @@ AddAndDeactivateItems:
     lda Items, x
     and #%11111110
     sta Items, x
+
+    lda InVillagerHut
+    beq @exit
+
+    ldy VillagerIndex
+    jsr GetItemIdForTheQuest
+    cmp TempItemIndex
+    bne @exit
+
+    ldy VillagerIndex
+    sty SpecialItemOwner
+    sta TakenQuestItems, y
+
 @exit:
     ldy TempY
     rts

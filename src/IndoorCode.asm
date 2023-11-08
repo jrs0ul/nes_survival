@@ -156,6 +156,26 @@ DoSleep:
 @exit:
     rts
 ;---------------------------------
+ShowThanksText:
+    lda VillagerIndex
+    tay
+    asl
+    asl ; index * 4
+    clc
+    adc ActiveVillagerQuests, y
+    tax
+
+    lda thanks_list_low, x
+    sta TextPtr
+    lda thanks_list_high, x
+    sta TextPtr + 1
+    lda #DIALOG_TEXT_LENGTH
+    sta TextLength
+
+    rts
+
+
+;---------------------------------
 SetupVillagerText:
 
     lda InVillagerHut
@@ -183,8 +203,15 @@ SetupVillagerText:
     bne @thanks
 
     lda SpecialItemIGave
-    bne @specialthanks
+    beq @regular_quest
 
+    lda VillagerIndex
+    cmp SpecialItemReceiver
+    beq @specialthanks
+    cmp SpecialItemOwner
+    beq @thanks
+
+@regular_quest:
     lda VillagerIndex
     tay
     asl
@@ -205,20 +232,7 @@ SetupVillagerText:
 
 @thanks:
 
-    lda VillagerIndex
-    tay
-    asl
-    asl ; index * 4
-    clc
-    adc ActiveVillagerQuests, y
-    tax
-
-    lda thanks_list_low, x
-    sta TextPtr
-    lda thanks_list_high, x
-    sta TextPtr + 1
-    lda #DIALOG_TEXT_LENGTH
-    sta TextLength
+    jsr ShowThanksText
     jmp @exit
 
 @specialthanks:

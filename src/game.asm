@@ -848,6 +848,10 @@ ItemIGave:
     .res 1  ;item index i gave to villager
 SpecialItemIGave:
     .res 1
+SpecialItemReceiver:
+    .res 1
+SpecialItemOwner:
+    .res 1
 
 Inventory:
     .res INVENTORY_MAX_SIZE
@@ -1290,7 +1294,7 @@ EnteredBeforeNightfall:
     .res 1
 
 Buffer:
-    .res 335  ;must see how much is still available
+    .res 333  ;must see how much is still available
 
 ;====================================================================================
 
@@ -3185,6 +3189,7 @@ RoutinesAfterFadeOut:
     sta InVillagerHut
     sta VillagerIndex
     jsr SpawnQuestItems
+    jsr SpawnSpecialItemOwnerReward
 
     ;------------------------------------------
     ;11.Second villager house's exit
@@ -3481,8 +3486,38 @@ CommonLocationRoutine:
 ;-------------------------------
 OnExitVillagerHut:
     lda ItemIGave
+    bne @cont
+    lda SpecialItemIGave
     beq @exit
 
+    ldy VillagerIndex
+    lda ActiveVillagerQuests, y
+    sta Temp
+
+    ldy #0
+
+@villagerloop:
+    tya
+    asl
+    tax
+    lda special_quests, x
+    cmp VillagerIndex
+    bne @next
+    inx
+    lda special_quests, x
+    cmp Temp
+    beq @special
+
+@next:
+    iny
+    cpy #MAX_VILLAGERS
+    bcc @villagerloop
+    bcs @exit
+
+@special:
+    lda #0
+    sta SpecialItemIGave
+@cont:
     lda #0
     sta ItemIGave
 @incrementQuest:
@@ -3539,14 +3574,12 @@ SkipTime:
 
 @exit:
     rts
+;--------------------------------
+;gets the item id that is spawned for the quest
+;input: Y - villager index
+;output: A - item id
+GetItemIdForTheQuest:
 
-;---------------------------------
-;spawn items needed for the villager quest
-SpawnQuestItems:
-
-    ldy VillagerIndex
-    lda TakenQuestItems, y
-    bne @exit
     lda ActiveVillagerQuests, y
     sta Temp
     tya
@@ -3557,8 +3590,55 @@ SpawnQuestItems:
     tay
     lda quest_items, y
 
+
+    rts
+;---------------------------------
+;spawn items needed for the villager quest
+SpawnQuestItems:
+
+    ldy VillagerIndex
+
+    lda TakenQuestItems, y
+    bne @exit
+
+    jsr GetItemIdForTheQuest
     beq @exit
 
+    asl
+    ora #%00000001
+    sta Items
+    lda #0
+    sta Items + 1
+    lda #120
+    sta Items + 2
+    lda #108
+    sta Items + 3
+
+    lda #1
+    sta ItemCount
+
+@exit:
+    rts
+;---------------------------------
+SpawnSpecialItemOwnerReward:
+
+
+    lda SpecialItemIGave
+    beq @exit
+
+    ldy VillagerIndex
+    cpy SpecialItemOwner
+    bne @exit
+    tya
+    asl
+    asl
+    clc
+    adc ActiveVillagerQuests, y
+    tay
+
+
+    lda reward_items_list, y
+    beq @exit
     asl
     ora #%00000001
     sta Items
@@ -4624,6 +4704,8 @@ ResetEntityVariables:
     sta FoodToStamina
     sta ItemIGave
     sta SpecialItemIGave
+    sta SpecialItemReceiver
+    sta SpecialItemOwner
     sta PaletteFadeAnimationState
     sta FadeIdx
     sta PaletteFadeTimer

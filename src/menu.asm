@@ -1872,6 +1872,9 @@ SpawnSpecialReward:
     lda #1
     sta MustExitMenuState
 
+    lda VillagerIndex
+    sta SpecialItemReceiver
+
 
     rts
 

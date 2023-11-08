@@ -222,7 +222,7 @@ QuestSprites:
     .byte 200,  6, 0, 216, 200, 7, 0, 224, 0, 0, 0, 0, 0, 0, 0, 0
 
 
-.segment "ROM0"
+.segment "RODATA"
 ;items that are spawned by a villager for that quest
 quest_items:
     .byte 0, 0, 0, 0
@@ -231,6 +231,8 @@ quest_items:
 
 
 .segment "ROM3"
+
+
 quest_list_low:
     .byte <villager_bear_quest_0
     .byte <villager_bear_quest_1
@@ -328,11 +330,6 @@ special_reward_items:
     .byte 0
     .byte ITEM_JAM
 
-;Villager Id, quest Id
-special_quests:
-    .byte 0, 0
-    .byte 0, 0
-    .byte 1, 2
 
 
 goal_items_list:
@@ -340,10 +337,16 @@ goal_items_list:
     .byte ITEM_RAW_MEAT, ITEM_KNIFE, ITEM_COOKED_FISH, ITEM_HIDE
     .byte ITEM_STICK, ITEM_STICK, ITEM_STICK, ITEM_STICK
 
+.segment "RODATA"
 reward_items_list:
     .byte 0, ITEM_HIDE, ITEM_FISHING_ROD, ITEM_HAMMER
-    .byte 0, ITEM_ROWAN_BERRIES, 0, ITEM_COAT
+    .byte 0, ITEM_ROWAN_BERRIES, ITEM_PIE, ITEM_COAT
     .byte 0, 0, ITEM_JAM, 0
 
-.segment "RODATA"
+
+;Villager Id, quest Id
+special_quests:
+    .byte 0, 0
+    .byte 0, 0
+    .byte 1, 2
 
