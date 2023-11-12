@@ -120,6 +120,7 @@ ItemCollisionCheck:
 @exit:
     rts
 ;----------------------------------
+;TODO: Optimize !!!!
 CheckItemsXY:
 
     lda Items, x
@@ -171,14 +172,22 @@ CheckItemsXY:
     jmp @exit
 @CheckX2Match:
 
+    sty TempIndex
     lda TempX
     clc
     adc #16
-    bcs @clamp
+    bcs @checkIfLastScreen
+    jmp @cont
+@checkIfLastScreen:
+
+    jsr LastScreenCheck
+    bcs @clamp ; if on last screen, then clamp
+    lda TempPointX2 ;restore max item X
     jmp @cont
 @clamp:
     lda #255
 @cont:
+    ldy TempIndex
     sec
     sbc GlobalScroll
 
@@ -192,6 +201,18 @@ CheckItemsXY:
     jsr CheckYPoints
 @exit:
     rts
+;----------------------------------
+LastScreenCheck:
+    sta TempPointX2
+    ldy LocationIndex
+    lda CurrentMapSegmentIndex
+    clc
+    adc #1
+    cmp LocationScreenCountList, y
+
+
+    rts
+
 ;-----------------------------------
 CheckYPoints:
 
