@@ -535,7 +535,7 @@ player_sprites_flip:
 
     DIALOG_TEXT_LENGTH         = 96
 
-    RECIPES_SIZE               = 33
+    RECIPES_SIZE               = 39
 
     ROT_AMOUNT_RAW_MEAT        = 50
     ROT_AMOUNT_COOKED_MEAT     = 25
