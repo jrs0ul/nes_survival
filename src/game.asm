@@ -1172,6 +1172,8 @@ ShotWithProjectile:
 
 SpritesUpdated:
     .res 1
+TaintedSprites:
+    .res 1
 ;----
 TempItemIndex:
     .res 1
@@ -1294,7 +1296,7 @@ EnteredBeforeNightfall:
     .res 1
 
 Buffer:
-    .res 333  ;must see how much is still available
+    .res 332  ;must see how much is still available
 
 ;====================================================================================
 
@@ -1346,6 +1348,8 @@ clrmem:
     lda #0
     sta NMINotFinished
     sta FlickerFrame
+    lda #MAX_SPRITE_COUNT
+    sta TaintedSprites
 
 
     ldy #6
@@ -6446,20 +6450,20 @@ UpdateSprites:
 
 ;------------------- hide unused sprites
 @hidesprites:
-    lda #MAX_SPRITE_COUNT
+    lda TaintedSprites
 
     cmp TempSpriteCount
     bcc @done
+    beq @done
     sec
     sbc TempSpriteCount
+    asl
+    asl
 
     tay
-@hideSpritesLoop:
     lda #$FE
+@hideSpritesLoop:
     sta FIRST_SPRITE, x
-    inx
-    inx
-    inx
     inx
 
     dey
@@ -6468,6 +6472,8 @@ UpdateSprites:
 
     lda #1
     sta SpritesUpdated
+    lda TempSpriteCount
+    sta TaintedSprites
 
     rts
 ;==============================================================

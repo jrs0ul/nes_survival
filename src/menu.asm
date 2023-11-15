@@ -2724,25 +2724,28 @@ UpdateInventorySprites:
 
 
 @hideSprites:
-    lda #MAX_SPRITE_COUNT - 1
+    lda TaintedSprites
 
     cmp TempSpriteCount
     bcc @done
+    beq @done
     sec
     sbc TempSpriteCount
+    asl
+    asl
 
     tay
-@hideSpritesLoop:
     lda #$FE
+@hideSpritesLoop:
     sta FIRST_SPRITE, x
-    inx
-    inx
-    inx
     inx
 
     dey
     bne @hideSpritesLoop
 @done:
+
+    lda TempSpriteCount
+    sta TaintedSprites
 
     rts
 
