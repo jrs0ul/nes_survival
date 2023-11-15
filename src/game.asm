@@ -2174,7 +2174,6 @@ Logics:
     jsr FoodLogics
 
     jsr RunTime
-   
     jsr RestoreStamina
 
 
