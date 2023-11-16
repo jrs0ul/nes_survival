@@ -232,8 +232,8 @@ fist_collision_pos:
 ;   tile row
 ;   tile column
 destructable_tiles_list:
-    .byte 6, $20, $87, 4, 7, 0, 0, 0
-    .byte 6, $20, $88, 4, 8, 0, 0, 0
+    .byte 6, $24, $87, 4, 7, 0, 0, 0
+    .byte 6, $24, $88, 4, 8, 0, 0, 0
 
 
 
@@ -1348,9 +1348,7 @@ clrmem:
     lda #0
     sta NMINotFinished
     sta FlickerFrame
-    lda #MAX_SPRITE_COUNT
-    sta TaintedSprites
-
+    
 
     ldy #6
     jsr bankswitch_y
@@ -3316,6 +3314,7 @@ RoutinesAfterFadeOut:
 
     lda #1
     sta InCave
+    sta MustCopyMainChr
     ;--------------------------
     ;21.alien base exit bottom
 @next22:
@@ -3326,6 +3325,7 @@ RoutinesAfterFadeOut:
 
     lda #1
     sta InCave
+    sta MustCopyMainChr
 
 @next23:
 
@@ -4624,6 +4624,8 @@ LoadGameOver:
 
 ;-------------------------------------
 ResetEntityVariables:
+    lda #MAX_SPRITE_COUNT
+    sta TaintedSprites
 
     lda #1
     sta PlayerSpeed
