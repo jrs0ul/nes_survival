@@ -331,6 +331,10 @@ SingleNpcVSPlayerCollision:
     sta DropedItemX ; store this for item droping
 
     lda CurrentMapSegmentIndex
+    clc
+    adc MustIncrementScreenIndex
+    sec
+    sbc MustDecrementScreenIndex
     cmp ItemMapScreenIndex
     beq @NpcMatchesScreen
     
