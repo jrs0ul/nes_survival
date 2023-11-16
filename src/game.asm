@@ -2538,10 +2538,18 @@ ScreenFilter:
     lda ItemMapScreenIndex
     beq @skipPrev
     lda CurrentMapSegmentIndex
+    clc
+    adc MustIncrementScreenIndex
+    sec
+    sbc MustDecrementScreenIndex
     cmp PrevItemMapScreenIndex
     bcc @disable
 @skipPrev:
     lda CurrentMapSegmentIndex
+    clc
+    adc MustIncrementScreenIndex
+    sec
+    sbc MustDecrementScreenIndex
     cmp NextItemMapScreenIndex
     bcs @disable
     jmp @exit
