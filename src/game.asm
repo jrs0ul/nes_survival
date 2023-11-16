@@ -713,9 +713,11 @@ GlobalScrollY:
 
 CurrentMapSegmentIndex: ;starting screen
     .res 1
-MustIncrementScreenIndex:
+OldCurrentMapSegmentIndex:
     .res 1
-MustDecrementScreenIndex:
+CurrentScreenWasIncremented:
+    .res 1
+CurrentScreenWasDecremented:
     .res 1
 
 ScreenCount:
@@ -1296,7 +1298,7 @@ EnteredBeforeNightfall:
     .res 1
 
 Buffer:
-    .res 332  ;must see how much is still available
+    .res 331  ;must see how much is still available
 
 ;====================================================================================
 
@@ -2536,18 +2538,10 @@ ScreenFilter:
     lda ItemMapScreenIndex
     beq @skipPrev
     lda CurrentMapSegmentIndex
-    clc
-    adc MustIncrementScreenIndex
-    sec
-    sbc MustDecrementScreenIndex
     cmp PrevItemMapScreenIndex
     bcc @disable
 @skipPrev:
     lda CurrentMapSegmentIndex
-    clc
-    adc MustIncrementScreenIndex
-    sec
-    sbc MustDecrementScreenIndex
     cmp NextItemMapScreenIndex
     bcs @disable
     jmp @exit
@@ -4094,10 +4088,6 @@ HandleInput:
 
     ;calc screen for collision
     lda CurrentMapSegmentIndex
-    clc
-    adc MustIncrementScreenIndex
-    sec
-    sbc MustDecrementScreenIndex
     sta TempCollisionVar
 
     ;first general check of newX and newY
@@ -4147,7 +4137,7 @@ HandleInput:
     jmp @finishInput
 
 @contInput:
-    jsr SwitchScreenIdxIfNeeded
+    jsr GenerateNpcsIfNeeded
 
 @finishInput:
     lda Buttons
@@ -4174,43 +4164,46 @@ BackupMovement:
     lda ScrollDirection
     sta OldScrollDirection
 
+    lda CurrentMapSegmentIndex
+    sta OldCurrentMapSegmentIndex
+
     rts
 ;--------------------------------
-SwitchScreenIdxIfNeeded:
-    lda MustIncrementScreenIndex
-    beq @checkDecrement
-    inc CurrentMapSegmentIndex
-    jsr FlipStartingNametable
-    lda #0
-    sta MustIncrementScreenIndex
+GenerateNpcsIfNeeded:
 
-    lda TempScreenNpcCount
-    sta TempNpcCnt
+
+    lda CurrentScreenWasIncremented
+    beq @checkdecrement
+
+    lda #0
+    sta CurrentScreenWasIncremented
+
     lda CurrentMapSegmentIndex
     clc
     adc #1
     cmp ScreenCount
     bcs @exit
-    sta TempIndex
-    jsr GenerateNpcs
+    jmp @generate
 
-@checkDecrement:
-    lda MustDecrementScreenIndex
+@checkdecrement:
+
+    lda CurrentScreenWasDecremented
     beq @exit
-    
-    dec CurrentMapSegmentIndex
-    jsr FlipStartingNametable
-    lda #0
-    sta MustDecrementScreenIndex
 
+    lda #0
+    sta CurrentScreenWasDecremented
 
     lda CurrentMapSegmentIndex
     cmp ScreenCount
     bcs @exit
-    sta TempIndex
+
+
+@generate:
+    sta TempIndex ; save Screen Index for new npcs
     lda TempScreenNpcCount
     sta TempNpcCnt
     jsr GenerateNpcs
+
 
 @exit:
     rts
@@ -4223,9 +4216,11 @@ ResetPlayerXMovement:
     sta GlobalScroll
     lda OldScrollDirection
     sta ScrollDirection
+    lda OldCurrentMapSegmentIndex
+    sta CurrentMapSegmentIndex
     lda #0
-    sta MustIncrementScreenIndex
-    sta MustDecrementScreenIndex
+    sta CurrentScreenWasIncremented
+    sta CurrentScreenWasDecremented
 
     rts
 
@@ -5872,8 +5867,12 @@ CheckLeft:
     sbc PlayerSpeed
     jmp @save
 @clamp:
+
+    dec CurrentMapSegmentIndex
+    jsr FlipStartingNametable
+
     lda #1
-    sta MustDecrementScreenIndex
+    sta CurrentScreenWasDecremented
 
     lda GlobalScroll
     sec
@@ -5968,12 +5967,14 @@ CheckRight:
     adc PlayerSpeed
     jmp @save
 @clamp:
+    inc CurrentMapSegmentIndex
+    jsr FlipStartingNametable
     lda #1
-    sta MustIncrementScreenIndex
+    sta CurrentScreenWasIncremented
 
     lda CurrentMapSegmentIndex
     clc
-    adc #2
+    adc #1
     cmp ScreenCount
     beq @preLastScreen
 
