@@ -813,6 +813,36 @@ LoadGameOverData:
 
 
     rts
+;-----------------------------------
+UpdateGameOverSprites:
+
+    ldx #8
+    stx TempSpriteCount
+
+    ldy #0
+@spriteLoop:
+    lda game_over_sprites, y
+    sta FIRST_SPRITE, y
+    iny
+    lda game_over_sprites, y
+    sta FIRST_SPRITE, y
+    iny
+    lda game_over_sprites, y
+    sta FIRST_SPRITE, y
+    iny
+    lda game_over_sprites, y
+    sta FIRST_SPRITE, y
+    iny
+
+    dex
+    bne @spriteLoop
+
+    jsr HideIntroSprites
+
+    rts
+
+
+
 ;------------------------------------
 SetDaysInGameOver:
     lda $2002

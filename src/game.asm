@@ -79,6 +79,17 @@ intro_palette:
     .byte $0C,$00,$31,$30, $0C,$01,$31,$30, $0C,$16,$31,$36, $0C,$18,$07,$30 ; background
     .byte $0C,$06,$16,$30, $0C,$0c,$35,$21, $0C,$0c,$16,$36, $0C,$01,$07,$21 ; sprites
 
+game_over_sprites:
+    .byte 152, $40, 0, 88 ;  G
+    .byte 152, $3A, 0, 96 ;  A
+    .byte 152, $46, 0, 104 ; M
+    .byte 152, $3E, 0, 112 ; E
+
+    .byte 152, $48, 0, 136 ; O
+    .byte 152, $4F, 0, 144 ; V
+    .byte 152, $3E, 0, 152 ; E
+    .byte 152, $4B, 0, 160 ; R
+
 .include "data/title_comp.asm"
 .include "data/game_over_comp.asm"
 .include "data/CutsceneData.asm"
@@ -1516,9 +1527,17 @@ checkOutro:
 
 checkTitle:
     cmp #STATE_TITLE
-    bne hide_sprites
+    bne checkGameOver
 
     jsr doTitle
+    jmp runrandom
+
+checkGameOver:
+    cmp #STATE_GAME_OVER
+    bne hide_sprites
+
+    jsr doGameOver
+    jmp runrandom
 
 hide_sprites:
     jsr HideSprites
@@ -1775,6 +1794,21 @@ RunSpriteUpdate:
 
     rts
 
+;--------------------------------
+doGameOver:
+
+    ldy current_bank
+    sty oldbank
+    ldy #5
+    bankswitch
+
+    jsr UpdateGameOverSprites
+
+    ldy oldbank
+    bankswitch
+
+
+    rts
 
 ;---------------------------------
 doIntro:
@@ -4505,9 +4539,9 @@ HideSprites:
 
     ldx #0
 
-    ldy #64
-@hideSpritesLoop:
+    ldy #MAX_SPRITE_COUNT 
     lda #$FE
+@hideSpritesLoop:
     sta ZERO_SPRITE, x
     inx
     ;index
