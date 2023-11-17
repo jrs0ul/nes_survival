@@ -181,7 +181,7 @@ hammerSprites:
 .include "data/alien_palette.asm"
 
 game_over_palette:
-    .byte $0f,$10,$20,$30,$0f,$0c,$35,$21,$0f,$0c,$16,$21,$0f,$01,$07,$21
+    .byte $0f,$0c,$11,$16,$0f,$0c,$35,$31,$0f,$0c,$16,$31,$0f,$0c,$11,$31
     .byte $0f,$10,$20,$30,$0f,$0c,$35,$21,$0f,$0c,$16,$21,$0f,$01,$07,$21
 
 snow_palette_frames: ;white and black
