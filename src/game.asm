@@ -80,15 +80,29 @@ intro_palette:
     .byte $0C,$06,$16,$30, $0C,$0c,$35,$21, $0C,$0c,$16,$36, $0C,$01,$07,$21 ; sprites
 
 game_over_sprites:
-    .byte 152, $40, 0, 88 ;  G
-    .byte 152, $3A, 0, 96 ;  A
-    .byte 152, $46, 0, 104 ; M
-    .byte 152, $3E, 0, 112 ; E
+    .byte 152, $40, 0, 88   ; G
+    .byte 152, $3A, 0, 96   ; A
+    .byte 152, $46, 0, 104  ; M
+    .byte 152, $3E, 0, 112  ; E
 
-    .byte 152, $48, 0, 136 ; O
-    .byte 152, $4F, 0, 144 ; V
-    .byte 152, $3E, 0, 152 ; E
-    .byte 152, $4B, 0, 160 ; R
+    .byte 152, $48, 0, 136  ; O
+    .byte 152, $4F, 0, 144  ; V
+    .byte 152, $3E, 0, 152  ; E
+    .byte 152, $4B, 0, 160  ; R
+
+    .byte 184, $4C, 0, 96   ; S
+    .byte 184, $4E, 0, 104  ; U
+    .byte 184, $4B, 0, 112  ; R
+    .byte 184, $4F, 0, 120  ; V
+    .byte 184, $42, 0, 128  ; I
+    .byte 184, $4F, 0, 136  ; V
+    .byte 184, $3E, 0, 144  ; E
+    .byte 184, $3D, 0, 152  ; D
+
+    .byte 200, $3D, 0, 128  ; D
+    .byte 200, $3A, 0, 136  ; A
+    .byte 200, $52, 0, 144  ; Y
+    .byte 200, $4C, 0, 152  ; S
 
 .include "data/title_comp.asm"
 .include "data/game_over_comp.asm"
@@ -193,7 +207,7 @@ hammerSprites:
 
 game_over_palette:
     .byte $0f,$0c,$11,$16,$0f,$0c,$35,$31,$0f,$0c,$16,$31,$0f,$0c,$11,$31
-    .byte $0f,$10,$20,$30,$0f,$0c,$35,$21,$0f,$0c,$16,$21,$0f,$01,$07,$21
+    .byte $0f,$30,$30,$30,$0f,$30,$30,$30,$0f,$30,$30,$30,$0f,$30,$30,$30
 
 snow_palette_frames: ;white and black
     .byte $20, $0F

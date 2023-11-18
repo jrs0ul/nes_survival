@@ -1,6 +1,11 @@
 .segment "ROM5"
 ;-----------------------------
 TitleLogics:
+
+    lda #0
+    sta TempSpriteCount
+    jsr HideIntroSprites
+    
     inc SnowDelay
     lda SnowDelay
     cmp #50
@@ -796,9 +801,6 @@ LoadGameOverData:
     sta NametableAddress
     jsr DecompressRLE
 
-
-    jsr SetDaysInGameOver
-
     lda #<game_over_palette
     sta PalettePtr
     lda #>game_over_palette
@@ -837,35 +839,92 @@ UpdateGameOverSprites:
     dex
     bne @spriteLoop
 
+
+    lda Days
+    clc
+    adc Days + 1
+    clc
+    adc Days + 2
+    sta Temp
+    cmp #0
+    beq @hide
+
+    cmp #2 ; 2 or more days survived ?
+    bcs @show_days
+    ldx #11
+    jmp @spriteLoop2
+@show_days:
+    ldx #12
+
+
+@spriteLoop2:
+    lda game_over_sprites, y
+    sta FIRST_SPRITE, y
+    iny
+    lda game_over_sprites, y
+    sta FIRST_SPRITE, y
+    iny
+    lda game_over_sprites, y
+    sta FIRST_SPRITE, y
+    iny
+    lda game_over_sprites, y
+    sta FIRST_SPRITE, y
+    iny
+
+    inc TempSpriteCount
+
+    dex
+    bne @spriteLoop2
+
+
+    ldx #0
+@daysLoop:
+
+    lda #200
+    sta FIRST_SPRITE, y
+    iny
+
+    lda #CHARACTER_ZERO
+    clc
+    adc Days, x
+    cmp #CHARACTER_ZERO
+    beq @check_index
+    jmp @write_sprite
+
+@check_index:
+    cpx #2
+    bne @was_zero
+@write_sprite:
+    inc TempSpriteCount
+    sta FIRST_SPRITE, y
+    iny
+
+    lda #0
+    sta FIRST_SPRITE, y
+    iny
+    txa
+    asl
+    asl
+    asl
+    clc
+    adc #96
+    sta FIRST_SPRITE, y
+    iny
+    jmp @next
+@was_zero:
+    dey
+
+@next:
+    inx
+    cpx #3
+    bne @daysLoop
+
+
+@hide:
     jsr HideIntroSprites
 
     rts
 
-
-
-;------------------------------------
-SetDaysInGameOver:
-    lda $2002
-    lda NametableAddress
-    clc
-    adc #3
-    sta $2006
-    lda #$11
-    sta $2006
-
-    ldy #0
-@daysLoop:
-    lda #CHARACTER_ZERO
-    clc 
-    adc Days, y
-    sta $2007
-    iny
-    cpy #3
-    bne @daysLoop
-
-
-
-    rts
 
 
 .segment "CODE"
