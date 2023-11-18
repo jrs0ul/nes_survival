@@ -587,24 +587,27 @@ DoIntroSpriteUpdate:
 ;TODO might be a duplicate
 HideIntroSprites:
 
-    lda #MAX_SPRITE_COUNT
+    lda TaintedSprites
     cmp TempSpriteCount
     bcc @done
+    beq @done
     sec
     sbc TempSpriteCount
+    asl
+    asl
 
     tax
-@hideSpritesLoop:
     lda #$FE
+@hideSpritesLoop:
     sta FIRST_SPRITE, y
-    iny
-    iny
-    iny
     iny
 
     dex
     bne @hideSpritesLoop
 @done:
+
+    lda TempSpriteCount
+    sta TaintedSprites
 
     rts
 ;---------------------
@@ -785,6 +788,10 @@ LoadTitleData:
     lda #STATE_TITLE
     sta GameState
 
+    lda #MAX_SPRITE_COUNT
+    sta TaintedSprites
+
+
     rts
 ;--------------------------------------
 ;same with this one
@@ -800,6 +807,9 @@ LoadGameOverData:
     lda #$20
     sta NametableAddress
     jsr DecompressRLE
+
+    lda #102
+    sta SnowDelay
 
     lda #<game_over_palette
     sta PalettePtr
@@ -818,12 +828,35 @@ LoadGameOverData:
 ;-----------------------------------
 UpdateGameOverSprites:
 
+    lda SnowDelay
+    beq @cont
+    sec
+    sbc #1
+    beq @cont
+
+    sta SnowDelay
+
+@cont:
+
+    lda SnowDelay
+    cmp #2
+    bne @cont2
+
+    lda #5
+    sta SongName
+    lda #1
+    sta MustPlayNewSong
+
+@cont2:
+
     ldx #8
     stx TempSpriteCount
 
     ldy #0
 @spriteLoop:
     lda game_over_sprites, y
+    clc
+    adc SnowDelay
     sta FIRST_SPRITE, y
     iny
     lda game_over_sprites, y
@@ -849,12 +882,19 @@ UpdateGameOverSprites:
     cmp #0
     beq @hide
 
+   
+    lda SnowDelay
+    cmp #2
+
+    bcs @hide
+
+    lda Temp
     cmp #2 ; 2 or more days survived ?
     bcs @show_days
-    ldx #11
+    ldx #11 ;survived + day
     jmp @spriteLoop2
 @show_days:
-    ldx #12
+    ldx #12 ;survived + days
 
 
 @spriteLoop2:
@@ -899,16 +939,16 @@ UpdateGameOverSprites:
     sta FIRST_SPRITE, y
     iny
 
-    lda #0
-    sta FIRST_SPRITE, y
+    lda #1
+    sta FIRST_SPRITE, y ;attrib
     iny
-    txa
+    txa ; index * 8
     asl
     asl
     asl
     clc
     adc #96
-    sta FIRST_SPRITE, y
+    sta FIRST_SPRITE, y ; number x coordinate
     iny
     jmp @next
 @was_zero:
