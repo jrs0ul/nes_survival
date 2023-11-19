@@ -2605,8 +2605,6 @@ OnCollisionWithPlayer:
     lda TempPointY2
     cmp PlayerY
     bcc @exit
-    beq @exit
-
 
     lda TempNpcType
     beq @timid
