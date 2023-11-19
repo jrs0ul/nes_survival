@@ -5172,6 +5172,8 @@ ProcessButtons:
     lda FishingRodActive
     bne @exit
 
+    lda #1
+    sta PlayerSpeed
     jsr CheckA ; speed up only active if dpad is used
 
 ;Check if LEFT is pressed
@@ -5228,12 +5230,9 @@ CheckA:
 
     dec Stamina
     lda #2
-    jmp @end
+    sta PlayerSpeed
 
 @exit:
-    lda #1
-@end:
-    sta PlayerSpeed
     rts
 
 ;----------------------------------
