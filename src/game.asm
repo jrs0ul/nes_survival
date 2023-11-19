@@ -4103,8 +4103,13 @@ HandleInput:
     bne @finishInput
 
     lda Buttons
-    beq @finishInput ; no input at all
+    bne @checkAttackTimer ; something is pressed
+    ;NO INPUT
+    lda #1
+    sta PlayerSpeed
+    jmp @finishInput ; no input at all
 
+@checkAttackTimer:
     lda AttackTimer
     bne @finishInput ; attack pause
 
@@ -4126,7 +4131,7 @@ HandleInput:
 
     ;save the movement before collision check
     jsr BackupMovement
-    
+
     ;gamepad button processing, the player could be moved here
     jsr ProcessButtons
 
