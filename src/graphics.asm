@@ -1,54 +1,79 @@
+.segment "ROM1"
+
 ;----------------------------------
 ;pointer - data
 ;Temp - screen High address
 ;TempX - screen Lower address
 ;TempPointX - column count
 ;TempPointY - row count
+
+
+;stores 1 in A when the transfer is done
 TransferTiles:
     lda #0  ;turn off ppu
     sta $2001
 
-    ldy #0
-    sty TempIndex
+    ;ldy #0
+    ;sty TempIndex
 
-@menuRowLoop:
-
+    ldy menuTileTransferRowIdx
     sty TempY
 
-    lda $2002
+    cpy #0
+    bne @cont
+    ; only if it's the first row
+
+    lda #0
+    sta menuTileTransferDataIdx
     lda Temp
-    sta $2006
+    sta menuTileTransferAddressHigh
     lda TempX
+    sta menuTileTransferAddressLow
+
+@cont:
+
+    lda $2002
+    lda menuTileTransferAddressHigh
+    sta $2006
+    lda menuTileTransferAddressLow
     sta $2006
 
     ldx #0
 
 @menuCellLoop:
-    ldy TempIndex 
+    ldy menuTileTransferDataIdx
     lda (pointer), y
     sta $2007
     inx
-    inc TempIndex
+    inc menuTileTransferDataIdx
     cpx TempPointX
     bne @menuCellLoop
 
-    lda TempX
+    lda menuTileTransferAddressLow
     clc
     adc #$20
     bcs @incrementUpperAddress
-    sta TempX
+    sta menuTileTransferAddressLow
     jmp @incrementRow
 @incrementUpperAddress:
-    sta TempX
-    inc Temp
+    sta menuTileTransferAddressLow
+    inc menuTileTransferAddressHigh
 @incrementRow:
     ldy TempY
     iny
     cpy TempPointY
-    bne @menuRowLoop
+    beq @finished
 
+    sty menuTileTransferRowIdx
+    lda #0
+    jmp @end
 
+@finished: ; transfered last row
+    lda #1
+@end:
     rts
+
+.segment "CODE"
 
 ;---------------------------------
 ; Loads palettes

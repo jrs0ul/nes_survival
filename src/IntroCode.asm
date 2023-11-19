@@ -5,7 +5,7 @@ TitleLogics:
     lda #0
     sta TempSpriteCount
     jsr HideIntroSprites
-    
+
     inc SnowDelay
     lda SnowDelay
     cmp #50

@@ -96,6 +96,8 @@ UpdateMenuGfx:
     jsr DrawStashItemMenu
     jsr ClearSubMenu
 
+    lda menuTileTransferRowIdx
+    bne @exit ; not finished updating gfx
     lda #0
     sta MustLoadSomething
 
@@ -120,14 +122,14 @@ DrawMenuTitle:
 
     lda EquipmentActivated
     beq @crafting
-    
+
     lda #10
     sta TempPointX
     lda #<equipment_title
     sta pointer
     lda #>equipment_title
     sta pointer + 1
-    
+
     jmp @draw
 
 @crafting:
@@ -139,7 +141,7 @@ DrawMenuTitle:
     sta pointer + 1
 
     jmp @draw
-    
+
 @storage:
     lda StashActivated
     beq @Inventory_title
@@ -160,8 +162,10 @@ DrawMenuTitle:
 @draw:
     jsr TransferTiles
 
+    ;let's assume it's jut one row
     lda #0
     sta MustDrawMenuTitle
+    sta menuTileTransferRowIdx
 
 @exit:
     rts
@@ -195,10 +199,14 @@ DrawInventoryGrid:
     sta pointer
     lda #>inventory_grid
     sta pointer + 1
+
     jsr TransferTiles
+    beq @exit; not fully drawn
 
     lda #0
     sta MustDrawInventoryGrid
+    sta menuTileTransferRowIdx
+    sta MustLoadSomething
 
 @exit:
     rts
@@ -233,9 +241,11 @@ lda InHouse
     lda #>equipment_grid
     sta pointer + 1
     jsr TransferTiles
+    beq @exit ; not done yet
 
     lda #0
     sta MustDrawEquipmentGrid
+    sta menuTileTransferRowIdx
 
 @exit:
     rts
@@ -306,9 +316,11 @@ DrawFoodMenu:
 
 @startTransfer:
     jsr TransferTiles
+    beq @exit ; not done
 
     lda #0
     sta MustDrawFoodMenu
+    sta menuTileTransferRowIdx
 
 @exit:
     rts
@@ -334,10 +346,13 @@ DrawStashFoodMenu:
     sta pointer
     lda #>StashFoodMenu
     sta pointer + 1
+
     jsr TransferTiles
+    beq @exit ; not fully transfered yet
 
     lda #0
     sta MustDrawStashFoodMenu
+    sta menuTileTransferRowIdx
 
 @exit:
     rts
@@ -364,9 +379,11 @@ DrawStashItemMenu:
     lda #>StashItemMenu
     sta pointer + 1
     jsr TransferTiles
+    beq @exit
 
     lda #0
     sta MustDrawStashItemMenu
+    sta menuTileTransferRowIdx
 
 @exit:
 
@@ -407,9 +424,11 @@ DrawToolMenu:
 
 @startTransfer:
     jsr TransferTiles
+    beq @exit ; not finished transfering
 
     lda #0
     sta MustDrawToolMenu
+    sta menuTileTransferRowIdx
 
 @exit:
     rts
@@ -436,9 +455,11 @@ DrawStashToolMenu:
     lda #>StashToolMenu
     sta pointer + 1
     jsr TransferTiles
+    beq @exit
 
     lda #0
     sta MustDrawStashToolMenu
+    sta menuTileTransferRowIdx
 
 @exit:
     rts
@@ -478,9 +499,11 @@ DrawItemMenu:
     sta pointer + 1
 @transfer:
     jsr TransferTiles
+    beq @exit ; not done
 
     lda #0
     sta MustDrawItemMenu
+    sta menuTileTransferRowIdx
 
 @exit:
     rts
@@ -521,9 +544,11 @@ DrawMaterialMenu:
 
 @transfertiles:
     jsr TransferTiles
+    beq @exit ; not finished transfering
 
     lda #0
     sta MustDrawMaterialMenu
+    sta menuTileTransferRowIdx
 
 @exit:
     rts
@@ -550,9 +575,11 @@ DrawStashMaterialMenu:
     lda #>StashMaterialMenu
     sta pointer + 1
     jsr TransferTiles
+    beq @exit
 
     lda #0
     sta MustDrawStashMaterialMenu
+    sta menuTileTransferRowIdx
 
 @exit:
     rts
@@ -580,10 +607,12 @@ ClearSubMenu:
     lda #>PopUpMenuClear
     sta pointer + 1
     jsr TransferTiles
+    beq @exit
 
 
     lda #0
     sta MustClearSubMenu
+    sta menuTileTransferRowIdx
 
 @exit:
     rts

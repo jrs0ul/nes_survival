@@ -719,8 +719,18 @@ MapTilesetBankNo: ; in which bank is located the tileset for map tiles and sprit
 TempScreen:
     .res 1
 
+menuTileTransferRowIdx: ; current row of tile graphics to be copied to menu screen
+    .res 1
+
+menuTileTransferAddressHigh:
+    .res 1
+menuTileTransferAddressLow:
+    .res 1
+menuTileTransferDataIdx:
+    .res 1
+
 ZPBuffer:
-    .res 112  ; I want to be aware of the free memory
+    .res 108  ; I want to be aware of the free memory
 
 ;--------------
 .segment "BSS" ; variables in ram
@@ -4754,6 +4764,7 @@ ResetEntityVariables:
     sta StaminaDelay
 
     lda #0
+    sta menuTileTransferRowIdx
     sta MapTilesetBankNo
     sta MustPlaySample
     sta InventoryItemIndex
