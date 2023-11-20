@@ -39,34 +39,30 @@ LoadMenu:
 
     jsr UpdateMenuStats
 
-    lda #0
-    sta MustLoadMenu
-    sta CraftingActivated
-    sta StashActivated
-    sta MustLoadSomething
-    sta InventoryActivated
-    sta InventoryItemIndex
-    sta EquipmentActivated
-    sta BaseMenuIndex
-    sta SubMenuIndex
-
-    lda #INVENTORY_POINTER_X
-    sta InventoryPointerX
-
-    lda #BASE_MENU_MIN_Y
-    sta InventoryPointerY
+    jsr ResetMenuVars
 
     lda #STATE_MENU
     sta GameState
 
     lda #0
     sta MustUpdatePalette
+    sta MustLoadSomething
+
+    lda InHouse
+    beq @exit
+
+    lda #$00
+    sta Temp
+    jsr ColorMainMenuAttributes
+
+
 @exit:
 
     rts
 ;------------------------------------
 .segment "ROM1"
 ;------------------------------------
+
 
 inventorypositions:
     .byte MENU_ITEM_SPRITE_MIN_Y + INVENTORY_STEP_PIXELS * 1
@@ -80,9 +76,33 @@ inventorypositions:
     .byte MENU_ITEM_SPRITE_MIN_Y + INVENTORY_STEP_PIXELS * 9
     .byte MENU_ITEM_SPRITE_MIN_Y + INVENTORY_STEP_PIXELS * 10
 
+;------------------------------------------
+ResetMenuVars:
 
+    lda #0
+    sta MustLoadMenu
+    sta CraftingActivated
+    sta StashActivated
+    sta InventoryActivated
+    sta InventoryItemIndex
+    sta EquipmentActivated
+    sta BaseMenuIndex
+    sta SubMenuIndex
+
+    lda #INVENTORY_POINTER_X
+    sta InventoryPointerX
+
+    lda #BASE_MENU_MIN_Y
+    sta InventoryPointerY
+
+
+    rts
+
+
+;------------------------------------------
 UpdateMenuGfx:
 
+    jsr ResetMenu
     jsr DrawMenuTitle
     jsr DrawInventoryGrid
     jsr DrawEquipmentGrid
@@ -103,6 +123,64 @@ UpdateMenuGfx:
 
 @exit:
     rts
+
+;----------------------------------
+ResetMenu:
+
+    lda MustResetMenu
+    beq @exit
+
+
+    lda menuTileTransferRowIdx
+    bne @continueTileTransfer
+
+    jsr UpdateMenuStats
+    jsr ResetMenuVars
+
+
+@continueTileTransfer:
+
+    lda FirstNametableAddr
+    clc
+    adc #1
+    sta Temp
+
+    lda #$03
+    sta TempX
+
+    lda #11
+    sta TempPointX
+    lda #16
+    sta TempPointY
+
+
+
+    lda #<MainMenu
+    sta pointer
+    lda #>MainMenu
+    sta pointer + 1
+    jsr TransferTiles
+    beq @exit
+
+    lda #0
+    sta MustResetMenu
+    sta menuTileTransferRowIdx
+    lda #1
+    sta MustDrawMenuTitle
+
+    lda InHouse
+    bne @exit
+
+
+    lda #$FF
+    sta Temp
+    jsr ColorMainMenuAttributes
+
+
+@exit:
+    rts
+
+
 ;----------------------------------
 DrawMenuTitle:
     lda MustDrawMenuTitle
@@ -151,11 +229,22 @@ DrawMenuTitle:
     sta pointer + 1
     jmp @draw
 @Inventory_title:
+    lda InventoryActivated
+    beq @empty
     lda #10
     sta TempPointX
     lda #<inventory_title
     sta pointer
     lda #>inventory_title
+    sta pointer + 1
+    jmp @draw
+@empty:
+
+    lda #10
+    sta TempPointX
+    lda #<empty_title
+    sta pointer
+    lda #>empty_title
     sta pointer + 1
 
 
@@ -178,7 +267,9 @@ DrawInventoryGrid:
     bne @cont
 
 
-    jsr ColorDisabledMenuAttributes
+    lda #$00
+    sta Temp
+    jsr ColorMainMenuAttributes
 
 @cont:
 
@@ -215,10 +306,12 @@ DrawEquipmentGrid:
     lda MustDrawEquipmentGrid
     beq @exit
 
-lda InHouse
+    lda InHouse
     bne @cont
 
-    jsr ColorDisabledMenuAttributes
+    lda #$00
+    sta Temp
+    jsr ColorMainMenuAttributes
 
 @cont:
 
@@ -734,18 +827,14 @@ UpdateMenuStats:
     cpy #3
     bne @daysLoop
 
-
-    lda InHouse
-    beq @exit
-
-    jsr ColorDisabledMenuAttributes
-
 @exit:
 
 
     rts
 ;-------------------------------------
-ColorDisabledMenuAttributes:
+;changes palette values of optional main menu items
+;Temp - palette value
+ColorMainMenuAttributes:
 
     lda $2002
     lda FirstNametableAddr
@@ -754,7 +843,7 @@ ColorDisabledMenuAttributes:
     sta $2006
     lda #$D9
     sta $2006
-    lda $FF
+    lda Temp
     sta $2007
     sta $2007
 
@@ -765,7 +854,7 @@ ColorDisabledMenuAttributes:
     sta $2006
     lda #$E1
     sta $2006
-    lda $FF
+    lda Temp
     sta $2007
     sta $2007
 
@@ -864,7 +953,6 @@ MenuInput:
 ;--------------------------------------
 CraftingInput:
 
-
     lda #12
     sta MenuStep
     lda #INVENTORY_SPRITE_MIN_Y
@@ -920,7 +1008,7 @@ CraftingInput:
 @revert:
     lda #1
     sta MustLoadSomething
-    sta MustLoadMenu
+    sta MustResetMenu
     lda #0
     sta CurrentCraftingComponent
 @resetIndexes:
@@ -1068,7 +1156,7 @@ EquipmentInput:
     sta EquipmentActivated
     lda #1
     sta MustLoadSomething
-    sta MustLoadMenu
+    sta MustResetMenu
 
 
 @exit:
@@ -1135,7 +1223,7 @@ InventoryInput:
 
     lda #1
     sta MustLoadSomething
-    sta MustLoadMenu
+    sta MustResetMenu
 
 
 @exit:
@@ -2846,6 +2934,7 @@ ExitMenuState:
     sta MustDrawEquipmentGrid
     sta MustDrawInventoryGrid
     sta MustDrawMenuTitle
+    sta MustResetMenu
 
 
     lda OldInventoryPointerY

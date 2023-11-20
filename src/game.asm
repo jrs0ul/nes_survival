@@ -962,6 +962,8 @@ MustLoadHouseInterior:
 
 MustLoadMenu:
     .res 1
+MustResetMenu: ; must update stats and draw main menu on top
+    .res 1
 MustLoadTitle:
     .res 1
 MustLoadTitleCHR:
@@ -1333,7 +1335,7 @@ EnteredBeforeNightfall:
     .res 1
 
 Buffer:
-    .res 331  ;must see how much is still available
+    .res 330  ;must see how much is still available
 
 ;====================================================================================
 
