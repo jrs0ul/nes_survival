@@ -1487,7 +1487,7 @@ FoodMenuInputVillager:
     bne @continue
 
     jsr GetPaletteFadeValueForHour
-    cmp #$40
+    cmp #DAYTIME_NIGHT
     bne @continue
 
     lda VillagerIndex
@@ -2225,6 +2225,7 @@ DoRegularInput:
 
     lda #1
     sta MustExitMenuState
+    jmp @exit
 
 @stashList:
     lda InHouse
@@ -2832,6 +2833,20 @@ ExitMenuState:
     sta SubMenuActivated
     sta SubMenuIndex
     sta MustLoadMenu
+    sta menuTileTransferRowIdx
+    sta MustClearSubMenu
+    sta MustDrawStashItemMenu
+    sta MustDrawStashFoodMenu
+    sta MustDrawStashToolMenu
+    sta MustDrawStashMaterialMenu
+    sta MustDrawToolMenu
+    sta MustDrawMaterialMenu
+    sta MustDrawItemMenu
+    sta MustDrawFoodMenu
+    sta MustDrawEquipmentGrid
+    sta MustDrawInventoryGrid
+    sta MustDrawMenuTitle
+
 
     lda OldInventoryPointerY
     sta InventoryPointerY
