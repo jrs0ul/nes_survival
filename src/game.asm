@@ -1664,6 +1664,7 @@ checkTitleState:
 
     jsr AnimateTitleTiles
 
+
 UpdatePalette:
     lda MustUpdatePalette
     beq doneUpdatingPalette
@@ -1741,6 +1742,7 @@ endOfNmi:
     lda PPUCTRL
     sta $2000
 
+
     lda current_bank
     cmp bankBeforeNMI
     beq noBankSwitch
@@ -1770,7 +1772,21 @@ noBankSwitch:
 .include "menu.asm"
 .include "IntroCode.asm"
 .include "IndoorCode.asm"
+;-----------------------------------
+AnimateTitleTiles:
 
+    lda current_bank
+    cmp #5
+    beq @doAnim
+
+    ldy #5
+    jsr bankswitch_y
+
+@doAnim:
+    jsr TitleTilesAnim
+
+    rts
+;-----------------------------------
 famistudioupdate:
 
     ;famistudio update

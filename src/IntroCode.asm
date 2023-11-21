@@ -74,7 +74,7 @@ TitleLogics:
 
     rts
 ;------------------------------
-AnimateTitleTiles:
+TitleTilesAnim:
     lda SnowDelay
     cmp #40
     bcc @display
