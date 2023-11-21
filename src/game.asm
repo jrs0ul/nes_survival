@@ -72,12 +72,16 @@ main_tiles_chr2: .incbin "alien.chr"
 .segment "ROM5" ;title and intro data (?)
 
 title_palette:
-    .byte $0F,$07,$11,$20, $0F,$01,$11,$07, $0F,$31,$26,$35, $0F,$07,$11,$35    ;background
+    .byte $0F,$07,$11,$20, $0F,$01,$11,$07, $0F,$30,$11,$38, $0F,$07,$11,$35    ;background
     .byte $0F,$0f,$17,$20, $0F,$06,$26,$39, $0F,$17,$21,$31, $0F,$0f,$37,$26    ;OAM sprites
 
 intro_palette:
     .byte $0C,$00,$31,$30, $0C,$01,$31,$30, $0C,$16,$31,$36, $0C,$18,$07,$30 ; background
     .byte $0C,$06,$16,$30, $0C,$0c,$35,$21, $0C,$0c,$16,$36, $0C,$01,$07,$21 ; sprites
+
+push_start:
+    .byte $49,$4e,$4c,$41,$00,$4c,$4d,$3a,$4b,$4d
+
 
 game_over_sprites:
     .byte 152, $40, 0, 88   ; G
@@ -1650,9 +1654,15 @@ DoneLoadingMaps:
     jmp UpdatePalette
 otherState:
     cmp #STATE_INTRO
-    bne UpdatePalette
+    bne checkTitleState
 
     jsr IntroNametableAnimations
+    jmp UpdatePalette
+checkTitleState:
+    cmp #STATE_TITLE
+    bne UpdatePalette
+
+    jsr AnimateTitleTiles
 
 UpdatePalette:
     lda MustUpdatePalette

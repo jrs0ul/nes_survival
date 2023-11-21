@@ -6,6 +6,7 @@ TitleLogics:
     sta TempSpriteCount
     jsr HideIntroSprites
 
+
     inc SnowDelay
     lda SnowDelay
     cmp #50
@@ -13,8 +14,10 @@ TitleLogics:
     lda #0
     sta SnowDelay
 
+    
 @incframe:
 
+    
     inc SnowFrame
     lda SnowFrame
     cmp #2
@@ -65,9 +68,54 @@ TitleLogics:
     sta MustUpdatePalette
     lda #16
     sta PaletteUpdateSize
+
+
 @exit:
 
     rts
+;------------------------------
+AnimateTitleTiles:
+    lda SnowDelay
+    cmp #40
+    bcc @display
+
+    lda #0
+    sta $2001
+    lda $2002
+    lda #$22
+    sta $2006
+    lda #$8B
+    sta $2006
+
+    lda #0
+    ldx #10
+@loop:
+    sta $2007
+    dex
+    bne @loop
+    jmp @exit
+
+@display:
+    lda #0
+    sta $2001
+    lda $2002
+    lda #$22
+    sta $2006
+    lda #$8B
+    sta $2006
+
+    ldx #0
+@display_loop:
+    lda push_start, x
+    sta $2007
+    inx
+    cpx #10
+    bcc @display_loop
+
+@exit:
+
+    rts
+
 ;-----------------------------
 IntroNameTableUpdate:
 
