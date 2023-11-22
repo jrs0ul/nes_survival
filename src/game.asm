@@ -72,7 +72,7 @@ main_tiles_chr2: .incbin "alien.chr"
 .segment "ROM5" ;title and intro data (?)
 
 title_palette:
-    .byte $0F,$07,$11,$20, $0F,$01,$11,$07, $0F,$30,$11,$38, $0F,$07,$11,$35    ;background
+    .byte $0F,$00,$11,$20, $0F,$01,$11,$07, $0F,$30,$11,$38, $0F,$07,$11,$35    ;background
     .byte $0F,$0f,$17,$20, $0F,$06,$26,$39, $0F,$17,$21,$31, $0F,$0f,$37,$26    ;OAM sprites
 
 intro_palette:
@@ -80,7 +80,7 @@ intro_palette:
     .byte $0C,$06,$16,$30, $0C,$0c,$35,$21, $0C,$0c,$16,$36, $0C,$01,$07,$21 ; sprites
 
 push_start:
-    .byte $49,$4e,$4c,$41,$00,$4c,$4d,$3a,$4b,$4d
+    .byte $48,$4d,$4b,$40,$00,$4b,$4c,$39,$4a,$4c
 
 
 game_over_sprites:
