@@ -16,6 +16,11 @@ DoSleep:
 
     jsr SkipTime
 
+    lda #1
+    sta HpUpdated
+    sta WarmthUpdated
+    sta FoodUpdated
+
 @decreaseHp:
 
     lda Food

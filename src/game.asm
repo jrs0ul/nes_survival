@@ -2511,74 +2511,15 @@ UpdateSingleProjectile:
     bcc @otherDir
     beq @moveLeft
 
-    iny
-    lda (ProjectilePtr), y
-    cmp #255 - SPEAR_SPEED
-    bcs @more
-
-    clc
-    adc #SPEAR_SPEED
-    sta (ProjectilePtr), y
-    jmp @filter
-
-@more:
-
-    lda #255
-    sec
-    sbc Projectiles, y
-    sta Temp
-    lda #SPEAR_SPEED
-    sec
-    sbc Temp
-    sta Projectiles, y
-
-    iny
-    lda Projectiles, y
-    clc
-    adc #1
-    sta Projectiles, y
+    jsr MoveSpearRight
+    bne @disable
     jmp @filter
 
 @moveLeft:
-    iny
-    lda Projectiles, y
-    cmp #SPEAR_SPEED
-    bcc @less
-
-    sec
-    sbc #SPEAR_SPEED
-    sta Projectiles, y
-    jmp @filter
-
-@less:
-    lda #SPEAR_SPEED
-    sec
-    sbc Projectiles, y
-    sta Temp
-    lda #255
-    sec
-    sbc Temp
-    sta Projectiles, y
-
-    iny
-    lda Projectiles, y
-    sec
-    sbc #1
-    sta Projectiles, y
-
+    jsr MoveSpearLeft
+    bne @disable
 
 @filter:
-
-    lda ProjectileIdx
-    asl
-    asl
-    tay
-
-
-    iny
-    iny
-    jsr FilterProjectiles
-    bne @disable
 
     jmp @exit
 
@@ -2596,15 +2537,47 @@ UpdateSingleProjectile:
 
 @disable:
 
+    jsr DisableProjectiles
+
+@exit:
+
+    rts
+;-----------------------------
+DisableProjectiles:
+
     lda ProjectileIdx
     asl
     asl
     tay
+    sty TempYOffset
+
+    iny
+    lda Projectiles, y
+    sta TempPointY
+    iny
+    lda Projectiles, y
+    sta TempPointX
+    iny
+    lda Projectiles, y
+    sta TempScreen
+
+    lda #%00001101 ; 7 + active bit
+    sta TempItemIndex
+    jsr ItemSpawnPrep
+    lda TempPointX
+    sta Items, y
+    iny
+    lda TempPointY
+    sta Items, y
+    iny
+    lda TempScreen
+    sta Items, y
+
+
+    ldy TempYOffset
     lda #0
     sta Projectiles, y
 
-
-@exit:
 
     rts
 ;-----------------------------
@@ -2638,42 +2611,6 @@ ScreenFilter:
 @exit:
     lda #0
 @end:
-    rts
-;------------------------------
-FilterProjectiles:
-
-    lda (ProjectilePtr), y ; screen
-
-    jsr ScreenFilter
-    bne @disable
-
-    lda CurrentMapSegmentIndex
-    cmp ItemMapScreenIndex
-    beq @ProjectileMatchesScreen
-
-    dey
-    lda (ProjectilePtr), y
-    sec
-    sbc GlobalScroll
-    bcs @disable
-    jmp @exit
-@ProjectileMatchesScreen:
-    dey
-    lda (ProjectilePtr), y ; x
-    cmp GlobalScroll
-    bcc @disable
-
-    jmp @exit
-
-@disable:
-    lda #1
-    jmp @end
-@exit:
-    lda #0
-
-
-@end:
-
     rts
 
 
@@ -2778,6 +2715,32 @@ UpdateSpear:
 
 @moveLeft:
 
+   jsr MoveSpearLeft
+   bne @disable
+
+@filter:
+    ldy #2
+    jmp @exit
+
+@otherDir:
+
+    ldy #3 ; set to Y
+
+    jsr MoveProjectileVerticaly
+    cmp #1
+    beq @disable
+
+    jmp @exit
+
+@disable:
+    jsr DisableSpear
+
+
+@exit:
+
+    rts
+;-------------------------------
+MoveSpearLeft:
     iny
     lda (ProjectilePtr), y
     cmp #SPEAR_SPEED
@@ -2786,7 +2749,6 @@ UpdateSpear:
     sec
     sbc #SPEAR_SPEED
 
-    ;---
     sta TempPointX
     sty TempYOffset
     iny
@@ -2797,9 +2759,8 @@ UpdateSpear:
     sta TempPointY
 
     jsr TestPointAgainstCollisionMap
-    bne @disable ;it does
-    
-    ;---
+    bne @return_disable ;it does
+
     ldy TempYOffset
     lda TempPointX
 
@@ -2816,7 +2777,6 @@ UpdateSpear:
     sbc Temp
 
     sta TempPointX
-    ;sta (ProjectilePtr), y
 
     ;decrease screen idx
     iny
@@ -2825,10 +2785,9 @@ UpdateSpear:
     sbc #1
     sta TempScreen
 
-    ;sta (ProjectilePtr), y
 
     jsr TestPointAgainstCollisionMap
-    bne @disable
+    bne @return_disable
 
 
     ldy #1
@@ -2838,29 +2797,17 @@ UpdateSpear:
     lda TempScreen
     sta (ProjectilePtr), y
 
-
-
 @filter:
-    ldy #2
+    lda #0
     jmp @exit
 
-@otherDir:
-
-    ldy #3 ; set to Y
-
-    jsr MoveSpearVerticaly
-    cmp #1
-    beq @disable
-
-    jmp @exit
-
-@disable:
-    jsr DisableSpear
-
+@return_disable:
+    lda #1
 
 @exit:
-
     rts
+
+
 ;-------------------------------
 DisableSpear:
 
@@ -2889,7 +2836,7 @@ DisableSpear:
 
 
 ;------------------------------
-MoveSpearVerticaly:
+MoveProjectileVerticaly:
     cmp #PROJECTILE_DIR_DOWN
     bne @checkUp
 
@@ -2942,46 +2889,6 @@ MoveSpearVerticaly:
     ldy TempYOffset
 
     sta (ProjectilePtr), y ; Y
-    cmp #SPEAR_SPEED
-    bcc @return_disable
-
-
-    lda #0
-    jmp @exit
-
-@return_disable:
-    lda #1
-
-
-@exit:
-
-    rts
-
-
-;------------------------------
-MoveProjectileVerticaly:
-    cmp #PROJECTILE_DIR_DOWN
-    bne @checkUp
-
-    lda (ProjectilePtr), y ; Y
-    clc
-    adc #SPEAR_SPEED
-
-    sta (ProjectilePtr), y ; Y
-    cmp #252
-    bcs @return_disable
-
-
-@checkUp:
-    cmp #PROJECTILE_DIR_UP
-    bne @exit
-
-    lda (ProjectilePtr), y ; y
-
-    sec
-    sbc #SPEAR_SPEED
-    sta (ProjectilePtr), y ; Y
-
     cmp #SPEAR_SPEED
     bcc @return_disable
 
