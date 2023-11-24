@@ -525,7 +525,7 @@ player_sprites_flip:
     ITEM_SLINGSHOT             = 22
     ITEM_PIE                   = 23
 
-    SPEAR_SPEED                = 3
+    PROJECTILE_SPEED           = 3
 
     ITEM_COUNT_LOC1            = 7
     ITEM_COUNT_LOC2            = 6
@@ -1188,7 +1188,8 @@ TempTextAddressLow:
 TempPlayerAttk:
     .res 1
 
-
+ProjectileWidth:
+    .res 1
 ProjectileX:
     .res 1
 ProjectileY:
@@ -1339,7 +1340,7 @@ EnteredBeforeNightfall:
     .res 1
 
 Buffer:
-    .res 330  ;must see how much is still available
+    .res 329  ;must see how much is still available
 
 ;====================================================================================
 
@@ -2511,12 +2512,14 @@ UpdateSingleProjectile:
     bcc @otherDir
     beq @moveLeft
 
-    jsr MoveSpearRight
+    lda #8
+    sta ProjectileWidth
+    jsr MoveProjectileRight
     bne @disable
     jmp @filter
 
 @moveLeft:
-    jsr MoveSpearLeft
+    jsr MoveProjectileLeft
     bne @disable
 
 @filter:
@@ -2614,16 +2617,20 @@ ScreenFilter:
     rts
 
 
+;setup the ProjectileWidth
 ;-------------------------------
-MoveSpearRight:
+MoveProjectileRight:
 
     iny
-    lda (ProjectilePtr), y
-    cmp #255 - SPEAR_SPEED
+    lda (ProjectilePtr), y ; x
+    clc
+    adc ProjectileWidth
+    bcs @more
+    cmp #255 - PROJECTILE_SPEED
     bcs @more
 
     clc
-    adc #SPEAR_SPEED
+    adc #PROJECTILE_SPEED
 
     ;---
     sta TempPointX
@@ -2642,6 +2649,8 @@ MoveSpearRight:
 
     ldy TempYOffset
     lda TempPointX
+    sec
+    sbc ProjectileWidth
     sta (ProjectilePtr), y
 
     jmp @filter
@@ -2651,8 +2660,10 @@ MoveSpearRight:
     lda #255
     sec
     sbc (ProjectilePtr), y
+    sec
+    sbc ProjectileWidth
     sta Temp
-    lda #SPEAR_SPEED
+    lda #PROJECTILE_SPEED
     sec
     sbc Temp
 
@@ -2673,7 +2684,13 @@ MoveSpearRight:
 
     ldy #1
     lda TempPointX
+    sec
+    sbc ProjectileWidth
     sta (ProjectilePtr), y
+    cmp TempPointX
+    bcc @cont
+    dec TempScreen
+@cont:
     iny
     lda TempScreen
     sta (ProjectilePtr), y
@@ -2709,13 +2726,15 @@ UpdateSpear:
     bcc @otherDir
     beq @moveLeft
 
-    jsr MoveSpearRight
+    lda #16
+    sta ProjectileWidth
+    jsr MoveProjectileRight
     bne @disable
     jmp @filter
 
 @moveLeft:
 
-   jsr MoveSpearLeft
+   jsr MoveProjectileLeft
    bne @disable
 
 @filter:
@@ -2740,14 +2759,14 @@ UpdateSpear:
 
     rts
 ;-------------------------------
-MoveSpearLeft:
+MoveProjectileLeft:
     iny
     lda (ProjectilePtr), y
-    cmp #SPEAR_SPEED
+    cmp #PROJECTILE_SPEED
     bcc @less
 
     sec
-    sbc #SPEAR_SPEED
+    sbc #PROJECTILE_SPEED
 
     sta TempPointX
     sty TempYOffset
@@ -2768,7 +2787,7 @@ MoveSpearLeft:
     jmp @filter
 
 @less:
-    lda #SPEAR_SPEED
+    lda #PROJECTILE_SPEED
     sec
     sbc (ProjectilePtr), y
     sta Temp
@@ -2784,6 +2803,9 @@ MoveSpearLeft:
     sec
     sbc #1
     sta TempScreen
+    iny
+    lda (ProjectilePtr), y ; y
+    sta TempPointY
 
 
     jsr TestPointAgainstCollisionMap
@@ -2842,7 +2864,7 @@ MoveProjectileVerticaly:
 
     lda (ProjectilePtr), y ; Y
     clc
-    adc #SPEAR_SPEED
+    adc #PROJECTILE_SPEED
 
     sta TempPointY
     sty TempYOffset
@@ -2871,7 +2893,7 @@ MoveProjectileVerticaly:
     lda (ProjectilePtr), y ; y
 
     sec
-    sbc #SPEAR_SPEED
+    sbc #PROJECTILE_SPEED
 
     sta TempPointY
     sty TempYOffset
@@ -2889,7 +2911,7 @@ MoveProjectileVerticaly:
     ldy TempYOffset
 
     sta (ProjectilePtr), y ; Y
-    cmp #SPEAR_SPEED
+    cmp #PROJECTILE_SPEED
     bcc @return_disable
 
 
@@ -4680,6 +4702,11 @@ ResetEntityVariables:
     ldx #6
     sta Storage, x
     ldx #8
+    lda #ITEM_SLINGSHOT
+    sta Storage, x
+    ldx #9
+    lda #ITEM_MAX_HP
+    sta Storage, x
 
     lda #OUTDOORS_LOC1_SCREEN_COUNT ;  screens in the outdoors map
     sta ScreenCount
