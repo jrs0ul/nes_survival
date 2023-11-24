@@ -2273,7 +2273,7 @@ ChangeNpcDirection:
 @timid:
 
     jsr SetDirectionForTimidNpc
-    jmp @storeDirection
+    beq @storeDirection ; else do random
 
 @randomDir:
     inx ; increase to direction
@@ -2289,6 +2289,16 @@ ChangeNpcDirection:
     sta TempDir
     jmp @storeDirection
 @predator:
+    jsr SetDirectionsForPredatorNpc
+@storeDirection:
+    lda TempDir
+    sta Npcs, x
+@exit:
+
+    rts
+;-------------------------------
+SetDirectionsForPredatorNpc:
+
     dex
     lda Npcs, x; y
     clc
@@ -2342,23 +2352,23 @@ ChangeNpcDirection:
     bcc @goDown ; bottom of npc should bump to center of player
     cmp Temp
     bcs @goUp
-    bcc @storeDirection
+    bcc @end
 @goDown:
     lda TempDir
     ora #%00001000
     sta TempDir
-    jmp @storeDirection
+    jmp @end
 @goUp:
     lda TempDir
     ora #%00000100
     sta TempDir
-
-@storeDirection:
-    lda TempDir
-    sta Npcs, x
-@exit:
+@end:
 
     rts
+
+
+
+;if A is 0 then direction is set
 ;----------------------
 SetDirectionForTimidNpc:
 
@@ -2371,8 +2381,16 @@ SetDirectionForTimidNpc:
     dex ;npc x
     lda Npcs, x; x
     clc
-    adc #8
+    adc #64
     sta TempPointX
+    lda Npcs, x
+    sec
+    sbc #48
+    sta TempPointX2
+    lda Npcs, x
+    clc
+    adc #8
+    sta TempZ
     inx ;y
     inx ;screen
     inx ;direction
@@ -2384,15 +2402,29 @@ SetDirectionForTimidNpc:
 
     lda #0
     sta TempDir
+;---
+    lda TempPointX ;npcX + 64
+    sec
+    sbc GlobalScroll
+    cmp PlayerX
 
-    lda TempPointX
+    bcc @doRandom
+
+    lda TempPointX2
+    sec
+    sbc GlobalScroll
+    cmp Temp
+
+    bcs @doRandom
+
+    lda TempZ ; npc center
     sec
     sbc GlobalScroll
     cmp PlayerX
     bcc @goLeft
     cmp Temp
     bcc @compareY
-    bcs @goRight
+
 @goRight:
     lda #1
     sta TempDir
@@ -2417,14 +2449,20 @@ SetDirectionForTimidNpc:
     lda TempDir
     ora #%00001000
     sta TempDir
-    jmp @exit
+    jmp @done
 @goUp:
     lda TempDir
     ora #%00000100
     sta TempDir
 
 
-@exit:
+@done:
+    lda #0
+    jmp @end
+@doRandom:
+    dex ; decrease to screen, because random routine will do inx
+    lda #1
+@end:
 
     rts
 
