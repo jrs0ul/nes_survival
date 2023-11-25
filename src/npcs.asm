@@ -2373,24 +2373,57 @@ SetDirectionsForPredatorNpc:
 SetDirectionForTimidNpc:
 
     dex ; npc y
+
+;calc Y1
     lda Npcs, x; y
     clc
     adc #8
+    sta TempNpcCenterY
+    clc
+    adc #56
+    bcs @clampY
+    jmp @saveY1
+@clampY:
+    lda #255
+@saveY1:
     sta TempPointY
 
+;calc Y2
+    lda Npcs, x; y
+    sec
+    sbc #48
+    bcs @clamp
+    jmp @saveY2
+@clamp:
+    lda #0
+@saveY2:
+    sta TempPointY2
+;---
+;Calc npc X points
     dex ;npc x
     lda Npcs, x; x
     clc
-    adc #64
-    sta TempPointX
+    adc #8
+    sta TempZ
+    clc
+    adc #56
+    bcs @clampX1
+    jmp @saveX1
+@clampX1:
+    lda #255
+@saveX1:
+    sta TempPointX ; max X
+
     lda Npcs, x
     sec
     sbc #48
-    sta TempPointX2
-    lda Npcs, x
-    clc
-    adc #8
-    sta TempZ
+    bcs @clampX2
+    jmp @saveX2
+@clampX2:
+    lda #0
+@saveX2:
+    sta TempPointX2 ; min X
+
     inx ;y
     inx ;screen
     inx ;direction
@@ -2407,14 +2440,12 @@ SetDirectionForTimidNpc:
     sec
     sbc GlobalScroll
     cmp PlayerX
-
     bcc @doRandom
 
-    lda TempPointX2
+    lda TempPointX2 ;npcX - 48
     sec
     sbc GlobalScroll
     cmp Temp
-
     bcs @doRandom
 
     lda TempZ ; npc center
@@ -2439,7 +2470,18 @@ SetDirectionForTimidNpc:
     adc #16
     sta Temp
 
-    lda TempPointY
+    ;check if player's Y is in the bunny's field of view
+
+    lda PlayerY
+    cmp TempPointY
+    bcs @doRandom
+
+    lda Temp
+    cmp TempPointY2
+    bcc @doRandom
+
+
+    lda TempNpcCenterY
     cmp PlayerY
     bcc @goUp
     cmp Temp

@@ -1170,6 +1170,8 @@ TempPointX2:
     .res 1
 TempPointY2:
     .res 1
+TempNpcCenterY:
+    .res 1
 TempHp:
     .res 1
 TempSpearX:
@@ -1283,7 +1285,7 @@ Item_Location8_Collection_times:
 
 Npcs:   ;animals and stuff
     .res 128 ; max 16 npcs * 8 bytes:
-            ;   (npc type(6 bits) + state(2 bit, 0 - dead, 1 - alive, 2 - attacks, 3 - damaged),
+            ;   (npc type(6 bits) + state(2 bit, 0 - dead, 1 - alive/idle, 2 - attacks, 3 - damaged),
             ;   x,
             ;   y,
             ;   screen_index
@@ -1340,7 +1342,7 @@ EnteredBeforeNightfall:
     .res 1
 
 Buffer:
-    .res 329  ;must see how much is still available
+    .res 328  ;must see how much is still available
 
 ;====================================================================================
 
