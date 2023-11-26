@@ -2166,7 +2166,7 @@ NpcMovement:
     cmp #1
     bne @goDown
 @goUp:
-    jsr TestCollisionGoingUp
+    jsr TestCollisionGoingVerticaly
     cmp #1
     beq @changeDir
     lda TempZ;stored Y
@@ -2177,7 +2177,7 @@ NpcMovement:
 @goDown:
     cmp #2
     bne @nextNpc
-    jsr TestCollisionGoingDown
+    jsr TestCollisionGoingVerticaly
     cmp #1
     beq @changeDir
     lda TempZ
@@ -2392,7 +2392,7 @@ SetDirectionForTimidNpc:
     lda Npcs, x; y
     sec
     sbc #48
-    bcs @clamp
+    bmi @clamp ; it's negative
     jmp @saveY2
 @clamp:
     lda #0
@@ -2417,7 +2417,7 @@ SetDirectionForTimidNpc:
     lda Npcs, x
     sec
     sbc #48
-    bcs @clampX2
+    bmi @clampX2 ; on negative
     jmp @saveX2
 @clampX2:
     lda #0
@@ -2436,17 +2436,17 @@ SetDirectionForTimidNpc:
     lda #0
     sta TempDir
 ;---
-    lda TempPointX ;npcX + 64
-    sec
-    sbc GlobalScroll
-    cmp PlayerX
-    bcc @doRandom
+  ;  lda TempPointX ;npcX + 64
+  ;  sec
+  ;  sbc GlobalScroll
+  ;  cmp PlayerX
+  ;  bcc @doRandom
 
-    lda TempPointX2 ;npcX - 48
-    sec
-    sbc GlobalScroll
-    cmp Temp
-    bcs @doRandom
+  ;  lda TempPointX2 ;npcX - 48
+  ;  sec
+  ;  sbc GlobalScroll
+  ;  cmp Temp
+  ;  bcs @doRandom
 
     lda TempZ ; npc center
     sec
@@ -2472,13 +2472,13 @@ SetDirectionForTimidNpc:
 
     ;check if player's Y is in the bunny's field of view
 
-    lda PlayerY
-    cmp TempPointY
-    bcs @doRandom
+    ;lda PlayerY
+    ;cmp TempPointY
+    ;bcs @doRandom
 
-    lda Temp
-    cmp TempPointY2
-    bcc @doRandom
+    ;lda Temp
+    ;cmp TempPointY2
+    ;bcc @doRandom
 
 
     lda TempNpcCenterY
@@ -2558,9 +2558,10 @@ TestCollisionGoingLeft:
     inx
     ;collision result is in A
     rts
-;-------------------------------------
-TestCollisionGoingUp:
-    lda NewNpcY
+;--------------------------------------
+TestCollisionGoingVerticaly:
+
+    lda NewNpcY ; y
     sta TempZ
 
     clc
@@ -2570,36 +2571,6 @@ TestCollisionGoingUp:
     lda NewNpcX
     clc
     adc #2
-    sta TempPointX
-    lda NewNpcScreen
-    sta TempScreen
-    jsr TestPointAgainstCollisionMap
-    cmp #1
-    beq @exit
-
-    lda TempPointX
-    clc
-    adc #12
-    sta TempPointX
-    lda NewNpcScreen
-    sta TempScreen
-    jsr TestPointAgainstCollisionMap
-@exit:
-
-    ldx NpcXPosition
-    inx
-    inx ;screen
-    rts
-;--------------------------------------
-TestCollisionGoingDown:
-
-    lda NewNpcY ; y
-    sta TempZ
-
-    clc
-    adc TempYOffset
-    sta TempPointY
-    lda NewNpcX
     sta TempPointX
     lda NewNpcScreen
     sta TempScreen
