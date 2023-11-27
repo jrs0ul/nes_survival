@@ -294,7 +294,7 @@ SingleNpcVSPlayerCollision:
     tay
 
     lda Npcs, y; let's get the state
-    and #%00000111
+    and #%00000011 ; let's ignore agitation bit
     sta TempNpcState
     cmp #0
     beq @exit ; it's dead
@@ -454,7 +454,7 @@ CheckSingleNpcAgainstPlayerHit:
     tay
 
     lda Npcs, y; let's get the state
-    and #%00000111
+    and #%00000011 ; ignoring the agitation bit
     sta TempNpcState
     cmp #0
     beq @exit ; it's dead
@@ -806,7 +806,7 @@ OnCollisionWithAttackRect:
     tay
     lda Npcs, y
     and #%11111000
-    eor #%00000011 ;set damaged state
+    eor #%00000111 ;set agitated bit + damaged state
     sta Npcs, y
     iny
     iny
@@ -1229,9 +1229,8 @@ UpdateSingleNpcSprites:
     asl ; a * 8
     tay
 
-    lda Npcs, y ; index + state
-
-    and #%00000111
+    lda Npcs, y ; index + agitation + state
+    and #%00000011
     sta TempNpcState
 
     jsr CollectSingleNpcData
@@ -2377,32 +2376,41 @@ SetDirectionsForPredatorNpc:
 ;----------------------
 SetDirectionForTimidNpc:
 
-    dex ; npc y
+    dex
+    dex
+    dex ; index + status
+    lda Npcs, x
+    and #%00000100 ; check the agitation bit
+    beq @doRandom
+
+    inx ; x
+    inx ; y
+
 
 ;calc Y1
     lda Npcs, x; y
     clc
     adc #8
     sta TempNpcCenterY
-    clc
-    adc #56
-    bcs @clampY
-    jmp @saveY1
-@clampY:
-    lda #255
-@saveY1:
-    sta TempPointY
+;    clc
+;    adc #56
+;    bcs @clampY
+;    jmp @saveY1
+;@clampY:
+;    lda #255
+;@saveY1:
+;    sta TempPointY
 
 ;calc Y2
-    lda Npcs, x; y
-    sec
-    sbc #48
-    bmi @clamp ; it's negative
-    jmp @saveY2
-@clamp:
-    lda #0
-@saveY2:
-    sta TempPointY2
+;    lda Npcs, x; y
+;    sec
+;    sbc #48
+;    bmi @clamp ; it's negative
+;    jmp @saveY2
+;@clamp:
+;    lda #0
+;@saveY2:
+;    sta TempPointY2
 ;---
 ;Calc npc X points
     dex ;npc x
@@ -2410,24 +2418,24 @@ SetDirectionForTimidNpc:
     clc
     adc #8
     sta TempZ
-    clc
-    adc #56
-    bcs @clampX1
-    jmp @saveX1
-@clampX1:
-    lda #255
-@saveX1:
-    sta TempPointX ; max X
+;    clc
+;    adc #56
+;    bcs @clampX1
+;    jmp @saveX1
+;@clampX1:
+;    lda #255
+;@saveX1:
+;    sta TempPointX ; max X
 
-    lda Npcs, x
-    sec
-    sbc #48
-    bmi @clampX2 ; on negative
-    jmp @saveX2
-@clampX2:
-    lda #0
-@saveX2:
-    sta TempPointX2 ; min X
+;    lda Npcs, x
+;    sec
+;    sbc #48
+;    bmi @clampX2 ; on negative
+;    jmp @saveX2
+;@clampX2:
+;    lda #0
+;@saveX2:
+;    sta TempPointX2 ; min X
 
     inx ;y
     inx ;screen
@@ -2507,7 +2515,9 @@ SetDirectionForTimidNpc:
     lda #0
     jmp @end
 @doRandom:
-    dex ; decrease to screen, because random routine will do inx
+    inx ;x
+    inx ;y
+    inx ; screen
     lda #1
 @end:
 
@@ -2675,7 +2685,7 @@ OnCollisionWithPlayer:
     beq @collides ; don't attack if in damaged state
 
     lda Npcs, x     ;  reload the status
-    and #%11111100  ;  remove previous status
+    and #%11111000  ;  remove previous status + agitation
     eor #%00000010  ;  set the attack state
     sta Npcs, x
 
