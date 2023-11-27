@@ -2034,7 +2034,22 @@ NpcMovement:
     dex ; x
     stx NpcXPosition ; index at x
 
+    lda #NPC_SPEED
+    sta TempNpcSpeed
 
+    lda TempNpcType
+    cmp #NPC_TYPE_TIMID
+    bne @continue_move
+    dex; state
+    lda Npcs, x ; index and stuff
+    and #%00000100 ; check agitated bit
+    beq @done_timid ; not agitated
+    lda #NPC_SPEED_AGITATED ; if agitated, go realy fast
+    sta TempNpcSpeed
+    jmp @done_timid
+@done_timid:
+    inx
+@continue_move:
     ;Calculate npcs new X and Y using the movement direction
     ;----------
     ;store the new coordinates, because there might not be any direction
@@ -2061,7 +2076,7 @@ NpcMovement:
 
     lda Npcs, x ; load x
     clc
-    adc #NPC_SPEED
+    adc TempNpcSpeed
     bcs @IncreaseScreen
     sta NewNpcX
 
@@ -2086,7 +2101,7 @@ NpcMovement:
     lda Npcs, x ; load x
     sta Temp
     sec
-    sbc #NPC_SPEED
+    sbc TempNpcSpeed
     cmp Temp
     bcs @DecreaseScreen
 
@@ -2119,7 +2134,7 @@ NpcMovement:
     lda Npcs, x
 
     sec
-    sbc #NPC_SPEED
+    sbc TempNpcSpeed
 
     sta NewNpcY
 
@@ -2134,7 +2149,7 @@ NpcMovement:
     inx ; move to y
     lda Npcs, x
     clc
-    adc #NPC_SPEED
+    adc TempNpcSpeed
 
     sta NewNpcY
 

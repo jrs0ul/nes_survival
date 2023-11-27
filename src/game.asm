@@ -372,6 +372,7 @@ player_sprites_flip:
     PROJECTILE_MAX_COUNT       = 4
 
     NPC_SPEED                  = 1
+    NPC_SPEED_AGITATED         = 2
 
     MAX_SPRITE_COUNT           = 64
 
@@ -1164,6 +1165,8 @@ TempNpcTimer:
     .res 1
 TempNpcRows:
     .res 1
+TempNpcSpeed:
+    .res 1
 TempFrameOffset:
     .res 1
 TempPointX2:
@@ -1342,7 +1345,7 @@ EnteredBeforeNightfall:
     .res 1
 
 Buffer:
-    .res 328  ;must see how much is still available
+    .res 327  ;must see how much is still available
 
 ;====================================================================================
 
