@@ -102,7 +102,7 @@ GenerateNpcs:
 
 @checkOldNpc:
     lda Npcs, x
-    and #%00000011
+    and #%00000111
     cmp #0
     bne @next
 
@@ -125,7 +125,7 @@ GenerateNpcs:
 GenerateSingleNpc:
     ;npc type
     lda TempFrame
-    cmp #$40    ;check if it's night
+    cmp #DAYTIME_NIGHT    ;check if it's night
     beq @makeWolf
 
     dec DogCounter
@@ -138,7 +138,7 @@ GenerateSingleNpc:
     ldy #12
     lda npc_data, y
     sta TempHp
-    lda #%00000101
+    lda #%00001001
     jmp @storeType
 @makeWolf:
     ldy #1
@@ -158,7 +158,7 @@ GenerateSingleNpc:
     ldy #28
     lda npc_data, y
     sta TempHp
-    lda #%00001101
+    lda #%00011001
 @storeType:
     sta Npcs, x
     inx
@@ -228,7 +228,7 @@ EliminateInactiveNpcs:
     stx TempEliminationDest
 
     lda Npcs, x 
-    and #%00000011
+    and #%00000111
     cmp #0
     beq @next
     inx
@@ -294,14 +294,16 @@ SingleNpcVSPlayerCollision:
     tay
 
     lda Npcs, y; let's get the state
-    and #%00000011
+    and #%00000111
     sta TempNpcState
     cmp #0
     beq @exit ; it's dead
 
     lda Npcs, y ; let's get DB index
     lsr
-    lsr ;eliminate 2 state bits
+    lsr
+    lsr ;eliminate 3 state bits
+
 
     sty Temp
     asl
@@ -452,14 +454,15 @@ CheckSingleNpcAgainstPlayerHit:
     tay
 
     lda Npcs, y; let's get the state
-    and #%00000011
+    and #%00000111
     sta TempNpcState
     cmp #0
     beq @exit ; it's dead
 
     lda Npcs, y ; let's get DB index
     lsr
-    lsr ;eliminate 2 state bits
+    lsr
+    lsr ;eliminate 3 state bits
 
     sty Temp
     asl
@@ -787,7 +790,7 @@ OnCollisionWithAttackRect:
     tay
 
     lda Npcs, y
-    and #%11111100; drop two last bits that stand for status
+    and #%11111000; drop three last bits that stand for status
     sta Npcs, y
 
     jsr DropItemAfterDeath
@@ -802,7 +805,7 @@ OnCollisionWithAttackRect:
     sbc #7  ;5
     tay
     lda Npcs, y
-    and #%11111100
+    and #%11111000
     eor #%00000011 ;set damaged state
     sta Npcs, y
     iny
@@ -1226,9 +1229,9 @@ UpdateSingleNpcSprites:
     asl ; a * 8
     tay
 
-    lda Npcs, y ; index + alive
+    lda Npcs, y ; index + state
 
-    and #%00000011
+    and #%00000111
     sta TempNpcState
 
     jsr CollectSingleNpcData
@@ -1297,6 +1300,7 @@ CollectSingleNpcData:
     sta DamagedPaletteMask
 @cont1:
     lda Npcs, y
+    lsr
     lsr
     lsr
 
@@ -1609,6 +1613,7 @@ doNpcAI:
 ;-----------------------------------
 FetchNpcVars:
     lda Npcs, x
+    lsr
     lsr
     lsr
     sta TempNpcIndex

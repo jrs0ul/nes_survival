@@ -1285,7 +1285,7 @@ Item_Location8_Collection_times:
 
 Npcs:   ;animals and stuff
     .res 128 ; max 16 npcs * 8 bytes:
-            ;   (npc type(6 bits) + state(2 bit, 0 - dead, 1 - alive/idle, 2 - attacks, 3 - damaged, 4 - agitated),
+            ;   (npc type(5 bits) + state(3 bit, 0 - dead, 1 - alive/idle, 2 - attacks, 3 - damaged, 4 - agitated),
             ;   x,
             ;   y,
             ;   screen_index
