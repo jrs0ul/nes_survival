@@ -1193,6 +1193,16 @@ TempTextAddressLow:
 TempPlayerAttk:
     .res 1
 
+;timid npc agitation range
+TempPlayerRangeX1:
+    .res 1
+TempPlayerRangeX2:
+    .res 1
+TempPlayerRangeY1:
+    .res 1
+TempPlayerRangeY2:
+    .res 1
+
 ProjectileWidth:
     .res 1
 ProjectileX:
@@ -1345,7 +1355,7 @@ EnteredBeforeNightfall:
     .res 1
 
 Buffer:
-    .res 327  ;must see how much is still available
+    .res 323  ;must see how much is still available
 
 ;====================================================================================
 

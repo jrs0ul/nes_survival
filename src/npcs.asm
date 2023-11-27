@@ -2037,16 +2037,18 @@ NpcMovement:
     lda #NPC_SPEED
     sta TempNpcSpeed
 
+
     lda TempNpcType
     cmp #NPC_TYPE_TIMID
     bne @continue_move
-    dex; state
+    jsr CheckAgitationByPlayer
+
+    dex; state (was at x coord)
     lda Npcs, x ; index and stuff
     and #%00000100 ; check agitated bit
     beq @done_timid ; not agitated
     lda #NPC_SPEED_AGITATED ; if agitated, go realy fast
     sta TempNpcSpeed
-    jmp @done_timid
 @done_timid:
     inx
 @continue_move:
@@ -2208,6 +2210,84 @@ NpcMovement:
     jsr ChangeNpcDirection
 @nextNpc:
     rts
+
+;-------------------------
+
+CheckAgitationByPlayer:
+    ; x reg at x coord
+
+    stx TempRegX
+
+    lda PlayerY
+    cmp #48
+    bcc @clampY1
+    sec
+    sbc #48
+    jmp @saveY1
+@clampY1:
+    lda #0
+@saveY1:
+    sta TempPlayerRangeY1
+
+    lda PlayerY
+    clc
+    adc #64
+    bcs @clampY2
+    jmp @saveY2
+@clampY2:
+    lda #255
+@saveY2:
+    sta TempPlayerRangeY2
+
+
+    lda PlayerX
+    clc
+    adc #64
+    sta TempPlayerRangeX2
+
+    lda PlayerX
+    sec
+    sbc #48
+    sta TempPlayerRangeX1
+
+    lda Npcs, x
+    sec
+    sbc GlobalScroll
+    cmp TempPlayerRangeX2
+    bcs @exit
+    lda Npcs, x
+    clc
+    adc #16
+    sec
+    sbc GlobalScroll
+    cmp TempPlayerRangeX1
+    bcc @exit
+
+    inx ; y
+    lda Npcs, x
+    cmp TempPlayerRangeY2
+    bcs @exit
+
+    lda Npcs, x
+    clc
+    adc #16
+    cmp TempPlayerRangeY1
+    bcc @exit
+;--
+    ldx TempRegX ; at x
+    dex ;state
+    ;set agitated
+    lda Npcs, x
+    and #%11111011
+    clc
+    adc #%00000100
+    sta Npcs, x
+
+@exit:
+    ldx TempRegX ; must return x to x coord
+
+    rts
+
 
 ;--------------------------
 HorizontalMovement:
@@ -2401,31 +2481,11 @@ SetDirectionForTimidNpc:
     inx ; x
     inx ; y
 
-
-;calc Y1
     lda Npcs, x; y
     clc
     adc #8
     sta TempNpcCenterY
-;    clc
-;    adc #56
-;    bcs @clampY
-;    jmp @saveY1
-;@clampY:
-;    lda #255
-;@saveY1:
-;    sta TempPointY
 
-;calc Y2
-;    lda Npcs, x; y
-;    sec
-;    sbc #48
-;    bmi @clamp ; it's negative
-;    jmp @saveY2
-;@clamp:
-;    lda #0
-;@saveY2:
-;    sta TempPointY2
 ;---
 ;Calc npc X points
     dex ;npc x
@@ -2433,24 +2493,6 @@ SetDirectionForTimidNpc:
     clc
     adc #8
     sta TempZ
-;    clc
-;    adc #56
-;    bcs @clampX1
-;    jmp @saveX1
-;@clampX1:
-;    lda #255
-;@saveX1:
-;    sta TempPointX ; max X
-
-;    lda Npcs, x
-;    sec
-;    sbc #48
-;    bmi @clampX2 ; on negative
-;    jmp @saveX2
-;@clampX2:
-;    lda #0
-;@saveX2:
-;    sta TempPointX2 ; min X
 
     inx ;y
     inx ;screen
@@ -2463,18 +2505,6 @@ SetDirectionForTimidNpc:
 
     lda #0
     sta TempDir
-;---
-  ;  lda TempPointX ;npcX + 64
-  ;  sec
-  ;  sbc GlobalScroll
-  ;  cmp PlayerX
-  ;  bcc @doRandom
-
-  ;  lda TempPointX2 ;npcX - 48
-  ;  sec
-  ;  sbc GlobalScroll
-  ;  cmp Temp
-  ;  bcs @doRandom
 
     lda TempZ ; npc center
     sec
@@ -2497,16 +2527,6 @@ SetDirectionForTimidNpc:
     clc
     adc #16
     sta Temp
-
-    ;check if player's Y is in the bunny's field of view
-
-    ;lda PlayerY
-    ;cmp TempPointY
-    ;bcs @doRandom
-
-    ;lda Temp
-    ;cmp TempPointY2
-    ;bcc @doRandom
 
 
     lda TempNpcCenterY
