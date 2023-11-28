@@ -4,7 +4,7 @@ CanPlayerGo:
     lda PlayerX
     clc
     adc #PLAYER_COLLISION_LINE_X1
-    adc GlobalScroll
+    adc ScrollX
     sta TempPointX
     bcs @increment
 
@@ -29,7 +29,7 @@ CanPlayerGo:
     lda PlayerX
     clc
     adc #PLAYER_COLLISION_LINE_X2
-    adc GlobalScroll
+    adc ScrollX
     sta TempPointX
     bcs @increment2
     lda TempCollisionVar
@@ -58,7 +58,7 @@ CanPlayerGoWithOldY:
     lda PlayerX
     clc
     adc #PLAYER_COLLISION_LINE_X1
-    adc GlobalScroll
+    adc ScrollX
     sta TempPointX
     bcs @increment
 
@@ -83,7 +83,7 @@ CanPlayerGoWithOldY:
     lda PlayerX
     clc
     adc #PLAYER_COLLISION_LINE_X2
-    adc GlobalScroll
+    adc ScrollX
     sta TempPointX
     bcs @increment2
 
@@ -114,7 +114,7 @@ CanPlayerGoWithOldX:
     lda OldPlayerX
     clc
     adc #PLAYER_COLLISION_LINE_X1
-    adc OldGlobalScroll
+    adc OldScrollX
     sta TempPointX
     bcs @increment
     lda TempCollisionVar
@@ -138,7 +138,7 @@ CanPlayerGoWithOldX:
     lda OldPlayerX
     clc
     adc #PLAYER_COLLISION_LINE_X2
-    adc OldGlobalScroll
+    adc OldScrollX
     sta TempPointX
     bcs @increment2
     lda TempCollisionVar

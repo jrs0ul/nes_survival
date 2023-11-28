@@ -335,20 +335,20 @@ SingleNpcVSPlayerCollision:
     lda CurrentMapSegmentIndex
     cmp ItemMapScreenIndex
     beq @NpcMatchesScreen
-    
+
     ;X1
     lda Npcs, y ; x
-    sec 
-    sbc GlobalScroll
+    sec
+    sbc ScrollX
     bcs @exit
     sta TempPointX
     jmp @calcY
 @NpcMatchesScreen:
     lda Npcs, y ; x
-    cmp GlobalScroll
+    cmp ScrollX
     bcc @exit
     sec
-    sbc GlobalScroll
+    sbc ScrollX
     sta TempPointX
 
 @calcY: ; Y1
@@ -497,17 +497,17 @@ CheckSingleNpcAgainstPlayerHit:
     
     ;X1
     lda Npcs, y ; x
-    sec 
-    sbc GlobalScroll
+    sec
+    sbc ScrollX
     bcs @exit
     sta TempPointX
     jmp @calcY
 @NpcMatchesScreen:
     lda Npcs, y ; x
-    cmp GlobalScroll
+    cmp ScrollX
     bcc @exit
     sec
-    sbc GlobalScroll
+    sbc ScrollX
     sta TempPointX
 
 @calcY: ; Y1
@@ -608,7 +608,7 @@ SingleProjectileCollision:
     dey
     lda Projectiles, y ; x
     sec
-    sbc GlobalScroll
+    sbc ScrollX
     bcs @exit
 
     jmp @cont
@@ -616,10 +616,10 @@ SingleProjectileCollision:
 
     dey
     lda Projectiles, y ; x
-    cmp GlobalScroll
+    cmp ScrollX
     bcc @exit
     sec
-    sbc GlobalScroll
+    sbc ScrollX
 
 @cont:
     sta ProjectileX
@@ -1127,16 +1127,16 @@ BuildSpearAttackSquare:
 
     lda SpearData + 1 ; x
     sec
-    sbc GlobalScroll
+    sbc ScrollX
     bcs @exit
     sta TempSpearX; save x
     jmp @doUpdate
 @SpearMatchesScreen:
     lda SpearData + 1 ; x
-    cmp GlobalScroll
+    cmp ScrollX
     bcc @exit
     sec
-    sbc GlobalScroll
+    sbc ScrollX
     sta TempSpearX
 
 
@@ -1263,16 +1263,16 @@ UpdateSingleNpcSprites:
 
     lda Npcs, y ; x
     sec
-    sbc GlobalScroll
+    sbc ScrollX
     bcs @nextNpc
     sta TempPointX ; save x
     jmp @calcY
 @NpcMatchesScreen:
     lda Npcs, y ; x
-    cmp GlobalScroll
+    cmp ScrollX
     bcc @nextNpc
     sec
-    sbc GlobalScroll
+    sbc ScrollX
     sta TempPointX
 @calcY:
     iny
@@ -1589,12 +1589,12 @@ doNpcAI:
 
     lda Npcs, x ; x
     sec
-    sbc GlobalScroll
+    sbc ScrollX
     bcs @nextNpc
     jmp @doAI
 @NpcMatchesScreen:
     lda Npcs, x ; x
-    cmp GlobalScroll
+    cmp ScrollX
     bcc @nextNpc
 ;-----------end of filter----------
 
@@ -1809,17 +1809,17 @@ CalcNPCXYOnScreen:
     
     ;X1
     lda Npcs, x ; x
-    sec 
-    sbc GlobalScroll
+    sec
+    sbc ScrollX
     bcs @fail
     sta TempPointX
     jmp @calcY
 @NpcMatchesScreen:
     lda Npcs, x ; x
-    cmp GlobalScroll
+    cmp ScrollX
     bcc @fail
     sec
-    sbc GlobalScroll
+    sbc ScrollX
     sta TempPointX
 
 @calcY: ; Y1
@@ -2258,14 +2258,14 @@ CheckAgitationByPlayer:
 
     lda Npcs, x
     sec
-    sbc GlobalScroll
+    sbc ScrollX
     cmp TempPlayerRangeX2
     bcs @exit
     lda Npcs, x
     clc
     adc #16
     sec
-    sbc GlobalScroll
+    sbc ScrollX
     cmp TempPlayerRangeX1
     bcc @exit
 
@@ -2428,7 +2428,7 @@ SetDirectionsForPredatorNpc:
 
     lda TempPointX
     sec
-    sbc GlobalScroll
+    sbc ScrollX
     cmp PlayerX
     bcc @goRight
     cmp Temp
@@ -2514,7 +2514,7 @@ SetDirectionForTimidNpc:
 
     lda TempZ ; npc center
     sec
-    sbc GlobalScroll
+    sbc ScrollX
     cmp PlayerX
     bcc @goLeft
     cmp Temp
@@ -2673,7 +2673,7 @@ OnCollisionWithPlayer:
 
     lda NewNpcX
     sec
-    sbc GlobalScroll
+    sbc ScrollX
     sta TempPointX
     inx
     inx ; back to screen idx

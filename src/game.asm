@@ -743,12 +743,12 @@ ZPBuffer:
 CurrentPaletteDecrementValue: ;a helper value to prevent doing too much of palette changing
     .res 1
 
-OldGlobalScroll:
+OldScrollX:
     .res 1
-GlobalScroll:
+ScrollX:
     .res 1
 
-GlobalScrollY:
+ScrollY:
     .res 1
 
 CurrentMapSegmentIndex: ;starting screen
@@ -1748,10 +1748,10 @@ WaitScanline:
     bne WaitScanline
 
 justScroll:
-    lda GlobalScroll
+    lda ScrollX
     sta $2005        ; write the horizontal scroll count register
 
-    lda GlobalScrollY ; vertical scroll
+    lda ScrollY ; vertical scroll
     sta $2005
 
 endOfNmi:
@@ -2385,7 +2385,7 @@ CheckEntryPoints:
     iny             ;maxX
     cmp MapEntryPoints, y
     bcs @nextEntry
-    lda GlobalScroll
+    lda ScrollX
     iny
     cmp MapEntryPoints, y
     bcc @nextEntry
@@ -3428,7 +3428,7 @@ CommonLocationRoutine:
 ;@continue:
     iny
     lda (pointer2), y ; scroll X
-    sta GlobalScroll
+    sta ScrollX
     iny
     lda (pointer2), y ; active screen
     sta CurrentMapSegmentIndex
@@ -4193,8 +4193,8 @@ BackupMovement:
     lda PlayerY
     sta OldPlayerY
 
-    lda GlobalScroll
-    sta OldGlobalScroll
+    lda ScrollX
+    sta OldScrollX
 
     lda ScrollDirection
     sta OldScrollDirection
@@ -4247,8 +4247,8 @@ ResetPlayerXMovement:
 
     lda OldPlayerX
     sta PlayerX
-    lda OldGlobalScroll
-    sta GlobalScroll
+    lda OldScrollX
+    sta ScrollX
     lda OldScrollDirection
     sta ScrollDirection
     lda OldCurrentMapSegmentIndex
@@ -4263,7 +4263,7 @@ ResetPlayerXMovement:
 ;--------------------------------
 CalcMapColumnToUpdate:
 
-    lda GlobalScroll
+    lda ScrollX
     lsr
     lsr
     lsr             ;GlobalScroll / 8
@@ -4758,7 +4758,7 @@ ResetEntityVariables:
     sta PaletteFadeAnimationState
     sta FadeIdx
     sta PaletteFadeTimer
-    sta GlobalScroll
+    sta ScrollX
     sta BaseMenuIndex
     sta InHouse
     sta InCave
@@ -5505,7 +5505,7 @@ SpawnItem:
 
     lda PlayerX
     clc
-    adc GlobalScroll
+    adc ScrollX
     sta TempPointX
     bcs @incrementScreen
     jmp @continue
@@ -5599,7 +5599,7 @@ CalcTileAddressInFrontOfPlayer:
 
 @cont:
     clc
-    adc GlobalScroll
+    adc ScrollX
     sta TempX
     bcs @mustIncrementScreen
 
@@ -5789,7 +5789,7 @@ ShootSlingshot:
     inx ; X
 
     lda PlayerX
-    adc GlobalScroll
+    adc ScrollX
     bcs @incrementScreen
 
 
@@ -5847,7 +5847,7 @@ LaunchSpear:
     lda PlayerX
     clc
     adc #8
-    adc GlobalScroll
+    adc ScrollX
     bcs @incrementScreen
 
 
@@ -5899,7 +5899,7 @@ CheckLeft:
 
 ;--
 @ScrollGlobalyLeft:
-    lda GlobalScroll
+    lda ScrollX
     cmp PlayerSpeed
     bcc @clamp
 
@@ -5914,7 +5914,7 @@ CheckLeft:
     lda #1
     sta CurrentScreenWasDecremented
 
-    lda GlobalScroll
+    lda ScrollX
     sec
     sbc PlayerSpeed
     jmp @save
@@ -5922,15 +5922,15 @@ CheckLeft:
 
 @firstScreen:
 
-    lda GlobalScroll
+    lda ScrollX
     beq @moveLeft
 
 
-    lda GlobalScroll
+    lda ScrollX
     cmp PlayerSpeed
     bcc @clamp1
 
-    lda GlobalScroll
+    lda ScrollX
     sec
     sbc PlayerSpeed
     jmp @save
@@ -5940,7 +5940,7 @@ CheckLeft:
     lda #0
 
 @save:
-    sta GlobalScroll
+    sta ScrollX
 
     jmp @exit
 
@@ -5987,7 +5987,7 @@ CheckRight:
     beq @moveRight
 
 
-    lda GlobalScroll
+    lda ScrollX
     cmp #MAX_V_SCROLL
     bcs @ScrollGlobalyRight
 
@@ -5998,11 +5998,11 @@ CheckRight:
     sbc PlayerSpeed
     clc
     adc #1
-    cmp GlobalScroll
+    cmp ScrollX
     bcc @clamp
     beq @clamp
 
-    lda GlobalScroll
+    lda ScrollX
     clc
     adc PlayerSpeed
     jmp @save
@@ -6018,7 +6018,7 @@ CheckRight:
     cmp ScreenCount
     beq @preLastScreen
 
-    lda GlobalScroll
+    lda ScrollX
     clc
     adc PlayerSpeed
     jmp @save
@@ -6027,7 +6027,7 @@ CheckRight:
 
 
 @save:
-    sta GlobalScroll
+    sta ScrollX
 
     jmp @exit
 
@@ -6307,16 +6307,16 @@ UpdateSprites:
 
     lda SpearData + 1 ; x
     sec
-    sbc GlobalScroll
+    sbc ScrollX
     bcs @projectiles
     sta TempPointX ; save x
     jmp @doUpdate
 @SpearMatchesScreen:
     lda SpearData + 1; x
-    cmp GlobalScroll
+    cmp ScrollX
     bcc @projectiles
     sec
-    sbc GlobalScroll
+    sbc ScrollX
     sta TempPointX
 
 
@@ -6741,7 +6741,7 @@ UpdateProjectileSprites:
     dey
     lda Projectiles, y ; x
     sec
-    sbc GlobalScroll
+    sbc ScrollX
     bcs @next
     sta TempPointX
     iny ; screen
@@ -6749,10 +6749,10 @@ UpdateProjectileSprites:
 @projectileMatchesScreen:
     dey
     lda Projectiles, y ; x
-    cmp GlobalScroll
+    cmp ScrollX
     bcc @next
     sec
-    sbc GlobalScroll
+    sbc ScrollX
     sta TempPointX
     iny; screen
 

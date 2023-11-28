@@ -181,15 +181,15 @@ DoPaletteAnim:
 ;-----------------------------
 DoScrolling:
     ;do some scrolling
-    lda GlobalScroll
+    lda ScrollX
     clc
     adc intro_scroll_dir_x, x
-    sta GlobalScroll
+    sta ScrollX
 
-    lda GlobalScrollY
+    lda ScrollY
     clc
     adc intro_scroll_dir_y, x
-    sta GlobalScrollY
+    sta ScrollY
 
     rts
 
@@ -264,7 +264,7 @@ IntroLogics:
     sta MustLoadSomething
     lda #0
     sta MustLoadIntroChr
-    sta GlobalScroll
+    sta ScrollX
 
     jmp @exit
 
@@ -289,15 +289,15 @@ OutroLogics:
     tax
 
     ;do some scrolling
-    lda GlobalScroll
+    lda ScrollX
     clc
     adc outro_scroll_dir_x, x
-    sta GlobalScroll
+    sta ScrollX
 
-    lda GlobalScrollY
+    lda ScrollY
     clc
     adc outro_scroll_dir_y, x
-    sta GlobalScrollY
+    sta ScrollY
 
 
     lda outro_scenes_duration, x
@@ -351,7 +351,7 @@ OutroLogics:
     sta MustLoadSomething
     lda #0
     sta MustLoadIntroChr
-    sta GlobalScroll
+    sta ScrollX
 
 @exit:
     rts
@@ -748,7 +748,7 @@ LoadOutroScene:
 InitIntro:
     lda #0
     sta CutsceneSceneIdx
-    sta GlobalScroll
+    sta ScrollX
     asl
     tax
     lda intro_sprite_pos_x, x
@@ -777,7 +777,7 @@ InitOutro:
 
     lda #0
     sta CutsceneSceneIdx
-    sta GlobalScroll
+    sta ScrollX
     asl
     tax
     lda outro_sprite_pos_x, x

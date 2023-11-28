@@ -132,7 +132,7 @@ CheckItemsXY:
 
     lda TempX
     sec
-    sbc GlobalScroll
+    sbc ScrollX
     bcs @exit ; x > 255 ?
     sta TempPointX
     lda PlayerX
@@ -147,7 +147,7 @@ CheckItemsXY:
     clc
     adc #16
     sec
-    sbc GlobalScroll
+    sbc ScrollX
     bcs @exit ; x > 255 ?
     sta TempPointX
     lda PlayerX
@@ -159,10 +159,10 @@ CheckItemsXY:
 
 @ItemMatchesScreen:
     lda TempX
-    cmp GlobalScroll
+    cmp ScrollX
     bcc @exit
     sec
-    sbc GlobalScroll
+    sbc ScrollX
     sta TempPointX
     lda PlayerX
     clc
@@ -189,7 +189,7 @@ CheckItemsXY:
 @cont:
     ldy TempIndex
     sec
-    sbc GlobalScroll
+    sbc ScrollX
 
     sta TempPointX
     lda PlayerX
@@ -420,16 +420,16 @@ UpdateSpritesForSingleItem:
     beq @ItemMatchesScreen
     lda TempX
     sec
-    sbc GlobalScroll
+    sbc ScrollX
     bcs @exit ; x > 255
     sta Temp; save new x
     jmp @continueWithSprite
 @ItemMatchesScreen:
     lda TempX
-    cmp GlobalScroll
+    cmp ScrollX
     bcc @exit
     sec
-    sbc GlobalScroll
+    sbc ScrollX
     sta Temp
 @continueWithSprite:
 
