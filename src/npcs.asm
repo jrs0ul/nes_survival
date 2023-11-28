@@ -816,7 +816,11 @@ OnCollisionWithAttackRect:
     lda EquipedItem
     cmp #ITEM_FISHING_ROD
     beq @exit
-
+    cmp #ITEM_SLINGSHOT
+    bne @wear
+    lda ShotWithProjectile
+    beq @exit
+@wear:
     jsr WearWeapon
 @exit:
 
@@ -933,6 +937,8 @@ CalcPlayerDmg:
     lda EquipedItem
     beq @exit
     cmp #ITEM_FISHING_ROD ; fishing rod is not a weapon
+    beq @exit
+    cmp #ITEM_SLINGSHOT
     beq @exit
 
     asl

@@ -1279,7 +1279,7 @@ DogCounter: ; used for canid generation
     .res 1
 
 Items:   ;items that lies in the map
-    .res 80 ; max 20 items * 4 bytes
+    .res 100 ; max 25 items * 4 bytes
             ;(item index(7 bits) + active(1 bit),
             ; screen_index
             ; x,
@@ -1355,7 +1355,7 @@ EnteredBeforeNightfall:
     .res 1
 
 Buffer:
-    .res 323  ;must see how much is still available
+    .res 303  ;must see how much is still available
 
 ;====================================================================================
 
