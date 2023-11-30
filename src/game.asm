@@ -369,7 +369,7 @@ player_sprites_flip:
 
     NPC_MAX_COUNT              = 16
 
-    PROJECTILE_MAX_COUNT       = 4
+    PROJECTILE_MAX_COUNT       = 10
 
     NPC_SPEED                  = 1
     NPC_SPEED_AGITATED         = 2
@@ -1310,11 +1310,11 @@ NpcCount:
     .res 1
 
 Projectiles:
-    .res 16 ;  4 bytes * 4 projectiles
-            ;  direction(7bit) + state (1bit)
-            ;  x
-            ;  screen
-            ;  y
+    .res 4 * PROJECTILE_MAX_COUNT ;  4 bytes * 4 projectiles
+                                  ;  direction(7bit) + state (1bit)
+                                  ;  x
+                                  ;  screen
+                                  ;  y
 
 ProjectileCount:
     .res 1
@@ -1355,7 +1355,7 @@ EnteredBeforeNightfall:
     .res 1
 
 Buffer:
-    .res 303  ;must see how much is still available
+    .res 279  ;must see how much is still available
 
 ;====================================================================================
 
@@ -2637,6 +2637,7 @@ ScreenFilter:
 MoveProjectileRight:
 
     iny
+    sty TempYOffset
     lda (ProjectilePtr), y ; x
     clc
     adc ProjectileWidth
@@ -2649,7 +2650,6 @@ MoveProjectileRight:
 
     ;---
     sta TempPointX
-    sty TempYOffset
     iny
     lda (ProjectilePtr), y ; screen
     sta TempScreen
@@ -2662,7 +2662,7 @@ MoveProjectileRight:
 
     ;---
 
-    ldy TempYOffset
+    ldy TempYOffset ; restore where x coordinate was
     lda TempPointX
     sec
     sbc ProjectileWidth
@@ -2697,7 +2697,7 @@ MoveProjectileRight:
     jsr TestPointAgainstCollisionMap
     bne @return_disable
 
-    ldy #1
+    ldy TempYOffset ; restore index of x coordinates location
     lda TempPointX
     sec
     sbc ProjectileWidth
@@ -2775,7 +2775,9 @@ UpdateSpear:
     rts
 ;-------------------------------
 MoveProjectileLeft:
+
     iny
+    sty TempYOffset ; store x coord position
     lda (ProjectilePtr), y
     cmp #PROJECTILE_SPEED
     bcc @less
@@ -2784,7 +2786,6 @@ MoveProjectileLeft:
     sbc #PROJECTILE_SPEED
 
     sta TempPointX
-    sty TempYOffset
     iny
     lda (ProjectilePtr), y ; screen
     sta TempScreen
@@ -2795,7 +2796,7 @@ MoveProjectileLeft:
     jsr TestPointAgainstCollisionMap
     bne @return_disable ;it does
 
-    ldy TempYOffset
+    ldy TempYOffset ; restore x coord pos
     lda TempPointX
 
     sta (ProjectilePtr), y
@@ -2827,7 +2828,7 @@ MoveProjectileLeft:
     bne @return_disable
 
 
-    ldy #1
+    ldy TempYOffset ; restore x coord pos
     lda TempPointX
     sta (ProjectilePtr), y
     iny
