@@ -528,6 +528,8 @@ player_sprites_flip:
 
     PROJECTILE_SPEED           = 3
 
+    ITEM_COUNT_MAX             = 25
+
     ITEM_COUNT_LOC1            = 7
     ITEM_COUNT_LOC2            = 6
     ITEM_COUNT_LOC3            = 4
@@ -1263,6 +1265,9 @@ TempPlayerSpriteIdx:
 TempNpcCollisionXReg:
     .res 1
 
+TempItemStorageIdx: ; for finding reusable item slot, to spawn item in map
+    .res 1
+
 FarOffNpcScreen:
     .res 1
 ;----------
@@ -1279,11 +1284,11 @@ DogCounter: ; used for canid generation
     .res 1
 
 Items:   ;items that lies in the map
-    .res 100 ; max 25 items * 4 bytes
-            ;(item index(7 bits) + active(1 bit),
-            ; screen_index
-            ; x,
-            ; y)
+    .res 4 * ITEM_COUNT_MAX ; ITEM_COUNT_MAX * 4 bytes
+                            ;(item index(7 bits) + active(1 bit),
+                            ; screen_index
+                            ; x,
+                            ; y)
 ItemCount:
     .res 1
 
@@ -1355,7 +1360,7 @@ EnteredBeforeNightfall:
     .res 1
 
 Buffer:
-    .res 279  ;must see how much is still available
+    .res 278  ;must see how much is still available
 
 ;====================================================================================
 
@@ -5481,8 +5486,40 @@ IsTree:
 
 ;----------------------------------
 ItemSpawnPrep:
-    inc ItemCount
+
     lda ItemCount
+    clc
+    adc #1
+    cmp #ITEM_COUNT_MAX
+    bcc @save_and_continue
+
+    ldy LocationIndex
+    lda LocationItemCounts, y ;we should start from here to look for reusable item slot
+    sta TempItemStorageIdx
+
+@testIfFits:
+    sec
+    sbc #1
+    asl
+    asl
+    tay
+    lda Items, y
+    lsr
+    bcc @found
+
+    lda TempItemStorageIdx
+    clc
+    adc #1
+    cmp #ITEM_COUNT_MAX
+    bcc @testIfFits
+
+@found:
+    lda TempItemStorageIdx
+    jmp @continue
+
+@save_and_continue:
+    sta ItemCount
+@continue:
     sec
     sbc #1
     asl
