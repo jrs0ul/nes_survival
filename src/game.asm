@@ -5495,9 +5495,9 @@ ItemSpawnPrep:
 
     ldy LocationIndex
     lda LocationItemCounts, y ;we should start from here to look for reusable item slot
-    sta TempItemStorageIdx
 
 @testIfFits:
+    sta TempItemStorageIdx
     sec
     sbc #1
     asl
