@@ -66,6 +66,8 @@ main_tiles_chr2: .incbin "alien.chr"
 
 .include "data/maps/alien_base1.asm"
 .include "data/maps/alien_base2.asm"
+.include "data/maps/cave1.asm"
+.include "data/maps/cave2.asm"
 
 
 ;=============================================================
@@ -115,8 +117,6 @@ game_over_sprites:
 
 .include "data/maps/field2_bg.asm"
 .include "data/maps/field2_bg1.asm"
-.include "data/maps/cave1.asm"
-.include "data/maps/cave2.asm"
 .include "data/maps/crashsite.asm"
 .include "data/maps/babloc1.asm"
 .include "data/maps/babloc2.asm"
@@ -261,8 +261,8 @@ fist_collision_pos:
 ;   tile row
 ;   tile column
 destructable_tiles_list:
-    .byte 6, $24, $87, 4, 7, 0, 0, 0
-    .byte 6, $24, $88, 4, 8, 0, 0, 0
+    .byte 6, $24, $E7, 7, 7, 0, 0, 0
+    .byte 6, $24, $E8, 7, 8, 0, 0, 0
 
 
 
@@ -3249,10 +3249,35 @@ RoutinesAfterFadeOut:
 @next11:
     lda ActiveMapEntryIndex
     cmp #23
-    bne @next13
+    bne @next12
 
     lda #1
     sta InCave
+
+    lda #4
+    sta MapTilesetBankNo
+    lda #1
+    sta MustCopyMainChr
+    ;TODO: perhaps it would be good to create a table for location - palette
+    lda #<alien_palette
+    sta CurrentMapPalettePtr
+    lda #>alien_palette
+    sta CurrentMapPalettePtr + 1
+    ;---------------------
+    ;12. crashsite
+@next12:
+
+    lda ActiveMapEntryIndex
+    cmp #12
+    bne @next13
+
+
+    lda #0
+    sta MapTilesetBankNo
+    lda #1
+    sta MustCopyMainChr
+
+
     ;------------------------------
     ;16.crashsite exit to cave
 @next13:
@@ -3263,6 +3288,18 @@ RoutinesAfterFadeOut:
 
     lda #1
     sta InCave
+
+    lda #4
+    sta MapTilesetBankNo
+    lda #1
+    sta MustCopyMainChr
+    ;TODO: perhaps it would be good to create a table for location - palette
+    lda #<alien_palette
+    sta CurrentMapPalettePtr
+    lda #>alien_palette
+    sta CurrentMapPalettePtr + 1
+
+
     ;-------------------------
     ;13.cave exit to cave location
 @next14:
@@ -3272,6 +3309,9 @@ RoutinesAfterFadeOut:
 
     lda #2
     sta ScrollDirection
+
+    lda #1
+    sta MustCopyMainChr
 
     ;----------------------------
     ;18.granny's house
@@ -3307,16 +3347,10 @@ RoutinesAfterFadeOut:
     cmp #14
     bne @next20
 
-    lda #4
-    sta MapTilesetBankNo
-    lda #1
-    sta MustCopyMainChr
-    ;TODO: perhaps it would be good to create a table for location - palette
-    lda #<alien_palette
-    sta CurrentMapPalettePtr
-    lda #>alien_palette
-    sta CurrentMapPalettePtr + 1
+    lda #0
+    sta InCave
 
+    
     ;------------------------
     ;15.alien base entrance top
 @next20:
@@ -3324,16 +3358,9 @@ RoutinesAfterFadeOut:
     lda ActiveMapEntryIndex
     cmp #15
     bne @next21
+    lda #0
+    sta InCave
 
-    lda #4
-    sta MapTilesetBankNo
-    lda #<alien_palette
-    sta CurrentMapPalettePtr
-    lda #>alien_palette
-    sta CurrentMapPalettePtr + 1
-
-    lda #1
-    sta MustCopyMainChr
     ;--------------------
     ;20.alien base exit top
 @next21:
@@ -3344,7 +3371,6 @@ RoutinesAfterFadeOut:
 
     lda #1
     sta InCave
-    sta MustCopyMainChr
     ;--------------------------
     ;21.alien base exit bottom
 @next22:
@@ -3355,7 +3381,6 @@ RoutinesAfterFadeOut:
 
     lda #1
     sta InCave
-    sta MustCopyMainChr
 
 @next23:
 
