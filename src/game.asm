@@ -3258,11 +3258,6 @@ RoutinesAfterFadeOut:
     sta MapTilesetBankNo
     lda #1
     sta MustCopyMainChr
-    ;TODO: perhaps it would be good to create a table for location - palette
-    lda #<alien_palette
-    sta CurrentMapPalettePtr
-    lda #>alien_palette
-    sta CurrentMapPalettePtr + 1
     ;---------------------
     ;12. crashsite
 @next12:
@@ -3293,12 +3288,6 @@ RoutinesAfterFadeOut:
     sta MapTilesetBankNo
     lda #1
     sta MustCopyMainChr
-    ;TODO: perhaps it would be good to create a table for location - palette
-    lda #<alien_palette
-    sta CurrentMapPalettePtr
-    lda #>alien_palette
-    sta CurrentMapPalettePtr + 1
-
 
     ;-------------------------
     ;13.cave exit to cave location
@@ -3349,6 +3338,12 @@ RoutinesAfterFadeOut:
 
     lda #0
     sta InCave
+  ;TODO: perhaps it would be good to create a table for location - palette
+    lda #<alien_palette
+    sta CurrentMapPalettePtr
+    lda #>alien_palette
+    sta CurrentMapPalettePtr + 1
+
 
     
     ;------------------------
@@ -3360,6 +3355,12 @@ RoutinesAfterFadeOut:
     bne @next21
     lda #0
     sta InCave
+
+    lda #<alien_palette
+    sta CurrentMapPalettePtr
+    lda #>alien_palette
+    sta CurrentMapPalettePtr + 1
+
 
     ;--------------------
     ;20.alien base exit top
@@ -3838,7 +3839,7 @@ AdaptBackgroundPaletteByTime:
     beq @calc ; if not in cave, we need to use lookup table to get certain fade level
 
 
-    ldx #0 ; night time index
+    ldx #5 ; evening time index
     lda palette_fade_for_periods, x
     jmp @cont
 
