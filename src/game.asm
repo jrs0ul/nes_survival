@@ -3258,6 +3258,12 @@ RoutinesAfterFadeOut:
     sta InCave
 
 
+    lda #$08
+    sta BgColumnIdxToUpload
+    lda #2
+    sta ScrollDirection
+
+
     lda #4
     sta MapTilesetBankNo
     lda #1
