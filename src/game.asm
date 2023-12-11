@@ -66,6 +66,7 @@ main_tiles_chr2: .incbin "alien.chr"
 
 .include "data/maps/alien_base1.asm"
 .include "data/maps/alien_base2.asm"
+.include "data/maps/cave0.asm"
 .include "data/maps/cave1.asm"
 .include "data/maps/cave2.asm"
 
@@ -456,7 +457,7 @@ player_sprites_flip:
     OUTDOORS_LOC1_SCREEN_COUNT = 4
     OUTDOORS_LOC2_SCREEN_COUNT = 2
     OUTDOORS_LOC3_SCREEN_COUNT = 2
-    OUTDOORS_LOC7_SCREEN_COUNT = 2
+    OUTDOORS_LOC7_SCREEN_COUNT = 3 ; cave
     PLAYER_START_X             = $50
     PLAYER_START_Y             = 200
 
@@ -465,7 +466,6 @@ player_sprites_flip:
 
     DAMAGE_RED_BLINK_DURATION  = 5
     COLOR_RED                  = $16
-
 
     SCREEN_ROW_COUNT           = 30
 
@@ -1359,8 +1359,11 @@ RedCounter:
 EnteredBeforeNightfall:
     .res 1
 
+DetectedMapType:
+    .res 1
+
 Buffer:
-    .res 278  ;must see how much is still available
+    .res 277  ;must see how much is still available
 
 ;====================================================================================
 
@@ -3254,6 +3257,7 @@ RoutinesAfterFadeOut:
     lda #1
     sta InCave
 
+
     lda #4
     sta MapTilesetBankNo
     lda #1
@@ -3385,9 +3389,27 @@ RoutinesAfterFadeOut:
 
 @next23:
 
+    lda DetectedMapType
+    bne @itsAnIndoorMap
+    lda #1
+    sta MustLoadOutside
+    lda InVillagerHut  ;let's check if we previously were inside a villager house
+    beq @finish
+    lda #0              ;so we're leaving the villager house
+    sta InVillagerHut
+    lda #1
+    sta MustCopyMainChr
+
+    jmp @finish
+@itsAnIndoorMap:
+    lda #1
+    sta MustLoadHouseInterior
+
+@finish:
     jsr ResetNameTableAdresses
     lda #1
     sta MustLoadSomething ; activate location loading in NMI
+
 
     rts
 ;------------------------------
@@ -3466,20 +3488,8 @@ CommonLocationRoutine:
     sta CurrentMapSegmentIndex
     iny
     lda (pointer2), y ; is the location indoors or outdoors
-    bne @itsAnIndoorMap
-    lda #1
-    sta MustLoadOutside
-    lda InVillagerHut  ;let's check if we previously were inside a villager house
-    beq @loadMapptr
-    lda #0              ;so we're leaving the villager house
-    sta InVillagerHut
-    lda #1
-    sta MustCopyMainChr
+    sta DetectedMapType
 
-    jmp @loadMapptr
-@itsAnIndoorMap:
-    lda #1
-    sta MustLoadHouseInterior
 @loadMapptr:
     iny
     lda (pointer2), y ;indoor map address (lower byte)
@@ -4802,9 +4812,10 @@ ResetEntityVariables:
     sta MustLoadGameOverAfterFadeOut
     sta EquipedClothing
     sta EquipedClothing + 1
-
+    lda #1 ;COMMENT THIS OUT!
     sta Destructables
     sta Destructables + 1
+    lda #2 ;COMMENT THIS OUT!
     sta DestroyedTilesCount
 
     lda #PLAYER_START_X
