@@ -533,6 +533,7 @@ player_sprites_flip:
     ITEM_COUNT_LOC1            = 7
     ITEM_COUNT_LOC2            = 6
     ITEM_COUNT_LOC3            = 4
+    ITEM_COUNT_LOC7            = 2
     ITEM_COUNT_LOC8            = 1
 
     ITEM_NEVER_BEEN_PICKED     = 255
@@ -564,6 +565,7 @@ player_sprites_flip:
     NPC_TYPE_TIMID             = 0
     NPC_TYPE_PREDATOR          = 1
     NPC_TYPE_VILLAGER          = 2
+    NPC_TYPE_PASSIVE           = 3
 
     DIALOG_TEXT_LENGTH         = 96
 
@@ -1298,6 +1300,8 @@ Item_Location2_Collection_times:
     .res ITEM_COUNT_LOC2
 Item_Location3_Collection_times:
     .res ITEM_COUNT_LOC3
+Item_Location7_Collection_times:
+    .res ITEM_COUNT_LOC7
 Item_Location8_Collection_times:
     .res ITEM_COUNT_LOC8
 
@@ -1366,7 +1370,7 @@ InitiateCompleteItemRespawn:
     .res 1
 
 Buffer:
-    .res 276  ;must see how much is still available
+    .res 274  ;must see how much is still available
 
 ;====================================================================================
 

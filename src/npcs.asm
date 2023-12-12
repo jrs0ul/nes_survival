@@ -760,6 +760,8 @@ OnCollisionWithAttackRect:
     lda TempNpcType
     cmp #NPC_TYPE_VILLAGER
     beq @doneDoingDmg
+    cmp #NPC_TYPE_PASSIVE
+    beq @exit
 
     inc NpcsHitByPlayer
 
@@ -1654,7 +1656,12 @@ SingleNpcAI:
 @idleState:
     lda TempNpcType
     cmp #NPC_TYPE_VILLAGER
-    bne @moveNpc
+    beq @changeDir
+    cmp #NPC_TYPE_PASSIVE
+    beq @nextNpc
+    jmp @moveNpc
+
+@changeDir:
     jsr ChangeNpcDirection
     jmp @nextNpc
 @moveNpc:

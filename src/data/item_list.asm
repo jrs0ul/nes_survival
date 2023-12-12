@@ -7,8 +7,13 @@ House_items:
     .byte 0
 
 Crashsite_items:
-    .byte 1
+    .byte ITEM_COUNT_LOC8
     .byte %00100111, 0, 80, 96
+
+Cave_items:
+    .byte ITEM_COUNT_LOC7
+    .byte %00010001, 0, 56, 200 ;knife
+    .byte %00001101, 0, 80, 150 ;rock
 
 Outside1_items:
     .byte ITEM_COUNT_LOC1
