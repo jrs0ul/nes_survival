@@ -233,30 +233,44 @@ LocationBanks:
 
 ;indexes in Item_Location1_Collection_times
 LocationItemIndexes:
-    .byte 0
-    .byte ITEM_COUNT_LOC1
-    .byte ITEM_COUNT_LOC1 + ITEM_COUNT_LOC2
-    .byte ITEM_COUNT_LOC1 + ITEM_COUNT_LOC2 + ITEM_COUNT_LOC3
-    .byte ITEM_COUNT_LOC1 + ITEM_COUNT_LOC2 + ITEM_COUNT_LOC3
-    .byte ITEM_COUNT_LOC1 + ITEM_COUNT_LOC2 + ITEM_COUNT_LOC3
-    .byte ITEM_COUNT_LOC1 + ITEM_COUNT_LOC2 + ITEM_COUNT_LOC3
-    .byte ITEM_COUNT_LOC1 + ITEM_COUNT_LOC2 + ITEM_COUNT_LOC3
+    .byte 0                                                   ;0
+    .byte ITEM_COUNT_LOC1                                     ;1
+    .byte ITEM_COUNT_LOC1 + ITEM_COUNT_LOC2                   ;2
+    .byte ITEM_COUNT_LOC1 + ITEM_COUNT_LOC2 + ITEM_COUNT_LOC3 ;3
+    .byte ITEM_COUNT_LOC1 + ITEM_COUNT_LOC2 + ITEM_COUNT_LOC3 ;4
+    .byte ITEM_COUNT_LOC1 + ITEM_COUNT_LOC2 + ITEM_COUNT_LOC3 ;5
+    .byte ITEM_COUNT_LOC1 + ITEM_COUNT_LOC2 + ITEM_COUNT_LOC3 ;6
+    .byte ITEM_COUNT_LOC1 + ITEM_COUNT_LOC2 + ITEM_COUNT_LOC3 ;7 crashsite
     .byte 0
     .byte 0
     .byte 0
     .byte 0
 
 LocationItemCounts:
-    .byte ITEM_COUNT_LOC1
-    .byte ITEM_COUNT_LOC2
-    .byte ITEM_COUNT_LOC3
+    .byte ITEM_COUNT_LOC1  ; 0
+    .byte ITEM_COUNT_LOC2  ; 1
+    .byte ITEM_COUNT_LOC3  ; 2
+    .byte 0                ; 3
+    .byte 0                ; 4
+    .byte 0                ; 5
+    .byte 0                ; 6
+    .byte ITEM_COUNT_LOC8  ; 7 crashsite
     .byte 0
     .byte 0
     .byte 0
     .byte 0
-    .byte ITEM_COUNT_LOC8
-    .byte 0
-    .byte 0
-    .byte 0
-    .byte 0
+
+LocationsWithRespawnableItems:
+    .byte 1 ; 0
+    .byte 1 ; 1
+    .byte 1 ; 2
+    .byte 0 ; 3
+    .byte 0 ; 4
+    .byte 0 ; 5
+    .byte 0 ; 6
+    .byte 0 ; 7
+    .byte 0 ; 8
+    .byte 0 ; 9
+    .byte 0 ; 10
+    .byte 0 ; 11
 

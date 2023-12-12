@@ -27,6 +27,9 @@ LoadItems:
 
     sta Temp
 
+    lda LocationsWithRespawnableItems, y
+    beq @deactivatedItem
+
     lda Hours
     sec
     sbc Temp
@@ -254,6 +257,11 @@ ResetTimesWhenItemsWerePicked:
     dex
     stx TempItemLoadX
 
+    lda InitiateCompleteItemRespawn
+    bne @location_loop
+    lda LocationsWithRespawnableItems, y
+    beq @nextLocation
+
 @location_loop:
 
     lda LocationItemIndexes, y
@@ -277,7 +285,7 @@ ResetTimesWhenItemsWerePicked:
 ;-----------------------------------
 AddAndDeactivateItems:
 
-    sty TempY
+    sty TempY ; store item index
 
     ldy #0 
 @inventoryLoop:
@@ -306,10 +314,10 @@ AddAndDeactivateItems:
     ;let's store the time when the item was picked up
     ldy LocationIndex
     lda LocationItemCounts, y
-    beq @continueAdding; item is generated, not loaded
+    beq @continueAdding  ; item is generated, not loaded
     cmp TempY
     beq @continueAdding
-    bcc @continueAdding; also a generated item
+    bcc @continueAdding  ; also a generated item
 
     lda LocationItemIndexes, y
     clc

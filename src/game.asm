@@ -582,7 +582,7 @@ player_sprites_flip:
     FADE_DELAY_SLEEP           = 10
     MAX_VILLAGERS              = 3
 
-    MAX_LOCATIONS              = 6
+    MAX_LOCATIONS              = 11
 
     SUBMENU_FOOD               = 1
     SUBMENU_STASH_FOOD         = 2
@@ -1362,8 +1362,11 @@ EnteredBeforeNightfall:
 DetectedMapType:
     .res 1
 
+InitiateCompleteItemRespawn:
+    .res 1
+
 Buffer:
-    .res 277  ;must see how much is still available
+    .res 276  ;must see how much is still available
 
 ;====================================================================================
 
@@ -3262,6 +3265,8 @@ RoutinesAfterFadeOut:
     sta BgColumnIdxToUpload
     lda #2
     sta ScrollDirection
+    lda #$20
+    sta DestScreenAddr
 
 
     lda #4
@@ -3293,6 +3298,13 @@ RoutinesAfterFadeOut:
 
     lda #1
     sta InCave
+    lda #$08
+    sta BgColumnIdxToUpload
+    lda #2
+    sta ScrollDirection
+
+    lda #$20
+    sta DestScreenAddr
 
     lda #4
     sta MapTilesetBankNo
@@ -4818,10 +4830,10 @@ ResetEntityVariables:
     sta MustLoadGameOverAfterFadeOut
     sta EquipedClothing
     sta EquipedClothing + 1
-    lda #1 ;COMMENT THIS OUT!
+    ;lda #1 ;COMMENT THIS OUT!
     sta Destructables
     sta Destructables + 1
-    lda #2 ;COMMENT THIS OUT!
+    ;lda #2 ;COMMENT THIS OUT!
     sta DestroyedTilesCount
 
     lda #PLAYER_START_X
@@ -5057,6 +5069,9 @@ StartGame:
     ldy #0
     jsr bankswitch_y
 
+    lda #1
+    sta InitiateCompleteItemRespawn
+
     jsr ResetEntityVariables
 
 
@@ -5099,6 +5114,9 @@ StartGame:
     sta MustCopyMainChr
 
     jsr BuildRowTable
+
+    lda #0
+    sta InitiateCompleteItemRespawn
 
 
     rts
