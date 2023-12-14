@@ -2408,20 +2408,22 @@ ChangeNpcDirection:
 @exit:
 
     rts
-;-------------------------------
-SetDirectionsForPredatorNpc:
 
-    dex
-    lda Npcs, x; y
-    clc
-    adc #16
-    sta TempPointY
-    dex
+;------------------------------
+;preparation for direction change for predator npc
+;x reg value is at the x coordinate index of that npc
+PredatorDirectionChangePrep:
+
     lda Npcs, x; x
     clc
     adc #8
     sta TempPointX
-    inx ;y
+    inx
+    lda Npcs, x; y
+    clc
+    adc #16
+    sta TempPointY
+
     inx ;screen
     inx ;direction
 
@@ -2433,6 +2435,26 @@ SetDirectionsForPredatorNpc:
     lda #0
     sta TempDir
 
+    lda PlayerY
+    clc
+    adc #16
+    sta TempPlayerY2
+
+    lda PlayerY
+    clc
+    adc #8
+    sta PlayerCenterY
+
+    rts
+
+;-------------------------------
+SetDirectionsForPredatorNpc:
+
+    dex
+    dex ; x
+
+    jsr PredatorDirectionChangePrep
+
     lda TempPointX
     sec
     sbc ScrollX
@@ -2442,7 +2464,7 @@ SetDirectionsForPredatorNpc:
     bcc @compareY
     bcs @goLeft
 @goRight:
-    lda # 1
+    lda #1
     sta TempDir
     jmp @compareY
 @goLeft:
@@ -2450,19 +2472,10 @@ SetDirectionsForPredatorNpc:
     sta TempDir
 
 @compareY:
-    lda PlayerY
-    clc
-    adc #16
-    sta Temp
-    lda PlayerY
-    clc
-    adc #8
-    sta PlayerCenterY
-
     lda TempPointY
     cmp PlayerCenterY
     bcc @goDown ; bottom of npc should bump to center of player
-    cmp Temp
+    cmp TempPlayerY2
     bcs @goUp
     bcc @end
 @goDown:
@@ -2724,6 +2737,8 @@ OnCollisionWithPlayer:
     beq @timid
 
     ;---
+    jsr SetTheAttackDirection
+
     ldx NpcXPosition
     dex ;status
     lda Npcs, x
@@ -2761,6 +2776,54 @@ OnCollisionWithPlayer:
     lda #1
 @done:
     rts
+;---------------------
+;clear the diagonal direction and set it one of four directions for attack anim
+SetTheAttackDirection:
+
+    ldx NpcXPosition
+
+    jsr PredatorDirectionChangePrep
+
+
+    lda TempPointY
+    cmp PlayerCenterY
+    bcc @goDown ; bottom of npc should bump to center of player
+    cmp TempPlayerY2
+    bcs @goUp
+    bcc @compareX
+@goDown:
+    lda #%00001000
+    sta TempDir
+    jmp @compareX
+@goUp:
+    lda #%00000100
+    sta TempDir
+
+@compareX:
+    lda TempPointX
+    sec
+    sbc ScrollX
+    cmp PlayerX
+    bcc @goRight
+    cmp Temp
+    bcc @done
+    bcs @goLeft
+@goRight:
+    lda # 1
+    sta TempDir
+    jmp @done
+@goLeft:
+    lda #2
+    sta TempDir
+
+
+@done:
+
+    lda TempDir
+    sta Npcs, x
+
+    rts
+
 ;---------------------
 DamagePlayer:
 

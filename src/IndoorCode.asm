@@ -178,7 +178,39 @@ ShowThanksText:
     sta TextLength
 
     rts
+;---------------------------------
+FireplaceUpdate:
 
+    lda $2002
+    lda #$21
+    sta $2006
+    lda #$0E
+    sta $2006
+
+    lda Fuel
+    clc
+    adc Fuel + 1
+    adc Fuel + 2
+    cmp #0
+    beq @putFireOut
+    lda FireFrame
+    asl
+    sta Temp
+    lda #$5C
+    clc
+    adc Temp
+    sta $2007
+    adc #1
+    sta $2007
+    jmp @exit
+@putFireOut:
+    lda #0
+    sta $2007
+    sta $2007
+
+@exit:
+
+    rts
 
 ;---------------------------------
 SetupVillagerText:

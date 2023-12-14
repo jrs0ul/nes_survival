@@ -1138,6 +1138,9 @@ TempRegX:
 TempAnimIndex:
     .res 1
 
+TempPlayerY2: ;used for npc direction change callculation
+    .res 1
+
 ;inventory temps
 TempTileIndex:
     .res 1
@@ -1370,7 +1373,7 @@ InitiateCompleteItemRespawn:
     .res 1
 
 Buffer:
-    .res 274  ;must see how much is still available
+    .res 273  ;must see how much is still available
 
 ;====================================================================================
 
@@ -2012,32 +2015,9 @@ UpdateFireplace:
     lda InHouse
     beq @exit
 
-    lda $2002
-    lda #$21
-    sta $2006
-    lda #$0E
-    sta $2006
-
-    lda Fuel
-    clc
-    adc Fuel + 1
-    adc Fuel + 2
-    cmp #0
-    beq @putFireOut
-    lda FireFrame
-    asl
-    sta Temp
-    lda #$5C
-    clc
-    adc Temp
-    sta $2007
-    adc #1
-    sta $2007
-    jmp @exit
-@putFireOut:
-    lda #0
-    sta $2007
-    sta $2007
+    ldy #3
+    jsr bankswitch_y
+    jsr FireplaceUpdate
 
 @exit:
     rts
