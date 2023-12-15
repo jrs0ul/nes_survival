@@ -214,12 +214,6 @@ game_over_palette:
     .byte $0f,$0c,$11,$16,$0f,$0c,$35,$31,$0f,$0c,$16,$31,$0f,$0c,$11,$31
     .byte $0f,$30,$30,$30,$0f,$10,$10,$10,$0f,$30,$30,$30,$0f,$30,$30,$30
 
-snow_palette_frames: ;white and black
-    .byte $20, $0F
-    .byte $0F, $20
-snow_palette_frames_1: ; white and blue
-    .byte $20, $11
-    .byte $11, $20
 
 sprites:
     .byte $11, $FF, %00000000, $08   ; sprite 0 
@@ -1833,8 +1827,13 @@ famistudioupdate:
 @checkNewSample:
     lda MustPlaySample
     beq @checkNewSong
+    lda #3
+    jsr famistudio_music_play
+    lda #0
+    sta MustPlaySample
+    lda #255
+    sta SampleTimer
 
-    jsr SamplePlay
     jmp @doSoundUpdate
 
 @checkNewSong:
@@ -1854,15 +1853,6 @@ famistudioupdate:
 
     rts
 
-;----------------------------------
-SamplePlay:
-    lda #3
-    jsr famistudio_music_play
-    lda #0
-    sta MustPlaySample
-    lda #255
-    sta SampleTimer
-    rts
 
 ;---------------------------------
 RunSpriteUpdate:
@@ -1888,7 +1878,7 @@ doGameOver:
     ldy #5
     bankswitch
 
-    jsr UpdateGameOverSprites
+    jsr UpdateGameOverSprites ; bank 5
 
     ldy oldbank
     bankswitch
@@ -2007,8 +1997,6 @@ ResetNameTableAdresses:
 
 
     rts
-
-
 ;----------------------------------
 UpdateFireplace:
 
@@ -2166,7 +2154,7 @@ UpdateAttributeColumn:
     adc AttribColumnIdxToUpdate
     sta pointer
 
-    ldx #7 ;
+    ldx #8 ;
     lda #$C0
     clc
     adc AttribColumnIdxToUpdate
@@ -2425,12 +2413,9 @@ CheckEntryPoints:
 @exit:
     rts
 
-
-;-------------------------------
-UpdateFishingRod:
-    lda FishingRodActive
-    beq @exit
-
+;--------------------------------
+.segment "ROM1"
+FishingRodUpdate:
     lda FishingDelay
     beq @runtimer
 
@@ -2473,6 +2458,28 @@ UpdateFishingRod:
 
 
 @exit:
+
+
+    rts
+
+.segment "CODE"
+;-------------------------------
+UpdateFishingRod:
+    lda FishingRodActive
+    beq @exit
+
+    lda current_bank
+    sta oldbank
+    ldy #1
+    jsr bankswitch_y
+
+    jsr FishingRodUpdate
+
+    ldy oldbank
+    jsr bankswitch_y
+
+@exit:
+
     rts
 ;-------------------------------
 UpdateProjectiles:

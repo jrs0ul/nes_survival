@@ -1,4 +1,13 @@
 .segment "ROM5"
+
+snow_palette_frames: ;white and black
+    .byte $20, $0F
+    .byte $0F, $20
+snow_palette_frames_1: ; white and blue
+    .byte $20, $11
+    .byte $11, $20
+
+
 ;-----------------------------
 TitleLogics:
 
