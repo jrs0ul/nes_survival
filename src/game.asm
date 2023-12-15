@@ -2186,20 +2186,6 @@ UpdateAttributeColumn:
     bne @attribLoop
 
     rts
-;-----------------------------------
-ActivateYouWin:
-    lda PaletteFadeAnimationState
-    bne @exit
-    lda #1
-    sta PaletteFadeAnimationState
-    sta MustShowOutroAfterFadeout
-    lda #0
-    sta PaletteFadeTimer
-    sta FadeIdx
-    lda #FADE_DELAY_GENERIC
-    sta PaletteAnimDelay
-@exit:
-    rts
 
 ;-----------------------------------
 Logics:
@@ -2217,6 +2203,16 @@ Logics:
     rts
 
 @gameOn:
+
+    ;-----------
+    lda current_bank
+    sta oldbank
+    ldy #1
+    jsr bankswitch_y
+    ;----- switching to bank 1
+
+
+
     lda PlayerAlive
     bne @cont
 ;----activate fading out for the game over
@@ -2241,8 +2237,19 @@ Logics:
 
 @cont2:
 
-    jsr AnimateFire
+    dec FireFrameDelay
+    lda FireFrameDelay
+    bne @HpCheck
+    lda #FIRE_ANIMATION_DELAY
+    sta FireFrameDelay
+    inc FireFrame
+    lda FireFrame
+    cmp #2
+    bne @HpCheck
+    lda #0
+    sta FireFrame
 
+@HpCheck:
     lda HP
     clc
     adc HP + 1
@@ -2256,21 +2263,19 @@ Logics:
     jmp @doneLogics
 
 @checkFuel:
-    jsr DecreaseFuel
+    jsr DecreaseFuel ;bank 1
 @checkWarmth:
-    jsr WarmthLogics
+    jsr WarmthLogics ;bank 1
 @checkFood:
-    jsr FoodLogics
+    jsr FoodLogics   ;bank 1
 
-    jsr RunTime
-    jsr RestoreStamina
+    jsr RunTime        ; bank 1
+    jsr RestoreStamina ; bank 1
 
 
 @doneLogics:
 
-    jsr UpdateProjectiles
-    jsr UpdateSpear
-    jsr UpdateFishingRod
+    jsr UpdateFishingRod ; bank 1
 
     lda AttackTimer
     beq @noAttack
@@ -2283,13 +2288,39 @@ Logics:
     sta PlayerAnimationRowIndex
 @noAttack:
 
+    jsr CheckEntryPoints ; bank 1
 
-    jsr CheckEntryPoints
+    ;-----------------
+    ldy oldbank
+    jsr bankswitch_y
+    ;------------------
+
+    jsr UpdateProjectiles
+    jsr UpdateSpear
+
 
 @exit:
 
     rts
 ;------------------------------
+.segment "ROM1"
+
+ActivateYouWin:
+    lda PaletteFadeAnimationState
+    bne @exit
+    lda #1
+    sta PaletteFadeAnimationState
+    sta MustShowOutroAfterFadeout
+    lda #0
+    sta PaletteFadeTimer
+    sta FadeIdx
+    lda #FADE_DELAY_GENERIC
+    sta PaletteAnimDelay
+@exit:
+    rts
+
+
+;-----------------------------------
 RestoreStamina:
 
     lda FoodToStamina
@@ -2339,6 +2370,7 @@ RestoreStamina:
     rts
 
 ;------------------------------
+
 CheckEntryPoints:
 
 
@@ -2414,8 +2446,12 @@ CheckEntryPoints:
     rts
 
 ;--------------------------------
-.segment "ROM1"
-FishingRodUpdate:
+UpdateFishingRod:
+
+    lda FishingRodActive
+    beq @exit
+
+
     lda FishingDelay
     beq @runtimer
 
@@ -2463,24 +2499,6 @@ FishingRodUpdate:
     rts
 
 .segment "CODE"
-;-------------------------------
-UpdateFishingRod:
-    lda FishingRodActive
-    beq @exit
-
-    lda current_bank
-    sta oldbank
-    ldy #1
-    jsr bankswitch_y
-
-    jsr FishingRodUpdate
-
-    ldy oldbank
-    jsr bankswitch_y
-
-@exit:
-
-    rts
 ;-------------------------------
 UpdateProjectiles:
 
@@ -3809,37 +3827,6 @@ RotFood:
 
     rts
 
-;-------------------------------
-RunTime:
-
-    inc Minutes
-    lda Minutes
-    cmp #MINUTES_MAX
-    bcc @exit
-
-    lda #0
-    sta Minutes
-    inc Hours
-    lda Hours
-    cmp #HOURS_MAX
-    bcc @adaptPalette
-    lda #0
-    sta Hours
-    jsr ResetTimesWhenItemsWerePicked
-    jsr DoFoodSpoilage
-    jsr IncreaseDays
-
-@adaptPalette:
-    lda PaletteFadeAnimationState
-    bne @exit
-    lda #<RamPalette
-    sta PalettePtr
-    lda #>RamPalette
-    sta PalettePtr + 1
-    jsr AdaptBackgroundPaletteByTime
-
-@exit:
-    rts
 
 ;-------------------------------
 ;PalettePtr - where to store the modified palette
@@ -3902,6 +3889,41 @@ GetPaletteFadeValueForHour:
 
     rts
 ;-------------------------------
+.segment "ROM1"
+
+RunTime:
+
+    inc Minutes
+    lda Minutes
+    cmp #MINUTES_MAX
+    bcc @exit
+
+    lda #0
+    sta Minutes
+    inc Hours
+    lda Hours
+    cmp #HOURS_MAX
+    bcc @adaptPalette
+    lda #0
+    sta Hours
+    jsr ResetTimesWhenItemsWerePicked
+    jsr DoFoodSpoilage
+    jsr IncreaseDays
+
+@adaptPalette:
+    lda PaletteFadeAnimationState
+    bne @exit
+    lda #<RamPalette
+    sta PalettePtr
+    lda #>RamPalette
+    sta PalettePtr + 1
+    jsr AdaptBackgroundPaletteByTime
+
+@exit:
+    rts
+
+;-------------------------------
+
 WarmthLogics:
     dec WarmthDelay
     lda WarmthDelay
@@ -4016,6 +4038,8 @@ DecreaseFuel:
 @exit:
     rts
 
+
+.segment "CODE"
 ;-------------------------------
 DecreaseLife:
     lda #<HP
@@ -4105,22 +4129,6 @@ AnimateWalk:
     sta PlayerAnimationRowIndex
 @exit:
     rts
-;--------------------------------
-AnimateFire:
-    dec FireFrameDelay
-    lda FireFrameDelay
-    bne @exit
-    lda #FIRE_ANIMATION_DELAY
-    sta FireFrameDelay
-    inc FireFrame
-    lda FireFrame
-    cmp #2
-    bne @exit
-    lda #0
-    sta FireFrame
-@exit:
-    rts
-
 ;----------------------------------
 HandleInput:
 

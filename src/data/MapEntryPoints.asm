@@ -1,3 +1,5 @@
+.segment "ROM1"
+
 ;where you enter a new location
 ;----------------------------------
 ;location index, where this entry point is
