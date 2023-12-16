@@ -4325,7 +4325,7 @@ CalcMapColumnToUpdate:
     lda ScrollX
     lsr
     lsr
-    lsr             ;GlobalScroll / 8
+    lsr             ;ScrollX / 8
     cmp #16
     bcc @WriteToB
 ;Write to A

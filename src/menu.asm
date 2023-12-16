@@ -386,11 +386,23 @@ DrawFoodMenu:
     lda InHouse
     beq @outdoorsMenu
 
+    jsr IsFoodCooked
+    bne @foodIsCooked
+
     lda #<FoodMenuAtHome
     sta pointer
     lda #>FoodMenuAtHome
     sta pointer + 1
     jmp @startTransfer
+@foodIsCooked:
+    lda #<CookedFoodMenuAtHome
+    sta pointer
+    lda #>CookedFoodMenuAtHome
+    sta pointer + 1
+    lda #9
+    sta TempPointY
+    jmp @startTransfer
+
 
 @outdoorsMenu:
     lda #<FoodMenuOutdoors
@@ -432,6 +444,11 @@ DrawStashFoodMenu:
 
     lda #9
     sta TempPointX
+
+    jsr IsFoodCooked
+    bne @foodIsCooked
+
+
     lda #11
     sta TempPointY
 
@@ -439,6 +456,19 @@ DrawStashFoodMenu:
     sta pointer
     lda #>StashFoodMenu
     sta pointer + 1
+    jmp @transfer
+
+@foodIsCooked:
+
+    lda #9
+    sta TempPointY
+
+    lda #<StashCookedFoodMenu
+    sta pointer
+    lda #>StashCookedFoodMenu
+    sta pointer + 1
+
+@transfer:
 
     jsr TransferTiles
     beq @exit ; not fully transfered yet
@@ -1401,6 +1431,9 @@ FoodMenuInput:
     lda InHouse
     beq @smallestMenu
 
+    jsr IsFoodCooked
+    bne @smallerMenu
+
     lda #144
     jmp @saveLimit
 
@@ -1424,6 +1457,9 @@ FoodMenuInput:
 
     lda InHouse
     beq @OutdoorMenuHeight
+
+    jsr IsFoodCooked
+    bne @villagerMenuHeight ; cooked food menu same height as villager menu
 
     lda #4
     jmp @maxItem
@@ -1453,11 +1489,19 @@ FoodMenuInput:
     lda InHouse
     beq @outdoorInput
 
+    jsr IsFoodCooked
+    bne @cookedFoodInput
+
     jsr FoodMenuInputAtHome
     beq @exit
     jmp @hidemenu
 @outdoorInput:
     jsr FoodMenuInputOutdoors
+    beq @exit
+    jmp @hidemenu
+
+@cookedFoodInput:
+    jsr CookedFoodMenuInputAtHome
     beq @exit
     jmp @hidemenu
 
@@ -1552,6 +1596,43 @@ FoodMenuInputAtHome:
 
 @end:
     rts
+;------------------------------------
+CookedFoodMenuInputAtHome:
+    lda FoodMenuIndex
+    cmp #0
+    beq @Eat
+
+    cmp #1
+    bne @clearItem
+
+    lda StashActivated
+    beq @storeItem
+    jsr TakeItemFromStash
+    bne @exit
+    jmp @clearItem
+@storeItem:
+    jsr StoreItemInStash
+    bne @exit
+    jmp @clearItem
+@Eat:
+    jsr UseFood
+
+
+@clearItem:
+    jsr ClearThatItem
+
+    lda #1
+    jmp @end
+
+
+@exit:
+    lda #0
+
+
+@end:
+    rts
+
+
 ;------------------------------------
 ;food menu while visiting a villager
 FoodMenuInputVillager:
@@ -2571,6 +2652,37 @@ DoCooking:
 
 
     rts
+
+;-------------------------------------
+;TempItemIndex - item index
+;a - 1 -> yes
+IsFoodCooked:
+
+    lda TempItemIndex
+    cmp #ITEM_COOKED_MEAT
+    beq @yes
+    cmp #ITEM_COOKED_JUMBO_MEAT
+    beq @yes
+    cmp #ITEM_COOKED_FISH
+    beq @yes
+    cmp #ITEM_JAM
+    beq @yes
+    cmp #ITEM_PIE
+    beq @yes
+
+    jmp @no
+
+
+@yes:
+    lda #1
+    jmp @end
+@no:
+    lda #0
+@end:
+
+    rts
+
+
 ;--------------------------------------
 LoadSelectedItemStuff:
     lda InventoryItemIndex
