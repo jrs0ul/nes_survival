@@ -651,6 +651,9 @@ DrawMaterialMenu:
     lda InVillagerHut
     bne @villagermenu
 
+    lda InHouse
+    beq @outdoorsMenu
+
 
     lda #<MaterialMenu
     sta pointer
@@ -664,6 +667,16 @@ DrawMaterialMenu:
     sta pointer
     lda #>MaterialMenuVillager
     sta pointer + 1
+    jmp @transfertiles
+
+@outdoorsMenu:
+    lda #5
+    sta TempPointY
+    lda #<MaterialMenuOutdoors
+    sta pointer
+    lda #>MaterialMenuOutdoors
+    sta pointer + 1
+
 
 @transfertiles:
     jsr TransferTiles
@@ -1762,6 +1775,10 @@ MaterialMenuInput:
 
     lda #16
     sta MenuStep
+
+    lda InHouse
+    beq @CheckB
+
     lda #112
     sta MenuLowerLimit
     lda #96
@@ -1783,6 +1800,12 @@ MaterialMenuInput:
     jsr LoadSelectedItemStuff
     beq @exit
 
+    lda InHouse
+    bne @cont
+    lda InVillagerHut
+    beq @outdoor
+
+@cont:
     lda ItemMenuIndex
     bne @clearItem ; DROP
 
@@ -1830,6 +1853,7 @@ MaterialMenuInput:
 
     jsr SpawnRewardItem
 
+@outdoor:
 
 
 @clearItem:
