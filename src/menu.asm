@@ -586,7 +586,30 @@ DrawStashToolMenu:
 
 @exit:
     rts
+;-------------------------
+;TempItemIndex - item index
+;a - 1 -> yes
+CanItemBeUsedOutdoors:
 
+    lda TempItemIndex
+
+    cmp #ITEM_ROWAN_BERRIES
+    beq @yes
+    cmp #ITEM_RADIO
+    beq @yes
+
+
+    jmp @no
+
+@yes:
+    lda #1
+    jmp @end
+@no:
+    lda #0
+@end:
+
+
+    rts
 ;-------------------------
 DrawItemMenu:
     lda MustDrawItemMenu
@@ -606,14 +629,54 @@ DrawItemMenu:
     lda #9
     sta TempPointY
 
-    lda InVillagerHut
-    beq @regularMenu
 
+    lda InHouse
+    bne @regularMenu
+
+    lda InVillagerHut
+    beq @outdoors
+
+    jsr CanItemBeUsedOutdoors
+    bne @usableVillager
+
+    lda #7
+    sta TempPointY
+    lda #<MaterialMenuVillager
+    sta pointer
+    lda #>MaterialMenuVillager
+    sta pointer + 1
+    jmp @transfer
+
+@usableVillager:
     lda #<ItemMenuVillager
     sta pointer
     lda #>ItemMenuVillager
     sta pointer + 1
     jmp @transfer
+
+@outdoors:
+
+    jsr CanItemBeUsedOutdoors
+    bne @usable
+    ;can't be used
+    lda #5
+    sta TempPointY
+    lda #<MaterialMenuOutdoors
+    sta pointer
+    lda #>MaterialMenuOutdoors
+    sta pointer + 1
+    jmp @transfer
+
+
+@usable:
+    lda #7
+    sta TempPointY
+    lda #<ItemMenuOutdoors
+    sta pointer
+    lda #>ItemMenuOutdoors
+    sta pointer + 1
+    jmp @transfer
+
 
 @regularMenu:
     lda #<ItemMenu
@@ -1776,9 +1839,12 @@ MaterialMenuInput:
     lda #16
     sta MenuStep
 
+    lda InVillagerHut
+    bne @normal
     lda InHouse
     beq @CheckB
 
+@normal:
     lda #112
     sta MenuLowerLimit
     lda #96
@@ -2206,14 +2272,32 @@ ItemMenuInput:
     sta MenuStep
     lda #96
     sta MenuUpperLimit
-    lda #128
-    sta MenuLowerLimit
     lda #<ItemMenuIndex
     sta pointer
     lda #>ItemMenuIndex
     sta pointer + 1
-    lda #3
+
+    lda InHouse
+    bne @house
+    lda InVillagerHut
+    bne @house ;same amount of items
+
+    jsr CanItemBeUsedOutdoors
+    beq @CheckB
+
+    lda #112
+    sta MenuLowerLimit
+    lda #2 ; use, drop
     sta MenuMaxItem
+    jmp @updown
+
+@house:
+    lda #128
+    sta MenuLowerLimit
+
+    lda #3 ; use, store, drop
+    sta MenuMaxItem
+@updown:
     jsr MenuInputUpDownCheck
 
 @CheckB:
@@ -2224,6 +2308,20 @@ ItemMenuInput:
     jsr LoadSelectedItemStuff
     beq @exit
 
+    lda InHouse
+    bne @inHouse
+
+    jsr CanItemBeUsedOutdoors
+    bne @inHouse
+
+    lda InVillagerHut
+    beq @inHouse
+
+    lda ItemMenuIndex
+    bne @clearItem
+    jmp @give_item
+
+@inHouse:
     lda ItemMenuIndex
     bne @checkIfStash
     ;use
@@ -2238,20 +2336,24 @@ ItemMenuInput:
     lda TempIndex
     cmp #ITEM_TYPE_FUEL
     bne @medicine
-    lda InHouse
-    beq @exit
     jsr UseFuel
     jmp @clearItem
 @medicine:
     jsr UseMedicine
     jmp @clearItem
+;-
 @checkIfStash:
     cmp #1
     bne @clearItem ; go to DROP
 
-    lda InVillagerHut
-    beq @stashStuff ; not in a villager house
+    lda InHouse
+    bne @stashStuff
 
+
+    lda InVillagerHut
+    beq @clearItem ; not at home and not at villager, must be 'drop'
+@give_item:
+    ;'give'
     jsr GiveItem
     beq @exit
 
