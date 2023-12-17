@@ -107,7 +107,7 @@ MapSpawnPoint:
     .byte 100, 48, 2, OUTDOORS_LOC3_SCREEN_COUNT, <Outside3_items, >Outside3_items, 0, 0, 0
     .byte 0, 0, 0, 2, 0, 0, 0
     ;granny location
-    .byte 77, 42, 8, 2, <House_items, >House_items, 5,  0, 0
+    .byte 77, 42, 8, 2, <granny_location_items, >granny_location_items, 5,  0, 0
     .byte 0, 0, 0, 2, 0, 0, 0
     ;---------------------
     ;Bear's house entrance
@@ -164,7 +164,7 @@ MapSpawnPoint:
     .byte 1, <grannys_hut, >grannys_hut, 0, <villager3_npcs, >villager3_npcs, 0
     ;--------------------
     ;granny's house exit to the location 8
-    .byte 119, 126, 8, 2, <House_items, >House_items, 5, 154, 0
+    .byte 119, 126, 8, 2, <granny_location_items, >granny_location_items, 5, 154, 0
     .byte 0, 0, 0, 2, 0, 0, 0
     ;------------
     ;alien base exit top
@@ -243,7 +243,7 @@ LocationItemIndexes:
     .byte ITEM_COUNT_LOC1 + ITEM_COUNT_LOC2 + ITEM_COUNT_LOC3 ;5
     .byte ITEM_COUNT_LOC1 + ITEM_COUNT_LOC2 + ITEM_COUNT_LOC3 ;6
     .byte ITEM_COUNT_LOC1 + ITEM_COUNT_LOC2 + ITEM_COUNT_LOC3 + ITEM_COUNT_LOC7 ;7 crashsite
-    .byte 0
+    .byte ITEM_COUNT_LOC1 + ITEM_COUNT_LOC2 + ITEM_COUNT_LOC3 + ITEM_COUNT_LOC7 + ITEM_COUNT_LOC8
     .byte 0
     .byte 0
     .byte 0
@@ -257,7 +257,7 @@ LocationItemCounts:
     .byte 0                ; 5
     .byte ITEM_COUNT_LOC7  ; 6 cave
     .byte ITEM_COUNT_LOC8  ; 7 crashsite
-    .byte 0
+    .byte ITEM_COUNT_LOC9  ; 9 granny location
     .byte 0
     .byte 0
     .byte 0
@@ -272,7 +272,7 @@ LocationsWithRespawnableItems:
     .byte 0 ; 6
     .byte 0 ; 7
     .byte 0 ; 8
-    .byte 0 ; 9
+    .byte 1 ; 9 ; granny location
     .byte 0 ; 10
     .byte 0 ; 11
 

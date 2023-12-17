@@ -465,9 +465,9 @@ player_sprites_flip:
 
     CHARACTER_ZERO             = $30
 
-    MAX_WARMTH_DELAY_OUTSIDE   = $50 ; how fast you lose warmth
-    MAX_WARMTH_DELAY_INDOORS   = $10 ; how fast you gain warmth
-    MAX_FOOD_DELAY             = $70
+    MAX_WARMTH_DELAY_OUTSIDE   = 75 ; how fast you lose warmth
+    MAX_WARMTH_DELAY_INDOORS   = 16 ; how fast you gain warmth
+    MAX_FOOD_DELAY             = 125
     MAX_FUEL_DELAY             = $55
 
     DECREMENT_FOOD_DEFAULT     = $3
@@ -529,6 +529,7 @@ player_sprites_flip:
     ITEM_COUNT_LOC3            = 4
     ITEM_COUNT_LOC7            = 2
     ITEM_COUNT_LOC8            = 1
+    ITEM_COUNT_LOC9            = 1
 
     ITEM_NEVER_BEEN_PICKED     = 255
 
@@ -1301,6 +1302,8 @@ Item_Location7_Collection_times:
     .res ITEM_COUNT_LOC7
 Item_Location8_Collection_times:
     .res ITEM_COUNT_LOC8
+Item_Location9_Collection_times:
+    .res ITEM_COUNT_LOC9
 
 Npcs:   ;animals and stuff
     .res 128 ; max 16 npcs * 8 bytes:
@@ -1367,7 +1370,7 @@ InitiateCompleteItemRespawn:
     .res 1
 
 Buffer:
-    .res 273  ;must see how much is still available
+    .res 272  ;must see how much is still available
 
 ;====================================================================================
 
@@ -3345,6 +3348,8 @@ RoutinesAfterFadeOut:
     sta InVillagerHut
     lda #2
     sta VillagerIndex
+    jsr SpawnQuestItems
+    jsr SpawnSpecialItemOwnerReward
 
     ;-------------------------------
     ;19.exit from grannys house

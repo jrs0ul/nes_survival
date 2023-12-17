@@ -40,3 +40,7 @@ Outside3_items:
     .byte %00100001, 1, 180, 78
     .byte %00000011, 1, 80, 120
     .byte %00001001, 0, 160, 72
+
+granny_location_items:
+    .byte ITEM_COUNT_LOC9
+    .byte %00001001, 0, 184, 104

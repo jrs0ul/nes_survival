@@ -90,12 +90,12 @@ granny_quest_2:
     .byte $48,$48,$44,$00,$42,$4d,$00,$3f,$48,$4b,$00,$46,$3e,$5a,$00,$00
 
 granny_quest_3:
-    .byte $00,$00,$00,$00,$00,$00,$00,$00,$52,$48,$4e,$00,$44,$47,$48,$50
-    .byte $00,$50,$41,$3a,$4d,$5a,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
-    .byte $00,$00,$00,$42,$4d,$7d,$4c,$00,$4c,$4d,$42,$45,$45,$00,$3a,$00
-    .byte $3b,$42,$4d,$00,$3c,$41,$42,$45,$45,$52,$82,$82,$82,$00,$00,$00
-    .byte $00,$00,$00,$3c,$48,$4e,$45,$3d,$00,$52,$48,$4e,$00,$3b,$4b,$42
-    .byte $47,$40,$00,$3a,$47,$48,$4d,$41,$3e,$4b,$00,$00,$00,$00,$00,$00
+    .byte $00,$00,$00,$00,$3b,$4b,$42,$47,$40,$00,$4d,$41,$42,$4c,$00,$43
+    .byte $3a,$4b,$00,$4d,$48,$00,$46,$52,$00,$00,$00,$00,$00,$00,$00,$00
+    .byte $00,$00,$40,$4b,$3a,$47,$3d,$4c,$48,$47,$00,$3b,$43,$48,$4b,$47
+    .byte $82,$00,$41,$3e,$00,$45,$42,$4f,$3e,$4c,$00,$4d,$48,$00,$00,$00
+    .byte $00,$00,$4d,$41,$3e,$00,$47,$48,$4b,$4d,$41,$00,$3f,$4b,$48,$46
+    .byte $00,$41,$3e,$4b,$3e,$82,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
 
 ;=====================
 villager_bear_thanks_0: ;after cooked meat
@@ -189,6 +189,23 @@ granny_thanks_2:  ;thanks for fish -> how to make a rod
     .byte $00,$3f,$4b,$48,$46,$00,$4d,$50,$48,$00,$49,$42,$3e,$3c,$3e,$4c
     .byte $00,$48,$3f,$00,$40,$4b,$3a,$4c,$4c,$82,$00,$00,$00,$00,$00,$00
 
+granny_thanks_3:
+    .byte $00,$00,$00,$00,$00,$00,$00,$41,$3e,$4b,$3e,$7c,$00,$41,$3a,$4f
+    .byte $3e,$00,$4d,$41,$42,$4c,$00,$49,$42,$3e,$00,$00,$00,$00,$00,$00
+    .byte $00,$00,$00,$00,$00,$00,$3f,$48,$4b,$00,$52,$48,$4e,$4b,$00,$4d
+    .byte $4b,$48,$4e,$3b,$45,$3e,$4c,$59,$00,$00,$00,$00,$00,$00,$00,$00
+    .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
+    .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
+
+
+
+bjorn_thanks_special:
+   .byte $00,$00,$00,$00,$00,$00,$00,$52,$4e,$46,$59,$00,$42,$00,$45,$48
+   .byte $4f,$3e,$00,$4d,$41,$3e,$00,$43,$3a,$46,$00,$00,$00,$00,$00,$00
+   .byte $00,$00,$46,$52,$00,$40,$4b,$3a,$47,$47,$52,$00,$46,$3a,$44,$3e
+   .byte $4c,$59,$00,$41,$3e,$4b,$3e,$7c,$00,$4d,$3a,$44,$3e,$00,$00,$00
+   .byte $00,$00,$00,$4d,$41,$42,$4c,$00,$4c,$45,$42,$47,$40,$4c,$41,$48
+   .byte $4d,$00,$3a,$4c,$00,$3a,$00,$4b,$3e,$50,$3a,$4b,$3d,$59,$00,$00
 
 
 granny_thanks_special:
@@ -203,7 +220,7 @@ granny_thanks_special:
 
 .segment "ROM1"
 QuestSpritesCount:
-    .byte 0, 4, 4, 0,  0, 4, 0, 2,  2, 2, 0, 2
+    .byte 0, 4, 4, 0,  0, 4, 0, 2,  2, 2, 0, 0
 
 QuestSprites:
     .byte 0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
@@ -219,7 +236,7 @@ QuestSprites:
     .byte 200,  6, 0, 176, 200, 7, 0, 184, 0, 0, 0, 0, 0, 0, 0, 0
     .byte 200,  6, 0, 216, 200, 7, 0, 224, 0, 0, 0, 0, 0, 0, 0, 0
     .byte 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-    .byte 200,  6, 0, 216, 200, 7, 0, 224, 0, 0, 0, 0, 0, 0, 0, 0
+    .byte 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 
 
 .segment "RODATA"
@@ -227,7 +244,7 @@ QuestSprites:
 quest_items:
     .byte 0, 0, 0, 0
     .byte 0, 0, ITEM_PIE, 0
-    .byte 0, 0, 0, 0
+    .byte 0, 0, 0, ITEM_JAM
 
 
 .segment "ROM3"
@@ -279,7 +296,7 @@ thanks_list_low:
     .byte <granny_thanks_0
     .byte <granny_thanks_1
     .byte <granny_thanks_2
-    .byte <granny_thanks_0
+    .byte <granny_thanks_3
 
 thanks_list_high:
     .byte >villager_bear_thanks_0
@@ -295,16 +312,16 @@ thanks_list_high:
     .byte >granny_thanks_0
     .byte >granny_thanks_1
     .byte >granny_thanks_2
-    .byte >granny_thanks_0
+    .byte >granny_thanks_3
 
 
 special_thanks_list_low:
-    .byte 0
+    .byte <bjorn_thanks_special
     .byte 0
     .byte <granny_thanks_special
 
 special_thanks_list_high:
-    .byte 0
+    .byte >bjorn_thanks_special
     .byte 0
     .byte >granny_thanks_special
 
@@ -321,12 +338,12 @@ first_time_text: ;when player enters the hut for the first time
 .segment "ROM1" ; menu
 
 special_goal_items:
-    .byte 0                 ;Bjorn
+    .byte ITEM_JAM          ;Bjorn
     .byte 0                 ;Hedgehog
     .byte ITEM_PIE          ;Grandma
 
 special_reward_items:
-    .byte 0
+    .byte ITEM_SLINGSHOT
     .byte 0
     .byte ITEM_JAM
 
@@ -335,18 +352,18 @@ special_reward_items:
 goal_items_list:
     .byte ITEM_COOKED_MEAT, ITEM_SPEAR, ITEM_JAM, ITEM_COAT
     .byte ITEM_RAW_MEAT, ITEM_KNIFE, 255, ITEM_HIDE
-    .byte ITEM_STICK, ITEM_STICK, ITEM_COOKED_FISH, ITEM_STICK
+    .byte ITEM_STICK, ITEM_STICK, ITEM_COOKED_FISH, 255
 
 .segment "RODATA"
 reward_items_list:
     .byte 0, ITEM_HIDE, ITEM_FISHING_ROD, ITEM_HAMMER
     .byte 0, ITEM_ROWAN_BERRIES, ITEM_PIE, ITEM_COAT
-    .byte 0, ITEM_JAM, 0, 0
+    .byte 0, ITEM_JAM, 0, ITEM_PIE
 
 
 ;Villager Id, quest Id
 special_quests:
-    .byte 0, 0
-    .byte 0, 0
+    .byte 2, 3
+    .byte 0, 255
     .byte 1, 2
 
