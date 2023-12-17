@@ -529,13 +529,27 @@ DrawToolMenu:
     lda #9
     sta TempPointY
 
+
+    lda InHouse
+    bne @regularMenu
+
     lda InVillagerHut
-    beq @regularMenu
+    beq @outdoorMenu
 
     lda #<ToolMenuVillager
     sta pointer
     lda #>ToolMenuVillager
     sta pointer + 1
+    jmp @startTransfer
+
+@outdoorMenu:
+    lda #7
+    sta TempPointY
+    lda #<ToolMenuOutdoors
+    sta pointer
+    lda #>ToolMenuOutdoors
+    sta pointer + 1
+
     jmp @startTransfer
 
 
@@ -1941,14 +1955,28 @@ ToolInput:
     sta MenuStep
     lda #96
     sta MenuUpperLimit
-    lda #128
-    sta MenuLowerLimit
-    lda #<ItemMenuIndex
+     lda #<ItemMenuIndex
     sta pointer
     lda #>ItemMenuIndex
     sta pointer + 1
+
+    lda InHouse
+    bne @threeoptions
+    lda InVillagerHut
+    bne @threeoptions
+
+    lda #112
+    sta MenuLowerLimit
+    lda #2
+    sta MenuMaxItem
+    jmp @doInput
+
+@threeoptions:
+    lda #128
+    sta MenuLowerLimit
     lda #3
     sta MenuMaxItem
+@doInput:
     jsr MenuInputUpDownCheck
 
 @CheckB:
@@ -1964,12 +1992,19 @@ ToolInput:
     beq @exit
 
     lda InVillagerHut
-    beq @inputAtHome
+    beq @checkIfOutdoors
 
     jsr ToolMenuInputVillager
     jmp @exit
 
-@inputAtHome:
+@checkIfOutdoors:
+    lda InHouse
+    bne @atHome
+
+    jsr ToolMenuInputOutdoors
+    jmp @exit
+
+@atHome:
     jsr ToolMenuInputAtHome
     jmp @exit
 
@@ -2032,6 +2067,46 @@ ToolMenuInputAtHome:
 @exit:
 
     rts
+;-------------------------------------
+ToolMenuInputOutdoors:
+
+    lda ItemMenuIndex
+    bne @clearItem
+
+    lda TempIndex
+    cmp #ITEM_TYPE_CLOTHING
+    beq @equipClothes
+
+    lda #<EquipedItem
+    sta pointer
+    lda #>EquipedItem
+    sta pointer + 1
+    jsr EquipItem
+    beq @hidemenu ;return 0
+    jmp @clearItem ;return 1
+
+@equipClothes:
+    lda #<EquipedClothing
+    sta pointer
+    lda #>EquipedClothing
+    sta pointer + 1
+    jsr EquipItem
+    beq @hidemenu ;return 0
+    jmp @clearItem ;return 1
+
+@clearItem:
+    jsr ClearThatItem
+
+
+@hidemenu:
+    jsr HideSubMenu
+
+@exit:
+
+
+    rts
+
+
 ;-------------------------------------
 ToolMenuInputVillager:
 
