@@ -3624,11 +3624,8 @@ OnExitVillagerHut:
 @special:
     lda #0
     sta SpecialItemIGave
-    dex
-    txa
-    lsr
-    tay
-    dey ; y - 1
+
+    ldy VillagerIndex
     lda #0
     sta TakenQuestItems, y
 @cont:
