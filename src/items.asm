@@ -356,7 +356,6 @@ AddAndDeactivateItems:
     bne @exit
 
     ldy VillagerIndex
-    sty SpecialItemOwner
     sta TakenQuestItems, y
 
 @exit:

@@ -891,8 +891,6 @@ SpecialItemIGave:
     .res 1
 SpecialItemReceiver:
     .res 1
-SpecialItemOwner:
-    .res 1
 
 Inventory:
     .res INVENTORY_MAX_SIZE
@@ -1370,7 +1368,7 @@ InitiateCompleteItemRespawn:
     .res 1
 
 Buffer:
-    .res 272  ;must see how much is still available
+    .res 273  ;must see how much is still available
 
 ;====================================================================================
 
@@ -3614,7 +3612,7 @@ OnExitVillagerHut:
     bne @next
     inx
     lda special_quests, x
-    cmp Temp
+    cmp Temp ; compare with active villager quest
     beq @special
 
 @next:
@@ -3626,6 +3624,13 @@ OnExitVillagerHut:
 @special:
     lda #0
     sta SpecialItemIGave
+    dex
+    txa
+    lsr
+    tay
+    dey ; y - 1
+    lda #0
+    sta TakenQuestItems, y
 @cont:
     lda #0
     sta ItemIGave
@@ -3736,8 +3741,8 @@ SpawnSpecialItemOwnerReward:
     beq @exit
 
     ldy VillagerIndex
-    cpy SpecialItemOwner
-    bne @exit
+    lda TakenQuestItems, y
+    beq @exit
     tya
     asl
     asl
@@ -4818,7 +4823,6 @@ ResetEntityVariables:
     sta ItemIGave
     sta SpecialItemIGave
     sta SpecialItemReceiver
-    sta SpecialItemOwner
     sta PaletteFadeAnimationState
     sta FadeIdx
     sta PaletteFadeTimer
