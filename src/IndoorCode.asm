@@ -239,16 +239,17 @@ SetupVillagerText:
     lda ItemIGave
     bne @thanks
 
-    lda SpecialItemIGave
-    beq @regular_quest      ;no special items were given
 
-    ;item was given
+    ldy VillagerIndex
+    lda SpecialItemReceivers, y ;did this villager receive the special item
+    bne @specialthanks
 
-    lda VillagerIndex
-    cmp SpecialItemReceiver ;did this villager receive the special item
-    beq @specialthanks
-
-    ;did this villager own the special item
+    ;was this villager the owner of the special item, that you delivered ?
+    ldy VillagerIndex
+    lda special_receivers, y
+    tay
+    lda SpecialItemReceivers, y
+    beq @regular_quest ;not delivered anything
     ldy VillagerIndex
     lda TakenQuestItems, y
     bne @thanks

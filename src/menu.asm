@@ -2213,8 +2213,7 @@ SpawnRewardItem:
 ;------------------------------------
 SpawnSpecialReward:
 
-    sta SpecialItemIGave
-
+    sta Temp
     lda special_reward_items, y
     beq @no_item
     asl
@@ -2235,8 +2234,9 @@ SpawnSpecialReward:
     lda #1
     sta MustExitMenuState
 
-    lda VillagerIndex
-    sta SpecialItemReceiver
+    ldy VillagerIndex
+    lda Temp
+    sta SpecialItemReceivers, y
 
 
     rts

@@ -367,3 +367,8 @@ special_quests:
     .byte 0, 255
     .byte 1, 2
 
+special_receivers:
+    .byte 255
+    .byte 2
+    .byte 0
+

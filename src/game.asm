@@ -887,10 +887,8 @@ EquipedClothing:
 
 ItemIGave:
     .res 1  ;item index i gave to villager
-SpecialItemIGave:
-    .res 1
-SpecialItemReceiver:
-    .res 1
+SpecialItemReceivers:
+    .res MAX_VILLAGERS
 
 Inventory:
     .res INVENTORY_MAX_SIZE
@@ -1368,7 +1366,7 @@ InitiateCompleteItemRespawn:
     .res 1
 
 Buffer:
-    .res 273  ;must see how much is still available
+    .res 272  ;must see how much is still available
 
 ;====================================================================================
 
@@ -3594,7 +3592,12 @@ CommonLocationRoutine:
 OnExitVillagerHut:
     lda ItemIGave
     bne @cont
-    lda SpecialItemIGave
+
+    ldy VillagerIndex
+
+    lda special_receivers, y
+    tay
+    lda SpecialItemReceivers, y
     beq @exit
 
     ldy VillagerIndex
@@ -3622,12 +3625,17 @@ OnExitVillagerHut:
     bcs @exit
 
 @special:
-    lda #0
-    sta SpecialItemIGave
 
     ldy VillagerIndex
     lda #0
     sta TakenQuestItems, y
+    dex
+    txa
+    lsr
+    tax
+    lda #0
+    sta SpecialItemReceivers, x
+
 @cont:
     lda #0
     sta ItemIGave
@@ -3734,7 +3742,11 @@ SpawnQuestItems:
 SpawnSpecialItemOwnerReward:
 
 
-    lda SpecialItemIGave
+
+    ldy VillagerIndex
+    lda special_receivers, y
+    tay
+    lda SpecialItemReceivers, y
     beq @exit
 
     ldy VillagerIndex
@@ -4818,8 +4830,9 @@ ResetEntityVariables:
     sta PlayerWins
     sta FoodToStamina
     sta ItemIGave
-    sta SpecialItemIGave
-    sta SpecialItemReceiver
+    sta SpecialItemReceivers
+    sta SpecialItemReceivers + 1
+    sta SpecialItemReceivers + 2
     sta PaletteFadeAnimationState
     sta FadeIdx
     sta PaletteFadeTimer
@@ -6637,7 +6650,9 @@ UpdateVillagerDialogSprites:
 
     lda ItemIGave
     bne @exit ;works for the quest dialogs so far
-    lda SpecialItemIGave
+    
+    ldy VillagerIndex
+    lda SpecialItemReceivers, y
     bne @exit
 
     lda MustUpdateTextBaloon
