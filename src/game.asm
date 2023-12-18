@@ -3161,6 +3161,12 @@ RoutinesAfterFadeOut:
     cmp #4
     bne @next2
 
+    lda #0
+    sta VillagerIndex
+    lda #1
+    sta InVillagerHut
+    sta MustRestartIndoorsMusic
+
     jsr GetPaletteFadeValueForHour
     cmp #DAYTIME_NIGHT
     bne @skip_night
@@ -3173,15 +3179,11 @@ RoutinesAfterFadeOut:
     lda #>Hut_npcs_night
     sta pointer + 1
     jsr LoadNpcs
+    jmp @next2
 
 @skip_night:
 
-    lda #0
-    sta VillagerIndex
-
     lda #1
-    sta MustRestartIndoorsMusic
-    sta InVillagerHut
     sta EnteredBeforeNightfall
     ;------------------------------------
     ;9.Bjorn's house exit

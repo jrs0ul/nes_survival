@@ -1758,6 +1758,11 @@ FoodMenuInputVillager:
 
     ldx TempRegX
 
+    ldy VillagerIndex
+    lda SpecialItemReceivers, y
+    bne @exit
+
+
     lda VillagerIndex
     tay
     asl
@@ -1909,7 +1914,7 @@ MaterialMenuInput:
     bne @continue
 
     jsr GetPaletteFadeValueForHour
-    cmp #$40
+    cmp #DAYTIME_NIGHT
     bne @continue
 
     lda VillagerIndex
@@ -1919,6 +1924,10 @@ MaterialMenuInput:
     bne @exit ; already gave an item
 
     ldx TempRegX
+
+    ldy VillagerIndex
+    lda SpecialItemReceivers, y
+    bne @exit
 
     lda VillagerIndex
     tay
@@ -2146,8 +2155,12 @@ ToolMenuInputVillager:
     bne @continue
 
     jsr GetPaletteFadeValueForHour
-    cmp #$40
+    cmp #DAYTIME_NIGHT
     bne @continue
+
+    ldy VillagerIndex
+    lda SpecialItemReceivers, y
+    bne @exit
 
     lda VillagerIndex
     beq @exit  ; no giving at night to bear
@@ -2307,12 +2320,16 @@ GiveItem:
     bne @continue
 
     jsr GetPaletteFadeValueForHour
-    cmp #$40
+    cmp #DAYTIME_NIGHT
     bne @continue
-
     lda VillagerIndex
     beq @exit  ; no giving at night to bear
 @continue:
+    
+    ldy VillagerIndex
+    lda SpecialItemReceivers, y
+    bne @exit
+
     lda ItemIGave
     bne @exit ; already gave item
 
