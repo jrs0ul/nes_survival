@@ -1742,64 +1742,8 @@ FoodMenuInputVillager:
 
     ;give item
 
-    lda EnteredBeforeNightfall
-    bne @continue
-
-    jsr GetPaletteFadeValueForHour
-    cmp #DAYTIME_NIGHT
-    bne @continue
-
-    lda VillagerIndex
-    beq @exit ;can't give item to a bear at night
-
-@continue:
-    lda ItemIGave
-    bne @exit ; already gave an item
-
-    ldx TempRegX
-
-    ldy VillagerIndex
-    lda SpecialItemsDelivered, y
-    bne @exit
-
-
-    lda VillagerIndex
-    tay
-    asl
-    asl ; villager index * 4
-    clc
-    adc ActiveVillagerQuests, y
-    tay
-    lda Inventory, x
-    cmp goal_items_list, y
-    beq @reward
-
-    lda VillagerIndex
-    asl
-    tay
-    lda special_quests, y ;the person
-    sta TempSpearX
-    iny
-    lda special_quests, y ;the quest index of that person
-    sta TempFrame
-    ldy TempSpearX ; that person index
-    lda ActiveVillagerQuests, y
-    cmp TempFrame
-    bne @exit
-
-
-    ldy VillagerIndex
-    lda Inventory, x
-    cmp special_goal_items, y
-    beq @special_reward
-    jmp @exit
-
-@reward:
-    jsr SpawnRewardItem
-    jmp @clear
-
-@special_reward:
-    jsr SpawnSpecialReward
+    jsr GiveItem
+    beq @exit
 
 @clear:
     jsr ClearThatItem
@@ -1908,39 +1852,8 @@ MaterialMenuInput:
     jmp @clearItem
 
 @giveItem:
-    stx TempRegX
-
-    lda EnteredBeforeNightfall
-    bne @continue
-
-    jsr GetPaletteFadeValueForHour
-    cmp #DAYTIME_NIGHT
-    bne @continue
-
-    lda VillagerIndex
-    beq @exit ;can't give item to a bear at night
-@continue:
-    lda ItemIGave
-    bne @exit ; already gave an item
-
-    ldx TempRegX
-
-    ldy VillagerIndex
-    lda SpecialItemsDelivered, y
-    bne @exit
-
-    lda VillagerIndex
-    tay
-    asl
-    asl ; villager index * 4
-    clc
-    adc ActiveVillagerQuests, y
-    tay
-    lda Inventory, x
-    cmp goal_items_list, y
-    bne @exit
-
-    jsr SpawnRewardItem
+    jsr GiveItem
+    beq @hidemenu
 
 @outdoor:
 
@@ -2148,41 +2061,8 @@ ToolMenuInputVillager:
     cmp #1
     bne @clearItem ; DROP
 
-
-    stx TempRegX
-
-    lda EnteredBeforeNightfall
-    bne @continue
-
-    jsr GetPaletteFadeValueForHour
-    cmp #DAYTIME_NIGHT
-    bne @continue
-
-    ldy VillagerIndex
-    lda SpecialItemsDelivered, y
-    bne @exit
-
-    lda VillagerIndex
-    beq @exit  ; no giving at night to bear
-@continue:
-    lda ItemIGave
-    bne @exit ; already gave item
-
-    ldx TempRegX
-    lda VillagerIndex
-    tay
-    asl
-    asl
-    clc
-    adc ActiveVillagerQuests, y
-    tay
-    lda Inventory, x
-    cmp goal_items_list, y
-    bne @exit
-
-
-    jsr SpawnRewardItem
-
+    jsr GiveItem
+    beq @hidemenu
 
 @clearItem:
     jsr ClearThatItem
@@ -2250,6 +2130,8 @@ SpawnSpecialReward:
     ldy VillagerIndex
     lda Temp
     sta SpecialItemsDelivered, y
+    lda #1
+    sta CompletedSpecialQuests, y
 
 
     rts
@@ -2322,32 +2204,72 @@ GiveItem:
     jsr GetPaletteFadeValueForHour
     cmp #DAYTIME_NIGHT
     bne @continue
+
     lda VillagerIndex
     beq @exit  ; no giving at night to bear
-@continue:
-    
-    ldy VillagerIndex
-    lda SpecialItemsDelivered, y
-    bne @exit
 
+@continue:
+
+    ldy VillagerIndex
+    lda ActiveVillagerQuests, y
+    cmp #MAX_QUEST - 1
+    bcc @con
+
+    lda CompletedSpecialQuests, y
+    bne @con
+
+    ;jmp @special_check
+
+@con:
     lda ItemIGave
     bne @exit ; already gave item
 
     ldx TempRegX
+
+    ldy VillagerIndex
+    lda SpecialItemsDelivered, y
+    bne @exit
+
     lda VillagerIndex
     tay
     asl
-    asl
+    asl ; villager index * 4
     clc
     adc ActiveVillagerQuests, y
     tay
     lda Inventory, x
     cmp goal_items_list, y
+    beq @reward
+
+@special_check:
+    lda VillagerIndex
+    asl
+    tay
+    lda special_quests, y ;the person
+    sta TempSpearX
+    iny
+    lda special_quests, y ;the quest index of that person
+    sta TempFrame
+    ldy TempSpearX ; that person index
+    lda ActiveVillagerQuests, y
+    cmp TempFrame
     bne @exit
 
+    ldy VillagerIndex
+    lda Inventory, x
+    cmp special_goal_items, y
+    beq @special_reward
+    jmp @exit
 
+
+@reward:
     jsr SpawnRewardItem
 
+    lda #1
+    jmp @done
+
+@special_reward:
+    jsr SpawnSpecialReward
     lda #1
     jmp @done
 
