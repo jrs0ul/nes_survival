@@ -326,6 +326,42 @@ special_thanks_list_high:
     .byte >granny_thanks_special
 
 
+specialQuestReminders_low:
+    .byte <bjorn_specialQuestReminder
+    .byte <hedge_specialQuestReminder
+    .byte <granny_specialQuestReminder
+
+specialQuestReminders_high:
+    .byte >bjorn_specialQuestReminder
+    .byte >hedge_specialQuestReminder
+    .byte >granny_specialQuestReminder
+
+
+bjorn_specialQuestReminder:
+    .byte $00,$00,$00,$00,$00,$42,$00,$50,$48,$47,$3d,$3e,$4b,$00,$50,$41
+    .byte $3a,$4d,$00,$40,$4b,$3a,$47,$47,$52,$00,$00,$00,$00,$00,$00,$00
+    .byte $00,$41,$3a,$4c,$00,$3b,$3e,$3e,$47,$00,$4e,$49,$00,$4d,$48,$82
+    .byte $00,$46,$3a,$52,$3b,$3e,$00,$4c,$41,$3e,$00,$46,$3a,$3d,$3e,$00
+    .byte $00,$4c,$48,$46,$3e,$4d,$41,$42,$47,$40,$00,$4d,$3a,$4c,$4d,$52
+    .byte $00,$3f,$48,$4b,$00,$46,$3e,$00,$5a,$5a,$00,$00,$00,$00,$00,$00
+
+hedge_specialQuestReminder:
+    .byte $00,$00,$00,$00,$3c,$48,$4e,$45,$3d,$00,$52,$48,$4e,$00,$49,$45
+    .byte $3e,$3a,$4c,$3e,$00,$45,$48,$48,$44,$00,$3f,$48,$4b,$00,$00,$00
+    .byte $00,$46,$52,$00,$47,$3e,$42,$40,$41,$3b,$48,$4b,$5a,$00,$42,$7d
+    .byte $46,$00,$4c,$4e,$4b,$3e,$00,$41,$3e,$00,$50,$3e,$47,$4d,$00,$00
+    .byte $00,$4d,$48,$00,$4d,$41,$3a,$4d,$00,$3d,$3a,$46,$47,$00,$3c,$3a
+    .byte $4f,$3e,$00,$4d,$48,$00,$4d,$41,$3e,$00,$47,$48,$4b,$4d,$41,$00
+
+granny_specialQuestReminder:
+    .byte $00,$00,$00,$42,$00,$3b,$3e,$45,$42,$3e,$4f,$3e,$00,$46,$52,$00
+    .byte $40,$4b,$3a,$47,$3d,$00,$3d,$3a,$4e,$40,$41,$4d,$3e,$4b,$00,$00
+    .byte $00,$50,$3a,$47,$4d,$3e,$3d,$00,$4d,$48,$00,$3b,$4b,$42,$47,$40
+    .byte $00,$46,$3e,$00,$4c,$48,$46,$3e,$4d,$41,$42,$47,$40,$82,$00,$00
+    .byte $00,$3c,$48,$4e,$45,$3d,$00,$52,$48,$4e,$00,$4f,$42,$4c,$42,$4d
+    .byte $00,$41,$3e,$4b,$00,$3a,$47,$3d,$00,$4c,$3e,$3e,$00,$5a,$00,$00
+
+
 
 first_time_text: ;when player enters the hut for the first time
     .byte $00,$00,$00,$00,$00,$00,$00,$47,$48,$3b,$48,$3d,$52,$7d,$4c,$00

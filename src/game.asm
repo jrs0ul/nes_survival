@@ -887,7 +887,7 @@ EquipedClothing:
 
 ItemIGave:
     .res 1  ;item index i gave to villager
-SpecialItemReceivers:
+SpecialItemsDelivered:
     .res MAX_VILLAGERS
 
 Inventory:
@@ -940,6 +940,8 @@ VillagerIndex:
 ActiveVillagerQuests:
     .res MAX_VILLAGERS
 TakenQuestItems:
+    .res MAX_VILLAGERS
+CompletedSpecialQuests: ; 1 if items is taken from sender, delivered and reward is taken from sender
     .res MAX_VILLAGERS
 
 
@@ -1366,7 +1368,7 @@ InitiateCompleteItemRespawn:
     .res 1
 
 Buffer:
-    .res 272  ;must see how much is still available
+    .res 269  ;must see how much is still available
 
 ;====================================================================================
 
@@ -3599,7 +3601,7 @@ OnExitVillagerHut:
 
     lda special_receivers, y
     tay
-    lda SpecialItemReceivers, y
+    lda SpecialItemsDelivered, y
     beq @exit
 
     ldy VillagerIndex
@@ -3636,7 +3638,7 @@ OnExitVillagerHut:
     lsr
     tax
     lda #0
-    sta SpecialItemReceivers, x
+    sta SpecialItemsDelivered, x
 
 @cont:
     lda #0
@@ -3748,7 +3750,7 @@ SpawnSpecialItemOwnerReward:
     ldy VillagerIndex
     lda special_receivers, y
     tay
-    lda SpecialItemReceivers, y
+    lda SpecialItemsDelivered, y
     beq @exit
 
     ldy VillagerIndex
@@ -4832,9 +4834,13 @@ ResetEntityVariables:
     sta PlayerWins
     sta FoodToStamina
     sta ItemIGave
-    sta SpecialItemReceivers
-    sta SpecialItemReceivers + 1
-    sta SpecialItemReceivers + 2
+    sta SpecialItemsDelivered
+    sta SpecialItemsDelivered + 1
+    sta SpecialItemsDelivered + 2
+    sta CompletedSpecialQuests
+    sta CompletedSpecialQuests + 1
+    sta CompletedSpecialQuests + 2
+
     sta PaletteFadeAnimationState
     sta FadeIdx
     sta PaletteFadeTimer
@@ -6654,7 +6660,7 @@ UpdateVillagerDialogSprites:
     bne @exit ;works for the quest dialogs so far
     
     ldy VillagerIndex
-    lda SpecialItemReceivers, y
+    lda SpecialItemsDelivered, y
     bne @exit
 
     lda MustUpdateTextBaloon
@@ -6680,6 +6686,19 @@ UpdateVillagerDialogSprites:
     jmp @exit
 
 @updateSprites:
+
+    ldy VillagerIndex
+    lda ActiveVillagerQuests, y
+    cmp #MAX_QUEST - 1
+    bcc @continue_update
+
+    lda CompletedSpecialQuests, y
+    bne @continue_update
+    jmp @exit
+
+@continue_update:
+
+
     lda VillagerIndex
     tay
     asl
@@ -6700,23 +6719,7 @@ UpdateVillagerDialogSprites:
 
 @spriteLoop:
 
-    lda QuestSprites, y
-    sta FIRST_SPRITE, x
-    inx
-    iny
-    lda QuestSprites, y
-    sta FIRST_SPRITE, x
-    inx
-    iny
-    lda QuestSprites, y
-    sta FIRST_SPRITE, x
-    inx
-    iny
-    lda QuestSprites, y
-    sta FIRST_SPRITE, x
-    inx
-    iny
-
+    jsr SingleDialogSpriteUpdate
 
     inc TempSpriteCount
 
@@ -6724,6 +6727,28 @@ UpdateVillagerDialogSprites:
     bne @spriteLoop
 
 @exit:
+
+    rts
+;-----------------------------------
+SingleDialogSpriteUpdate:
+
+    lda QuestSprites, y
+    sta FIRST_SPRITE, x
+    inx
+    iny
+    lda QuestSprites, y
+    sta FIRST_SPRITE, x
+    inx
+    iny
+    lda QuestSprites, y
+    sta FIRST_SPRITE, x
+    inx
+    iny
+    lda QuestSprites, y
+    sta FIRST_SPRITE, x
+    inx
+    iny
+
 
     rts
 ;-----------------------------------

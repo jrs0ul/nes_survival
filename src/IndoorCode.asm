@@ -239,37 +239,37 @@ SetupVillagerText:
     lda ItemIGave
     bne @thanks
 
+   
 
     ldy VillagerIndex
-    lda SpecialItemReceivers, y ;did this villager receive the special item
+    lda SpecialItemsDelivered, y ;did this villager receive the special item
     bne @specialthanks
 
     ;was this villager the owner of the special item, that you delivered ?
     ldy VillagerIndex
     lda special_receivers, y
     tay
-    lda SpecialItemReceivers, y
+    lda SpecialItemsDelivered, y
     beq @regular_quest ;not delivered anything
     ldy VillagerIndex
     lda TakenQuestItems, y
     bne @thanks
 
 @regular_quest:
-    lda VillagerIndex
-    tay
-    asl
-    asl ; index * 4
-    clc
-    adc ActiveVillagerQuests, y
-    tax
 
-    lda quest_list_low, x
-    sta TextPtr
-    lda quest_list_high, x
-    sta TextPtr + 1
-    lda #DIALOG_TEXT_LENGTH
-    sta TextLength
+    ldy VillagerIndex
+    lda ActiveVillagerQuests, y
+    cmp #MAX_QUEST - 1
+    bcc @continue_regular
 
+    lda CompletedSpecialQuests, y
+    bne @continue_regular
+
+    jsr SpecialQuestReminder
+    jmp @exit
+
+@continue_regular:
+    jsr RegularQuestText
 
     jmp @exit
 
@@ -311,6 +311,37 @@ SetupVillagerText:
     sta TextLength
 
 @exit:
+    rts
+;------------------------------
+RegularQuestText:
+    lda VillagerIndex
+    tay
+    asl
+    asl ; index * 4
+    clc
+    adc ActiveVillagerQuests, y
+    tax
+
+    lda quest_list_low, x
+    sta TextPtr
+    lda quest_list_high, x
+    sta TextPtr + 1
+    lda #DIALOG_TEXT_LENGTH
+    sta TextLength
+
+    rts
+;---------------------------------------
+SpecialQuestReminder:
+
+    ldy VillagerIndex
+
+    lda specialQuestReminders_low, y
+    sta TextPtr
+    lda specialQuestReminders_high, y
+    sta TextPtr + 1
+    lda #DIALOG_TEXT_LENGTH
+    sta TextLength
+
     rts
 
 ;---------------------------------------

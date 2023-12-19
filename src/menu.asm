@@ -1759,7 +1759,7 @@ FoodMenuInputVillager:
     ldx TempRegX
 
     ldy VillagerIndex
-    lda SpecialItemReceivers, y
+    lda SpecialItemsDelivered, y
     bne @exit
 
 
@@ -1926,7 +1926,7 @@ MaterialMenuInput:
     ldx TempRegX
 
     ldy VillagerIndex
-    lda SpecialItemReceivers, y
+    lda SpecialItemsDelivered, y
     bne @exit
 
     lda VillagerIndex
@@ -2159,7 +2159,7 @@ ToolMenuInputVillager:
     bne @continue
 
     ldy VillagerIndex
-    lda SpecialItemReceivers, y
+    lda SpecialItemsDelivered, y
     bne @exit
 
     lda VillagerIndex
@@ -2249,7 +2249,7 @@ SpawnSpecialReward:
 
     ldy VillagerIndex
     lda Temp
-    sta SpecialItemReceivers, y
+    sta SpecialItemsDelivered, y
 
 
     rts
@@ -2327,7 +2327,7 @@ GiveItem:
 @continue:
     
     ldy VillagerIndex
-    lda SpecialItemReceivers, y
+    lda SpecialItemsDelivered, y
     bne @exit
 
     lda ItemIGave
