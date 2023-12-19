@@ -208,6 +208,16 @@ bjorn_thanks_special:
    .byte $4d,$00,$3a,$4c,$00,$3a,$00,$4b,$3e,$50,$3a,$4b,$3d,$59,$00,$00
 
 
+hedge_thanks_special:
+   .byte $00,$00,$00,$00,$00,$00,$00,$52,$4e,$46,$59,$00,$42,$00,$45,$48
+   .byte $4f,$3e,$00,$4d,$41,$3e,$00,$43,$3a,$46,$00,$00,$00,$00,$00,$00
+   .byte $00,$00,$46,$52,$00,$40,$4b,$3a,$47,$47,$52,$00,$46,$3a,$44,$3e
+   .byte $4c,$59,$00,$41,$3e,$4b,$3e,$7c,$00,$4d,$3a,$44,$3e,$00,$00,$00
+   .byte $00,$00,$00,$4d,$41,$42,$4c,$00,$4c,$45,$42,$47,$40,$4c,$41,$48
+   .byte $4d,$00,$3a,$4c,$00,$3a,$00,$4b,$3e,$50,$3a,$4b,$3d,$59,$00,$00
+
+
+
 granny_thanks_special:
     .byte $00,$00,$00,$00,$00,$00,$4d,$41,$42,$4c,$00,$46,$4e,$4c,$4d,$00
     .byte $41,$3a,$4f,$3e,$00,$3b,$3e,$3e,$47,$00,$00,$00,$00,$00,$00,$00
@@ -317,12 +327,12 @@ thanks_list_high:
 
 special_thanks_list_low:
     .byte <bjorn_thanks_special
-    .byte 0
+    .byte <hedge_thanks_special
     .byte <granny_thanks_special
 
 special_thanks_list_high:
     .byte >bjorn_thanks_special
-    .byte 0
+    .byte >hedge_thanks_special
     .byte >granny_thanks_special
 
 
@@ -375,7 +385,7 @@ first_time_text: ;when player enters the hut for the first time
 
 special_goal_items:
     .byte ITEM_JAM          ;Bjorn
-    .byte 0                 ;Hedgehog
+    .byte ITEM_LETTER       ;Hedgehog
     .byte ITEM_PIE          ;Grandma
 
 special_reward_items:

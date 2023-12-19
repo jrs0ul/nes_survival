@@ -519,6 +519,7 @@ player_sprites_flip:
     ITEM_WOOD_HAMMER           = 21
     ITEM_SLINGSHOT             = 22
     ITEM_PIE                   = 23
+    ITEM_LETTER                = 24
 
     PROJECTILE_SPEED           = 3
 
@@ -527,7 +528,7 @@ player_sprites_flip:
     ITEM_COUNT_LOC1            = 7
     ITEM_COUNT_LOC2            = 6
     ITEM_COUNT_LOC3            = 4
-    ITEM_COUNT_LOC7            = 2
+    ITEM_COUNT_LOC7            = 3
     ITEM_COUNT_LOC8            = 1
     ITEM_COUNT_LOC9            = 1
 
@@ -1368,7 +1369,7 @@ InitiateCompleteItemRespawn:
     .res 1
 
 Buffer:
-    .res 269  ;must see how much is still available
+    .res 268  ;must see how much is still available
 
 ;====================================================================================
 

@@ -12,8 +12,9 @@ Crashsite_items:
 
 Cave_items:
     .byte ITEM_COUNT_LOC7
-    .byte %00010001, 0, 56, 200 ;knife
-    .byte %00001101, 0, 80, 150 ;rock
+    .byte %00010001, 0, 56, 200 ; knife
+    .byte %00001101, 0, 80, 150 ; rock
+    .byte %00110001, 0, 48, 180 ; letter
 
 Outside1_items:
     .byte ITEM_COUNT_LOC1
