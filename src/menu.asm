@@ -2130,10 +2130,26 @@ SpawnSpecialReward:
     ldy VillagerIndex
     lda Temp
     sta SpecialItemsDelivered, y
+
+    
+    tya
+    asl
+    tay
+    lda special_quests, y
+    cmp VillagerIndex
+    beq @completed
+
+    
+
+    jmp @exit
+
+
+@completed:
     lda #1
+    ldy VillagerIndex
     sta CompletedSpecialQuests, y
 
-
+@exit:
     rts
 
 

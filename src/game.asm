@@ -3758,6 +3758,17 @@ GetItemIdForTheQuest:
 SpawnQuestItems:
 
     ldy VillagerIndex
+    
+    lda ActiveVillagerQuests, y
+    cmp #MAX_QUEST - 1
+    bcc @cont
+
+    lda CompletedSpecialQuests, y
+    bne @cont
+
+    jmp @exit
+
+@cont:
 
     lda TakenQuestItems, y
     bne @exit
@@ -3816,6 +3827,12 @@ SpawnSpecialItemOwnerReward:
 
     lda #1
     sta ItemCount
+
+    ldy VillagerIndex
+    lda special_receivers, y
+    tay
+    lda #1
+    sta CompletedSpecialQuests, y
 
 @exit:
     rts

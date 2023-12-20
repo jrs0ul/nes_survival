@@ -389,7 +389,7 @@ special_goal_items:
 special_reward_items:
     .byte ITEM_SLINGSHOT
     .byte 0
-    .byte ITEM_JAM
+    .byte ITEM_COOKED_JUMBO_MEAT
 
 
 

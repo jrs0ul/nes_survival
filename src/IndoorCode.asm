@@ -265,6 +265,7 @@ SetupVillagerText:
     lda CompletedSpecialQuests, y
     bne @continue_regular
 
+    ;let's block the regular quests ant remind about a special quest
     jsr SpecialQuestReminder
     jmp @exit
 
