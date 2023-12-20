@@ -2218,7 +2218,7 @@ GiveItem:
     lda CompletedSpecialQuests, y
     bne @con
 
-    ;jmp @special_check
+    jmp @special_check
 
 @con:
     lda ItemIGave
@@ -2242,6 +2242,7 @@ GiveItem:
     beq @reward
 
 @special_check:
+    ldx TempRegX
     lda VillagerIndex
     asl
     tay

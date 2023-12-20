@@ -1368,8 +1368,11 @@ DetectedMapType:
 InitiateCompleteItemRespawn:
     .res 1
 
+DontIncrementQuestNumber:
+    .res 1
+
 Buffer:
-    .res 268  ;must see how much is still available
+    .res 267  ;must see how much is still available
 
 ;====================================================================================
 
@@ -3596,21 +3599,51 @@ CommonLocationRoutine:
 ;-------------------------------
 OnExitVillagerHut:
     lda ItemIGave
-    bne @cont
+    bne @cont ; increment quest only if the regular item was given
 
-    ldy VillagerIndex
-
-    lda special_receivers, y
-    tay
-    lda SpecialItemsDelivered, y
-    beq @exit
+    lda #0
+    sta DontIncrementQuestNumber
 
     ldy VillagerIndex
     lda ActiveVillagerQuests, y
-    sta Temp
+    sta Temp ; store villager quest number
 
+
+    ;what if this npc is his own receiver?
+    lda VillagerIndex
+    asl
+    tay
+    lda special_quests, y
+    cmp VillagerIndex
+    bne @checkIfDifferentReceiver
+    iny
+    lda special_quests, y ; quest number
+    cmp Temp
+    bne @checkIfDifferentReceiver
+
+    lda VillagerIndex
+    asl
+    tax
+    inx
+    lda #1
+    sta DontIncrementQuestNumber
+    ldy VillagerIndex
+    lda SpecialItemsDelivered, y
+    bne @special
+
+
+@checkIfDifferentReceiver:
+    ;check if an item was delivered to a receiver of this npc
+    ldy VillagerIndex
+    lda special_receivers, y
+    tay
+    lda SpecialItemsDelivered, y
+    beq @exit ; nope, the quest was not completed
+
+   
     ldy #0
 
+    ;does the active quest number match the number from the list ?
 @villagerloop:
     tya
     asl
@@ -3640,6 +3673,10 @@ OnExitVillagerHut:
     tax
     lda #0
     sta SpecialItemsDelivered, x
+
+    lda DontIncrementQuestNumber
+    bne @exit
+
 
 @cont:
     lda #0
