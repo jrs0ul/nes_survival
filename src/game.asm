@@ -5854,6 +5854,17 @@ CalcTileAddressInFrontOfPlayer:
 CanCastRodHere:
     ;let's check if I can throw there
 
+    lda InHouse
+    bne @exit
+    lda InVillagerHut
+    bne @exit
+    lda InCave
+    bne @exit
+
+    lda LocationIndex
+    cmp #LOCATION_ALIEN_BASE
+    beq @exit
+
     jsr CalcTileAddressInFrontOfPlayer
 
     lda (pointer), y

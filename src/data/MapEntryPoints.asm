@@ -33,7 +33,7 @@ MapEntryPoints:
     ;7.Exit point of third location
     .byte 2, 0, 0, 255, 0, 255, 0,   20
     ;8.Second villager's house
-    .byte 2, 0, 118, 122, 48, 66, 122, 142
+    .byte 2, 0, 118, 122, 126, 129, 122, 142
     ;------------------------
     ;9.Bjorn's house exit
     .byte 3, 0, 0, 255, 0, 255, 152, 255
@@ -136,7 +136,7 @@ MapSpawnPoint:
     .byte 0, 0, 0, 3, 0, 0, 0
     ;-----------------
     ;Second villager house's exit
-    .byte 119, 151, 2, OUTDOORS_LOC3_SCREEN_COUNT, <Outside3_items, >Outside3_items, 0, 57, 0
+    .byte 119, 151, 2, OUTDOORS_LOC3_SCREEN_COUNT, <Outside3_items, >Outside3_items, 0, 128, 0
     .byte 0, 0, 0, 2, 0, 0, 0
     ;---------------
     ;entrance to place where the plane is
