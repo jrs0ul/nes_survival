@@ -118,6 +118,7 @@ game_over_sprites:
 
 .include "data/maps/field2_bg.asm"
 .include "data/maps/field2_bg1.asm"
+.include "data/maps/crashsite0.asm"
 .include "data/maps/crashsite.asm"
 .include "data/maps/babloc1.asm"
 .include "data/maps/babloc2.asm"

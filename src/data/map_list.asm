@@ -36,8 +36,8 @@ map_list_low:
     .byte <cave2
     .byte 0
 
+    .byte <crashsite0
     .byte <crashsite
-    .byte 0
     .byte 0
     .byte 0
 
@@ -100,8 +100,8 @@ map_list_high:
     .byte >cave2
     .byte 0
 
+    .byte >crashsite0
     .byte >crashsite
-    .byte 0
     .byte 0
     .byte 0
 

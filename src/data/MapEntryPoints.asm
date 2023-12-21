@@ -140,7 +140,7 @@ MapSpawnPoint:
     .byte 0, 0, 0, 2, 0, 0, 0
     ;---------------
     ;entrance to place where the plane is
-    .byte 57, 210, 7, 1, <Crashsite_items, >Crashsite_items, 5, 0, 0
+    .byte 57, 210, 7, 2, <Crashsite_items, >Crashsite_items, 5, 0, 0
     .byte 0, 0, 0, 0, 0, 0, 0
     ;cave exit to cave location
     .byte 144, 63, 11, 1, <House_items, >House_items, 5, 0, 0
@@ -195,7 +195,7 @@ LocationScreenCountList:
     .byte 1                          ; 4 Player's house
     .byte 1                          ; 5 Hedgehog
     .byte OUTDOORS_LOC7_SCREEN_COUNT ; 6 cave
-    .byte 1                          ; 7 crashsite
+    .byte 2                          ; 7 crashsite
     .byte 2                          ; 8 granny location
     .byte 1                          ; 9 granny's hut
     .byte 2                          ; 10 alien base
