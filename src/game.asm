@@ -2057,11 +2057,12 @@ UpdateDestructableTiles:
     rts
 
 ;--------------------------------------------
+;BgColumnIdxToUpload - column to be updated from ROM
 ;Check and upload background columns from rom map to the PPU
 UploadBgColumns:
 
     lda ScreenCount
-    cmp #2
+    cmp #3
     bcc @exit
 
     lda LocationIndex

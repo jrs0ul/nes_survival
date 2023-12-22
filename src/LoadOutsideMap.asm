@@ -51,10 +51,6 @@ LoadOutsideMap:
 
     ;Load Nametable 2
 
-    lda #$00
-    sta $2000
-    sta $2001
-
     ldy CurrentMapSegmentIndex
     iny ; map index + 1
 
@@ -77,6 +73,8 @@ LoadOutsideMap:
     lda ScreenCount
     cmp #3
     bcc @loadRest ; stuff bellow is not needed if there are 2 screens max
+
+;    jsr LoadTilesForScrollPosition
 
     lda BgColumnIdxToUpload
     cmp #16
@@ -115,7 +113,7 @@ LoadOutsideMap:
     jsr ReloadLowerColumnRange_movingLeft
 @justLowerRight:
     jsr ReloadLowerColumnRange_movingRight
-;*******
+;*****************************************
 
 @loadRest:
     jsr LoadStatusBar
@@ -157,6 +155,23 @@ LoadOutsideMap:
 
     rts
 ;-----------------------------------
+LoadTilesForScrollPosition:
+
+    lda ScrollDirection
+    cmp #1
+    bne @movingRight
+
+@movingLeft:
+
+
+
+@movingRight:
+
+
+
+    rts
+
+;----------------------------------
 ;TempY - map segment index
 CalcMapAddress:
 
