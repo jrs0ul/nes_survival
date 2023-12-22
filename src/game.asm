@@ -2109,7 +2109,7 @@ UploadBgColumns:
     lda pointer2
     sta $2006
 
-    ldx #SCREEN_ROW_COUNT - 5 ; skip two rows that are invisible anyway and 3 for HUD
+    ldx #SCREEN_ROW_COUNT - 4 ; skip 4 status bar rows (2 are invisible for NTSC)
     ldy #128  ;  skip four rows
 @loop:
     lda (pointer), y
@@ -3235,8 +3235,6 @@ RoutinesAfterFadeOut:
     cmp #7
     bne @next9
 
-    lda #28
-    sta BgColumnIdxToUpload
     lda #2
     sta ScrollDirection
     ;------------------------------------------
@@ -3262,8 +3260,6 @@ RoutinesAfterFadeOut:
     cmp #11
     bne @next11
 
-    lda #23
-    sta BgColumnIdxToUpload
     lda #2
     sta ScrollDirection
 
@@ -3278,14 +3274,8 @@ RoutinesAfterFadeOut:
     lda #1
     sta InCave
 
-
-    lda #$08
-    sta BgColumnIdxToUpload
     lda #2
     sta ScrollDirection
-    lda #$20
-    sta DestScreenAddr
-
 
     lda #4
     sta MapTilesetBankNo
@@ -3316,13 +3306,9 @@ RoutinesAfterFadeOut:
 
     lda #1
     sta InCave
-    lda #$08
-    sta BgColumnIdxToUpload
+
     lda #2
     sta ScrollDirection
-
-    lda #$20
-    sta DestScreenAddr
 
     lda #4
     sta MapTilesetBankNo
@@ -3364,8 +3350,6 @@ RoutinesAfterFadeOut:
     cmp #19
     bne @next19
 
-    lda #3
-    sta BgColumnIdxToUpload
     lda #2
     sta ScrollDirection
 
@@ -3447,6 +3431,7 @@ RoutinesAfterFadeOut:
     jsr ResetNameTableAdresses
     lda #1
     sta MustLoadSomething ; activate location loading in NMI
+    jsr CalcMapColumnToUpdate
 
 
     rts
@@ -4398,7 +4383,13 @@ ResetPlayerXMovement:
 
     rts
 
+;-----------------------------
+;Calculates depending on ScrollX and ScrollDirection:
 
+;  BgColumnIdxToUpload;     - tile column to update
+;  AttribColumnIdxToUpdate; - attribute column to update
+;  DestScreenAddr;          - which nametable to use (20 or 24)
+;  SourceMapIdx;            - map screen ID from ROM
 ;--------------------------------
 CalcMapColumnToUpdate:
 
@@ -4430,6 +4421,7 @@ CalcMapColumnToUpdate:
     sta SourceMapIdx
     ldx FirstNametableAddr
     jmp @storeIdx
+
 @WriteToB:
     clc
     adc #16
