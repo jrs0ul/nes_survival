@@ -789,6 +789,7 @@ OldScrollDirection:
 NametableAddress:
     .res 1
 
+
 OldPlayerX:
     .res 1
 OldPlayerY:
@@ -1371,6 +1372,9 @@ InitiateCompleteItemRespawn:
 
 DontIncrementQuestNumber:
     .res 1
+
+
+
 
 Buffer:
     .res 267  ;must see how much is still available
@@ -2063,8 +2067,11 @@ UploadBgColumns:
 
     lda ScreenCount
     cmp #3
-    bcc @exit
+    bcs @bigmap
 
+    rts
+
+@bigmap:
     lda LocationIndex
     asl
     asl
@@ -2072,8 +2079,11 @@ UploadBgColumns:
 
     lda SourceMapIdx
     cmp ScreenCount
-    bcs @exit
+    bcc @doUpdates
 
+    rts
+
+@doUpdates:
     tya
     clc
     adc SourceMapIdx
@@ -2096,7 +2106,6 @@ UploadBgColumns:
     sta pointer2
     lda DestScreenAddr
     sta pointer2 + 1
-    
 
     lda #0
     sta $2001
@@ -2131,14 +2140,7 @@ UploadBgColumns:
     lda PPUCTRL ; restore normal ppu addressing
     sta $2000
 
-;update attributes
-    jsr UpdateAttributeColumn
-
-@exit:
-    rts
-;--------------------------------------------
-UpdateAttributeColumn:
-
+;update attributes===========================
     lda LocationIndex
     asl
     asl
@@ -2154,7 +2156,6 @@ UpdateAttributeColumn:
     adc #$3
     sta pointer + 1
 
-@start:
 
     lda pointer
     clc
@@ -2192,6 +2193,8 @@ UpdateAttributeColumn:
     dex
     bne @attribLoop
 
+
+@exit:
     rts
 
 ;-----------------------------------
@@ -3370,8 +3373,6 @@ RoutinesAfterFadeOut:
     lda #>alien_palette
     sta CurrentMapPalettePtr + 1
 
-
-    
     ;------------------------
     ;15.alien base entrance top
 @next20:

@@ -74,8 +74,6 @@ LoadOutsideMap:
     cmp #3
     bcc @loadRest ; stuff bellow is not needed if there are 2 screens max
 
-;    jsr LoadTilesForScrollPosition
-
     lda BgColumnIdxToUpload
     cmp #16
     bcc @lowerRange
@@ -152,22 +150,6 @@ LoadOutsideMap:
     sta PaletteFadeAnimationState
     lda #PALETTE_FADE_MAX_ITERATION
     sta FadeIdx
-
-    rts
-;-----------------------------------
-LoadTilesForScrollPosition:
-
-    lda ScrollDirection
-    cmp #1
-    bne @movingRight
-
-@movingLeft:
-
-
-
-@movingRight:
-
-
 
     rts
 
@@ -319,20 +301,8 @@ ReloadUpperColumnRange_movingLeft:
     beq @exit
     sec
     sbc #1
-    tay
-    
-    lda map_list_low, y
-    sta pointer
-    lda map_list_high, y
-    sta pointer + 1
 
-
-    lda DestScreenAddr
-    sta Temp ;upper address
-    lda #0
-    sta TempY ;lower address
-
-    ldx #30 ; rows
+    jsr UpperColumnRange_prepair
 
     lda #32
     sec
@@ -401,6 +371,25 @@ MovingLeft_PreRowLoop:
     ldy #0
 
     rts
+;----------------------------------
+;y - screen index
+UpperColumnRange_prepair:
+
+    tay
+    lda map_list_low, y
+    sta pointer
+    lda map_list_high, y
+    sta pointer + 1
+
+    lda DestScreenAddr
+    sta Temp ;upper address
+    lda #0
+    sta TempY ;lower address
+
+    ldx #30 ; rows
+
+
+    rts
 
 ;-----------------------------------
 ReloadUpperColumnRange_movingRight:
@@ -409,19 +398,8 @@ ReloadUpperColumnRange_movingRight:
     lda CurrentMapSegmentIndex
     clc
     adc #1
-    tay
-    lda map_list_low, y
-    sta pointer
-    lda map_list_high, y
-    sta pointer + 1
 
-
-    lda DestScreenAddr
-    sta Temp ;upper address
-    lda #0
-    sta TempY ;lower address
-
-    ldx #30 ; rows
+    jsr UpperColumnRange_prepair
 
     lda BgColumnIdxToUpload
     sec
@@ -480,4 +458,5 @@ ReloadUpperColumnRange_movingRight:
 
 
     rts
+;----------------------------------------------------
 
