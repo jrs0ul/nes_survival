@@ -271,6 +271,8 @@ ReloadUpperColumnRange_movingRight:
     lda CurrentMapSegmentIndex
     clc
     adc #1
+    cmp ScreenCount
+    bcs @exit
 
     jsr PrepairDestAndSource
 
@@ -292,6 +294,7 @@ ReloadUpperColumnRange_movingRight:
     adc #1
     jsr CopyAttributes
 
+@exit:
     rts
 
 ;-----------------------------------
@@ -299,6 +302,23 @@ ReloadUpperColumnRange_movingRight:
 CopyAttributes:
 
     tay
+
+    lda TempPointX
+    lsr
+    lsr
+    sta TempPointX ; TempPointX = TempPointX / 4
+
+    lda TempZ
+    lsr
+    lsr
+    sta TempZ
+
+    lda TempPreRowLoopValue
+    lsr
+    lsr
+    sta TempPreRowLoopValue
+
+
     lda map_list_low, y
     clc
     adc #$C0
@@ -320,6 +340,28 @@ CopyAttributes:
 
 @rowLoop:
 
+    lda pointer
+    clc
+    adc TempPreRowLoopValue
+    sta pointer
+    bcs @inc_high_Src_Addr
+    jmp @screen_addr
+
+@inc_high_Src_Addr:
+    inc pointer + 1
+
+@screen_addr:
+
+    lda TempY
+    clc
+    adc TempPreRowLoopValue
+    sta TempY
+    bcs @increase
+    jmp @continue
+@increase:
+    inc Temp ; increese screen high adr
+
+@continue:
     lda $2002
     lda Temp
     sta $2006
@@ -333,8 +375,30 @@ CopyAttributes:
     lda (pointer), y
     sta $2007
 
-    iny ;??
+    iny
+    cpy TempPointX
+    bcc @loop
 
+    ;next attribute row
+
+    lda pointer
+    clc 
+    adc TempZ
+    sta pointer
+    bcs @incrementHighPtr
+    jmp @incrementDest
+@incrementHighPtr:
+    inc pointer + 1
+
+@incrementDest:
+    lda TempY
+    clc
+    adc TempZ
+    sta TempY
+    cmp #0
+    bne @done
+    inc Temp
+@done:
 
 
     dex
