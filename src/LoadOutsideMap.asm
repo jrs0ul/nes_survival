@@ -185,6 +185,9 @@ ReloadLowerColumnRange_movingRight:
 
     jsr PrepairDestAndSource
 
+    lda #SCREEN_COLUMN_COUNT
+    sta TempZ
+
 @lowerRangeRowLoop:  ;---------loop
     lda $2002
     lda Temp  ;high
@@ -201,22 +204,7 @@ ReloadLowerColumnRange_movingRight:
     cpy BgColumnIdxToUpload
     bcc @lowerRangeLoop
 
-    lda pointer
-    clc
-    adc #SCREEN_COLUMN_COUNT
-    sta pointer
-    cmp #0
-    bne @incrementDest
-    inc pointer + 1
-@incrementDest:
-    lda TempY
-    clc
-    adc #SCREEN_COLUMN_COUNT
-    sta TempY
-    cmp #0
-    bne @nextrow
-    inc Temp
-@nextrow:
+    jsr JumpToNextTileRow
     dex
     bne @lowerRangeRowLoop ;----loop
 @exit:
@@ -241,42 +229,30 @@ ReloadLowerColumnRange_movingLeft:
     sbc BgColumnIdxToUpload
     sta TempPointX  ;16 - ColumnIndex = 16 .. 1
 
+    ;x is SCREEN_ROW_COUNT (30)
 
-@lowerRangeRowLoop:
+@rowLoop:
     jsr MovingLeft_PreRowLoop
     ;y reg is 0
 
-@lowerRangeLoop:
+@loop:
 
     lda (pointer), y
     sta $2007
     iny
     cpy TempPointX
-    bcc @lowerRangeLoop  ; if Column is 0, then this will go until y is 16
+    bcc @loop  ; if Column is 0, then this will go until y is 16
 
     ;next row ??
-    lda pointer
-    clc
-    adc TempZ
-    sta pointer
-    cmp #0
-    bne @incrementDest
-    inc pointer + 1
-@incrementDest:
-    lda TempY
-    clc
-    adc TempZ
-    sta TempY
-    cmp #0
-    bne @nextrow
-    inc Temp
-@nextrow:
+    jsr JumpToNextTileRow
     dex
-    bne @lowerRangeRowLoop
+    bne @rowLoop
 
 @exit:
 
     rts
+
+
 
 ;-----------------------------------
 ReloadUpperColumnRange_movingLeft:
@@ -289,43 +265,89 @@ ReloadUpperColumnRange_movingLeft:
     sbc #1 ; rom screen idx
     jsr PrepairDestAndSource
 
-    lda #32
+    lda #SCREEN_COLUMN_COUNT
     sec
-    sbc BgColumnIdxToUpload
+    sbc BgColumnIdxToUpload ; 32 - (16..32) = 16 .. 0
     sta TempZ
 
-@UpperRangeRowLoop:
+    ;x is 30
+
+@rowLoop:
     jsr MovingLeft_PreRowLoop
 
-@UpperRangeLoop:
+    ;y is 0
+
+@loop:
     lda (pointer), y
     sta $2007
     iny
-    cpy TempZ
-    bcc @UpperRangeLoop
-    lda pointer
-    clc
+    cpy TempZ       ; columns (16 .. 0)
+    bcc @loop
 
-
-    adc TempZ
-    sta pointer
-    cmp #0
-    bne @incrementDest
-    inc pointer + 1
-
-@incrementDest:
-    lda TempY
-    clc
-    adc TempZ
-    sta TempY
-    cmp #0
-    bne @nextrow
-    inc Temp
-@nextrow:
+    ;next row ?
+    jsr JumpToNextTileRow
     dex
-    bne @UpperRangeRowLoop
+    bne @rowLoop
 
 @exit:
+    rts
+
+;-----------------------------------
+ReloadUpperColumnRange_movingRight:
+    ;Upper Range 16 .. BgColumnIdxToUpload
+
+    lda CurrentMapSegmentIndex
+    clc
+    adc #1
+
+    jsr PrepairDestAndSource
+
+    lda BgColumnIdxToUpload
+    sec
+    sbc #16
+    sta TempPointX
+
+    lda #16
+    sta TempZ
+
+@rowLoop:
+
+    lda pointer
+    clc
+    adc #16
+    sta pointer
+    cmp #0
+
+    lda TempY
+    clc
+    adc #16
+
+    sta TempY
+    cmp #0
+    bne @continue
+    inc Temp
+
+@continue:
+    lda $2002
+    lda Temp
+    sta $2006
+    lda TempY
+    sta $2006
+
+    ldy #0;
+
+@loop:
+    lda (pointer), y
+    sta $2007
+    iny
+    cpy TempPointX
+    bcc @loop
+
+    ;next row
+    jsr JumpToNextTileRow
+    dex
+    bne @rowLoop
+
     rts
 
 ;-----------------------------------
@@ -381,74 +403,26 @@ PrepairDestAndSource:
 
     rts
 
-;-----------------------------------
-ReloadUpperColumnRange_movingRight:
-    ;Upper Range 16 .. BgColumnIdxToUpload
-
-    lda CurrentMapSegmentIndex
-    clc
-    adc #1
-
-    jsr PrepairDestAndSource
-
-    lda BgColumnIdxToUpload
-    sec
-    sbc #16
-    sta TempZ
-
-@UpperRangeRowLoop:
+;---------------------------------
+JumpToNextTileRow:
 
     lda pointer
     clc
-    adc #16
+    adc TempZ
     sta pointer
-    cmp #0
-
-    lda TempY
-    clc
-    adc #16
-
-    sta TempY
-    cmp #0
-    bne @continue
-    inc Temp
-
-@continue:
-    lda $2002
-    lda Temp
-    sta $2006
-    lda TempY
-    sta $2006
-
-    ldy #0;
-
-@UpperRangeLoop:
-    lda (pointer), y
-    sta $2007
-    iny
-    cpy TempZ
-    bcc @UpperRangeLoop
-    lda pointer
-    clc
-
-    adc #16
-    sta pointer
-    cmp #0
-    bne @incrementDest
+    bcs @incrementHighPtr
+    jmp @incrementDest
+@incrementHighPtr:
     inc pointer + 1
 
 @incrementDest:
     lda TempY
     clc
-    adc #16
+    adc TempZ
     sta TempY
     cmp #0
-    bne @nextrow
+    bne @exit
     inc Temp
-@nextrow:
-    dex
-    bne @UpperRangeRowLoop
-
+@exit:
 
     rts
-
