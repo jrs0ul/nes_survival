@@ -195,6 +195,10 @@ ReloadLowerColumnRange_movingRight:
     sta TempPreRowLoopValue
 
     jsr CopyTilesToScreen
+    lda CurrentMapSegmentIndex
+    clc
+    adc #2
+    jsr CopyAttributes
 
 @exit:
 
@@ -224,6 +228,8 @@ ReloadLowerColumnRange_movingLeft:
     ;x is SCREEN_ROW_COUNT (30)
 
     jsr CopyTilesToScreen
+    lda CurrentMapSegmentIndex
+    jsr CopyAttributes
 
 @exit:
 
@@ -252,6 +258,8 @@ ReloadUpperColumnRange_movingLeft:
     ;x is 30
 
     jsr CopyTilesToScreen
+    lda CurrentMapSegmentIndex
+    jsr CopyAttributes
 
 @exit:
     rts
@@ -277,8 +285,64 @@ ReloadUpperColumnRange_movingRight:
 
     jsr CopyTilesToScreen
 
+
+
+    lda CurrentMapSegmentIndex
+    clc
+    adc #1
+    jsr CopyAttributes
+
     rts
 
+;-----------------------------------
+;a - screen index
+CopyAttributes:
+
+    tay
+    lda map_list_low, y
+    clc
+    adc #$C0
+    sta pointer
+    lda map_list_high, y
+    clc
+    adc #$3
+    sta pointer + 1
+
+    lda DestScreenAddr
+    clc
+    adc #$3
+    sta Temp
+    lda #$C0
+    sta TempY
+
+    ldx #8
+
+
+@rowLoop:
+
+    lda $2002
+    lda Temp
+    sta $2006
+    lda TempY
+    sta $2006
+
+
+    ldy #0
+
+@loop:
+    lda (pointer), y
+    sta $2007
+
+    iny ;??
+
+
+
+    dex
+    bne @rowLoop
+
+
+
+    rts
 ;-----------------------------------
 CopyTilesToScreen:
 
@@ -314,7 +378,7 @@ CopyTilesToScreen:
 
     ldy #0
 
-    @loop:
+@loop:
     lda (pointer), y
     sta $2007
     iny

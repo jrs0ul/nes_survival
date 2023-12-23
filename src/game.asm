@@ -2155,6 +2155,7 @@ UploadBgColumns:
     adc #$C0
     sta pointer
     lda map_list_high, y
+    clc
     adc #$3
     sta pointer + 1
 
