@@ -172,36 +172,29 @@ CalcMapAddress:
 
 ;-----------------------------------
 ReloadLowerColumnRange_movingRight:
-    ;0.. BgColumnIdxToUpload
+    ;copy tile columns
+    ;to screen's 0.. BgColumnIdxToUpload(0..15), row by row
+    ;from CurrentMapScreen + 2
 
     lda CurrentMapSegmentIndex
     clc
-    adc #2
+    adc #2 ;screen index we're using
+
     cmp ScreenCount
     bcs @exit
-    tay
 
-    lda map_list_low, y
-    sta pointer
-    lda map_list_high, y
-    sta pointer + 1
+    jsr PrepairDestAndSource
 
-
-    lda DestScreenAddr
-    sta Temp
-    lda #0
-    sta TempY
-    ldx #30
-@lowerRangeRowLoop:
+@lowerRangeRowLoop:  ;---------loop
     lda $2002
-    lda Temp
+    lda Temp  ;high
     sta $2006
-    lda TempY
+    lda TempY ;low
     sta $2006
 
-    ldy #0;BgColumnIdxToUpload
+    ldy #0
+
 @lowerRangeLoop:
-
     lda (pointer), y
     sta $2007
     iny
@@ -210,7 +203,7 @@ ReloadLowerColumnRange_movingRight:
 
     lda pointer
     clc
-    adc #32
+    adc #SCREEN_COLUMN_COUNT
     sta pointer
     cmp #0
     bne @incrementDest
@@ -218,49 +211,40 @@ ReloadLowerColumnRange_movingRight:
 @incrementDest:
     lda TempY
     clc
-    adc #32
+    adc #SCREEN_COLUMN_COUNT
     sta TempY
     cmp #0
     bne @nextrow
     inc Temp
 @nextrow:
     dex
-    bne @lowerRangeRowLoop
+    bne @lowerRangeRowLoop ;----loop
 @exit:
 
     rts
 ;-----------------------------------
 ReloadLowerColumnRange_movingLeft:
-    ;0.. BgColumnIdxToUpload
-    
-    ldy CurrentMapSegmentIndex
+    ;copy tiles to screen's columns 0.. BgColumnIdxToUpload(0..15)
+    ;from CurrentMapScreen
 
-    lda map_list_low, y
-    sta pointer
-    lda map_list_high, y
-    sta pointer + 1
+    lda CurrentMapSegmentIndex ; screen we're copying
 
-    lda #32
+    jsr PrepairDestAndSource
 
+    lda #SCREEN_COLUMN_COUNT
     sec
     sbc BgColumnIdxToUpload
-    sta TempZ
+    sta TempZ       ;32 - ColumnIndex = 32 .. 17
 
     lda #16
     sec
     sbc BgColumnIdxToUpload
-    sta TempPointX
+    sta TempPointX  ;16 - ColumnIndex = 16 .. 1
 
 
-    lda DestScreenAddr
-    sta Temp
-    lda #0
-    sta TempY
-
-
-    ldx #30
 @lowerRangeRowLoop:
     jsr MovingLeft_PreRowLoop
+    ;y reg is 0
 
 @lowerRangeLoop:
 
@@ -268,8 +252,9 @@ ReloadLowerColumnRange_movingLeft:
     sta $2007
     iny
     cpy TempPointX
-    bcc @lowerRangeLoop
+    bcc @lowerRangeLoop  ; if Column is 0, then this will go until y is 16
 
+    ;next row ??
     lda pointer
     clc
     adc TempZ
@@ -295,14 +280,14 @@ ReloadLowerColumnRange_movingLeft:
 
 ;-----------------------------------
 ReloadUpperColumnRange_movingLeft:
-    ;Upper Range 16 .. BgColumnIdxToUpload
+    ;Upper Range 16 .. BgColumnIdxToUpload(16..32)
 
     lda CurrentMapSegmentIndex
     beq @exit
-    sec
-    sbc #1
 
-    jsr UpperColumnRange_prepair
+    sec
+    sbc #1 ; rom screen idx
+    jsr PrepairDestAndSource
 
     lda #32
     sec
@@ -318,9 +303,10 @@ ReloadUpperColumnRange_movingLeft:
     iny
     cpy TempZ
     bcc @UpperRangeLoop
-
     lda pointer
     clc
+
+
     adc TempZ
     sta pointer
     cmp #0
@@ -345,21 +331,26 @@ ReloadUpperColumnRange_movingLeft:
 ;-----------------------------------
 MovingLeft_PreRowLoop:
 
-    lda BgColumnIdxToUpload
-    beq @continue ; zero
     lda pointer
     clc
     adc BgColumnIdxToUpload
     sta pointer
-    cmp #0
+    bcs @inc_high_Src_Addr
+    jmp @screen_addr
+
+@inc_high_Src_Addr:
+    inc pointer + 1
+
+@screen_addr:
 
     lda TempY
     clc
     adc BgColumnIdxToUpload
     sta TempY
-    cmp #0
-    bne @continue
-    inc Temp
+    bcs @increase
+    jmp @continue
+@increase:
+    inc Temp ; increese screen high adr
 
 @continue:
     lda $2002
@@ -372,8 +363,8 @@ MovingLeft_PreRowLoop:
 
     rts
 ;----------------------------------
-;y - screen index
-UpperColumnRange_prepair:
+;a - screen index
+PrepairDestAndSource:
 
     tay
     lda map_list_low, y
@@ -386,8 +377,7 @@ UpperColumnRange_prepair:
     lda #0
     sta TempY ;lower address
 
-    ldx #30 ; rows
-
+    ldx #SCREEN_ROW_COUNT
 
     rts
 
@@ -399,7 +389,7 @@ ReloadUpperColumnRange_movingRight:
     clc
     adc #1
 
-    jsr UpperColumnRange_prepair
+    jsr PrepairDestAndSource
 
     lda BgColumnIdxToUpload
     sec
@@ -417,10 +407,12 @@ ReloadUpperColumnRange_movingRight:
     lda TempY
     clc
     adc #16
+
     sta TempY
     cmp #0
     bne @continue
     inc Temp
+
 @continue:
     lda $2002
     lda Temp
@@ -429,15 +421,16 @@ ReloadUpperColumnRange_movingRight:
     sta $2006
 
     ldy #0;
+
 @UpperRangeLoop:
     lda (pointer), y
     sta $2007
     iny
     cpy TempZ
     bcc @UpperRangeLoop
-
     lda pointer
     clc
+
     adc #16
     sta pointer
     cmp #0
@@ -458,5 +451,4 @@ ReloadUpperColumnRange_movingRight:
 
 
     rts
-;----------------------------------------------------
 

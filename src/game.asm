@@ -463,6 +463,7 @@ player_sprites_flip:
     COLOR_RED                  = $16
 
     SCREEN_ROW_COUNT           = 30
+    SCREEN_COLUMN_COUNT        = 32
 
     CHARACTER_ZERO             = $30
 
