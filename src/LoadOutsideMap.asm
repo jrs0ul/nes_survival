@@ -188,25 +188,14 @@ ReloadLowerColumnRange_movingRight:
     lda #SCREEN_COLUMN_COUNT
     sta TempZ
 
-@lowerRangeRowLoop:  ;---------loop
-    lda $2002
-    lda Temp  ;high
-    sta $2006
-    lda TempY ;low
-    sta $2006
+    lda BgColumnIdxToUpload
+    sta TempPointX
 
-    ldy #0
+    lda #0
+    sta TempPreRowLoopValue
 
-@lowerRangeLoop:
-    lda (pointer), y
-    sta $2007
-    iny
-    cpy BgColumnIdxToUpload
-    bcc @lowerRangeLoop
+    jsr CopyTilesToScreen
 
-    jsr JumpToNextTileRow
-    dex
-    bne @lowerRangeRowLoop ;----loop
 @exit:
 
     rts
@@ -229,30 +218,16 @@ ReloadLowerColumnRange_movingLeft:
     sbc BgColumnIdxToUpload
     sta TempPointX  ;16 - ColumnIndex = 16 .. 1
 
+    lda BgColumnIdxToUpload
+    sta TempPreRowLoopValue
+
     ;x is SCREEN_ROW_COUNT (30)
 
-@rowLoop:
-    jsr MovingLeft_PreRowLoop
-    ;y reg is 0
-
-@loop:
-
-    lda (pointer), y
-    sta $2007
-    iny
-    cpy TempPointX
-    bcc @loop  ; if Column is 0, then this will go until y is 16
-
-    ;next row ??
-    jsr JumpToNextTileRow
-    dex
-    bne @rowLoop
+    jsr CopyTilesToScreen
 
 @exit:
 
     rts
-
-
 
 ;-----------------------------------
 ReloadUpperColumnRange_movingLeft:
@@ -269,25 +244,14 @@ ReloadUpperColumnRange_movingLeft:
     sec
     sbc BgColumnIdxToUpload ; 32 - (16..32) = 16 .. 0
     sta TempZ
+    sta TempPointX
+
+    lda BgColumnIdxToUpload
+    sta TempPreRowLoopValue
 
     ;x is 30
 
-@rowLoop:
-    jsr MovingLeft_PreRowLoop
-
-    ;y is 0
-
-@loop:
-    lda (pointer), y
-    sta $2007
-    iny
-    cpy TempZ       ; columns (16 .. 0)
-    bcc @loop
-
-    ;next row ?
-    jsr JumpToNextTileRow
-    dex
-    bne @rowLoop
+    jsr CopyTilesToScreen
 
 @exit:
     rts
@@ -309,53 +273,20 @@ ReloadUpperColumnRange_movingRight:
 
     lda #16
     sta TempZ
+    sta TempPreRowLoopValue
+
+    jsr CopyTilesToScreen
+
+    rts
+
+;-----------------------------------
+CopyTilesToScreen:
 
 @rowLoop:
 
     lda pointer
     clc
-    adc #16
-    sta pointer
-    cmp #0
-
-    lda TempY
-    clc
-    adc #16
-
-    sta TempY
-    cmp #0
-    bne @continue
-    inc Temp
-
-@continue:
-    lda $2002
-    lda Temp
-    sta $2006
-    lda TempY
-    sta $2006
-
-    ldy #0;
-
-@loop:
-    lda (pointer), y
-    sta $2007
-    iny
-    cpy TempPointX
-    bcc @loop
-
-    ;next row
-    jsr JumpToNextTileRow
-    dex
-    bne @rowLoop
-
-    rts
-
-;-----------------------------------
-MovingLeft_PreRowLoop:
-
-    lda pointer
-    clc
-    adc BgColumnIdxToUpload
+    adc TempPreRowLoopValue
     sta pointer
     bcs @inc_high_Src_Addr
     jmp @screen_addr
@@ -367,7 +298,7 @@ MovingLeft_PreRowLoop:
 
     lda TempY
     clc
-    adc BgColumnIdxToUpload
+    adc TempPreRowLoopValue
     sta TempY
     bcs @increase
     jmp @continue
@@ -382,6 +313,36 @@ MovingLeft_PreRowLoop:
     sta $2006
 
     ldy #0
+
+    @loop:
+    lda (pointer), y
+    sta $2007
+    iny
+    cpy TempPointX
+    bcc @loop
+
+    ;next row
+    lda pointer
+    clc
+    adc TempZ
+    sta pointer
+    bcs @incrementHighPtr
+    jmp @incrementDest
+@incrementHighPtr:
+    inc pointer + 1
+
+@incrementDest:
+    lda TempY
+    clc
+    adc TempZ
+    sta TempY
+    cmp #0
+    bne @done
+    inc Temp
+@done:
+
+    dex
+    bne @rowLoop
 
     rts
 ;----------------------------------
@@ -400,29 +361,5 @@ PrepairDestAndSource:
     sta TempY ;lower address
 
     ldx #SCREEN_ROW_COUNT
-
-    rts
-
-;---------------------------------
-JumpToNextTileRow:
-
-    lda pointer
-    clc
-    adc TempZ
-    sta pointer
-    bcs @incrementHighPtr
-    jmp @incrementDest
-@incrementHighPtr:
-    inc pointer + 1
-
-@incrementDest:
-    lda TempY
-    clc
-    adc TempZ
-    sta TempY
-    cmp #0
-    bne @exit
-    inc Temp
-@exit:
 
     rts

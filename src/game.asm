@@ -1374,11 +1374,12 @@ InitiateCompleteItemRespawn:
 DontIncrementQuestNumber:
     .res 1
 
-
+TempPreRowLoopValue: ; used in LoadOutsidemap
+    .res 1
 
 
 Buffer:
-    .res 267  ;must see how much is still available
+    .res 266  ;must see how much is still available
 
 ;====================================================================================
 
