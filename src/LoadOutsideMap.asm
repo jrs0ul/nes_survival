@@ -290,7 +290,6 @@ ReloadUpperColumnRange_movingRight:
     jsr CopyTilesToScreen
 
 
-
     lda CurrentMapSegmentIndex
     clc
     adc #1
@@ -371,74 +370,7 @@ CopyAttributes:
 
     ldx #8
 
-
-@rowLoop:
-
-    lda pointer
-    clc
-    adc TempPreRowLoopValue
-    sta pointer
-    bcs @inc_high_Src_Addr
-    jmp @screen_addr
-
-@inc_high_Src_Addr:
-    inc pointer + 1
-
-@screen_addr:
-
-    lda TempY
-    clc
-    adc TempPreRowLoopValue
-    sta TempY
-    bcs @increase
-    jmp @continue
-@increase:
-    inc Temp ; increese screen high adr
-
-@continue:
-    lda $2002
-    lda Temp
-    sta $2006
-    lda TempY
-    sta $2006
-
-
-    ldy #0
-
-@loop:
-    lda (pointer), y
-    sta $2007
-
-    iny
-    cpy TempPointX
-    bcc @loop
-
-    ;next attribute row
-
-    lda pointer
-    clc 
-    adc TempZ
-    sta pointer
-    bcs @incrementHighPtr
-    jmp @incrementDest
-@incrementHighPtr:
-    inc pointer + 1
-
-@incrementDest:
-    lda TempY
-    clc
-    adc TempZ
-    sta TempY
-    cmp #0
-    bne @done
-    inc Temp
-@done:
-
-
-    dex
-    bne @rowLoop
-
-
+    jsr CopyTilesToScreen
 
     rts
 ;-----------------------------------
