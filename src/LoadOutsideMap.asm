@@ -259,6 +259,8 @@ ReloadUpperColumnRange_movingLeft:
 
     jsr CopyTilesToScreen
     lda CurrentMapSegmentIndex
+    sec
+    sbc #1
     jsr CopyAttributes
 
 @exit:
@@ -306,12 +308,44 @@ CopyAttributes:
     lda TempPointX
     lsr
     lsr
-    sta TempPointX ; TempPointX = TempPointX / 4
+    sta Temp
+    asl
+    asl
+    cmp TempPointX
+    bcc @increment
+
+    lda Temp
+    jmp @saveTempPointX
+
+@increment:
+    lda Temp
+    clc
+    adc #1
+
+@saveTempPointX:
+    sta TempPointX ; TempPointX = TempPointX / 4 (rounded)
 
     lda TempZ
     lsr
     lsr
+    sta Temp
+    asl
+    asl
+    cmp TempZ
+    bcc @incrementTempZ
+
+
+    lda Temp
+    jmp @saveTempZ
+
+@incrementTempZ:
+    lda Temp
+    clc
+    adc #1
+
+@saveTempZ:
     sta TempZ
+    ;TempZ / 4 rounded
 
     lda TempPreRowLoopValue
     lsr
