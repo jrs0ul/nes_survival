@@ -463,6 +463,7 @@ player_sprites_flip:
     COLOR_RED                  = $16
 
     SCREEN_ROW_COUNT           = 30
+    SCREEN_COLUMN_COUNT        = 32
 
     CHARACTER_ZERO             = $30
 
@@ -788,6 +789,7 @@ OldScrollDirection:
 
 NametableAddress:
     .res 1
+
 
 OldPlayerX:
     .res 1
@@ -1372,8 +1374,12 @@ InitiateCompleteItemRespawn:
 DontIncrementQuestNumber:
     .res 1
 
+TempPreRowLoopValue: ; used in LoadOutsidemap
+    .res 1
+
+
 Buffer:
-    .res 267  ;must see how much is still available
+    .res 266  ;must see how much is still available
 
 ;====================================================================================
 
@@ -2057,13 +2063,17 @@ UpdateDestructableTiles:
     rts
 
 ;--------------------------------------------
+;BgColumnIdxToUpload - column to be updated from ROM
 ;Check and upload background columns from rom map to the PPU
 UploadBgColumns:
 
     lda ScreenCount
-    cmp #2
-    bcc @exit
+    cmp #3
+    bcs @bigmap
 
+    rts
+
+@bigmap:
     lda LocationIndex
     asl
     asl
@@ -2071,8 +2081,11 @@ UploadBgColumns:
 
     lda SourceMapIdx
     cmp ScreenCount
-    bcs @exit
+    bcc @doUpdates
 
+    rts
+
+@doUpdates:
     tya
     clc
     adc SourceMapIdx
@@ -2095,7 +2108,6 @@ UploadBgColumns:
     sta pointer2
     lda DestScreenAddr
     sta pointer2 + 1
-    
 
     lda #0
     sta $2001
@@ -2108,7 +2120,7 @@ UploadBgColumns:
     lda pointer2
     sta $2006
 
-    ldx #SCREEN_ROW_COUNT - 5 ; skip two rows that are invisible anyway and 3 for HUD
+    ldx #SCREEN_ROW_COUNT - 4 ; skip 4 status bar rows (2 are invisible for NTSC)
     ldy #128  ;  skip four rows
 @loop:
     lda (pointer), y
@@ -2130,14 +2142,7 @@ UploadBgColumns:
     lda PPUCTRL ; restore normal ppu addressing
     sta $2000
 
-;update attributes
-    jsr UpdateAttributeColumn
-
-@exit:
-    rts
-;--------------------------------------------
-UpdateAttributeColumn:
-
+;update attributes===========================
     lda LocationIndex
     asl
     asl
@@ -2150,10 +2155,10 @@ UpdateAttributeColumn:
     adc #$C0
     sta pointer
     lda map_list_high, y
+    clc
     adc #$3
     sta pointer + 1
 
-@start:
 
     lda pointer
     clc
@@ -2191,6 +2196,8 @@ UpdateAttributeColumn:
     dex
     bne @attribLoop
 
+
+@exit:
     rts
 
 ;-----------------------------------
@@ -3234,8 +3241,6 @@ RoutinesAfterFadeOut:
     cmp #7
     bne @next9
 
-    lda #28
-    sta BgColumnIdxToUpload
     lda #2
     sta ScrollDirection
     ;------------------------------------------
@@ -3261,8 +3266,6 @@ RoutinesAfterFadeOut:
     cmp #11
     bne @next11
 
-    lda #23
-    sta BgColumnIdxToUpload
     lda #2
     sta ScrollDirection
 
@@ -3277,14 +3280,8 @@ RoutinesAfterFadeOut:
     lda #1
     sta InCave
 
-
-    lda #$08
-    sta BgColumnIdxToUpload
     lda #2
     sta ScrollDirection
-    lda #$20
-    sta DestScreenAddr
-
 
     lda #4
     sta MapTilesetBankNo
@@ -3315,13 +3312,9 @@ RoutinesAfterFadeOut:
 
     lda #1
     sta InCave
-    lda #$08
-    sta BgColumnIdxToUpload
+
     lda #2
     sta ScrollDirection
-
-    lda #$20
-    sta DestScreenAddr
 
     lda #4
     sta MapTilesetBankNo
@@ -3363,8 +3356,6 @@ RoutinesAfterFadeOut:
     cmp #19
     bne @next19
 
-    lda #3
-    sta BgColumnIdxToUpload
     lda #2
     sta ScrollDirection
 
@@ -3385,8 +3376,6 @@ RoutinesAfterFadeOut:
     lda #>alien_palette
     sta CurrentMapPalettePtr + 1
 
-
-    
     ;------------------------
     ;15.alien base entrance top
 @next20:
@@ -3446,6 +3435,7 @@ RoutinesAfterFadeOut:
     jsr ResetNameTableAdresses
     lda #1
     sta MustLoadSomething ; activate location loading in NMI
+    jsr CalcMapColumnToUpdate
 
 
     rts
@@ -4397,7 +4387,13 @@ ResetPlayerXMovement:
 
     rts
 
+;-----------------------------
+;Calculates depending on ScrollX and ScrollDirection:
 
+;  BgColumnIdxToUpload;     - tile column to update
+;  AttribColumnIdxToUpdate; - attribute column to update
+;  DestScreenAddr;          - which nametable to use (20 or 24)
+;  SourceMapIdx;            - map screen ID from ROM
 ;--------------------------------
 CalcMapColumnToUpdate:
 
@@ -4429,6 +4425,7 @@ CalcMapColumnToUpdate:
     sta SourceMapIdx
     ldx FirstNametableAddr
     jmp @storeIdx
+
 @WriteToB:
     clc
     adc #16
