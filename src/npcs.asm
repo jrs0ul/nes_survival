@@ -857,10 +857,8 @@ DropItemAfterDeath:
     cmp #NPC_TYPE_PREDATOR
     bne @continueDrop
 
-    lda NpcsHitByPlayer
-    cmp #2
-    bcs @continueDrop
-    jmp @exit ;don't drop anything for the first hostile
+    lda TempNpcIndex
+    beq @exit
 
 @continueDrop:
     ;drop item
@@ -875,17 +873,28 @@ DropItemAfterDeath:
     cmp #2
     bcs @specialRewardItem
 
-    lda #%00000101
+    lda #ITEM_RAW_MEAT
+    asl
+    ora #1
+
     jmp @storeItem
 @specialRewardItem:
     jsr UpdateRandomNumber
     and #3
     cmp #2
     bcs @spawnHide
-    lda #%00011001
+    lda #ITEM_RAW_JUMBO_MEAT
+    asl
+    ora #1
     jmp @storeItem
 @spawnHide:
-    lda #%00010101
+    jsr UpdateRandomNumber
+    and #3
+    cmp #2
+    bcc @exit
+    lda #ITEM_HIDE
+    asl
+    ora #1
 @storeItem:
 
     sta TempItemIndex
