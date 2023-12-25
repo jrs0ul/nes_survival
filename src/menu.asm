@@ -1351,7 +1351,7 @@ InventoryInput:
 ;--------------------------------------
 OnItemClicked:
 
-    jsr LoadSelectedItemStuff
+    jsr LoadSelectedItemInfo
     beq @exit
 
     lda TempIndex
@@ -1570,7 +1570,7 @@ FoodMenuInput:
     and #BUTTON_B_MASK
     beq @CheckA
 
-    jsr LoadSelectedItemStuff
+    jsr LoadSelectedItemInfo
     beq @exit
 
     lda InVillagerHut
@@ -1826,7 +1826,7 @@ MaterialMenuInput:
     and #BUTTON_B_MASK
     beq @CheckA
 
-    jsr LoadSelectedItemStuff
+    jsr LoadSelectedItemInfo
     beq @exit
 
     lda InHouse
@@ -1910,7 +1910,7 @@ ToolInput:
     lsr
     bcs @exit ; can't equip anything when you throw a spear
 
-    jsr LoadSelectedItemStuff
+    jsr LoadSelectedItemInfo
     beq @exit
 
     lda InVillagerHut
@@ -2336,7 +2336,7 @@ ItemMenuInput:
     and #BUTTON_B_MASK
     beq @CheckA
 
-    jsr LoadSelectedItemStuff
+    jsr LoadSelectedItemInfo
     beq @exit
 
     lda InHouse
@@ -2841,7 +2841,7 @@ IsFoodCooked:
 
 
 ;--------------------------------------
-LoadSelectedItemStuff:
+LoadSelectedItemInfo:
     lda InventoryItemIndex
     asl ;item_index * 2
     tax
@@ -2864,8 +2864,8 @@ LoadSelectedItemStuff:
     lda item_data, y
     sta TempIndex
     iny
-    lda item_data, y 
-    sta Temp ;power
+    lda item_data, y
+    sta SelectedItemPower ;power
     lda #1
     jmp @exit
 @empty:
@@ -2878,6 +2878,24 @@ LoadSelectedItemStuff:
 ;TODO: eliminate repetetive code
 ;---------------------------------------
 UseMedicine:
+
+    ;let's add lowest value digit
+    lda SelectedItemPower
+    and #%00001111
+    sta DigitChangeSize
+    lda #<HP
+    sta DigitPtr
+    lda #>HP
+    sta DigitPtr + 1
+    jsr IncreaseDigits
+
+    ;now the middle digit
+    lda SelectedItemPower
+    lsr
+    lsr
+    lsr
+    lsr
+    sta Temp
 
     lda HP
     bne @clampHp
@@ -2905,6 +2923,26 @@ UseFuel:
     lda #MAX_FUEL_DELAY
     sta FuelDelay
 
+    ;let's add lowest value digit
+    lda SelectedItemPower
+    and #%00001111
+    sta DigitChangeSize
+    lda #<Fuel
+    sta DigitPtr
+    lda #>Fuel
+    sta DigitPtr + 1
+    jsr IncreaseDigits
+
+
+    ;middle digit
+
+    lda SelectedItemPower
+    lsr
+    lsr
+    lsr
+    lsr
+    sta Temp
+
     lda Fuel
     bne @clampFuel
 
@@ -2929,6 +2967,25 @@ UseFuel:
 UseFood:
     lda #MAX_FOOD_DELAY
     sta FoodDelay
+
+    ;let's add lowest value digit
+    lda SelectedItemPower
+    and #%00001111
+    sta DigitChangeSize
+    lda #<Food
+    sta DigitPtr
+    lda #>Food
+    sta DigitPtr + 1
+    jsr IncreaseDigits
+
+
+    lda SelectedItemPower
+    lsr
+    lsr
+    lsr
+    lsr
+    sta Temp
+
 
     lda Food    ; highest digit
     bne @clampFood

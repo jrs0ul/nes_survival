@@ -517,7 +517,7 @@ CheckSingleNpcAgainstPlayerHit:
 ;-------
     lda ItemMapScreenIndex
     sta KilledNpcScreenIdx
-    
+
     jsr CollisionWithProjectiles
 
     lda SpearData
@@ -948,11 +948,11 @@ CalcPlayerDmg:
 
     sty TempY
     tay
-    iny
-    iny
-    iny
+    iny ;palette
+    iny ;type
+    iny ;power
 
-    lda item_data, y
+    lda item_data, y ;get power value
     sta TempPlayerAttk
 
     ldy TempY

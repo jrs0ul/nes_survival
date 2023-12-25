@@ -467,12 +467,12 @@ player_sprites_flip:
 
     CHARACTER_ZERO             = $30
 
-    MAX_WARMTH_DELAY_OUTSIDE   = 75 ; how fast you lose warmth
+    MAX_WARMTH_DELAY_OUTSIDE   = 60 ; how fast you lose warmth
     MAX_WARMTH_DELAY_INDOORS   = 16 ; how fast you gain warmth
     MAX_FOOD_DELAY             = 125
     MAX_FUEL_DELAY             = $55
 
-    DECREMENT_FOOD_DEFAULT     = $3
+    DECREMENT_FOOD_DEFAULT     = 2
 
     FIRE_ANIMATION_DELAY       = $20
 
@@ -1377,9 +1377,12 @@ DontIncrementQuestNumber:
 TempPreRowLoopValue: ; used in LoadOutsidemap
     .res 1
 
+SelectedItemPower:
+    .res 1
+
 
 Buffer:
-    .res 266  ;must see how much is still available
+    .res 265  ;must see how much is still available
 
 ;====================================================================================
 
