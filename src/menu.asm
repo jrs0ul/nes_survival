@@ -1250,6 +1250,9 @@ EquipmentInput:
     lsr
     bcs @exit ; you've launched a spear can't unequip it now
 
+    lda FishingRodActive
+    bne @exit ;  the fishing rod is active, can't unequip
+
     ;let's simply unequip
 
     lda #<EquipedItem
@@ -1909,6 +1912,9 @@ ToolInput:
     lda SpearData
     lsr
     bcs @exit ; can't equip anything when you throw a spear
+
+    lda FishingRodActive
+    bne @exit  ; can't equip anything else while the rod is casted
 
     jsr LoadSelectedItemInfo
     beq @exit
