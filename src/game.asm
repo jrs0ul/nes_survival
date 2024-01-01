@@ -217,7 +217,7 @@ game_over_palette:
 
 
 sprites:
-    .byte $11, $FF, %00000000, $08   ; sprite 0 
+    .byte $1A, $FF, %00000011, $08   ; sprite 0 
 
 
 ;position of knife sprite depending on the player frame
@@ -1769,7 +1769,7 @@ WaitSprite0:
     and #%01000000
     beq WaitSprite0      ; wait until sprite 0 is hit
 
-    ldx #219
+    ldx #14
 WaitScanline:
     dex
     bne WaitScanline
