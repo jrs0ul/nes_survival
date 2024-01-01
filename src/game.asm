@@ -312,13 +312,6 @@ sun_moon_sprites_for_periods:
     .byte 232, 246, 0, 0 ;$40
     .byte 232, 246, 0, 0 ;$40
 
-player_anim_row_sequence:
-   .byte 0
-   .byte 16
-   .byte 32
-   .byte 16
-   .byte 48
-
 npc_anim_row_sequence:
     .byte 0
     .byte 32
@@ -327,17 +320,69 @@ npc_anim_row_sequence:
     .byte 96
 
 
+.segment "ROM1";-------
+
+player_anim_row_sequence:
+   .byte 0
+   .byte 16
+   .byte 32
+   .byte 16
+   .byte 48
+
+
 player_sprites_not_flip:
+    ;left
+    .byte 0, 0,  %00000011, 0 ;1st sprite
+    .byte 0, 1,  %00000011, 8 ;2nd
+    .byte 8, 16, %00000011, 0 ;3rd
+    .byte 8, 17, %00000011, 8 ;4th
+
+    ;up
+    .byte 0, 0,  %00000011, 0 ;1st sprite
+    .byte 0, 1,  %00000011, 8 ;2nd
+    .byte 8, 16, %00000011, 0 ;3rd
+    .byte 8, 17, %00000011, 8 ;4th
+
+    ;down
+    .byte 0, 0,  %00000011, 0 ;1st sprite
+    .byte 0, 1,  %00000011, 8 ;2nd
+    .byte 8, 16, %00000011, 0 ;3rd
+    .byte 8, 17, %00000011, 8 ;4th
+
+    ;attack
     .byte 0, 0,  %00000011, 0 ;1st sprite
     .byte 0, 1,  %00000011, 8 ;2nd
     .byte 8, 16, %00000011, 0 ;3rd
     .byte 8, 17, %00000011, 8 ;4th
 
 player_sprites_flip:
+    ;right
     .byte 0, 1,  %01000011, 0 ;1st
     .byte 0, 0,  %01000011, 8 ;2nd
     .byte 8, 17, %01000011, 0 ;3rd
     .byte 8, 16, %01000011, 8 ;4th
+
+    ;up
+    .byte 0, 0,  %00000011, 0 ;1st sprite
+    .byte 0, 1,  %00000011, 8 ;2nd
+    .byte 8, 16, %00000011, 0 ;3rd
+    .byte 8, 17, %00000011, 8 ;4th
+
+    ;down
+    .byte 0, 0,  %00000011, 0 ;1st sprite
+    .byte 0, 1,  %00000011, 8 ;2nd
+    .byte 8, 16, %00000011, 0 ;3rd
+    .byte 8, 17, %00000011, 8 ;4th
+
+    ;attack
+    .byte 0, 0,  %00000011, 0 ;1st sprite
+    .byte 0, 1,  %00000011, 8 ;2nd
+    .byte 8, 16, %00000011, 0 ;3rd
+    .byte 8, 17, %00000011, 8 ;4th
+
+;---
+
+.segment "RODATA"
 
 
 ;--------------
@@ -6414,7 +6459,7 @@ UpdateSprites:
     ldy PlayerFlip
     beq @notFlipped
     clc
-    adc #16 ;16 bytes
+    adc #64 ;64 byte jump to player_sprites_flip
 @notFlipped:
     tay
     lda PlayerY
@@ -6427,10 +6472,11 @@ UpdateSprites:
     clc
     adc player_sprites_not_flip, y
     cpx #8
-    bcc @notAnimate
+    bcc @skipAnimation
+    ;add animation frames
     clc
     adc TempAnimIndex
-@notAnimate:
+@skipAnimation:
     sta FIRST_SPRITE, x
     inx
     iny
