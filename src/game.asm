@@ -38,6 +38,7 @@ main_tiles_chr: .incbin "main.chr"
 ;===========================================================
 .segment "ROM1"
 
+.include "data/player_sprite_data.asm"
 .include "data/menu_data.asm"
 .include "data/recipes.asm"
 .include "data/menu_screen_comp.asm"
@@ -318,180 +319,6 @@ npc_anim_row_sequence:
     .byte 64
     .byte 32
     .byte 96
-
-
-.segment "ROM1";-------
-
-
-player_sprites_not_flip:
-    ;LEFT
-    ;head
-    .byte 0, 0,  %00000011, 0 ;1st sprite
-    .byte 0, 1,  %00000011, 8 ;2nd
-    ;body
-    ;frame 0
-    .byte 8, 16, %00000011, 0 ;3rd
-    .byte 8, 17, %00000011, 8 ;4th
-    ;frame 1
-    .byte 8, 32, %00000011, 0 ;3rd
-    .byte 8, 33, %00000011, 8 ;4th
-    ;frame 2
-    .byte 8, 48, %00000011, 0 ;3rd
-    .byte 8, 49, %00000011, 8 ;4th
-    ;frame 3
-    .byte 8, 32, %00000011, 0 ;3rd
-    .byte 8, 33, %00000011, 8 ;4th
-    ;attack
-    .byte 8, 64, %00000011, 0 ;3rd
-    .byte 8, 65, %00000011, 8 ;4th
-
-    .byte 0,0,0,0
-    .byte 0,0,0,0
-    .byte 0,0,0,0
-    .byte 0,0,0,0
-
-    ;---------------------------------
-    ;UP
-    ;head
-    .byte 0, 2,  %00000011, 0 ;1st sprite
-    .byte 0, 2,  %01000011, 8 ;2nd
-    ;body
-    ;frame 0
-    .byte 8, 18, %00000011, 0 ;3rd
-    .byte 8, 34, %01000011, 8 ;4th
-    ;frame 1
-    .byte 8, 16, %00000011, 0 ;3rd
-    .byte 8, 17, %00000011, 8 ;4th
-    ;frame 2
-    .byte 8, 16, %00000011, 0 ;3rd
-    .byte 8, 17, %00000011, 8 ;4th
-    ;frame 3
-    .byte 8, 16, %00000011, 0 ;3rd
-    .byte 8, 17, %00000011, 8 ;4th
-    ;attack
-    .byte 8, 66, %00000011, 0 ;3rd
-    .byte 8, 67, %00000011, 8 ;4th
-
-    .byte 0,0,0,0
-    .byte 0,0,0,0
-    .byte 0,0,0,0
-    .byte 0,0,0,0
-
-
-    ;---------------------------------
-    ;DOWN
-    .byte 0, 3,  %00000011, 0 ;1st sprite
-    .byte 0, 3,  %01000011, 8 ;2nd
-    ;body
-    ;frame 0
-    .byte 8, 19, %00000011, 0 ;3rd
-    .byte 8, 51, %01000011, 8 ;4th
-    ;frame 1
-    .byte 8, 19, %00000011, 0 ;3rd
-    .byte 8, 51, %01000011, 8 ;4th
-    ;frame 2
-    .byte 8, 19, %00000011, 0 ;3rd
-    .byte 8, 51, %01000011, 8 ;4th
-    ;frame 3
-    .byte 8, 19, %00000011, 0 ;3rd
-    .byte 8, 51, %01000011, 8 ;4th
-    ;attack
-    .byte 8, 68, %00000011, 0 ;3rd
-    .byte 8, 69, %00000011, 8 ;4th
-
-    .byte 0,0,0,0
-    .byte 0,0,0,0
-    .byte 0,0,0,0
-    .byte 0,0,0,0
-
-
-    
-player_sprites_flip:
-    ;RIGHT
-    ;head
-    .byte 0, 1,  %01000011, 0 ;1st
-    .byte 0, 0,  %01000011, 8 ;2nd
-    ;body
-    ;frame 0
-    .byte 8, 17, %01000011, 0 ;3rd
-    .byte 8, 16, %01000011, 8 ;4th
-    ;frame 1
-    .byte 8, 16, %00000011, 0 ;3rd
-    .byte 8, 17, %00000011, 8 ;4th
-    ;frame 2
-    .byte 8, 16, %00000011, 0 ;3rd
-    .byte 8, 17, %00000011, 8 ;4th
-    ;frame 3
-    .byte 8, 16, %00000011, 0 ;3rd
-    .byte 8, 17, %00000011, 8 ;4th
-    ;attack
-    .byte 8, 16, %00000011, 0 ;3rd
-    .byte 8, 17, %00000011, 8 ;4th
-
-    .byte 0,0,0,0
-    .byte 0,0,0,0
-    .byte 0,0,0,0
-    .byte 0,0,0,0
-
-    ;----------------------------------
-    ;UP
-    ;head
-    .byte 0, 2,  %01000011, 8 ;1st sprite
-    .byte 0, 2,  %00000011, 0 ;2nd
-    ;body
-    ;frame 0
-    .byte 8, 34, %00000011, 0 ;3rd
-    .byte 8, 18, %01000011, 8 ;4th
-    ;frame 1
-    .byte 8, 16, %00000011, 0 ;3rd
-    .byte 8, 17, %00000011, 8 ;4th
-    ;frame 2
-    .byte 8, 16, %00000011, 0 ;3rd
-    .byte 8, 17, %00000011, 8 ;4th
-    ;frame 3
-    .byte 8, 16, %00000011, 0 ;3rd
-    .byte 8, 17, %00000011, 8 ;4th
-    ;attack
-    .byte 8, 16, %00000011, 0 ;3rd
-    .byte 8, 17, %00000011, 8 ;4th
-
-    .byte 0,0,0,0
-    .byte 0,0,0,0
-    .byte 0,0,0,0
-    .byte 0,0,0,0
-
-    ;---------------------------------
-    ;DOWN
-    ;head
-    .byte 0, 3,  %01000011, 8 ;1st sprite
-    .byte 0, 3,  %00000011, 0 ;2nd
-    ;body
-    ;frame 0
-    .byte 8, 51, %00000011, 0 ;3rd
-    .byte 8, 19, %01000011, 8 ;4th
-    ;frame 1
-    .byte 8, 16, %00000011, 0 ;3rd
-    .byte 8, 17, %00000011, 8 ;4th
-    ;frame 2
-    .byte 8, 16, %00000011, 0 ;3rd
-    .byte 8, 17, %00000011, 8 ;4th
-    ;frame 3
-    .byte 8, 16, %00000011, 0 ;3rd
-    .byte 8, 17, %00000011, 8 ;4th
-    ;attack
-    .byte 8, 16, %00000011, 0 ;3rd
-    .byte 8, 17, %00000011, 8 ;4th
-
-    .byte 0,0,0,0
-    .byte 0,0,0,0
-    .byte 0,0,0,0
-    .byte 0,0,0,0
-
-
-
-;---
-
-.segment "RODATA"
 
 
 ;--------------
@@ -890,8 +717,11 @@ menuTileTransferAddressLow:
 menuTileTransferDataIdx:
     .res 1
 
+player_sprite_data_ptr:
+    .res 2
+
 ZPBuffer:
-    .res 108  ; I want to be aware of the free memory
+    .res 106  ; I want to be aware of the free memory
 
 ;--------------
 .segment "BSS" ; variables in ram
@@ -6561,6 +6391,23 @@ UpdateSprites:
     asl ;x4 to get bytes
     sta TempAnimIndex
 
+    lda PlayerFlip
+    beq @notFlipped
+
+    lda #<player_sprites_flip
+    sta player_sprite_data_ptr
+    lda #>player_sprites_flip
+    sta player_sprite_data_ptr + 1
+
+    jmp @doIt
+@notFlipped:
+
+    lda #<player_sprites_not_flip
+    sta player_sprite_data_ptr
+    lda #>player_sprites_not_flip
+    sta player_sprite_data_ptr + 1
+
+@doIt:
     ldx #0
     ldy #0
 
@@ -6576,13 +6423,6 @@ UpdateSprites:
     asl
     asl
 
-    ldy PlayerFlip
-    beq @notFlipped
-
-    clc
-    adc #192 ;192 byte jump to player_sprites_flip
-@notFlipped:
-
     cpx #7
     bcc @skipAnim ; first row of sprites are not animated
 
@@ -6593,24 +6433,24 @@ UpdateSprites:
     tay
     lda PlayerY
     clc
-    adc player_sprites_not_flip, y
+    adc (player_sprite_data_ptr), y
     sta FIRST_SPRITE, x ; y coordinate
     inx
     iny
     lda #0
     clc
-    adc player_sprites_not_flip, y
+    adc (player_sprite_data_ptr), y
 
     sta FIRST_SPRITE, x ; sprite frame
     inx
     iny
-    lda player_sprites_not_flip, y
+    lda (player_sprite_data_ptr), y
     sta FIRST_SPRITE, x
     inx
     iny
     lda PlayerX
     clc
-    adc player_sprites_not_flip, y
+    adc (player_sprite_data_ptr), y
     sta FIRST_SPRITE, x
     inx
 
