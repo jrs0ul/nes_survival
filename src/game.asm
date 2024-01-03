@@ -718,7 +718,7 @@ menuTileTransferAddressLow:
 menuTileTransferDataIdx:
     .res 1
 
-player_sprite_data_ptr:
+character_sprite_data_ptr:
     .res 2
 
 ZPBuffer:

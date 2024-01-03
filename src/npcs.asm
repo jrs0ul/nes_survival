@@ -1290,14 +1290,40 @@ UpdateSingleNpcSprites:
     lda Npcs, y; y
     sta TempPointY ; save y
 
-    lda Temp ; row count
+    ;let's get the pointer to the sprite data
+    lda TempNpcIndex
+    asl
+    asl
+    asl ;index * 8
+    clc
+    adc #6
     tay
+    lda npc_data, y
+    sta character_sprite_data_ptr
+    iny
+    lda npc_data, y
+    sta character_sprite_data_ptr + 1
+
+
+    lda Temp ; row count
+    sta TempRowIndex
     lda #0
-    sta TempPush ; additionl Y
     sta TempIndex ;additional sprite index
+
+    
+    ;ldy #0
 @rowloop:
+
+    lda Temp
+    sec
+    sbc TempRowIndex
+    asl
+    asl
+    asl
+    tay
+
     jsr UpdateNpcRow
-    dey
+    dec TempRowIndex
     bne @rowloop
 @nextNpc:
     rts
@@ -1321,6 +1347,7 @@ CollectSingleNpcData:
     lsr
 
     sty Temp; store Npcs index
+    sta TempNpcIndex ; what kind of npc is this ?
     asl
     asl
     asl
@@ -1394,9 +1421,10 @@ UpdateNpcRow:
 
     lda TempPointY
     clc
-    adc TempPush
+    adc (character_sprite_data_ptr), y
     sta FIRST_SPRITE, x ; y coordinate
     inx
+    iny
 
     ;----------------
     lda TempDir
@@ -1420,30 +1448,33 @@ UpdateNpcRow:
     clc
     adc TempIndex
     adc TempFrameOffset
-    cpy #3 ; don't animate first row if there are 3 in total
-    beq @storeSpriteIndex1
-    adc TempFrame
     jmp @storeSpriteIndex1
 
 @contFirstSprite:
     lda TempZ
     clc
     adc TempIndex
-    cpy #3 ; don't animate first row if there are 3 in total
-    beq @storeSpriteIndex1
-    adc TempFrame
     jmp @storeSpriteIndex1
 @spriteIndexFlip1:
     lda TempZ
     clc
     adc TempIndex
     adc #1
-    cpy #3
-    beq @storeSpriteIndex1
-    adc TempFrame
 @storeSpriteIndex1:
     sta FIRST_SPRITE, x ; tile index
+
+    lda TempRowIndex
+    cmp #3
+    beq @doAttrib
+
+    lda FIRST_SPRITE, x
+    clc
+    adc TempFrame
+    sta FIRST_SPRITE, x
+
+@doAttrib:
     inx
+    iny
 
     ;-------------------------
     lda TempDir
@@ -1457,12 +1488,16 @@ UpdateNpcRow:
     eor DamagedPaletteMask
     sta FIRST_SPRITE, x
     inx
-    ;X
+    iny
+    ;X coord------------------
     lda TempPointX
+    clc
+    adc (character_sprite_data_ptr), y
     sta FIRST_SPRITE, x
     inc TempSpriteCount
 
     inx
+    iny
 
     ;SECOND SPRITE -----------------------------------
 
@@ -1470,13 +1505,16 @@ UpdateNpcRow:
     clc
     adc #8
     bcs @exit
+    ;----
 
     lda TempPointY
     clc
-    adc TempPush
+    ;adc TempPush
+    adc (character_sprite_data_ptr), y
     sta FIRST_SPRITE, x ; y coordinate
     inx
-    ;index
+    iny
+    ;index-----------
     lda TempDir
     cmp #1
     beq @flipSpriteIndex2
@@ -1490,9 +1528,6 @@ UpdateNpcRow:
     adc #1
     adc TempIndex
     adc TempFrameOffset
-    cpy #3
-    beq @storeSpriteIndex2
-    adc TempFrame
     jmp @storeSpriteIndex2
     ;--
 
@@ -1501,21 +1536,27 @@ UpdateNpcRow:
     clc
     adc #1
     adc TempIndex
-    cpy #3
-    beq @storeSpriteIndex2
-    adc TempFrame
     jmp @storeSpriteIndex2
 @flipSpriteIndex2:
     lda TempZ
     clc
     adc TempIndex
-    cpy #3
-    beq @storeSpriteIndex2
-    adc TempFrame
 @storeSpriteIndex2:
     sta FIRST_SPRITE, x ; tile index
+
+    lda TempRowIndex
+    cmp #3
+    beq @doneRow
+
+    lda FIRST_SPRITE, x
+    clc
+    adc TempFrame
+    sta FIRST_SPRITE, x
+
+@doneRow:
     inx
-    ;--------------
+    iny
+    ;-------------- attributes
     lda TempDir
     cmp #1
     beq @flip2
@@ -1527,20 +1568,18 @@ UpdateNpcRow:
     eor DamagedPaletteMask
     sta FIRST_SPRITE, x ; sprite attributes
     inx
+    iny
     ;--------------
     lda TempPointX
     clc
-    adc #8
+    adc (character_sprite_data_ptr), y
     sta FIRST_SPRITE, x ; x coordinate
     inx
+    iny
 
     inc TempSpriteCount
 
 @exit:
-    lda TempPush
-    clc
-    adc #8
-    sta TempPush
     lda TempIndex
     clc
     adc #16

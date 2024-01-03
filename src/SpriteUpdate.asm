@@ -23,17 +23,17 @@ UpdateSprites:
     beq @notFlipped
 
     lda #<player_sprites_flip
-    sta player_sprite_data_ptr
+    sta character_sprite_data_ptr
     lda #>player_sprites_flip
-    sta player_sprite_data_ptr + 1
+    sta character_sprite_data_ptr + 1
 
     jmp @doIt
 @notFlipped:
 
     lda #<player_sprites_not_flip
-    sta player_sprite_data_ptr
+    sta character_sprite_data_ptr
     lda #>player_sprites_not_flip
-    sta player_sprite_data_ptr + 1
+    sta character_sprite_data_ptr + 1
 
 @doIt:
     ldx #0
@@ -61,21 +61,21 @@ UpdateSprites:
     tay
     lda PlayerY
     clc
-    adc (player_sprite_data_ptr), y
+    adc (character_sprite_data_ptr), y
     sta FIRST_SPRITE, x ; y coordinate
     inx
     iny
-    lda (player_sprite_data_ptr), y
+    lda (character_sprite_data_ptr), y
     sta FIRST_SPRITE, x ; sprite frame
     inx
     iny
-    lda (player_sprite_data_ptr), y
+    lda (character_sprite_data_ptr), y
     sta FIRST_SPRITE, x
     inx
     iny
     lda PlayerX
     clc
-    adc (player_sprite_data_ptr), y
+    adc (character_sprite_data_ptr), y
     sta FIRST_SPRITE, x
     inx
 
