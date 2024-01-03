@@ -1,3 +1,9 @@
+player_frame_indexes:
+    .byte 0  ; LEFT/RIGHT
+    .byte 12 ; UP
+    .byte 24 ; DOWN
+
+
 player_sprites_not_flip:
     ;LEFT
     ;head
@@ -19,11 +25,6 @@ player_sprites_not_flip:
     ;attack
     .byte 8, 64, %00000011, 0 ;3rd
     .byte 8, 65, %00000011, 8 ;4th
-
-    .byte 0,0,0,0
-    .byte 0,0,0,0
-    .byte 0,0,0,0
-    .byte 0,0,0,0
 
     ;---------------------------------
     ;UP
@@ -47,12 +48,6 @@ player_sprites_not_flip:
     .byte 8, 66, %00000011, 0 ;3rd
     .byte 8, 67, %00000011, 8 ;4th
 
-    .byte 0,0,0,0
-    .byte 0,0,0,0
-    .byte 0,0,0,0
-    .byte 0,0,0,0
-
-
     ;---------------------------------
     ;DOWN
     .byte 0, 3,  %00000011, 0 ;1st sprite
@@ -73,12 +68,6 @@ player_sprites_not_flip:
     ;attack
     .byte 8, 68, %00000011, 0 ;3rd
     .byte 8, 69, %00000011, 8 ;4th
-
-    .byte 0,0,0,0
-    .byte 0,0,0,0
-    .byte 0,0,0,0
-    .byte 0,0,0,0
-
 
 player_sprites_flip:
     ;RIGHT
@@ -102,11 +91,6 @@ player_sprites_flip:
     .byte 8, 65, %01000011, 0 ;3rd
     .byte 8, 64, %01000011, 8 ;4th
 
-    .byte 0,0,0,0
-    .byte 0,0,0,0
-    .byte 0,0,0,0
-    .byte 0,0,0,0
-
     ;----------------------------------
     ;UP
     ;head
@@ -129,11 +113,6 @@ player_sprites_flip:
     .byte 8, 66, %01000011, 8 ;3rd
     .byte 8, 67, %01000011, 0 ;4th
 
-    .byte 0,0,0,0
-    .byte 0,0,0,0
-    .byte 0,0,0,0
-    .byte 0,0,0,0
-
     ;---------------------------------
     ;DOWN
     ;head
@@ -155,11 +134,4 @@ player_sprites_flip:
     ;attack
     .byte 8, 69, %01000011, 0 ;3rd
     .byte 8, 68, %01000011, 8 ;4th
-
-    .byte 0,0,0,0
-    .byte 0,0,0,0
-    .byte 0,0,0,0
-    .byte 0,0,0,0
-
-
 
