@@ -1387,20 +1387,24 @@ CollectSingleNpcData:
     rts
 
 ;-------------------------------------
+;Update two npc sprites
 UpdateNpcRow:
-     ;Y
+
+    ;Sprite 1
+
     lda TempPointY
     clc
     adc TempPush
-    sta FIRST_SPRITE, x
+    sta FIRST_SPRITE, x ; y coordinate
     inx
-    ;index
+
+    ;----------------
     lda TempDir
     cmp #1
     beq @spriteIndexFlip1
     cmp #3
     bcc @contFirstSprite
-;--
+
     lda TempNpcState
     beq @skipDirFrames ; don't animate direction if dead
 
@@ -1420,7 +1424,7 @@ UpdateNpcRow:
     beq @storeSpriteIndex1
     adc TempFrame
     jmp @storeSpriteIndex1
-;--
+
 @contFirstSprite:
     lda TempZ
     clc
@@ -1438,9 +1442,10 @@ UpdateNpcRow:
     beq @storeSpriteIndex1
     adc TempFrame
 @storeSpriteIndex1:
-    sta FIRST_SPRITE, x
+    sta FIRST_SPRITE, x ; tile index
     inx
-    ;attr
+
+    ;-------------------------
     lda TempDir
     cmp #1
     beq @flip1
@@ -1459,17 +1464,17 @@ UpdateNpcRow:
 
     inx
 
+    ;SECOND SPRITE -----------------------------------
+
     lda TempPointX ; check if the second sprite is still in screen
     clc
     adc #8
     bcs @exit
 
-
-    ;Y
     lda TempPointY
     clc
     adc TempPush
-    sta FIRST_SPRITE, x
+    sta FIRST_SPRITE, x ; y coordinate
     inx
     ;index
     lda TempDir
@@ -1508,9 +1513,9 @@ UpdateNpcRow:
     beq @storeSpriteIndex2
     adc TempFrame
 @storeSpriteIndex2:
-    sta FIRST_SPRITE, x
+    sta FIRST_SPRITE, x ; tile index
     inx
-    ;attr
+    ;--------------
     lda TempDir
     cmp #1
     beq @flip2
@@ -1520,13 +1525,13 @@ UpdateNpcRow:
     lda #%01000000
 @saveattr2:
     eor DamagedPaletteMask
-    sta FIRST_SPRITE, x
+    sta FIRST_SPRITE, x ; sprite attributes
     inx
-    ;X
+    ;--------------
     lda TempPointX
     clc
     adc #8
-    sta FIRST_SPRITE, x
+    sta FIRST_SPRITE, x ; x coordinate
     inx
 
     inc TempSpriteCount

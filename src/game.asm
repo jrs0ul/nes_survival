@@ -39,6 +39,7 @@ main_tiles_chr: .incbin "main.chr"
 .segment "ROM1"
 
 .include "data/player_sprite_data.asm"
+.include "data/npc_sprite_data.asm"
 .include "data/menu_data.asm"
 .include "data/recipes.asm"
 .include "data/menu_screen_comp.asm"

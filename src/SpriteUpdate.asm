@@ -6,8 +6,8 @@ UpdateSprites:
 
     lda #0
     sta SpritesUpdated
-;--- MAIN CHARACTER:
 
+;--- MAIN CHARACTER:
     ldy PlayerFrame
     lda player_frame_indexes, y
     sta TempFrame
@@ -65,10 +65,7 @@ UpdateSprites:
     sta FIRST_SPRITE, x ; y coordinate
     inx
     iny
-    lda #0
-    clc
-    adc (player_sprite_data_ptr), y
-
+    lda (player_sprite_data_ptr), y
     sta FIRST_SPRITE, x ; sprite frame
     inx
     iny
