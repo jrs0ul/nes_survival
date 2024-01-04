@@ -1297,14 +1297,34 @@ UpdateSingleNpcSprites:
     lda #0
     sta TempIndex ;additional sprite index
 
+
+    ;add to y reg particular ammount of rows to get the right frame
+    ;npc_row_count * 8 * frame_index
+
+    lda #0
+    ldy TempNpcFrame
+@multiplyLoop:
+    clc
+    adc Temp
+    dey
+    bne @multiplyLoop
+    asl
+    asl
+    asl
+    sta TempNpcFrame
+
+
 @rowloop:
 
     lda Temp
     sec
-    sbc TempRowIndex 
-    asl ; let's assume that a row is two sprites portraed by 8 bytes
+    sbc TempRowIndex
+    ;current row is in the a register
+    asl ; let's assume that a row is 2 sprites portraed by 8 bytes
     asl
     asl
+    clc
+    adc TempNpcFrame
     tay
 
     jsr UpdateNpcRow
@@ -1330,10 +1350,19 @@ GetSpriteDataPointer:
     ;we got the pointer
 
     lda TempDir
-    cmp #1
+    cmp #1 ;right
     beq @right
+    cmp #3
+    bcc @left
 
-    lda #0 ;left,right,up or down
+    lsr
+    lsr
+    clc
+    adc #1 ; (1 or 2) + 1 = 2 or 3 (up or down)
+    jmp @found
+
+@left:
+    lda #0 ;left
     jmp @found
 @right:
     lda #1
@@ -1404,6 +1433,7 @@ CollectSingleNpcData:
     lsr
     lsr
     lsr
+    sta TempNpcFrame ; let's store the frame for later
     stx TempRegX
     tax
     lda npc_anim_row_sequence, x

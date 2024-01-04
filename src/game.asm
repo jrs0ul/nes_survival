@@ -1368,9 +1368,11 @@ TempPreRowLoopValue: ; used in LoadOutsidemap
 SelectedItemPower:
     .res 1
 
+TempNpcFrame:
+    .res 1
 
 Buffer:
-    .res 265  ;must see how much is still available
+    .res 264  ;must see how much is still available
 
 ;====================================================================================
 
