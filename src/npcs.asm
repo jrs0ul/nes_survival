@@ -1290,34 +1290,19 @@ UpdateSingleNpcSprites:
     lda Npcs, y; y
     sta TempPointY ; save y
 
-    ;let's get the pointer to the sprite data
-    lda TempNpcIndex
-    asl
-    asl
-    asl ;index * 8
-    clc
-    adc #6
-    tay
-    lda npc_data, y
-    sta character_sprite_data_ptr
-    iny
-    lda npc_data, y
-    sta character_sprite_data_ptr + 1
-
+    jsr GetSpriteDataPointer
 
     lda Temp ; row count
     sta TempRowIndex
     lda #0
     sta TempIndex ;additional sprite index
 
-    
-    ;ldy #0
 @rowloop:
 
     lda Temp
     sec
-    sbc TempRowIndex
-    asl
+    sbc TempRowIndex 
+    asl ; let's assume that a row is two sprites portraed by 8 bytes
     asl
     asl
     tay
@@ -1327,6 +1312,42 @@ UpdateSingleNpcSprites:
     bne @rowloop
 @nextNpc:
     rts
+;----------------------------------
+GetSpriteDataPointer:
+    ;let's get the pointer to the sprite data
+    lda TempNpcIndex
+    asl
+    asl
+    asl ;index * 8
+    clc
+    adc #6 ;offset to reach the pointer to the frame list
+    tay
+    lda npc_data, y
+    sta ptr_list
+    iny
+    lda npc_data, y
+    sta ptr_list + 1
+    ;we got the pointer
+
+    lda TempDir
+    cmp #1
+    beq @right
+
+    lda #0 ;left,right,up or down
+    jmp @found
+@right:
+    lda #1
+@found:
+    asl
+    tay
+    lda (ptr_list), y
+    sta character_sprite_data_ptr
+    iny
+    lda (ptr_list), y
+    sta character_sprite_data_ptr + 1
+
+    rts
+
 
 ;-----------------------------------
 CollectSingleNpcData:
@@ -1515,12 +1536,12 @@ UpdateNpcRow:
     inx
     iny
     ;index-----------
+
     lda TempDir
     cmp #1
     beq @flipSpriteIndex2
     cmp #3
     bcc @contSprite2
-
     ;--
 
     lda TempZ

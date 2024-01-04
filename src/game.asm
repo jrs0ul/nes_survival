@@ -721,8 +721,11 @@ menuTileTransferDataIdx:
 character_sprite_data_ptr:
     .res 2
 
+ptr_list:
+    .res 2
+
 ZPBuffer:
-    .res 106  ; I want to be aware of the free memory
+    .res 104  ; I want to be aware of the free memory
 
 ;--------------
 .segment "BSS" ; variables in ram
