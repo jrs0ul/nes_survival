@@ -781,14 +781,17 @@ OnCollisionWithAttackRect:
     jsr PlayDamageSfx
 
     lda #0
-    sta Npcs, y
+    sta Npcs, y ;hp
     dey
     lda #32
-    sta Npcs, y
+    sta Npcs, y ;timer
+    dey
+    lda #5*32
+    sta Npcs, y ;frame
 
     tya
     sec
-    sbc #6 ; go to status
+    sbc #5 ; go to status
     tay
 
     lda Npcs, y
@@ -1294,13 +1297,12 @@ UpdateSingleNpcSprites:
 
     lda Temp ; row count
     sta TempRowIndex
-    lda #0
-    sta TempIndex ;additional sprite index
 
 
     ;add to y reg particular ammount of rows to get the right frame
     ;npc_row_count * 8 * frame_index
 
+    ;TODO: MAKE THIS FAAAST!!!!!
     lda #0
     ldy TempNpcFrame
 @multiplyLoop:
@@ -1402,8 +1404,6 @@ CollectSingleNpcData:
     asl
     asl
     tay
-    lda npc_data, y ; first tile index
-    sta TempZ ;save tile
     iny
     lda npc_data, y ; tile rows for the npc
     ldy Temp; restore Npcs index
@@ -1434,12 +1434,7 @@ CollectSingleNpcData:
     lsr
     lsr
     sta TempNpcFrame ; let's store the frame for later
-    stx TempRegX
-    tax
-    lda npc_anim_row_sequence, x
-    ldx TempRegX
 
-    sta TempFrame ; store frame
     iny
     lda Npcs, y ;timer
     sta TempNpcTimer
@@ -1449,18 +1444,6 @@ CollectSingleNpcData:
     sbc #5
     tay
 
-    ;force to use 2 tile rows if dead
-    lda TempNpcState
-    bne @exit
-
-    lda #2
-    sta Temp
-    lda #0
-    sta TempIndex
-    sta TempFrame
-    sta TempFrameOffset
-    lda #ANIM_FRAME_BLOODSTAIN
-    sta TempZ
 @exit:
     rts
 
@@ -1477,66 +1460,11 @@ UpdateNpcRow:
     inx
     iny
 
-    ;----------------
-;    lda TempDir
-;    cmp #1
-;    beq @spriteIndexFlip1
-;    cmp #3
-;    bcc @contFirstSprite
-
-;    lda TempNpcState
-;    beq @skipDirFrames ; don't animate direction if dead
-
-;    lda TempDir
-;    lsr
-;    lsr
-;    asl ;extract Y dir and multiply by 2
-;    sta TempFrameOffset
-
-;@skipDirFrames:
-
-;    lda TempZ
-;    clc
-;    adc TempIndex
-;    adc TempFrameOffset
-;    jmp @storeSpriteIndex1
-
-;@contFirstSprite:
-;    lda TempZ
-;    clc
-;    adc TempIndex
-;    jmp @storeSpriteIndex1
-;@spriteIndexFlip1:
-;    lda TempZ
-;    clc
-;    adc TempIndex
-;    adc #1
-;@storeSpriteIndex1:
     lda (character_sprite_data_ptr), y
     sta FIRST_SPRITE, x ; tile index
-
-    ;lda TempRowIndex
-    ;cmp #3
-    ;beq @doAttrib
-
-    ;lda FIRST_SPRITE, x
-    ;clc
-    ;adc TempFrame
-    ;sta FIRST_SPRITE, x
-
-@doAttrib:
     inx
     iny
 
-    ;-------------------------
-;    lda TempDir
-;    cmp #1
-;    beq @flip1
-;    lda #%00000000
-;    jmp @saveattr1
-;@flip1:
-;    lda #%01000000
-;@saveattr1:
     lda (character_sprite_data_ptr), y
     eor DamagedPaletteMask
     sta FIRST_SPRITE, x
@@ -1546,9 +1474,8 @@ UpdateNpcRow:
     lda TempPointX
     clc
     adc (character_sprite_data_ptr), y
-    sta FIRST_SPRITE, x
+    sta FIRST_SPRITE, x ; x coordinate
     inc TempSpriteCount
-
     inx
     iny
 
@@ -1562,63 +1489,18 @@ UpdateNpcRow:
 
     lda TempPointY
     clc
-    ;adc TempPush
     adc (character_sprite_data_ptr), y
     sta FIRST_SPRITE, x ; y coordinate
     inx
     iny
     ;index-----------
 
-;    lda TempDir
-;    cmp #1
-;    beq @flipSpriteIndex2
-;    cmp #3
-;    bcc @contSprite2
-    ;--
-
-;    lda TempZ
-;    clc
-;    adc #1
-;    adc TempIndex
-;    adc TempFrameOffset
-;    jmp @storeSpriteIndex2
-    ;--
-
-;@contSprite2:
-;    lda TempZ
-;    clc
-;    adc #1
-;    adc TempIndex
-;    jmp @storeSpriteIndex2
-;@flipSpriteIndex2:
-;    lda TempZ
-;    clc
-;    adc TempIndex
-;@storeSpriteIndex2:
     lda (character_sprite_data_ptr), y
     sta FIRST_SPRITE, x ; tile index
 
-;    lda TempRowIndex
-;    cmp #3
-;    beq @doneRow
-
-;    lda FIRST_SPRITE, x
-;    clc
-;    adc TempFrame
-;    sta FIRST_SPRITE, x
-
-@doneRow:
     inx
     iny
-    ;-------------- attributes
-;    lda TempDir
-;    cmp #1
-;    beq @flip2
-;    lda #0
-;    jmp @saveattr2
-;@flip2:
-;    lda #%01000000
-;@saveattr2:
+
     lda (character_sprite_data_ptr), y
     eor DamagedPaletteMask
     sta FIRST_SPRITE, x ; sprite attributes
@@ -1635,11 +1517,6 @@ UpdateNpcRow:
     inc TempSpriteCount
 
 @exit:
-    lda TempIndex
-    clc
-    adc #16
-    sta TempIndex
-
 
     rts
 
