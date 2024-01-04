@@ -1478,64 +1478,66 @@ UpdateNpcRow:
     iny
 
     ;----------------
-    lda TempDir
-    cmp #1
-    beq @spriteIndexFlip1
-    cmp #3
-    bcc @contFirstSprite
+;    lda TempDir
+;    cmp #1
+;    beq @spriteIndexFlip1
+;    cmp #3
+;    bcc @contFirstSprite
 
-    lda TempNpcState
-    beq @skipDirFrames ; don't animate direction if dead
+;    lda TempNpcState
+;    beq @skipDirFrames ; don't animate direction if dead
 
-    lda TempDir
-    lsr
-    lsr
-    asl ;extract Y dir and multiply by 2
-    sta TempFrameOffset
+;    lda TempDir
+;    lsr
+;    lsr
+;    asl ;extract Y dir and multiply by 2
+;    sta TempFrameOffset
 
-@skipDirFrames:
+;@skipDirFrames:
 
-    lda TempZ
-    clc
-    adc TempIndex
-    adc TempFrameOffset
-    jmp @storeSpriteIndex1
+;    lda TempZ
+;    clc
+;    adc TempIndex
+;    adc TempFrameOffset
+;    jmp @storeSpriteIndex1
 
-@contFirstSprite:
-    lda TempZ
-    clc
-    adc TempIndex
-    jmp @storeSpriteIndex1
-@spriteIndexFlip1:
-    lda TempZ
-    clc
-    adc TempIndex
-    adc #1
-@storeSpriteIndex1:
+;@contFirstSprite:
+;    lda TempZ
+;    clc
+;    adc TempIndex
+;    jmp @storeSpriteIndex1
+;@spriteIndexFlip1:
+;    lda TempZ
+;    clc
+;    adc TempIndex
+;    adc #1
+;@storeSpriteIndex1:
+    lda (character_sprite_data_ptr), y
     sta FIRST_SPRITE, x ; tile index
 
-    lda TempRowIndex
-    cmp #3
-    beq @doAttrib
+    ;lda TempRowIndex
+    ;cmp #3
+    ;beq @doAttrib
 
-    lda FIRST_SPRITE, x
-    clc
-    adc TempFrame
-    sta FIRST_SPRITE, x
+    ;lda FIRST_SPRITE, x
+    ;clc
+    ;adc TempFrame
+    ;sta FIRST_SPRITE, x
 
 @doAttrib:
     inx
     iny
 
     ;-------------------------
-    lda TempDir
-    cmp #1
-    beq @flip1
-    lda #%00000000
-    jmp @saveattr1
-@flip1:
-    lda #%01000000
-@saveattr1:
+;    lda TempDir
+;    cmp #1
+;    beq @flip1
+;    lda #%00000000
+;    jmp @saveattr1
+;@flip1:
+;    lda #%01000000
+;@saveattr1:
+    lda (character_sprite_data_ptr), y
     eor DamagedPaletteMask
     sta FIRST_SPRITE, x
     inx
@@ -1567,55 +1569,57 @@ UpdateNpcRow:
     iny
     ;index-----------
 
-    lda TempDir
-    cmp #1
-    beq @flipSpriteIndex2
-    cmp #3
-    bcc @contSprite2
+;    lda TempDir
+;    cmp #1
+;    beq @flipSpriteIndex2
+;    cmp #3
+;    bcc @contSprite2
     ;--
 
-    lda TempZ
-    clc
-    adc #1
-    adc TempIndex
-    adc TempFrameOffset
-    jmp @storeSpriteIndex2
+;    lda TempZ
+;    clc
+;    adc #1
+;    adc TempIndex
+;    adc TempFrameOffset
+;    jmp @storeSpriteIndex2
     ;--
 
-@contSprite2:
-    lda TempZ
-    clc
-    adc #1
-    adc TempIndex
-    jmp @storeSpriteIndex2
-@flipSpriteIndex2:
-    lda TempZ
-    clc
-    adc TempIndex
-@storeSpriteIndex2:
+;@contSprite2:
+;    lda TempZ
+;    clc
+;    adc #1
+;    adc TempIndex
+;    jmp @storeSpriteIndex2
+;@flipSpriteIndex2:
+;    lda TempZ
+;    clc
+;    adc TempIndex
+;@storeSpriteIndex2:
+    lda (character_sprite_data_ptr), y
     sta FIRST_SPRITE, x ; tile index
 
-    lda TempRowIndex
-    cmp #3
-    beq @doneRow
+;    lda TempRowIndex
+;    cmp #3
+;    beq @doneRow
 
-    lda FIRST_SPRITE, x
-    clc
-    adc TempFrame
-    sta FIRST_SPRITE, x
+;    lda FIRST_SPRITE, x
+;    clc
+;    adc TempFrame
+;    sta FIRST_SPRITE, x
 
 @doneRow:
     inx
     iny
     ;-------------- attributes
-    lda TempDir
-    cmp #1
-    beq @flip2
-    lda #0
-    jmp @saveattr2
-@flip2:
-    lda #%01000000
-@saveattr2:
+;    lda TempDir
+;    cmp #1
+;    beq @flip2
+;    lda #0
+;    jmp @saveattr2
+;@flip2:
+;    lda #%01000000
+;@saveattr2:
+    lda (character_sprite_data_ptr), y
     eor DamagedPaletteMask
     sta FIRST_SPRITE, x ; sprite attributes
     inx
