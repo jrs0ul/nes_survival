@@ -1458,7 +1458,7 @@ UpdateNpcRow:
 
     lda (character_sprite_data_ptr), y
     eor DamagedPaletteMask
-    sta FIRST_SPRITE, x
+    sta FIRST_SPRITE, x; sprite attributes
     inx
     iny
     ;X coord------------------
@@ -1484,11 +1484,9 @@ UpdateNpcRow:
     sta FIRST_SPRITE, x ; y coordinate
     inx
     iny
-    ;index-----------
 
     lda (character_sprite_data_ptr), y
     sta FIRST_SPRITE, x ; tile index
-
     inx
     iny
 
@@ -1497,15 +1495,14 @@ UpdateNpcRow:
     sta FIRST_SPRITE, x ; sprite attributes
     inx
     iny
-    ;--------------
+    ;X coord------------------
     lda TempPointX
     clc
     adc (character_sprite_data_ptr), y
     sta FIRST_SPRITE, x ; x coordinate
+    inc TempSpriteCount
     inx
     iny
-
-    inc TempSpriteCount
 
     jmp @exit
 @skipThatSprite:
