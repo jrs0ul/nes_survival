@@ -1,3 +1,26 @@
+npc_anim_3_row_sequence:
+    .byte 0
+    .byte 3
+    .byte 6
+    .byte 9
+    .byte 12
+    .byte 15
+
+npc_anim_2_row_sequence:
+    .byte 0
+    .byte 2
+    .byte 4
+    .byte 6
+    .byte 8
+    .byte 10
+
+npc_anim_rows:
+    .byte 0,                        0
+    .byte 0,                        0
+    .byte <npc_anim_2_row_sequence, >npc_anim_2_row_sequence
+    .byte <npc_anim_3_row_sequence, >npc_anim_3_row_sequence
+
+
 ;Bunny
 npc_BUNNY_sprite_data:
 

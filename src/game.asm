@@ -314,12 +314,6 @@ sun_moon_sprites_for_periods:
     .byte 232, 246, 0, 0 ;$40
     .byte 232, 246, 0, 0 ;$40
 
-npc_anim_row_sequence:
-    .byte 0
-    .byte 32
-    .byte 64
-    .byte 32
-    .byte 96
 
 
 ;--------------

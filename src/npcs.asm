@@ -1300,35 +1300,26 @@ UpdateSingleNpcSprites:
 
 
     ;add to y reg particular ammount of rows to get the right frame
-    ;npc_row_count * 8 * frame_index
-
-    ;TODO: MAKE THIS FAAAST!!!!!
-    lda #0
-    ldy TempNpcFrame
-@multiplyLoop:
-    clc
-    adc Temp
-    dey
-    bne @multiplyLoop
-    asl
-    asl
-    asl
-    sta TempNpcFrame
-
-
-@rowloop:
-
+    ;npc_height_in_rows * frame_index
     lda Temp
-    sec
-    sbc TempRowIndex
-    ;current row is in the a register
+    asl
+    tay
+    lda npc_anim_rows, y
+    sta ptr_list
+    iny
+    lda npc_anim_rows, y
+    sta ptr_list + 1
+
+
+    ldy TempNpcFrame
+    lda (ptr_list), y
+
     asl ; let's assume that a row is 2 sprites portraed by 8 bytes
     asl
     asl
-    clc
-    adc TempNpcFrame
-    tay
+    tay ; index for our sprite data
 
+@rowloop:
     jsr UpdateNpcRow
     dec TempRowIndex
     bne @rowloop
@@ -1432,7 +1423,7 @@ CollectSingleNpcData:
     lsr
     lsr
     lsr
-    lsr
+    lsr ;frame / 32
     sta TempNpcFrame ; let's store the frame for later
 
     iny
@@ -1484,7 +1475,7 @@ UpdateNpcRow:
     lda TempPointX ; check if the second sprite is still in screen
     clc
     adc #8
-    bcs @exit
+    bcs @skipThatSprite
     ;----
 
     lda TempPointY
@@ -1515,6 +1506,14 @@ UpdateNpcRow:
     iny
 
     inc TempSpriteCount
+
+    jmp @exit
+@skipThatSprite:
+
+    iny
+    iny
+    iny
+    iny
 
 @exit:
 
