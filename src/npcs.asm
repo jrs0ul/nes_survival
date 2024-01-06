@@ -781,14 +781,17 @@ OnCollisionWithAttackRect:
     jsr PlayDamageSfx
 
     lda #0
-    sta Npcs, y
+    sta Npcs, y ;hp
     dey
     lda #32
-    sta Npcs, y
+    sta Npcs, y ;timer
+    dey
+    lda #5*32
+    sta Npcs, y ;frame
 
     tya
     sec
-    sbc #6 ; go to status
+    sbc #5 ; go to status
     tay
 
     lda Npcs, y
@@ -1290,17 +1293,79 @@ UpdateSingleNpcSprites:
     lda Npcs, y; y
     sta TempPointY ; save y
 
+    jsr GetSpriteDataPointer
+
     lda Temp ; row count
+    sta TempRowIndex
+
+
+    ;add to y reg particular ammount of rows to get the right frame
+    ;npc_height_in_rows * frame_index
+    lda Temp
+    asl
     tay
-    lda #0
-    sta TempPush ; additionl Y
-    sta TempIndex ;additional sprite index
+    lda npc_anim_rows, y
+    sta ptr_list
+    iny
+    lda npc_anim_rows, y
+    sta ptr_list + 1
+
+
+    ldy TempNpcFrame
+    lda (ptr_list), y
+
+    asl ; let's assume that a row is 2 sprites portrayed by 8 bytes
+    asl
+    asl
+    tay ; index for our sprite data
+
 @rowloop:
     jsr UpdateNpcRow
-    dey
+    dec TempRowIndex
     bne @rowloop
 @nextNpc:
     rts
+;----------------------------------
+GetSpriteDataPointer:
+    ;let's get the pointer to the sprite data
+    ldy TempNpcIndex
+    lda frame_list_index_lookup, y
+    tay
+    lda npc_data, y
+    sta ptr_list
+    iny
+    lda npc_data, y
+    sta ptr_list + 1
+    ;we got the pointer
+
+    lda TempDir
+    cmp #1 ;right
+    beq @right
+    cmp #3
+    bcc @left
+
+    lsr
+    lsr
+    clc
+    adc #1 ; (1 or 2) + 1 = 2 or 3 (up or down)
+    jmp @found
+
+@left:
+    lda #0 ;left
+    jmp @found
+@right:
+    lda #1
+@found:
+    asl
+    tay
+    lda (ptr_list), y
+    sta character_sprite_data_ptr
+    iny
+    lda (ptr_list), y
+    sta character_sprite_data_ptr + 1
+
+    rts
+
 
 ;-----------------------------------
 CollectSingleNpcData:
@@ -1321,12 +1386,11 @@ CollectSingleNpcData:
     lsr
 
     sty Temp; store Npcs index
+    sta TempNpcIndex ; what kind of npc is this ?
     asl
     asl
     asl
     tay
-    lda npc_data, y ; first tile index
-    sta TempZ ;save tile
     iny
     lda npc_data, y ; tile rows for the npc
     ldy Temp; restore Npcs index
@@ -1355,13 +1419,9 @@ CollectSingleNpcData:
     lsr
     lsr
     lsr
-    lsr
-    stx TempRegX
-    tax
-    lda npc_anim_row_sequence, x
-    ldx TempRegX
+    lsr ;frame / 32
+    sta TempNpcFrame ; let's store the frame for later
 
-    sta TempFrame ; store frame
     iny
     lda Npcs, y ;timer
     sta TempNpcTimer
@@ -1371,176 +1431,84 @@ CollectSingleNpcData:
     sbc #5
     tay
 
-    ;force to use 2 tile rows if dead
-    lda TempNpcState
-    bne @exit
-
-    lda #2
-    sta Temp
-    lda #0
-    sta TempIndex
-    sta TempFrame
-    sta TempFrameOffset
-    lda #ANIM_FRAME_BLOODSTAIN
-    sta TempZ
 @exit:
     rts
 
 ;-------------------------------------
+;Update two npc sprites
 UpdateNpcRow:
-     ;Y
+
+    ;Sprite 1
+
     lda TempPointY
     clc
-    adc TempPush
-    sta FIRST_SPRITE, x
+    adc (character_sprite_data_ptr), y
+    sta FIRST_SPRITE, x ; y coordinate
     inx
-    ;index
-    lda TempDir
-    cmp #1
-    beq @spriteIndexFlip1
-    cmp #3
-    bcc @contFirstSprite
-;--
-    lda TempNpcState
-    beq @skipDirFrames ; don't animate direction if dead
+    iny
 
-    lda TempDir
-    lsr
-    lsr
-    asl ;extract Y dir and multiply by 2
-    sta TempFrameOffset
-
-@skipDirFrames:
-
-    lda TempZ
-    clc
-    adc TempIndex
-    adc TempFrameOffset
-    cpy #3 ; don't animate first row if there are 3 in total
-    beq @storeSpriteIndex1
-    adc TempFrame
-    jmp @storeSpriteIndex1
-;--
-@contFirstSprite:
-    lda TempZ
-    clc
-    adc TempIndex
-    cpy #3 ; don't animate first row if there are 3 in total
-    beq @storeSpriteIndex1
-    adc TempFrame
-    jmp @storeSpriteIndex1
-@spriteIndexFlip1:
-    lda TempZ
-    clc
-    adc TempIndex
-    adc #1
-    cpy #3
-    beq @storeSpriteIndex1
-    adc TempFrame
-@storeSpriteIndex1:
-    sta FIRST_SPRITE, x
+    lda (character_sprite_data_ptr), y
+    sta FIRST_SPRITE, x ; tile index
     inx
-    ;attr
-    lda TempDir
-    cmp #1
-    beq @flip1
-    lda #%00000000
-    jmp @saveattr1
-@flip1:
-    lda #%01000000
-@saveattr1:
+    iny
+
+    lda (character_sprite_data_ptr), y
     eor DamagedPaletteMask
-    sta FIRST_SPRITE, x
+    sta FIRST_SPRITE, x; sprite attributes
     inx
-    ;X
+    iny
+    ;X coord------------------
     lda TempPointX
-    sta FIRST_SPRITE, x
+    clc
+    adc (character_sprite_data_ptr), y
+    sta FIRST_SPRITE, x ; x coordinate
     inc TempSpriteCount
-
     inx
+    iny
+
+    ;SECOND SPRITE -----------------------------------
 
     lda TempPointX ; check if the second sprite is still in screen
     clc
     adc #8
-    bcs @exit
+    bcs @skipThatSprite
+    ;----
 
-
-    ;Y
     lda TempPointY
     clc
-    adc TempPush
-    sta FIRST_SPRITE, x
+    adc (character_sprite_data_ptr), y
+    sta FIRST_SPRITE, x ; y coordinate
     inx
-    ;index
-    lda TempDir
-    cmp #1
-    beq @flipSpriteIndex2
-    cmp #3
-    bcc @contSprite2
+    iny
 
-    ;--
-
-    lda TempZ
-    clc
-    adc #1
-    adc TempIndex
-    adc TempFrameOffset
-    cpy #3
-    beq @storeSpriteIndex2
-    adc TempFrame
-    jmp @storeSpriteIndex2
-    ;--
-
-@contSprite2:
-    lda TempZ
-    clc
-    adc #1
-    adc TempIndex
-    cpy #3
-    beq @storeSpriteIndex2
-    adc TempFrame
-    jmp @storeSpriteIndex2
-@flipSpriteIndex2:
-    lda TempZ
-    clc
-    adc TempIndex
-    cpy #3
-    beq @storeSpriteIndex2
-    adc TempFrame
-@storeSpriteIndex2:
-    sta FIRST_SPRITE, x
+    lda (character_sprite_data_ptr), y
+    sta FIRST_SPRITE, x ; tile index
     inx
-    ;attr
-    lda TempDir
-    cmp #1
-    beq @flip2
-    lda #0
-    jmp @saveattr2
-@flip2:
-    lda #%01000000
-@saveattr2:
+    iny
+
+    lda (character_sprite_data_ptr), y
     eor DamagedPaletteMask
-    sta FIRST_SPRITE, x
+    sta FIRST_SPRITE, x ; sprite attributes
     inx
-    ;X
+    iny
+    ;X coord------------------
     lda TempPointX
     clc
-    adc #8
-    sta FIRST_SPRITE, x
-    inx
-
+    adc (character_sprite_data_ptr), y
+    sta FIRST_SPRITE, x ; x coordinate
     inc TempSpriteCount
+    inx
+    iny
+
+    jmp @exit
+@skipThatSprite:
+
+    iny
+    iny
+    iny
+    iny
 
 @exit:
-    lda TempPush
-    clc
-    adc #8
-    sta TempPush
-    lda TempIndex
-    clc
-    adc #16
-    sta TempIndex
-
 
     rts
 
