@@ -1314,7 +1314,7 @@ UpdateSingleNpcSprites:
     ldy TempNpcFrame
     lda (ptr_list), y
 
-    asl ; let's assume that a row is 2 sprites portraed by 8 bytes
+    asl ; let's assume that a row is 2 sprites portrayed by 8 bytes
     asl
     asl
     tay ; index for our sprite data
