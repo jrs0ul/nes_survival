@@ -1328,12 +1328,8 @@ UpdateSingleNpcSprites:
 ;----------------------------------
 GetSpriteDataPointer:
     ;let's get the pointer to the sprite data
-    lda TempNpcIndex
-    asl
-    asl
-    asl ;index * 8
-    clc
-    adc #6 ;offset to reach the pointer to the frame list
+    ldy TempNpcIndex
+    lda frame_list_index_lookup, y
     tay
     lda npc_data, y
     sta ptr_list

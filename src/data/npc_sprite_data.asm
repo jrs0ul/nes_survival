@@ -20,6 +20,16 @@ npc_anim_rows:
     .byte <npc_anim_2_row_sequence, >npc_anim_2_row_sequence
     .byte <npc_anim_3_row_sequence, >npc_anim_3_row_sequence
 
+;lookup table for framelist indexes in npc_data
+frame_list_index_lookup:
+    .byte 6  ; dogman
+    .byte 14 ; bunny
+    .byte 22 ; bjorn
+    .byte 30 ; canid
+    .byte 38 ; erika
+    .byte 46 ; granny
+    .byte 54 ; deadman
+
 
 ;Bunny
 npc_BUNNY_sprite_data:
