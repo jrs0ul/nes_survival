@@ -19,8 +19,9 @@ UpdateSprites:
     asl ;x4 to get to the bytes
     sta TempAnimIndex
 
-    lda PlayerFlip
-    beq @notFlipped
+    lda DirectionX
+    cmp #2
+    bne @notFlipped
 
     lda #<player_sprites_flip
     sta character_sprite_data_ptr
@@ -177,8 +178,9 @@ UpdateSprites:
     jmp @update
 
 @horizontal:
-    lda PlayerFlip
-    bne @flipIndex
+    lda DirectionX
+    cmp #2
+    beq @flipIndex
 
     ldy #0
     jmp @update
@@ -631,8 +633,9 @@ UpdateProjectileSprites:
 ;----------------------------------
 PrepareKnifeSprite:
 
-    lda PlayerFlip
-    beq @notFlippedKnife
+    lda DirectionX
+    cmp #2
+    bne @notFlippedKnife
 
     lda #%01000000
     sta Temp
@@ -699,15 +702,16 @@ UpdateHammerSprites:
     clc
     adc #16
     tay
-    lda PlayerFlip
-    beq @updatesprites
+    lda DirectionX
+    cmp #2
+    bne @updatesprites
     tya
     clc
     adc #16
     tay
     jmp @updatesprites
 @horizontal:
-    lda PlayerFlip ; playerflip * 8 
+    lda #1 ; playerflip * 8 
     asl
     asl
     asl

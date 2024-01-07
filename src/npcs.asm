@@ -986,8 +986,9 @@ PreparePlayerAttackSquare:
     beq @spearEquiped
 
     
-    lda PlayerFlip
-    beq @notFlipped
+    lda DirectionX
+    cmp #2
+    bne @notFlipped
 
     lda PlayerFrame
     asl
@@ -1054,8 +1055,9 @@ PreparePlayerAttackSquare:
 
 @nothingEquiped:
     
-    lda PlayerFlip
-    beq @notFlippedUnarmed
+    lda DirectionX
+    cmp #2
+    bne @notFlippedUnarmed
 
     lda PlayerFrame
     asl

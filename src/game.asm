@@ -797,7 +797,7 @@ NpcsHitByPlayer:
     .res 1
 PlayerFrame:
     .res 1
-PlayerFlip:
+TempNpcFrame:
     .res 1
 
 SnowFrame:
@@ -1362,11 +1362,9 @@ TempPreRowLoopValue: ; used in LoadOutsidemap
 SelectedItemPower:
     .res 1
 
-TempNpcFrame:
-    .res 1
 
 Buffer:
-    .res 264  ;must see how much is still available
+    .res 265  ;must see how much is still available
 
 ;====================================================================================
 
@@ -5751,8 +5749,9 @@ CalcTileAddressInFrontOfPlayer:
     jmp @cont
 
 @horizontal:
-    lda PlayerFlip
-    beq @left
+    lda DirectionX
+    cmp #2
+    bne @left
     ;right
     lda PlayerX
     clc
@@ -5954,7 +5953,9 @@ ShootSlingshot:
     lda PlayerFrame
     bne @saveDir
 ;horizontal direction
-    lda PlayerFlip
+    lda DirectionX
+    sec
+    sbc #1
     clc
     adc #3
 @saveDir:
@@ -6004,7 +6005,9 @@ LaunchSpear:
     lda PlayerFrame
     bne @saveDir
 
-    lda PlayerFlip
+    lda DirectionX
+    sec
+    sbc #1
     clc
     adc #3
 
@@ -6053,7 +6056,6 @@ SetupCheckLeft:
     sta ScrollDirection
     lda #0
     sta PlayerFrame
-    sta PlayerFlip
 
     rts
 
@@ -6139,8 +6141,6 @@ SetupCheckRight:
     sta ScrollDirection
     lda #0
     sta PlayerFrame
-    lda #1
-    sta PlayerFlip
 
     rts
 
