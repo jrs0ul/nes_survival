@@ -194,19 +194,6 @@ spearSprites:
     .byte 252, $E0, %00000000, 248, 252, $E1, %00000000, 0 ;left
     .byte 252, $E1, %01000000, 248, 252, $E0, %01000000, 0 ;right
 
-fishingRodSprites:
-    .byte   8, $E7, %00000000, 0,   8, $E8, %00000000, 248 ;left
-    .byte   8, $E7, %01000000, 8,   8, $E8, %01000000, 16 ;right
-    .byte   8, $E6, %00000000, 0,  16, $D8, %00000000, 0  ;down
-    .byte   0, $E6, %10000000, 0,  248, $D8, %10000000, 0 ;up
-
-hammerSprites:
-    .byte   7, $A9, %00000000, 0,   7, $A8, %00000000, 248  ;left
-    .byte   7, $A9, %01000000, 8,   7, $A8, %01000000, 16   ;right
-    .byte   255, $99, %11000000, 8,  250, $98, %11000000, 8 ;up
-    .byte   9, $99, %00000000, 0,  17, $98, %00000000, 0    ;down
-    .byte   255, $99, %10000000, 0,  250, $98, %10000000, 0 ;up-flipped
-    .byte   9,   $99, %01000000, 8,  17,  $98, %01000000, 8 ;down-flipped
 
 
 .include "data/house_palette.asm"
@@ -223,15 +210,12 @@ sprites:
 
 
 ;position of knife sprite depending on the player frame
-knife_pos_flipped:
-    .byte 16,  8 ; left/right
-    .byte  0,  0 ; up
-    .byte  8, 16 ; down
+knife_pos:
+    .byte 248,  8 ; left (248 = -8)
+    .byte  16,  8 ; right
+    .byte   8,  0 ; up
+    .byte   0, 16 ; down
 
-knife_pos_normal:
-    .byte  248,  8 ; left/right (248 = -8)
-    .byte  8  ,  0 ; up
-    .byte  0  , 16 ; down
 
 knife_collision_pos_flip:
     .byte 22, 9, 22, 15  ; l/r

@@ -3,6 +3,18 @@ player_frame_indexes:
     .byte 12 ; UP
     .byte 24 ; DOWN
 
+fishingRodSprites:
+    .byte   8, $E7, %00000000, 0,   8, $E8, %00000000, 248 ;left
+    .byte   8, $E7, %01000000, 8,   8, $E8, %01000000, 16 ;right
+    .byte   8, $E6, %00000000, 0,  16, $D8, %00000000, 0  ;down
+    .byte   0, $E6, %10000000, 0,  248, $D8, %10000000, 0 ;up
+
+hammerSprites:
+    .byte   7,   $A9, %00000000, 0,   7,  $A8, %00000000, 248 ;left
+    .byte   7,   $A9, %01000000, 8,   7,  $A8, %01000000, 16  ;right
+    .byte   255, $99, %11000000, 8,  250, $98, %11000000, 8   ;up
+    .byte   9,   $99, %00000000, 0,  17,  $98, %00000000, 0   ;down
+
 
 player_sprites_not_flip:
     ;LEFT
