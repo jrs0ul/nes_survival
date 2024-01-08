@@ -187,14 +187,6 @@ stamina_segment_values:
     .byte 96
     .byte 128
 
-spearSprites:
-          ;+Y,frame,attributes,+X
-    .byte 248, $E2, %00000000, 252, 0, $E3, %00000000, 252 ;up
-    .byte 248, $E3, %10000000, 252, 0, $E2, %10000000, 252 ;down
-    .byte 252, $E0, %00000000, 248, 252, $E1, %00000000, 0 ;left
-    .byte 252, $E1, %01000000, 248, 252, $E0, %01000000, 0 ;right
-
-
 
 .include "data/house_palette.asm"
 .include "data/main_palette.asm"
@@ -216,24 +208,17 @@ knife_pos:
     .byte   8,  0 ; up
     .byte   0, 16 ; down
 
-
-knife_collision_pos_flip:
-    .byte 22, 9, 22, 15  ; l/r
-    .byte 2,  1,  6, 1   ; up
-    .byte 10, 22, 14, 22 ;down
 knife_collision_pos:
-    .byte 250, 9, 250, 15
-    .byte 10, 1, 14, 1
-    .byte 2, 24, 6, 24
+    .byte 250, 9, 250, 15 ; left
+    .byte 22, 9, 22, 15   ; right
+    .byte 10, 1, 14, 1    ; up
+    .byte 2, 24, 6, 24    ; down
 
-fist_collision_pos_flip:
-    .byte 18, 9, 18, 15  ; l/r
-    .byte 2,  4,  6, 4   ; up
-    .byte 10, 18, 14, 18 ;down
 fist_collision_pos:
-    .byte 254, 9, 254, 15
-    .byte 10, 4, 14, 4
-    .byte 2, 18, 6, 18
+    .byte 254, 9, 254, 15  ;left
+    .byte 18, 9, 18, 15    ;right
+    .byte 10, 4, 14, 4     ;up
+    .byte 2, 18, 6, 18     ;down
 
 
 ;data: 

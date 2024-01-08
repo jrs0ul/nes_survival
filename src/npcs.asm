@@ -974,6 +974,7 @@ CalcPlayerDmg:
 
 
 ;--------------------------------------
+;TODO: remove repeating code
 PreparePlayerAttackSquare:
 
     sty TempY
@@ -985,40 +986,27 @@ PreparePlayerAttackSquare:
     cmp #ITEM_SPEAR
     beq @spearEquiped
 
-    
+    ;knife
+
+    lda PlayerFrame
+    bne @vertical
+
     lda DirectionX
     cmp #2
-    bne @notFlipped
+    beq @facingRight
 
-    lda PlayerFrame
-    asl
-    asl
-    tay
-    lda knife_collision_pos_flip, y
-    clc
-    adc PlayerX
-    sta AttackTopLeftX
-    iny
-    lda knife_collision_pos_flip, y
-    clc
-    adc PlayerY
-    sta AttackTopLeftY
-    iny
-    lda knife_collision_pos_flip, y
-    clc
-    adc PlayerX
-    sta AttackBottomRightX
-    iny
-    lda knife_collision_pos_flip, y
-    clc
-    adc PlayerY
-    sta AttackBottomRightY
+    lda #0
+    jmp @multiply
 
-    jmp @calcCollision
+@facingRight:
+    lda #1 ; right
+    jmp @multiply
 
-@notFlipped:
-    
-    lda PlayerFrame
+@vertical:
+    clc
+    adc #1
+
+@multiply:
     asl
     asl
     tay
@@ -1038,7 +1026,7 @@ PreparePlayerAttackSquare:
     sta AttackBottomRightX
     iny
     lda knife_collision_pos, y
-    clc 
+    clc
     adc PlayerY
     sta AttackBottomRightY
 
@@ -1054,40 +1042,26 @@ PreparePlayerAttackSquare:
 
 
 @nothingEquiped:
-    
+
+    lda PlayerFrame
+    bne @fistVert
+
     lda DirectionX
     cmp #2
-    bne @notFlippedUnarmed
+    beq @fistRight
 
-    lda PlayerFrame
-    asl
-    asl
-    tay
-    lda fist_collision_pos_flip, y
-    clc
-    adc PlayerX
-    sta AttackTopLeftX
-    iny
-    lda fist_collision_pos_flip, y
-    clc
-    adc PlayerY
-    sta AttackTopLeftY
-    iny
-    lda fist_collision_pos_flip, y
-    clc
-    adc PlayerX
-    sta AttackBottomRightX
-    iny
-    lda fist_collision_pos_flip, y
-    clc
-    adc PlayerY
-    sta AttackBottomRightY
+    lda #0
+    jmp @fistMult
 
-    jmp @calcCollision
+@fistRight:
+    lda #1 ; right
+    jmp @fistMult
 
-@notFlippedUnarmed:
-    
-    lda PlayerFrame
+@fistVert:
+    clc
+    adc #1
+
+@fistMult:
     asl
     asl
     tay
@@ -1111,7 +1085,6 @@ PreparePlayerAttackSquare:
     adc PlayerY
     sta AttackBottomRightY
 
-    jmp @calcCollision
 
 @calcCollision:
 

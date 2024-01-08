@@ -706,7 +706,7 @@ UpdateHammerSprites:
     jmp @multiply
 
 @flipped:
-    lda #1 
+    lda #1
 
 @multiply:
     asl

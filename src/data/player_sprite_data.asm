@@ -3,6 +3,14 @@ player_frame_indexes:
     .byte 12 ; UP
     .byte 24 ; DOWN
 
+spearSprites:
+          ;+Y,frame,attributes,+X
+    .byte 248, $E2, %00000000, 252, 0, $E3, %00000000, 252 ;up
+    .byte 248, $E3, %10000000, 252, 0, $E2, %10000000, 252 ;down
+    .byte 252, $E0, %00000000, 248, 252, $E1, %00000000, 0 ;left
+    .byte 252, $E1, %01000000, 248, 252, $E0, %01000000, 0 ;right
+
+
 fishingRodSprites:
     .byte   8, $E7, %00000000, 0,   8, $E8, %00000000, 248 ;left
     .byte   8, $E7, %01000000, 8,   8, $E8, %01000000, 16 ;right
