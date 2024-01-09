@@ -9,6 +9,16 @@ UpdateSprites:
 
 ;--- MAIN CHARACTER:
     ldy PlayerFrame
+    bne @vertical
+
+    lda DirectionX
+    cmp #2 ;is right ?
+    bne @doIt ; frame is 0
+
+@vertical:
+    iny ; increment frame
+
+@doIt:
     lda player_frame_indexes, y
     sta TempFrame
 
@@ -19,24 +29,21 @@ UpdateSprites:
     asl ;x4 to get to the bytes
     sta TempAnimIndex
 
-    lda DirectionX
-    cmp #2
-    bne @notFlipped
-
-    lda #<player_sprites_flip
+    lda EquipedClothing
+    beq @noClothing
+     lda #<player_sprites_coat
     sta character_sprite_data_ptr
-    lda #>player_sprites_flip
+    lda #>player_sprites_coat
+    sta character_sprite_data_ptr + 1
+    jmp @gogo
+
+@noClothing:
+    lda #<player_sprites
+    sta character_sprite_data_ptr
+    lda #>player_sprites
     sta character_sprite_data_ptr + 1
 
-    jmp @doIt
-@notFlipped:
-
-    lda #<player_sprites_not_flip
-    sta character_sprite_data_ptr
-    lda #>player_sprites_not_flip
-    sta character_sprite_data_ptr + 1
-
-@doIt:
+@gogo:
     ldx #0
     ldy #0
 
