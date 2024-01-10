@@ -9,6 +9,16 @@ UpdateSprites:
 
 ;--- MAIN CHARACTER:
     ldy PlayerFrame
+    bne @vertical
+
+    lda DirectionX
+    cmp #2 ;is right ?
+    bne @doIt ; frame is 0
+
+@vertical:
+    iny ; increment frame
+
+@doIt:
     lda player_frame_indexes, y
     sta TempFrame
 
@@ -19,23 +29,21 @@ UpdateSprites:
     asl ;x4 to get to the bytes
     sta TempAnimIndex
 
-    lda PlayerFlip
-    beq @notFlipped
-
-    lda #<player_sprites_flip
+    lda EquipedClothing
+    beq @noClothing
+     lda #<player_sprites_coat
     sta character_sprite_data_ptr
-    lda #>player_sprites_flip
+    lda #>player_sprites_coat
+    sta character_sprite_data_ptr + 1
+    jmp @gogo
+
+@noClothing:
+    lda #<player_sprites
+    sta character_sprite_data_ptr
+    lda #>player_sprites
     sta character_sprite_data_ptr + 1
 
-    jmp @doIt
-@notFlipped:
-
-    lda #<player_sprites_not_flip
-    sta character_sprite_data_ptr
-    lda #>player_sprites_not_flip
-    sta character_sprite_data_ptr + 1
-
-@doIt:
+@gogo:
     ldx #0
     ldy #0
 
@@ -177,8 +185,9 @@ UpdateSprites:
     jmp @update
 
 @horizontal:
-    lda PlayerFlip
-    bne @flipIndex
+    lda DirectionX
+    cmp #2
+    beq @flipIndex
 
     ldy #0
     jmp @update
@@ -631,19 +640,41 @@ UpdateProjectileSprites:
 ;----------------------------------
 PrepareKnifeSprite:
 
-    lda PlayerFlip
-    beq @notFlippedKnife
+    lda #%00000000
+    sta Temp ; knife is not flipped
+
+    lda #0
+    sta TempFrame
+
+    lda DirectionX
+    cmp #2
+    bne @notFlipped
 
     lda #%01000000
-    sta Temp
+    sta Temp ; knife is flipped
+    lda #1
+    sta TempFrame
+
+
+@notFlipped:
 
     lda PlayerFrame
+    bne @vertical
+
+    clc 
+    adc TempFrame
+    jmp @horizontal
+
+@vertical:
+    clc
+    adc #1
+@horizontal:
     asl
     tay
-    lda knife_pos_flipped, y
+    lda knife_pos, y
     sta TempPointX
     iny
-    lda knife_pos_flipped, y
+    lda knife_pos, y
     sta TempPointY
     lda PlayerY
     clc
@@ -655,59 +686,36 @@ PrepareKnifeSprite:
     adc TempPointX
     sta TempPointX
 
-    jmp @exit
-@notFlippedKnife:
-
-    lda #%00000000
-    sta Temp
-
-    lda PlayerFrame
-    asl
-    tay
-    lda knife_pos_normal, y
-    sta TempPointX
-    iny
-    lda knife_pos_normal, y
-    sta TempPointY
-    lda PlayerY
-    clc
-    adc TempPointY
-    sta TempPointY
-    sta AttackTopLeftY
-
-    lda PlayerX
-    clc
-    adc TempPointX
-    sta TempPointX
-    sta AttackTopLeftX
-
-@exit:
     rts
 ;----------------------------------
 UpdateHammerSprites:
 
     lda AttackTimer
-    beq @exit
+    bne @cont
 
+    rts
+
+@cont:
     lda PlayerFrame
-    beq @horizontal ; ( playerframe - 1 ) * 8 + 16
-    sec
-    sbc #1
-    asl
-    asl
-    asl
+    beq @horizontal ;
+
     clc
-    adc #16
-    tay
-    lda PlayerFlip
-    beq @updatesprites
-    tya
-    clc
-    adc #16
-    tay
-    jmp @updatesprites
-@horizontal:
-    lda PlayerFlip ; playerflip * 8 
+    adc #1
+
+    jmp @multiply
+
+@horizontal: ; left or right
+
+    lda DirectionX
+    cmp #2
+    beq @flipped
+    lda #0
+    jmp @multiply
+
+@flipped:
+    lda #1
+
+@multiply:
     asl
     asl
     asl

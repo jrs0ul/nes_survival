@@ -972,12 +972,57 @@ CalcPlayerDmg:
 @exit:
     rts
 
+;-------------------------------------
+MakeGenericAttackSquare:
+
+    lda PlayerFrame
+    bne @vertical
+
+    lda DirectionX
+    cmp #2
+    beq @facingRight
+
+    lda #0
+    jmp @multiply
+
+@facingRight:
+    lda #1 ; right
+    jmp @multiply
+
+@vertical:
+    clc
+    adc #1
+
+@multiply:
+    asl
+    asl
+    tay
+    lda (weapon_collision_ptr), y
+    clc
+    adc PlayerX
+    sta AttackTopLeftX
+    iny
+    lda (weapon_collision_ptr), y
+    clc
+    adc PlayerY
+    sta AttackTopLeftY
+    iny
+    lda (weapon_collision_ptr), y
+    clc
+    adc PlayerX
+    sta AttackBottomRightX
+    iny
+    lda (weapon_collision_ptr), y
+    clc
+    adc PlayerY
+    sta AttackBottomRightY
+
+    rts
 
 ;--------------------------------------
 PreparePlayerAttackSquare:
 
     sty TempY
-
 
     lda EquipedItem
     beq @nothingEquiped
@@ -985,61 +1030,12 @@ PreparePlayerAttackSquare:
     cmp #ITEM_SPEAR
     beq @spearEquiped
 
-    
-    lda PlayerFlip
-    beq @notFlipped
-
-    lda PlayerFrame
-    asl
-    asl
-    tay
-    lda knife_collision_pos_flip, y
-    clc
-    adc PlayerX
-    sta AttackTopLeftX
-    iny
-    lda knife_collision_pos_flip, y
-    clc
-    adc PlayerY
-    sta AttackTopLeftY
-    iny
-    lda knife_collision_pos_flip, y
-    clc
-    adc PlayerX
-    sta AttackBottomRightX
-    iny
-    lda knife_collision_pos_flip, y
-    clc
-    adc PlayerY
-    sta AttackBottomRightY
-
-    jmp @calcCollision
-
-@notFlipped:
-    
-    lda PlayerFrame
-    asl
-    asl
-    tay
-    lda knife_collision_pos, y
-    clc
-    adc PlayerX
-    sta AttackTopLeftX
-    iny
-    lda knife_collision_pos, y
-    clc
-    adc PlayerY
-    sta AttackTopLeftY
-    iny
-    lda knife_collision_pos, y
-    clc
-    adc PlayerX
-    sta AttackBottomRightX
-    iny
-    lda knife_collision_pos, y
-    clc 
-    adc PlayerY
-    sta AttackBottomRightY
+    ;knife
+    lda #<knife_collision_pos
+    sta weapon_collision_ptr
+    lda #>knife_collision_pos
+    sta weapon_collision_ptr + 1
+    jsr MakeGenericAttackSquare
 
     jmp @calcCollision
 
@@ -1051,65 +1047,12 @@ PreparePlayerAttackSquare:
 
     jmp @calcCollision
 
-
 @nothingEquiped:
-    
-    lda PlayerFlip
-    beq @notFlippedUnarmed
-
-    lda PlayerFrame
-    asl
-    asl
-    tay
-    lda fist_collision_pos_flip, y
-    clc
-    adc PlayerX
-    sta AttackTopLeftX
-    iny
-    lda fist_collision_pos_flip, y
-    clc
-    adc PlayerY
-    sta AttackTopLeftY
-    iny
-    lda fist_collision_pos_flip, y
-    clc
-    adc PlayerX
-    sta AttackBottomRightX
-    iny
-    lda fist_collision_pos_flip, y
-    clc
-    adc PlayerY
-    sta AttackBottomRightY
-
-    jmp @calcCollision
-
-@notFlippedUnarmed:
-    
-    lda PlayerFrame
-    asl
-    asl
-    tay
-    lda fist_collision_pos, y
-    clc
-    adc PlayerX
-    sta AttackTopLeftX
-    iny
-    lda fist_collision_pos, y
-    clc
-    adc PlayerY
-    sta AttackTopLeftY
-    iny
-    lda fist_collision_pos, y
-    clc
-    adc PlayerX
-    sta AttackBottomRightX
-    iny
-    lda fist_collision_pos, y
-    clc 
-    adc PlayerY
-    sta AttackBottomRightY
-
-    jmp @calcCollision
+    lda #<fist_collision_pos
+    sta weapon_collision_ptr
+    lda #>fist_collision_pos
+    sta weapon_collision_ptr + 1
+    jsr MakeGenericAttackSquare
 
 @calcCollision:
 

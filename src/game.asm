@@ -187,27 +187,6 @@ stamina_segment_values:
     .byte 96
     .byte 128
 
-spearSprites:
-          ;+Y,frame,attributes,+X
-    .byte 248, $E2, %00000000, 252, 0, $E3, %00000000, 252 ;up
-    .byte 248, $E3, %10000000, 252, 0, $E2, %10000000, 252 ;down
-    .byte 252, $E0, %00000000, 248, 252, $E1, %00000000, 0 ;left
-    .byte 252, $E1, %01000000, 248, 252, $E0, %01000000, 0 ;right
-
-fishingRodSprites:
-    .byte   8, $E7, %00000000, 0,   8, $E8, %00000000, 248 ;left
-    .byte   8, $E7, %01000000, 8,   8, $E8, %01000000, 16 ;right
-    .byte   8, $E6, %00000000, 0,  16, $D8, %00000000, 0  ;down
-    .byte   0, $E6, %10000000, 0,  248, $D8, %10000000, 0 ;up
-
-hammerSprites:
-    .byte   7, $A9, %00000000, 0,   7, $A8, %00000000, 248  ;left
-    .byte   7, $A9, %01000000, 8,   7, $A8, %01000000, 16   ;right
-    .byte   255, $99, %11000000, 8,  250, $98, %11000000, 8 ;up
-    .byte   9, $99, %00000000, 0,  17, $98, %00000000, 0    ;down
-    .byte   255, $99, %10000000, 0,  250, $98, %10000000, 0 ;up-flipped
-    .byte   9,   $99, %01000000, 8,  17,  $98, %01000000, 8 ;down-flipped
-
 
 .include "data/house_palette.asm"
 .include "data/main_palette.asm"
@@ -223,33 +202,23 @@ sprites:
 
 
 ;position of knife sprite depending on the player frame
-knife_pos_flipped:
-    .byte 16,  8 ; left/right
-    .byte  0,  0 ; up
-    .byte  8, 16 ; down
+knife_pos:
+    .byte 248,  8 ; left (248 = -8)
+    .byte  16,  8 ; right
+    .byte   8,  0 ; up
+    .byte   0, 16 ; down
 
-knife_pos_normal:
-    .byte  248,  8 ; left/right (248 = -8)
-    .byte  8  ,  0 ; up
-    .byte  0  , 16 ; down
-
-knife_collision_pos_flip:
-    .byte 22, 9, 22, 15  ; l/r
-    .byte 2,  1,  6, 1   ; up
-    .byte 10, 22, 14, 22 ;down
 knife_collision_pos:
-    .byte 250, 9, 250, 15
-    .byte 10, 1, 14, 1
-    .byte 2, 24, 6, 24
+    .byte 250, 9, 250, 15 ; left
+    .byte 22, 9, 22, 15   ; right
+    .byte 10, 1, 14, 1    ; up
+    .byte 2, 24, 6, 24    ; down
 
-fist_collision_pos_flip:
-    .byte 18, 9, 18, 15  ; l/r
-    .byte 2,  4,  6, 4   ; up
-    .byte 10, 18, 14, 18 ;down
 fist_collision_pos:
-    .byte 254, 9, 254, 15
-    .byte 10, 4, 14, 4
-    .byte 2, 18, 6, 18
+    .byte 254, 9, 254, 15  ;left
+    .byte 18, 9, 18, 15    ;right
+    .byte 10, 4, 14, 4     ;up
+    .byte 2, 18, 6, 18     ;down
 
 
 ;data: 
@@ -715,11 +684,14 @@ menuTileTransferDataIdx:
 character_sprite_data_ptr:
     .res 2
 
+weapon_collision_ptr:
+    .res 2
+
 ptr_list:
     .res 2
 
 ZPBuffer:
-    .res 104  ; I want to be aware of the free memory
+    .res 102  ; I want to be aware of the free memory
 
 ;--------------
 .segment "BSS" ; variables in ram
@@ -797,7 +769,7 @@ NpcsHitByPlayer:
     .res 1
 PlayerFrame:
     .res 1
-PlayerFlip:
+TempNpcFrame:
     .res 1
 
 SnowFrame:
@@ -1362,11 +1334,9 @@ TempPreRowLoopValue: ; used in LoadOutsidemap
 SelectedItemPower:
     .res 1
 
-TempNpcFrame:
-    .res 1
 
 Buffer:
-    .res 264  ;must see how much is still available
+    .res 265  ;must see how much is still available
 
 ;====================================================================================
 
@@ -5745,14 +5715,22 @@ CalcTileAddressInFrontOfPlayer:
     lda PlayerFrame
     beq @horizontal ;player is facing left or right
 
+    cmp #1
+    bne @downwards
+    lda PlayerX
+    clc
+    adc #12
+    jmp @cont
+@downwards:
     lda PlayerX
     clc
     adc #4
     jmp @cont
 
 @horizontal:
-    lda PlayerFlip
-    beq @left
+    lda DirectionX
+    cmp #2
+    bne @left
     ;right
     lda PlayerX
     clc
@@ -5954,7 +5932,9 @@ ShootSlingshot:
     lda PlayerFrame
     bne @saveDir
 ;horizontal direction
-    lda PlayerFlip
+    lda DirectionX
+    sec
+    sbc #1
     clc
     adc #3
 @saveDir:
@@ -6004,7 +5984,9 @@ LaunchSpear:
     lda PlayerFrame
     bne @saveDir
 
-    lda PlayerFlip
+    lda DirectionX
+    sec
+    sbc #1
     clc
     adc #3
 
@@ -6053,7 +6035,6 @@ SetupCheckLeft:
     sta ScrollDirection
     lda #0
     sta PlayerFrame
-    sta PlayerFlip
 
     rts
 
@@ -6139,8 +6120,6 @@ SetupCheckRight:
     sta ScrollDirection
     lda #0
     sta PlayerFrame
-    lda #1
-    sta PlayerFlip
 
     rts
 
