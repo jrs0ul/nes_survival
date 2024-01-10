@@ -7,3 +7,4 @@ npc_data:
     .byte 255, 3, 17, 2, 255, 0, <npc_ERIKA_frames,   >npc_ERIKA_frames       ;villager-Erika
     .byte 255, 2, 2,  2, 255, 0, <npc_GRANNY_frames,  >npc_GRANNY_frames      ;villager-granny
     .byte 255, 3, 17, 3, 255, 0, <npc_DEADMAN_frames, >npc_DEADMAN_frames     ;dead-villager
+    .byte 255, 2, 4,  0, 10,  5, <npc_BOAR_frames,    >npc_BOAR_frames        ;wild-boar

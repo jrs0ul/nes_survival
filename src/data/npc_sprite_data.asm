@@ -29,6 +29,7 @@ frame_list_index_lookup:
     .byte 38 ; erika
     .byte 46 ; granny
     .byte 54 ; deadman
+    .byte 62 ; boar
 
 
 ;Bunny
@@ -655,4 +656,141 @@ npc_DEADMAN_frame_RIGHT:
     .byte 8,  $1B, %00000000, 8
     .byte 16, $2A, %00000000, 0
     .byte 16, $2B, %00000000, 8
+;======================================
+npc_BOAR_sprite_data:
+
+npc_BOAR_frames:
+    .byte <npc_BOAR_frames_LEFT,  >npc_BOAR_frames_LEFT
+    .byte <npc_BOAR_frames_RIGHT, >npc_BOAR_frames_RIGHT
+    .byte <npc_BOAR_frames_UP,    >npc_BOAR_frames_UP
+    .byte <npc_BOAR_frames_DOWN,  >npc_BOAR_frames_DOWN
+
+npc_BOAR_frames_LEFT:
+;frame 0
+    .byte 0, $3A, %00000000, 0
+    .byte 0, $3B, %00000000, 8
+    .byte 8, $4A, %00000000, 0
+    .byte 8, $4B, %00000000, 8
+;frame 1
+    .byte 0, $3A, %00000000, 0
+    .byte 0, $3B, %00000000, 8
+    .byte 8, $4A, %00000000, 0
+    .byte 8, $4B, %00000000, 8
+;frame 2
+    .byte 0, $3A, %00000000, 0
+    .byte 0, $3B, %00000000, 8
+    .byte 8, $4A, %00000000, 0
+    .byte 8, $4B, %00000000, 8
+;frame 3
+    .byte 0, $3A, %00000000, 0
+    .byte 0, $3B, %00000000, 8
+    .byte 8, $4A, %00000000, 0
+    .byte 8, $4B, %00000000, 8
+;attack
+    .byte 0, $3A, %00000000, 0
+    .byte 0, $3B, %00000000, 8
+    .byte 8, $4A, %00000000, 0
+    .byte 8, $4B, %00000000, 8
+;death
+    .byte 0, $B8, %00000000, 0
+    .byte 0, $B9, %00000000, 8
+    .byte 8, $C8, %00000000, 0
+    .byte 8, $C9, %00000000, 8
+;----------------------------------
+npc_BOAR_frames_RIGHT:
+;frame 0
+    .byte 0, $3B, %01000000, 0
+    .byte 0, $3A, %01000000, 8
+    .byte 8, $4B, %01000000, 0
+    .byte 8, $4A, %01000000, 8
+;frame 1
+    .byte 0, $3B, %01000000, 0
+    .byte 0, $3A, %01000000, 8
+    .byte 8, $4B, %01000000, 0
+    .byte 8, $4A, %01000000, 8
+;frame 2
+    .byte 0, $3B, %01000000, 0
+    .byte 0, $3A, %01000000, 8
+    .byte 8, $4B, %01000000, 0
+    .byte 8, $4A, %01000000, 8
+;frame 3
+    .byte 0, $3B, %01000000, 0
+    .byte 0, $3A, %01000000, 8
+    .byte 8, $4B, %01000000, 0
+    .byte 8, $4A, %01000000, 8
+;attack
+    .byte 0, $3B, %01000000, 0
+    .byte 0, $3A, %01000000, 8
+    .byte 8, $4B, %01000000, 0
+    .byte 8, $4A, %01000000, 8
+;death
+    .byte 0, $B8, %00000000, 0
+    .byte 0, $B9, %00000000, 8
+    .byte 8, $C8, %00000000, 0
+    .byte 8, $C9, %00000000, 8
+;-------------------------------
+npc_BOAR_frames_UP:
+;frame 0
+    .byte 0, $3B, %01000000, 0
+    .byte 0, $3A, %01000000, 8
+    .byte 8, $4B, %01000000, 0
+    .byte 8, $4A, %01000000, 8
+;frame 1
+    .byte 0, $3B, %01000000, 0
+    .byte 0, $3A, %01000000, 8
+    .byte 8, $4B, %01000000, 0
+    .byte 8, $4A, %01000000, 8
+;frame 2
+    .byte 0, $3B, %01000000, 0
+    .byte 0, $3A, %01000000, 8
+    .byte 8, $4B, %01000000, 0
+    .byte 8, $4A, %01000000, 8
+;frame 3
+    .byte 0, $3B, %01000000, 0
+    .byte 0, $3A, %01000000, 8
+    .byte 8, $4B, %01000000, 0
+    .byte 8, $4A, %01000000, 8
+;attack
+    .byte 0, $3B, %01000000, 0
+    .byte 0, $3A, %01000000, 8
+    .byte 8, $4B, %01000000, 0
+    .byte 8, $4A, %01000000, 8
+;death
+    .byte 0, $B8, %00000000, 0
+    .byte 0, $B9, %00000000, 8
+    .byte 8, $C8, %00000000, 0
+    .byte 8, $C9, %00000000, 8
+;------------------------------
+npc_BOAR_frames_DOWN:
+;frame 0
+    .byte 0, $3C, %00000000, 0
+    .byte 0, $3C, %01000000, 8
+    .byte 8, $4C, %00000000, 0
+    .byte 8, $4C, %01000000, 8
+;frame 1
+    .byte 0, $3C, %00000000, 0
+    .byte 0, $3C, %01000000, 8
+    .byte 8, $4C, %00000000, 0
+    .byte 8, $4C, %01000000, 8
+;frame 2
+    .byte 0, $3C, %00000000, 0
+    .byte 0, $3C, %01000000, 8
+    .byte 8, $4C, %00000000, 0
+    .byte 8, $4C, %01000000, 8
+;frame 3
+    .byte 0, $3C, %00000000, 0
+    .byte 0, $3C, %01000000, 8
+    .byte 8, $4C, %00000000, 0
+    .byte 8, $4C, %01000000, 8
+;attack
+    .byte 0, $3C, %00000000, 0
+    .byte 0, $3C, %01000000, 8
+    .byte 8, $4C, %00000000, 0
+    .byte 8, $4C, %01000000, 8
+;death
+    .byte 0, $B8, %00000000, 0
+    .byte 0, $B9, %00000000, 8
+    .byte 8, $C8, %00000000, 0
+    .byte 8, $C9, %00000000, 8
+
 
