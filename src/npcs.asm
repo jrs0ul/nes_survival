@@ -972,21 +972,8 @@ CalcPlayerDmg:
 @exit:
     rts
 
-
-;--------------------------------------
-;TODO: remove repeating code
-PreparePlayerAttackSquare:
-
-    sty TempY
-
-
-    lda EquipedItem
-    beq @nothingEquiped
-
-    cmp #ITEM_SPEAR
-    beq @spearEquiped
-
-    ;knife
+;-------------------------------------
+MakeGenericAttackSquare:
 
     lda PlayerFrame
     bne @vertical
@@ -1010,25 +997,45 @@ PreparePlayerAttackSquare:
     asl
     asl
     tay
-    lda knife_collision_pos, y
+    lda (weapon_collision_ptr), y
     clc
     adc PlayerX
     sta AttackTopLeftX
     iny
-    lda knife_collision_pos, y
+    lda (weapon_collision_ptr), y
     clc
     adc PlayerY
     sta AttackTopLeftY
     iny
-    lda knife_collision_pos, y
+    lda (weapon_collision_ptr), y
     clc
     adc PlayerX
     sta AttackBottomRightX
     iny
-    lda knife_collision_pos, y
+    lda (weapon_collision_ptr), y
     clc
     adc PlayerY
     sta AttackBottomRightY
+
+    rts
+
+;--------------------------------------
+PreparePlayerAttackSquare:
+
+    sty TempY
+
+    lda EquipedItem
+    beq @nothingEquiped
+
+    cmp #ITEM_SPEAR
+    beq @spearEquiped
+
+    ;knife
+    lda #<knife_collision_pos
+    sta weapon_collision_ptr
+    lda #>knife_collision_pos
+    sta weapon_collision_ptr + 1
+    jsr MakeGenericAttackSquare
 
     jmp @calcCollision
 
@@ -1040,51 +1047,12 @@ PreparePlayerAttackSquare:
 
     jmp @calcCollision
 
-
 @nothingEquiped:
-
-    lda PlayerFrame
-    bne @fistVert
-
-    lda DirectionX
-    cmp #2
-    beq @fistRight
-
-    lda #0
-    jmp @fistMult
-
-@fistRight:
-    lda #1 ; right
-    jmp @fistMult
-
-@fistVert:
-    clc
-    adc #1
-
-@fistMult:
-    asl
-    asl
-    tay
-    lda fist_collision_pos, y
-    clc
-    adc PlayerX
-    sta AttackTopLeftX
-    iny
-    lda fist_collision_pos, y
-    clc
-    adc PlayerY
-    sta AttackTopLeftY
-    iny
-    lda fist_collision_pos, y
-    clc
-    adc PlayerX
-    sta AttackBottomRightX
-    iny
-    lda fist_collision_pos, y
-    clc 
-    adc PlayerY
-    sta AttackBottomRightY
-
+    lda #<fist_collision_pos
+    sta weapon_collision_ptr
+    lda #>fist_collision_pos
+    sta weapon_collision_ptr + 1
+    jsr MakeGenericAttackSquare
 
 @calcCollision:
 

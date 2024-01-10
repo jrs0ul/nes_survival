@@ -684,11 +684,14 @@ menuTileTransferDataIdx:
 character_sprite_data_ptr:
     .res 2
 
+weapon_collision_ptr:
+    .res 2
+
 ptr_list:
     .res 2
 
 ZPBuffer:
-    .res 104  ; I want to be aware of the free memory
+    .res 102  ; I want to be aware of the free memory
 
 ;--------------
 .segment "BSS" ; variables in ram
@@ -5712,6 +5715,13 @@ CalcTileAddressInFrontOfPlayer:
     lda PlayerFrame
     beq @horizontal ;player is facing left or right
 
+    cmp #1
+    bne @downwards
+    lda PlayerX
+    clc
+    adc #12
+    jmp @cont
+@downwards:
     lda PlayerX
     clc
     adc #4
