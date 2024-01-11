@@ -129,7 +129,7 @@ GenerateSingleNpc:
     beq @makeWolf
 
     dec DogCounter
-    beq @makeCanid
+    beq @decideWhatToMake
 
 @makeBunny:
     ldy #9
@@ -149,6 +149,24 @@ GenerateSingleNpc:
     sta TempHp
     lda #%00000001
     jmp @storeType
+
+@decideWhatToMake:
+    jsr UpdateRandomNumber
+    and #3
+    cmp #2
+    bcs @makeCanid
+@makeBoar:
+    lda #NUM_OF_BUNNIES_BEFORE_DOG
+    sta DogCounter
+    ldy #57
+    lda npc_data, y
+    sta TempNpcRows
+    ldy #60
+    lda npc_data, y
+    sta TempHp
+    lda #%00111001
+    jmp @storeType
+
 @makeCanid:
     lda #NUM_OF_BUNNIES_BEFORE_DOG
     sta DogCounter
@@ -2299,8 +2317,10 @@ ChangeNpcDirection:
     bne @randomDir
 
     lda TempNpcType
-    cmp #NPC_TYPE_TIMID
-    bne @predator
+    cmp #NPC_TYPE_PREDATOR
+    beq @predator
+    cmp #NPC_TYPE_AGRESSIVE
+    beq @agressiveWhenDamaged
 
 @timid:
 
@@ -2320,6 +2340,12 @@ ChangeNpcDirection:
     ldx TempX
     sta TempDir
     jmp @storeDirection
+@agressiveWhenDamaged:
+
+    jsr SetDirectionForBoar
+    beq @storeDirection
+    jmp @randomDir
+
 @predator:
     jsr SetDirectionsForPredatorNpc
 @storeDirection:
@@ -2328,6 +2354,32 @@ ChangeNpcDirection:
 @exit:
 
     rts
+;------------------------------
+SetDirectionForBoar:
+    
+
+    dex
+    dex
+    dex
+    lda Npcs, x
+    and #%00000100
+    beq @doRandom
+
+
+@done:
+    lda #0
+    jmp @end
+
+@doRandom:
+    inx
+    inx
+    inx
+    lda #1
+@end:
+
+
+    rts
+
 
 ;------------------------------
 ;preparation for direction change for predator npc

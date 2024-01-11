@@ -509,6 +509,7 @@ sun_moon_sprites_for_periods:
     NPC_TYPE_PREDATOR          = 1
     NPC_TYPE_VILLAGER          = 2
     NPC_TYPE_PASSIVE           = 3
+    NPC_TYPE_AGRESSIVE         = 4
 
     DIALOG_TEXT_LENGTH         = 96
 

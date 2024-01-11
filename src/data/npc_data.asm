@@ -1,4 +1,5 @@
-;<unused>, rows, collision offset Y, type(1-predator, 0-timid, 2 - villager, 3 - inactive), max_hp, attack
+;<unused>, rows, collision offset Y, type, max_hp, attack
+;types: 1-predator, 0-timid, 2 - villager, 3 - inactive, 4 - agressive when attacked
 npc_data:
     .byte 255, 3, 17, 1, 6,   9, <npc_DOGMAN_frames,  >npc_DOGMAN_frames      ;dogman
     .byte 255, 2, 9,  0, 2,   0, <npc_BUNNY_frames,   >npc_BUNNY_frames       ;bunny
@@ -7,4 +8,4 @@ npc_data:
     .byte 255, 3, 17, 2, 255, 0, <npc_ERIKA_frames,   >npc_ERIKA_frames       ;villager-Erika
     .byte 255, 2, 2,  2, 255, 0, <npc_GRANNY_frames,  >npc_GRANNY_frames      ;villager-granny
     .byte 255, 3, 17, 3, 255, 0, <npc_DEADMAN_frames, >npc_DEADMAN_frames     ;dead-villager
-    .byte 255, 2, 4,  0, 10,  5, <npc_BOAR_frames,    >npc_BOAR_frames        ;wild-boar
+    .byte 255, 2, 4,  4, 10,  5, <npc_BOAR_frames,    >npc_BOAR_frames        ;wild-boar
