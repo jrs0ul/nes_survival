@@ -829,7 +829,8 @@ OnCollisionWithAttackRect:
     tay
     lda Npcs, y
     and #%11111000
-    eor #%00000111 ;set agitated bit + damaged state
+    eor #%00000011 ; setting agitation bit messes everything, so let's just set damaged state
+    
     sta Npcs, y
     iny
     iny
@@ -888,6 +889,8 @@ DropItemAfterDeath:
     lda TempNpcType
     cmp #NPC_TYPE_PREDATOR
     beq @spawnHide
+    cmp #NPC_TYPE_AGRESSIVE
+    beq @specialRewardItem
 
 
     lda NpcsHitByPlayer
@@ -2230,8 +2233,7 @@ CheckAgitationByPlayer:
     ;set agitated
     lda Npcs, x
     and #%11111011
-    clc
-    adc #%00000100
+    eor #%00000100
     sta Npcs, x
 
 @exit:
