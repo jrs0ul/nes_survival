@@ -829,7 +829,7 @@ OnCollisionWithAttackRect:
     tay
     lda Npcs, y
     and #%11111000
-    eor #%00000011 ; setting agitation bit messes everything, so let's just set damaged state
+    eor #%00000111 ; setting agitation bit + damaged state
     
     sta Npcs, y
     iny
@@ -2369,6 +2369,10 @@ SetDirectionForBoar:
 
 
 @done:
+    inx ; x
+    inx ; y
+    inx ; screen
+    jsr SetDirectionsForPredatorNpc
     lda #0
     jmp @end
 
@@ -2722,7 +2726,7 @@ OnCollisionWithPlayer:
     beq @collides ; don't attack if in damaged state
 
     lda Npcs, x     ;  reload the status
-    and #%11111000  ;  remove previous status + agitation
+    and #%11111100  ;  remove previous status
     eor #%00000010  ;  set the attack state
     sta Npcs, x
 
