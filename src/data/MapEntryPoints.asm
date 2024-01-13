@@ -24,7 +24,7 @@ MapEntryPoints:
     .byte 0, OUTDOORS_LOC1_SCREEN_COUNT - 1, 0, 255, 0, 255, 222, 255
     ;---------------------------------------
     ;4.Bear's house entrance
-    .byte 1, 0, 118, 122, 177, 190, $68, $6F
+    .byte 1, 0, 118, 136, 169, 192, $68, $6F
     ;5.Exit point of second location
     .byte 1, 0, 0, 255, 0, 255, 222, 255
     ;6.entrance to cave location
@@ -33,7 +33,7 @@ MapEntryPoints:
     ;7.Exit point of third location
     .byte 2, 0, 0, 255, 0, 255, 0,   20
     ;8.Second villager's house
-    .byte 2, 0, 118, 122, 126, 129, 122, 142
+    .byte 2, 0, 118, 124, 126, 129, 122, 142
     ;------------------------
     ;9.Bjorn's house exit
     .byte 3, 0, 0, 255, 0, 255, 152, 255

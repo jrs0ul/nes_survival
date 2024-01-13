@@ -323,7 +323,7 @@ SingleNpcVSPlayerCollision:
     lsr ;eliminate 3 state bits
 
 
-    sty Temp
+    sty TempNpcDataIdxForCollision
     asl
     asl
     asl
@@ -335,7 +335,7 @@ SingleNpcVSPlayerCollision:
     iny
     lda npc_data, y ; npc type
     sta TempNpcType
-    ldy Temp
+    ldy TempNpcDataIdxForCollision
 
     iny
     iny
