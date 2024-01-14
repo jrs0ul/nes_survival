@@ -198,7 +198,7 @@ game_over_palette:
 
 
 sprites:
-    .byte $1A, $FF, %00000011, $08   ; sprite 0 
+    .byte $1A, $FF, %00000011, $01  ; sprite 0 
 
 
 ;position of knife sprite depending on the player frame
@@ -444,6 +444,7 @@ sun_moon_sprites_for_periods:
     ITEM_TYPE_MATERIAL         = 4
     ITEM_TYPE_TOOL             = 5
     ITEM_TYPE_CLOTHING         = 6
+    ITEM_TYPE_DOCUMENT         = 7
 
     ITEM_STICK                 = 1
     ITEM_RAW_MEAT              = 2
@@ -538,6 +539,8 @@ sun_moon_sprites_for_periods:
     SUBMENU_STASH_MATERIAL     = 6
     SUBMENU_TOOL               = 7
     SUBMENU_STASH_TOOL         = 8
+    SUBMENU_DOCUMENT           = 9
+    SUBMENU_STASH_DOCUMENT     = 10
 
 ;===================================================================
 .segment "ZEROPAGE"
@@ -967,6 +970,10 @@ MustDrawStashMaterialMenu:
     .res 1
 MustDrawToolMenu:
     .res 1
+MustDrawDocumentMenu:
+    .res 1
+MustDrawStashDocumentMenu:
+    .res 1
 MustDrawStashToolMenu:
     .res 1
 MustClearSubMenu:
@@ -1340,7 +1347,7 @@ TempNpcDataIdxForCollision:
 
 
 Buffer:
-    .res 264  ;must see how much is still available
+    .res 262  ;must see how much is still available
 
 ;====================================================================================
 

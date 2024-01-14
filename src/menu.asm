@@ -110,10 +110,12 @@ UpdateMenuGfx:
     jsr DrawItemMenu
     jsr DrawMaterialMenu
     jsr DrawToolMenu
+    jsr DrawDocumentMenu
     jsr DrawStashMaterialMenu
     jsr DrawStashToolMenu
     jsr DrawStashFoodMenu
     jsr DrawStashItemMenu
+    jsr DrawStashDocumentMenu
     jsr ClearSubMenu
 
     lda menuTileTransferRowIdx
@@ -342,7 +344,108 @@ DrawEquipmentGrid:
 
 @exit:
     rts
+;----------------------------------
+DrawStashDocumentMenu:
 
+    lda MustDrawStashDocumentMenu
+    beq @exit
+
+    lda FirstNametableAddr
+    clc
+    adc #1
+    sta Temp
+
+    lda #MENU_SUBMENU_ADDRESS_LOW
+    sta TempX
+
+    lda #9
+    sta TempPointX
+
+
+
+    lda #<StashDocumentMenu
+    sta pointer
+    lda #>StashDocumentMenu
+    sta pointer + 1
+    lda #9
+    sta TempPointY
+
+
+
+@startTransfer:
+    jsr TransferTiles
+    beq @exit ; not done
+
+    lda #0
+    sta MustDrawStashDocumentMenu
+    sta menuTileTransferRowIdx
+
+
+@exit:
+    rts
+;----------------------------------
+DrawDocumentMenu:
+
+    lda MustDrawDocumentMenu
+    beq @exit
+
+    lda FirstNametableAddr
+    clc
+    adc #1
+    sta Temp
+
+    lda #MENU_SUBMENU_ADDRESS_LOW
+    sta TempX
+
+    lda #9
+    sta TempPointX
+
+
+    lda InVillagerHut
+    bne @villagerDocument
+    lda InHouse
+    bne @atHomeDocument
+
+    lda #<DocumentMenu
+    sta pointer
+    lda #>DocumentMenu
+    sta pointer + 1
+    lda #7
+    sta TempPointY
+    jmp @startTransfer
+
+@villagerDocument:
+
+    lda #<DocumentMenuVillager
+    sta pointer
+    lda #>DocumentMenuVillager
+    sta pointer + 1
+    lda #9
+    sta TempPointY
+    jmp @startTransfer
+
+@atHomeDocument:
+
+    lda #<DocumentMenuAtHome
+    sta pointer
+    lda #>DocumentMenuAtHome
+    sta pointer + 1
+    lda #9
+    sta TempPointY
+
+
+
+
+@startTransfer:
+    jsr TransferTiles
+    beq @exit ; not done
+
+    lda #0
+    sta MustDrawDocumentMenu
+    sta menuTileTransferRowIdx
+
+@exit:
+    rts
 ;----------------------------------
 DrawFoodMenu:
     lda MustDrawFoodMenu
@@ -1020,6 +1123,9 @@ MenuInput:
     cmp #SUBMENU_TOOL
     beq @DoToolInput
 
+    cmp #SUBMENU_DOCUMENT
+    beq @DoDocumentInput
+
 @skipSubmenuStuff:
 
     lda CraftingActivated
@@ -1058,6 +1164,10 @@ MenuInput:
     jsr EquipmentInput
     jmp @exit
 
+@DoDocumentInput:
+    jsr DocumentInput
+    jmp @exit
+
 @DoToolInput:
     jsr ToolInput
     jmp @exit
@@ -1070,6 +1180,19 @@ MenuInput:
     sta MenuButtons
 
     rts
+;--------------------------------------
+DocumentInput:
+
+    lda #16
+    sta MenuStep
+
+@CheckB:
+
+@CheckA:
+
+@exit:
+    rts
+
 ;--------------------------------------
 CraftingInput:
 
@@ -1368,6 +1491,8 @@ OnItemClicked:
     beq @tool
     cmp #ITEM_TYPE_CLOTHING
     beq @tool
+    cmp #ITEM_TYPE_DOCUMENT
+    beq @document
 
     ;regular item
 
@@ -1418,8 +1543,12 @@ OnItemClicked:
     jmp @exit
 ;-----------
 @material:
-   jsr MaterialItemClicked
-   jmp @exit
+    jsr MaterialItemClicked
+    jmp @exit
+@document:
+    jsr DocumentItemClicked
+    jmp @exit
+
 @tool:
     jsr ToolItemClicked
 
@@ -1437,6 +1566,18 @@ RegularItemClicked:
     sta ItemMenuIndex
     sta InventoryActivated
 
+    rts
+;-------------------------------------
+DocumentItemClicked:
+    lda #1
+    sta MustLoadSomething
+    sta MustDrawDocumentMenu
+    lda #SUBMENU_DOCUMENT
+    sta SubMenuIndex
+    jsr ActivateSubmenu
+    lda #0
+    sta ItemMenuIndex
+    sta InventoryActivated
     rts
 ;-------------------------------------
 ToolItemClicked:

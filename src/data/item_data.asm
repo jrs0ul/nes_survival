@@ -1,5 +1,13 @@
 ;first tile index (0 means empty), palette index, type, power
-;types: 0 - none, 1 - food, 2 - fuel, 3 - medicine, 4 - material, 5 - tool/weapon, 6 - clothing
+;types:
+;   0 - none,
+;   1 - food,
+;   2 - fuel,
+;   3 - medicine,
+;   4 - material,
+;   5 - tool/weapon,
+;   6 - clothing,
+;   7 - document
 ;except for the weapons, the power is split in two parts 4 bit wide, for last two stat digits.
 item_data: ;          ---||---
     .byte 0,   0, 0, %00000000  ; 0  empty
@@ -26,7 +34,7 @@ item_data: ;          ---||---
     .byte 24 , 0, 5, 1          ; 21 wooden hammer
     .byte 40 , 2, 5, 5          ; 22 slingshot
     .byte 56 , 0, 1, %01100000  ; 23 pie
-    .byte 72 , 2, 4, 0          ; 24 letter
+    .byte 72 , 2, 7, 0          ; 24 letter
 
 item_wear:
     .byte 0   ;empty
