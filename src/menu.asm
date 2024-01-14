@@ -1185,10 +1185,94 @@ DocumentInput:
 
     lda #16
     sta MenuStep
+    lda #96
+    sta MenuUpperLimit
+    lda #<ItemMenuIndex
+    sta pointer
+    lda #>ItemMenuIndex
+    sta pointer + 1
+
+
+    lda InVillagerHut
+    bne @atVillager
+    lda InHouse
+    bne @atVillager
+
+    lda #112
+    sta MenuLowerLimit
+    lda #2
+    sta MenuMaxItem
+
+
+    jmp @doInput
+
+@atVillager:
+    lda #128
+    sta MenuLowerLimit
+    lda #3
+    sta MenuMaxItem
+
+
+@doInput:
+    jsr MenuInputUpDownCheck
 
 @CheckB:
+    lda Buttons
+    and #BUTTON_B_MASK
+    beq @CheckA
+
+    jsr LoadSelectedItemInfo
+    beq @exit
+
+    lda ItemMenuIndex
+    bne @otherOptions
+
+    ;Activate 'read' here
+
+    jmp @CheckA
+
+@otherOptions:
+    lda InHouse
+    beq @notAtHome
+
+    ;options at home
+    lda StashActivated
+    bne @stashActive
+    ;store or drop
+
+    jmp @CheckA
+@stashActive: ; take or drop
+
+
+    jmp @CheckA
+
+@notAtHome: ;give, drop
+
+    lda InVillagerHut
+    beq @justDropIt
+
+    ;give or drop
+    lda ItemMenuIndex
+    cmp #1
+    bne @justDropIt
+
+    jsr GiveItem
+    beq @hidemenu
+
+    jmp @CheckA
+
+@justDropIt:
+    jsr ClearThatItem
+    jsr HideSubMenu
+
 
 @CheckA:
+    lda Buttons
+    and #BUTTON_A_MASK
+    beq @exit
+
+@hidemenu:
+    jsr HideSubMenu
 
 @exit:
     rts
