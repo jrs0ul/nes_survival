@@ -358,7 +358,11 @@ DrawEquipmentGrid:
 ;----------------------------------
 DrawDocument:
     lda MustDrawDocument
-    beq @exit
+    bne @continue
+
+    rts
+
+@continue:
 
     lda FirstNametableAddr
     clc
@@ -368,7 +372,7 @@ DrawDocument:
     lda #MENU_SUBMENU_ADDRESS_LOW
     sta TempX
 
-    lda #12
+    lda #15
     sta TempPointX
 
     lda #12
@@ -387,6 +391,47 @@ DrawDocument:
     lda #0
     sta MustDrawDocument
     sta menuTileTransferRowIdx
+
+    lda $2002
+    lda FirstNametableAddr
+    clc
+    adc #3
+    sta $2006
+    lda #$D4
+    sta $2006
+    lda #09
+    sta $2007
+
+    lda $2002
+    lda FirstNametableAddr
+    clc
+    adc #3
+    sta $2006
+    lda #$DC
+    sta $2006
+    lda #0
+    sta $2007
+
+    lda $2002
+    lda FirstNametableAddr
+    clc
+    adc #3
+    sta $2006
+    lda #$E4
+    sta $2006
+    lda #0
+    sta $2007
+
+    lda $2002
+    lda FirstNametableAddr
+    clc
+    adc #3
+    sta $2006
+    lda #$EC
+    sta $2006
+    lda #$50
+    sta $2007
+
 
 @exit:
     rts
@@ -951,7 +996,11 @@ DrawStashMaterialMenu:
 ;----------------------------
 ClearSubMenu:
     lda MustClearSubMenu
-    beq @exit
+    bne @continue
+
+    rts
+
+@continue:
 
     lda FirstNametableAddr
     clc
@@ -961,7 +1010,7 @@ ClearSubMenu:
     lda #MENU_SUBMENU_ADDRESS_LOW
     sta TempX
 
-    lda #12
+    lda #15
     sta TempPointX
     lda #12
     sta TempPointY
@@ -983,6 +1032,47 @@ ClearSubMenu:
 
     lda #1
     sta DocumentJustClosed
+    
+    lda $2002
+    lda FirstNametableAddr
+    clc
+    adc #3
+    sta $2006
+    lda #$D4
+    sta $2006
+    lda #$19
+    sta $2007
+
+    lda $2002
+    lda FirstNametableAddr
+    clc
+    adc #3
+    sta $2006
+    lda #$DC
+    sta $2006
+    lda #$11
+    sta $2007
+
+    lda $2002
+    lda FirstNametableAddr
+    clc
+    adc #3
+    sta $2006
+    lda #$E4
+    sta $2006
+    lda #$11
+    sta $2007
+
+    lda $2002
+    lda FirstNametableAddr
+    clc
+    adc #3
+    sta $2006
+    lda #$EC
+    sta $2006
+    lda #$51
+    sta $2007
+
 
     
 @exit:
@@ -3570,6 +3660,7 @@ ExitMenuState:
 
     lda #0
     sta SubMenuActivated
+    sta DocumentActivated
     sta SubMenuIndex
     sta MustLoadMenu
     sta menuTileTransferRowIdx
@@ -3582,6 +3673,9 @@ ExitMenuState:
     sta MustDrawMaterialMenu
     sta MustDrawItemMenu
     sta MustDrawFoodMenu
+    sta MustDrawStashDocumentMenu
+    sta MustDrawDocumentMenu
+    sta DocumentJustClosed
     sta MustDrawEquipmentGrid
     sta MustDrawInventoryGrid
     sta MustDrawMenuTitle
