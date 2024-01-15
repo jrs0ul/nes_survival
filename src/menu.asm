@@ -132,7 +132,13 @@ UpdateMenuGfx:
     sta DocumentJustClosed
     lda #1
     sta MustLoadSomething
+    lda StashActivated
+    bne @stash
+    lda #1
     sta MustDrawDocumentMenu
+    jmp @exit
+@stash:
+    sta MustDrawStashDocumentMenu
 
 @exit:
     rts
@@ -1275,6 +1281,10 @@ MenuInput:
 
     cmp #SUBMENU_DOCUMENT
     beq @DoDocumentInput
+
+    cmp #SUBMENU_STASH_DOCUMENT
+    beq @DoDocumentInput
+
     jmp @skipSubmenuStuff
 
 @DocumentStuff:
@@ -1411,11 +1421,24 @@ DocumentMenuInput:
     bne @stashActive
     ;store or drop
 
-    jmp @CheckA
+    lda ItemMenuIndex
+    cmp #1
+    bne @justDropIt
+    ;store
+
+    jsr StoreItemInStash
+    bne @exit
+    jmp @justDropIt
 @stashActive: ; take or drop
 
+    lda ItemMenuIndex
+    cmp #1
+    bne @justDropIt
 
-    jmp @CheckA
+    ;take
+    jsr TakeItemFromStash
+    bne @exit
+    jmp @justDropIt
 
 @notAtHome: ;give, drop
 
@@ -1430,7 +1453,6 @@ DocumentMenuInput:
     jsr GiveItem
     beq @hidemenu
 
-    jmp @CheckA
 
 @justDropIt:
     jsr ClearThatItem
@@ -1733,7 +1755,11 @@ InventoryInput:
 OnItemClicked:
 
     jsr LoadSelectedItemInfo
-    beq @exit
+    bne @continue
+
+    rts
+
+@continue:
 
     lda TempIndex
     cmp #ITEM_TYPE_FOOD
@@ -1801,6 +1827,11 @@ OnItemClicked:
     jsr MaterialItemClicked
     jmp @exit
 @document:
+    lda StashActivated
+    beq @fromInv
+    jsr DocumentItemClickedInStash
+    jmp @exit
+@fromInv:
     jsr DocumentItemClicked
     jmp @exit
 
@@ -1834,6 +1865,19 @@ DocumentItemClicked:
     sta ItemMenuIndex
     sta InventoryActivated
     rts
+;------------------------------------
+DocumentItemClickedInStash:
+    lda #1
+    sta MustLoadSomething
+    sta MustDrawStashDocumentMenu
+    lda #SUBMENU_STASH_DOCUMENT
+    sta SubMenuIndex
+    jsr ActivateSubmenu
+    lda #0
+    sta ItemMenuIndex
+    sta InventoryActivated
+    rts
+
 ;-------------------------------------
 ToolItemClicked:
 
