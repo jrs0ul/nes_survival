@@ -976,6 +976,8 @@ MustDrawStashDocumentMenu:
     .res 1
 MustDrawStashToolMenu:
     .res 1
+MustDrawDocument:
+    .res 1
 MustClearSubMenu:
     .res 1
 MustRestartIndoorsMusic:
@@ -1010,6 +1012,9 @@ InventoryActivated:
 SubMenuIndex:
     .res 1
 SubMenuActivated:
+    .res 1
+
+DocumentActivated:
     .res 1
 
 StashActivated:
@@ -1345,9 +1350,12 @@ SelectedItemPower:
 TempNpcDataIdxForCollision:
     .res 1
 
+DocumentJustClosed:
+    .res 1
+
 
 Buffer:
-    .res 262  ;must see how much is still available
+    .res 259  ;must see how much is still available
 
 ;====================================================================================
 

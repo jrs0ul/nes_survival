@@ -116,12 +116,23 @@ UpdateMenuGfx:
     jsr DrawStashFoodMenu
     jsr DrawStashItemMenu
     jsr DrawStashDocumentMenu
+    jsr DrawDocument
     jsr ClearSubMenu
 
     lda menuTileTransferRowIdx
     bne @exit ; not finished updating gfx
     lda #0
     sta MustLoadSomething
+
+    lda DocumentJustClosed
+    beq @exit
+
+    lda #0
+    sta DocumentActivated
+    sta DocumentJustClosed
+    lda #1
+    sta MustLoadSomething
+    sta MustDrawDocumentMenu
 
 @exit:
     rts
@@ -344,6 +355,43 @@ DrawEquipmentGrid:
 
 @exit:
     rts
+;----------------------------------
+DrawDocument:
+    lda MustDrawDocument
+    beq @exit
+
+    lda FirstNametableAddr
+    clc
+    adc #1
+    sta Temp
+
+    lda #MENU_SUBMENU_ADDRESS_LOW
+    sta TempX
+
+    lda #12
+    sta TempPointX
+
+    lda #12
+    sta TempPointY
+
+    lda #<LetterFromTheCave
+    sta pointer
+    lda #>LetterFromTheCave
+    sta pointer + 1
+    
+
+
+    jsr TransferTiles
+    beq @exit; not done
+
+    lda #0
+    sta MustDrawDocument
+    sta menuTileTransferRowIdx
+
+@exit:
+    rts
+
+
 ;----------------------------------
 DrawStashDocumentMenu:
 
@@ -913,9 +961,9 @@ ClearSubMenu:
     lda #MENU_SUBMENU_ADDRESS_LOW
     sta TempX
 
-    lda #9
+    lda #12
     sta TempPointX
-    lda #11
+    lda #12
     sta TempPointY
 
     lda #<PopUpMenuClear
@@ -930,6 +978,13 @@ ClearSubMenu:
     sta MustClearSubMenu
     sta menuTileTransferRowIdx
 
+    lda DocumentActivated ; did you close a document ?
+    beq @exit
+
+    lda #1
+    sta DocumentJustClosed
+
+    
 @exit:
     rts
 ;----------------------------------
@@ -1090,13 +1145,18 @@ ColorMainMenuAttributes:
 MenuInput:
     lda Buttons
     cmp MenuButtons
-    beq @exit
+    bne @continue
+    rts
 
+@continue:
     lda InventoryActivated
     bne @DoInventoryInput
 
     lda SubMenuActivated
     beq @skipSubmenuStuff
+
+    lda DocumentActivated
+    bne @DocumentStuff
 
     lda SubMenuIndex
     cmp #SUBMENU_FOOD
@@ -1125,6 +1185,11 @@ MenuInput:
 
     cmp #SUBMENU_DOCUMENT
     beq @DoDocumentInput
+    jmp @skipSubmenuStuff
+
+@DocumentStuff:
+    jsr ActivatedDocumentInput
+    jmp @exit
 
 @skipSubmenuStuff:
 
@@ -1165,7 +1230,7 @@ MenuInput:
     jmp @exit
 
 @DoDocumentInput:
-    jsr DocumentInput
+    jsr DocumentMenuInput
     jmp @exit
 
 @DoToolInput:
@@ -1181,7 +1246,19 @@ MenuInput:
 
     rts
 ;--------------------------------------
-DocumentInput:
+ActivatedDocumentInput:
+
+@CheckA:
+    lda Buttons
+    and #BUTTON_A_MASK
+    beq @exit
+
+    jsr HideDocument
+
+@exit:
+    rts
+;--------------------------------------
+DocumentMenuInput:
 
     lda #16
     sta MenuStep
@@ -1228,6 +1305,10 @@ DocumentInput:
     bne @otherOptions
 
     ;Activate 'read' here
+    lda #1
+    sta MustLoadSomething
+    sta MustDrawDocument
+    sta DocumentActivated
 
     jmp @CheckA
 
@@ -2643,6 +2724,14 @@ ItemMenuInput:
     jsr HideSubMenu
 @exit:
     rts
+;---------------------------------
+HideDocument:
+    lda #1
+    sta MustLoadSomething
+    sta MustClearSubMenu
+
+    rts
+
 
 ;---------------------------------
 HideSubMenu:
@@ -3320,6 +3409,7 @@ UpdateInventorySprites:
 
     lda SubMenuActivated
     beq @singlePointer
+
     
     ldx TempSpriteIdx
     lda OldInventoryPointerY
@@ -3344,6 +3434,10 @@ UpdateInventorySprites:
 
 
 @singlePointer:
+
+    lda DocumentActivated ; don't draw pointer if document is opened
+    bne @hideSprites
+
     ldx TempSpriteIdx
     lda InventoryPointerY
     sec
