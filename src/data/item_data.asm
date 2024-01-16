@@ -35,6 +35,12 @@ item_data: ;          ---||---
     .byte 40 , 2, 5, 5          ; 22 slingshot
     .byte 56 , 0, 1, %01100000  ; 23 pie
     .byte 72 , 2, 7, 0          ; 24 letter
+    .byte 72 , 0, 7, 0          ; 25 first letter from Jon
+
+;item id, width, address low, address high
+document_item_data:
+    .byte 24, 15, <LetterFromTheCave, >LetterFromTheCave
+    .byte 25, 15, <FirstLetterFromJon, >FirstLetterFromJon
 
 item_wear:
     .byte 0   ;empty
@@ -62,3 +68,4 @@ item_wear:
     .byte 5   ;slingshot
     .byte 0   ;pie
     .byte 0   ;letter
+    .byte 0   ;letter1

@@ -1016,6 +1016,8 @@ SubMenuActivated:
 
 DocumentActivated:
     .res 1
+ActiveDocument:
+    .res 1
 
 StashActivated:
     .res 1
@@ -1355,7 +1357,7 @@ DocumentJustClosed:
 
 
 Buffer:
-    .res 259  ;must see how much is still available
+    .res 258  ;must see how much is still available
 
 ;====================================================================================
 
@@ -4832,6 +4834,12 @@ ResetEntityVariables:
     lda #ITEM_SLINGSHOT
     sta Storage, x
     ldx #9
+    lda #ITEM_MAX_HP
+    sta Storage, x
+    inx
+    lda #25
+    sta Storage, x
+    inx
     lda #ITEM_MAX_HP
     sta Storage, x
 

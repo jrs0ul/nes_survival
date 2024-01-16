@@ -378,17 +378,36 @@ DrawDocument:
     lda #MENU_SUBMENU_ADDRESS_LOW
     sta TempX
 
-    lda #15
+    lda #1
+    sta TempNpcSpeed
+@loop:
+    lda TempNpcSpeed
+    asl
+    asl
+    tay
+
+
+    lda document_item_data, y
+    cmp ActiveDocument
+    beq @LoadMoreData
+    dec TempNpcSpeed
+    bne @exit ;not found
+    jmp @loop
+
+@LoadMoreData:
+    iny
+    lda document_item_data, y
     sta TempPointX
 
     lda #12
     sta TempPointY
 
-    lda #<LetterFromTheCave
+    iny
+    lda document_item_data, y
     sta pointer
-    lda #>LetterFromTheCave
+    iny
+    lda document_item_data, y
     sta pointer + 1
-    
 
 
     jsr TransferTiles
@@ -1409,6 +1428,8 @@ DocumentMenuInput:
     sta MustLoadSomething
     sta MustDrawDocument
     sta DocumentActivated
+    lda TempItemIndex
+    sta ActiveDocument
 
     jmp @CheckA
 
