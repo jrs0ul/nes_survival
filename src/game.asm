@@ -304,6 +304,7 @@ sun_moon_sprites_for_periods:
     BUTTON_UP_MASK              = %00001000
 
     BUTTON_START_MASK           = %00010000
+    BUTTON_SELECT_MASK          = %00100000
 
     BUTTON_B_MASK               = %01000000
     BUTTON_A_MASK               = %10000000
@@ -1355,9 +1356,13 @@ TempNpcDataIdxForCollision:
 DocumentJustClosed:
     .res 1
 
+PreviouslyEquipedItemIdx:
+    .res 1
+EquipNextResetCount:
+    .res 1
 
 Buffer:
-    .res 258  ;must see how much is still available
+    .res 256  ;must see how much is still available
 
 ;====================================================================================
 
@@ -4784,6 +4789,9 @@ ResetEntityVariables:
     sta WarmthUpdated
     sta FoodUpdated
 
+    lda #254
+    sta PreviouslyEquipedItemIdx
+
     lda #0
     sta ActiveVillagerQuests
     sta ActiveVillagerQuests + 1
@@ -5221,11 +5229,11 @@ CheckStartButton:
     lda Buttons
     and #BUTTON_START_MASK
     bne @checkOld
-    jmp @exit
+    jmp @checkSelect
 @checkOld:
     lda OldButtons
     and #BUTTON_START_MASK
-    bne @exit
+    bne @checkSelect
 
 
     lda GameState
@@ -5285,8 +5293,96 @@ CheckStartButton:
     lda #1
     sta MustLoadMenu
     sta MustLoadSomething
+    jmp @exit
+
+@checkSelect:
+    lda Buttons
+    and #BUTTON_SELECT_MASK
+    bne @checkOldSelect
+    jmp @exit
+@checkOldSelect:
+    lda OldButtons
+    and #BUTTON_SELECT_MASK
+    bne @exit
+
+    lda GameState
+    cmp #STATE_GAME
+    beq @equipNext
+    cmp #STATE_MENU
+    beq @equipNext
+    jmp @exit
+
+@equipNext:
+
+    jsr EquipNext
 
 @exit:
+    rts
+
+;--------------------------------------
+EquipNext:
+
+    lda current_bank
+    sta oldbank
+    ldy #1
+    jsr bankswitch_y
+
+    lda #0
+    sta EquipNextResetCount
+
+    ldx PreviouslyEquipedItemIdx
+@loop:
+    inx
+    inx
+    cpx #INVENTORY_MAX_SIZE
+    bcs @reset
+    lda Inventory,x
+    beq @loop
+    asl
+    asl
+    tay
+    iny
+    iny
+    lda item_data,y
+    cmp #ITEM_TYPE_TOOL
+    bne @loop
+    jmp @cont ; done
+
+@reset:
+    lda EquipNextResetCount
+    cmp #1
+    bcs @exit
+    inc EquipNextResetCount
+    ldx #254
+    jmp @loop
+
+@cont:
+    stx TempItemIndex
+
+    lda #<EquipedItem
+    sta pointer
+    lda #>EquipedItem
+    sta pointer + 1
+    jsr UnequipItem
+
+    lda EquipedItem
+    bne @exit ; failed
+
+    ldx TempItemIndex
+    jsr EquipItem
+    beq @exit
+    ;dex
+    stx PreviouslyEquipedItemIdx
+    lda #0
+    sta Inventory, x
+    inx
+    sta Inventory, x
+    
+
+@exit:
+    ldy oldbank
+    jsr bankswitch_y
+
     rts
 
 ;--------------------------------------
