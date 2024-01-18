@@ -4279,6 +4279,7 @@ HandleInput:
     jmp @finishInput
 
 @contInput:
+
     jsr GenerateNpcsIfNeeded
 
 @finishInput:
@@ -4317,6 +4318,7 @@ GenerateNpcsIfNeeded:
     lda CurrentScreenWasIncremented
     beq @checkdecrement
 
+    jsr FlipStartingNametable
     lda #0
     sta CurrentScreenWasIncremented
 
@@ -4332,6 +4334,7 @@ GenerateNpcsIfNeeded:
     lda CurrentScreenWasDecremented
     beq @exit
 
+    jsr FlipStartingNametable
     lda #0
     sta CurrentScreenWasDecremented
 
@@ -6094,7 +6097,6 @@ CheckLeft:
 @clamp:
 
     dec CurrentMapSegmentIndex
-    jsr FlipStartingNametable
 
     lda #1
     sta CurrentScreenWasDecremented
@@ -6191,7 +6193,6 @@ CheckRight:
     jmp @save
 @clamp:
     inc CurrentMapSegmentIndex
-    jsr FlipStartingNametable
     lda #1
     sta CurrentScreenWasIncremented
 
