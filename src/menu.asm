@@ -487,7 +487,7 @@ DrawSleepMenu:
     adc #1
     sta Temp
 
-    lda #MENU_SUBMENU_ADDRESS_LOW
+    lda #04
     sta TempX
 
     lda #9
@@ -497,7 +497,7 @@ DrawSleepMenu:
     sta pointer
     lda #>SleepConfirmation
     sta pointer + 1
-    lda #7
+    lda #9
     sta TempPointY
 
     jsr TransferTiles
@@ -1435,13 +1435,13 @@ ActivatedDocumentInput:
 ;--------------------------------------
 SleepMenuInput:
 
-    lda #112
+    lda #96
     sta MenuLowerLimit
     lda #2
     sta MenuMaxItem
     lda #16
     sta MenuStep
-    lda #96
+    lda #80
     sta MenuUpperLimit
 
     lda #<ItemMenuIndex
@@ -3262,7 +3262,15 @@ OpenupSleep:
     sta MustDrawMenuTitle
     lda #SUBMENU_SLEEP
     sta SubMenuIndex
-    jsr ActivateSubmenu
+
+    lda #1
+    sta SubMenuActivated
+    lda #40;#MENU_SUBMENU_POINTER_X
+    sta InventoryPointerX
+    lda InventoryPointerY
+    sta OldInventoryPointerY
+    lda #80;#MENU_SUBMENU_POINTER_MIN_Y
+    sta InventoryPointerY
 
     rts
 
@@ -3628,6 +3636,15 @@ UpdateInventorySprites:
     cmp #0
     beq @ThePointer
 
+    ;if sleep submenu is active
+    lda SubMenuActivated
+    beq @itemLoop
+    lda SubMenuIndex
+    cmp #SUBMENU_SLEEP
+    bne @itemLoop
+
+    jmp @ThePointer ; then let's skip item drawing
+
 @itemLoop:
     lda EquipmentActivated
     beq @checkIfStash
@@ -3685,8 +3702,11 @@ UpdateInventorySprites:
 
     lda SubMenuActivated
     beq @singlePointer
+    lda SubMenuIndex
+    cmp #SUBMENU_SLEEP
+    beq @singlePointer ; don't need two pointers if sleep menu option is selected
 
-    
+
     ldx TempSpriteIdx
     lda OldInventoryPointerY
     sec
