@@ -106,6 +106,7 @@ UpdateMenuGfx:
     jsr DrawMenuTitle
     jsr DrawInventoryGrid
     jsr DrawEquipmentGrid
+    jsr DrawSleepMenu
     jsr DrawFoodMenu
     jsr DrawItemMenu
     jsr DrawMaterialMenu
@@ -167,7 +168,7 @@ ResetMenu:
     lda #$03
     sta TempX
 
-    lda #11
+    lda #13
     sta TempPointX
     lda #16
     sta TempPointY
@@ -203,8 +204,10 @@ ResetMenu:
 ;----------------------------------
 DrawMenuTitle:
     lda MustDrawMenuTitle
-    beq @exit
+    bne @cont
 
+    rts
+@cont:
     lda FirstNametableAddr
     clc
     sta Temp
@@ -249,7 +252,7 @@ DrawMenuTitle:
     jmp @draw
 @Inventory_title:
     lda InventoryActivated
-    beq @empty
+    beq @SleepTitle
     lda #10
     sta TempPointX
     lda #<inventory_title
@@ -257,6 +260,20 @@ DrawMenuTitle:
     lda #>inventory_title
     sta pointer + 1
     jmp @draw
+@SleepTitle:
+    lda SubMenuActivated
+    beq @empty
+    lda SubMenuIndex
+    cmp #SUBMENU_SLEEP
+    bne @empty
+    lda #10
+    sta TempPointX
+    lda #<sleep_title
+    sta pointer
+    lda #>sleep_title
+    sta pointer + 1
+    jmp @draw
+
 @empty:
 
     lda #10
@@ -460,7 +477,39 @@ DrawDocument:
 
 @exit:
     rts
+;---------------------------------
+DrawSleepMenu:
+    lda MustDrawSleepMenu
+    beq @exit
 
+    lda FirstNametableAddr
+    clc
+    adc #1
+    sta Temp
+
+    lda #MENU_SUBMENU_ADDRESS_LOW
+    sta TempX
+
+    lda #9
+    sta TempPointX
+
+    lda #<SleepConfirmation
+    sta pointer
+    lda #>SleepConfirmation
+    sta pointer + 1
+    lda #7
+    sta TempPointY
+
+    jsr TransferTiles
+    beq @exit ; not done
+
+    lda #0
+    sta MustDrawSleepMenu
+    sta menuTileTransferRowIdx
+
+
+@exit:
+    rts
 
 ;----------------------------------
 DrawStashDocumentMenu:
@@ -1304,6 +1353,9 @@ MenuInput:
     cmp #SUBMENU_STASH_DOCUMENT
     beq @DoDocumentInput
 
+    cmp #SUBMENU_SLEEP
+    beq @DoSleepInput
+
     jmp @skipSubmenuStuff
 
 @DocumentStuff:
@@ -1352,6 +1404,10 @@ MenuInput:
     jsr DocumentMenuInput
     jmp @exit
 
+@DoSleepInput:
+    jsr SleepMenuInput
+    jmp @exit
+
 @DoToolInput:
     jsr ToolInput
     jmp @exit
@@ -1376,6 +1432,54 @@ ActivatedDocumentInput:
 
 @exit:
     rts
+;--------------------------------------
+SleepMenuInput:
+
+    lda #112
+    sta MenuLowerLimit
+    lda #2
+    sta MenuMaxItem
+    lda #16
+    sta MenuStep
+    lda #96
+    sta MenuUpperLimit
+
+    lda #<ItemMenuIndex
+    sta pointer
+    lda #>ItemMenuIndex
+    sta pointer + 1
+
+
+    jsr MenuInputUpDownCheck
+
+@CheckB:
+    lda Buttons
+    and #BUTTON_B_MASK
+    beq @CheckA
+
+    lda ItemMenuIndex
+    cmp #1 ; yes
+    bne @hidemenu
+    jsr StartSleep
+@CheckA: 
+    lda Buttons
+    and #BUTTON_A_MASK
+    beq @exit
+
+@hidemenu:
+    lda #0
+    sta SubMenuActivated
+    sta SubMenuIndex
+    jsr UpdateMenuStats
+    lda #1
+    sta MustLoadSomething
+    sta MustResetMenu
+
+
+
+@exit:
+    rts
+
 ;--------------------------------------
 DocumentMenuInput:
 
@@ -3016,7 +3120,8 @@ DoRegularInput:
     lda InHouse
     beq @exit
 
-    jsr StartSleep
+
+    jsr OpenupSleep
     jmp @exit
 
 @CheckA:
@@ -3048,13 +3153,9 @@ DoRegularInput:
 
 @setPointerToSleep:
 
-    lda #0
-    sta PlayerInteractedWithBed
-    lda #4
-    sta BaseMenuIndex
-    lda #BASE_MENU_MIN_Y + 64
-    sta InventoryPointerY
+    jsr OpenupSleep
 
+    
 
 @exit:
 
@@ -3145,6 +3246,26 @@ OpenupCrafting:
     sta CurrentCraftingComponent
 @exit:
     rts
+;------------------------------------
+OpenupSleep:
+    lda #4
+    sta BaseMenuIndex
+    lda #BASE_MENU_MIN_Y + 64
+    sta InventoryPointerY
+
+    lda #0
+    sta PlayerInteractedWithBed
+    sta ItemMenuIndex
+    lda #1
+    sta MustLoadSomething
+    sta MustDrawSleepMenu
+    sta MustDrawMenuTitle
+    lda #SUBMENU_SLEEP
+    sta SubMenuIndex
+    jsr ActivateSubmenu
+
+    rts
+
 ;------------------------------------
 OpenupInventory:
     lda #0
@@ -3744,6 +3865,7 @@ ExitMenuState:
     sta MustDrawEquipmentGrid
     sta MustDrawInventoryGrid
     sta MustDrawMenuTitle
+    sta MustDrawSleepMenu
     sta MustResetMenu
 
 

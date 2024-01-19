@@ -542,6 +542,7 @@ sun_moon_sprites_for_periods:
     SUBMENU_STASH_TOOL         = 8
     SUBMENU_DOCUMENT           = 9
     SUBMENU_STASH_DOCUMENT     = 10
+    SUBMENU_SLEEP              = 11
 
 ;===================================================================
 .segment "ZEROPAGE"
@@ -977,6 +978,8 @@ MustDrawStashDocumentMenu:
     .res 1
 MustDrawStashToolMenu:
     .res 1
+MustDrawSleepMenu:
+    .res 1
 MustDrawDocument:
     .res 1
 MustClearSubMenu:
@@ -1362,7 +1365,7 @@ EquipNextResetCount:
     .res 1
 
 Buffer:
-    .res 256  ;must see how much is still available
+    .res 255  ;must see how much is still available
 
 ;====================================================================================
 
