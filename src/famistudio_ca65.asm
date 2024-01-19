@@ -127,7 +127,7 @@
 
 ; One of these MUST be defined (PAL or NTSC playback). Note that only NTSC support is supported when using any of the audio expansions.
 ; FAMISTUDIO_CFG_PAL_SUPPORT   = 1
-FAMISTUDIO_CFG_NTSC_SUPPORT  = 1
+; FAMISTUDIO_CFG_NTSC_SUPPORT  = 1
 
 ; Support for sound effects playback + number of SFX that can play at once.
  FAMISTUDIO_CFG_SFX_SUPPORT   = 1 
