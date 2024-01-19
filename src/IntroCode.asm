@@ -434,6 +434,7 @@ UpdateOutroSprites:
 
     lda outro_meta_sprite_count, x
     sta CutsceneMetaspriteCount
+    beq @hide
 
 
     txa
@@ -499,6 +500,7 @@ UpdateOutroSprites:
     sta TempSpriteCount
 
     ldy TempPointY2
+@hide:
     jsr HideIntroSprites
 
 @done:
@@ -524,6 +526,7 @@ UpdateIntroSprites:
 
     lda intro_meta_sprite_count, x
     sta CutsceneMetaspriteCount
+    beq @hide
 
 
     txa
@@ -589,6 +592,7 @@ UpdateIntroSprites:
     sta TempSpriteCount
 
     ldy TempPointY2
+@hide:
     jsr HideIntroSprites
 
 @done:
@@ -709,6 +713,7 @@ LoadIntroScene:
     lda #0
     sta MustLoadIntro
     sta MustLoadSomething
+
 
 
     rts

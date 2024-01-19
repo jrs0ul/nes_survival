@@ -38,6 +38,6 @@ def label_to_nl(label_file, nl_file, range_min, range_max):
     print("debug symbols: " + nl_file)
     
 if __name__ == "__main__":
-    label_to_nl("survival.labels.txt", "survival.nes.ram.nl", 0x0000, 0x7FF)
-    label_to_nl("survival.labels.txt", "survival.nes.0.nl", 0x8000, 0xBFFF)
-    label_to_nl("survival.labels.txt", "survival.nes.1.nl", 0xC000, 0xFFFF)
+    label_to_nl(sys.argv[1] + ".labels.txt", sys.argv[1] + ".nes.ram.nl", 0x0000, 0x7FF)
+    label_to_nl(sys.argv[1] + ".labels.txt", sys.argv[1] + ".nes.0.nl", 0x8000, 0xBFFF)
+    label_to_nl(sys.argv[1] + ".labels.txt", sys.argv[1] + ".nes.1.nl", 0xC000, 0xFFFF)
