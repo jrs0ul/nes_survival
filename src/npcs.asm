@@ -1117,8 +1117,6 @@ BuildSpearAttackSquare:
     sbc ScrollX
     sta TempSpearX
 
-
-
 @doUpdate:
 
     lda SpearData ; Dir + Active

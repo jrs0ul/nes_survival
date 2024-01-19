@@ -231,6 +231,13 @@ destructable_tiles_list:
     .byte 6, $24, $E7, 7, 7, 0, 0, 0
     .byte 6, $24, $E8, 7, 8, 0, 0, 0
 
+spearSprites:
+          ;+Y,frame,attributes,+X
+    .byte 248, $E2, %00000000, 252, 0, $E3, %00000000, 252 ;up
+    .byte 248, $E3, %10000000, 252, 0, $E2, %10000000, 252 ;down
+    .byte 252, $E0, %00000000, 248, 252, $E1, %00000000, 0 ;left
+    .byte 252, $E1, %01000000, 248, 252, $E0, %01000000, 0 ;right
+
 
 
 npc_direction_list:
