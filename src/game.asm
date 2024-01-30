@@ -168,18 +168,19 @@ zerosprite:
     .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
     .byte $72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72
     .byte $72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72
-    .byte $00,$57,$31,$30,$30,$00,$00,$00,$56,$30,$36,$37,$00,$00,$00,$55
-    .byte $30,$38,$33,$00,$00,$00,$00,$00,$00,$00,$00,$00,$7C,$7D,$8B,$00
+    .byte $00,$00,$00,$00,$57,$31,$30,$30,$00,$00,$56,$30,$36,$37,$00,$00
+    .byte $55,$30,$38,$33,$00,$00,$00,$00,$00,$00,$00,$00,$7c,$7d,$8b,$00
     .byte $70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70
     .byte $70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70
 
 
 stamina_sprite_lookup:
-    .byte 168
     .byte 176
     .byte 184
     .byte 192
     .byte 200
+    .byte 208
+
 stamina_segment_values:
     .byte 0
     .byte 32
@@ -294,8 +295,8 @@ sun_moon_sprites_for_periods:
 
 ;--------------
 ; CONSTANTS
-    ZERO_SPRITE                 = $0200
-    FIRST_SPRITE                = $0204
+    ZERO_SPRITE                = $0200
+    FIRST_SPRITE               = $0204
 
     ;possible game states
     STATE_TITLE                = 0
@@ -305,16 +306,16 @@ sun_moon_sprites_for_periods:
     STATE_INTRO                = 4
     STATE_OUTRO                = 5
 
-    BUTTON_RIGHT_MASK           = %00000001
-    BUTTON_LEFT_MASK            = %00000010
-    BUTTON_DOWN_MASK            = %00000100
-    BUTTON_UP_MASK              = %00001000
+    BUTTON_RIGHT_MASK          = %00000001
+    BUTTON_LEFT_MASK           = %00000010
+    BUTTON_DOWN_MASK           = %00000100
+    BUTTON_UP_MASK             = %00001000
 
-    BUTTON_START_MASK           = %00010000
-    BUTTON_SELECT_MASK          = %00100000
+    BUTTON_START_MASK          = %00010000
+    BUTTON_SELECT_MASK         = %00100000
 
-    BUTTON_B_MASK               = %01000000
-    BUTTON_A_MASK               = %10000000
+    BUTTON_B_MASK              = %01000000
+    BUTTON_A_MASK              = %10000000
 
     NPC_MAX_COUNT              = 16
 
@@ -369,13 +370,15 @@ sun_moon_sprites_for_periods:
     NPC_ELIMINATION_DELAY      = 200
 
 
-    PLAYER_COLLISION_LINE_X1    = 3
-    PLAYER_COLLISION_LINE_X2    = 13 ;16 - 3
-    PLAYER_COLLISION_LINE_Y1    = 8
-    PLAYER_WIDTH                = 16
-    PLAYER_STAMINA_SIZE         = 128
+    PLAYER_COLLISION_LINE_X1   = 3
+    PLAYER_COLLISION_LINE_X2   = 13 ;16 - 3
+    PLAYER_COLLISION_LINE_Y1   = 8
+    PLAYER_WIDTH               = 16
+    PLAYER_STAMINA_SIZE        = 128
 
-    STAMINA_TILE                = $1A
+    STAMINA_END_SPRITE         = $FD
+    STAMINA_SEGMENT_START      = $56 ; lower adress where first stamina segment should be placed
+    STAMINA_TILE               = $1A
 
     MAX_TILE_SCROLL_LEFT       = 248; -8
     MAX_TILE_SCROLL_RIGHT      = 8
@@ -4521,7 +4524,7 @@ UpdateStatusDigits:
     lda $2002
     lda #$20
     sta $2006
-    lda #$55
+    lda #STAMINA_SEGMENT_START
     sta $2006
 
     lda Stamina
@@ -4578,7 +4581,7 @@ UpdateStatusDigits:
     lda $2002
     lda #$20
     sta $2006
-    lda #$42
+    lda #$45
     sta $2006
 
     ldy #0
@@ -4596,7 +4599,7 @@ UpdateStatusDigits:
     lda $2002
     lda #$20
     sta $2006
-    lda #$50
+    lda #$51
     sta $2006
 
 
@@ -4622,7 +4625,7 @@ UpdateStatusDigits:
     lda $2002
     lda #$20
     sta $2006
-    lda #$49
+    lda #$4B
     sta $2006
 
     ldy #0

@@ -261,6 +261,52 @@ UpdateSprites:
     inx
 ;---------------------
 @no_second_celestial_body:
+;Equiped item
+    lda EquipedItem
+    beq @no_equiped_item
+
+    asl
+    asl
+    tay
+    lda item_data, y
+    sta Temp
+
+    lda #15
+    sta FIRST_SPRITE, x
+    inx
+    lda Temp
+    sta FIRST_SPRITE, x
+    inx
+    lda #%00000000
+    sta FIRST_SPRITE, x
+    inx
+    lda #8
+    sta FIRST_SPRITE, x
+    inx
+
+    inc Temp
+
+    lda #15
+    sta FIRST_SPRITE, x
+    inx
+    lda Temp
+    sta FIRST_SPRITE, x
+    inx
+    lda #%00000000
+    sta FIRST_SPRITE, x
+    inx
+    lda #16
+    sta FIRST_SPRITE, x
+    inx
+
+
+    lda TempSpriteCount
+    clc
+    adc #2
+    sta TempSpriteCount
+
+
+@no_equiped_item:
     lda Stamina
     beq @no_stamina_bar
     cmp #PLAYER_STAMINA_SIZE
@@ -269,7 +315,7 @@ UpdateSprites:
     lda #15
     sta FIRST_SPRITE, x
     inx
-    lda #$FD
+    lda #STAMINA_END_SPRITE
     sta FIRST_SPRITE, x
     inx
     lda #%00000001
