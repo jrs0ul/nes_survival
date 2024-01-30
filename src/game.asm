@@ -167,11 +167,11 @@ zerosprite:
     .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
     .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
     .byte $72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72
-    .byte $72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72
+    .byte $72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$2d,$7e,$7e,$7e,$7e,$2c
     .byte $00,$00,$00,$00,$57,$31,$30,$30,$00,$00,$56,$30,$36,$37,$00,$00
-    .byte $55,$30,$38,$33,$00,$00,$00,$00,$00,$00,$00,$00,$7c,$7d,$8b,$00
+    .byte $55,$30,$38,$33,$00,$00,$00,$00,$00,$00,$7c,$00,$00,$00,$00,$8b
     .byte $70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70
-    .byte $70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70
+    .byte $70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$2e,$7d,$7d,$7d,$7d,$2f
 
 
 stamina_sprite_lookup:
@@ -260,36 +260,36 @@ palette_fade_for_periods: ; each period is 1h 30 mins
     .byte DAYTIME_NIGHT ;01:30
     .byte DAYTIME_NIGHT ;03:00
     .byte DAYTIME_NIGHT ;04:30
-    .byte $30 ;06:00
-    .byte $20 ;07:30
-    .byte $10 ;09:00
-    .byte $00 ;10:30
-    .byte $00 ;12:00
-    .byte $00 ;13:30
-    .byte $10 ;15:00
-    .byte $20 ;16:30
-    .byte $30 ;18:00
+    .byte $30           ;06:00
+    .byte $20           ;07:30
+    .byte $10           ;09:00
+    .byte $00           ;10:30
+    .byte $00           ;12:00
+    .byte $00           ;13:30
+    .byte $10           ;15:00
+    .byte $20           ;16:30
+    .byte $30           ;18:00
     .byte DAYTIME_NIGHT ;19:30
     .byte DAYTIME_NIGHT ;21:00
     .byte DAYTIME_NIGHT ;22:30
 
-sun_moon_sprites_for_periods:
-    .byte 232, 246, 0, 0 ;$40
-    .byte 232, 246, 0, 0 ;$40
-    .byte 232, 246, 0, 0 ;$40
-    .byte 232, 246, 0, 0 ;$40
-    .byte 240, 246, 0, 0 ; 30
-    .byte 240, 246, 224, 244 ; 20
-    .byte 240, 248, 224, 243 ; 10
-    .byte 232, 243, 0, 0 ; 0
-    .byte 232, 243, 0, 0 ; 0
-    .byte 232, 243, 0, 0 ; 0
-    .byte 240, 243, 0, 0 ; 10
-    .byte 240, 243, 224, 247 ; 20
-    .byte 224, 246, 240,  245; 30
-    .byte 232, 246, 0, 0 ;$40
-    .byte 232, 246, 0, 0 ;$40
-    .byte 232, 246, 0, 0 ;$40
+sun_moon_tiles_for_periods:
+    .byte $00, $5D, $5E, $00 ;$40
+    .byte $00, $5D, $5E, $00 ;$40
+    .byte $00, $5D, $5E, $00 ;$40
+    .byte $00, $5D, $5E, $00 ;$40
+    .byte $00, $00, $5D, $5E ;$30
+    .byte $5C, $00, $5D, $5E ;$20
+    .byte $5B, $5C, $00, $5D ;$10
+    .byte $00, $5B, $5C, $00 ;$00
+    .byte $00, $5B, $5C, $00 ;$00
+    .byte $00, $5B, $5C, $00 ;$00
+    .byte $00, $00, $5B, $5C ;$10
+    .byte $5E, $00, $5B, $5C ;$20
+    .byte $5D, $5E, $00, $5B ;$30
+    .byte $00, $5D, $5E, $00 ;$40
+    .byte $00, $5D, $5E, $00 ;$40
+    .byte $00, $5D, $5E, $00 ;$40
 
 
 
@@ -4620,7 +4620,7 @@ UpdateStatusDigits:
 
 @food:
     lda FoodUpdated
-    beq @exit
+    beq @sunmoon
 
     lda $2002
     lda #$20
@@ -4638,6 +4638,33 @@ UpdateStatusDigits:
     iny
     cpy #3
     bcc @FoodLoop
+
+@sunmoon:
+    lda $2002
+    lda #$20
+    sta $2006
+    lda #$5B
+    sta $2006
+
+    lda Hours
+    lsr
+    lsr
+    lsr
+    lsr
+    asl
+    asl
+    tay
+    lda sun_moon_tiles_for_periods, y
+    sta $2007
+    iny
+    lda sun_moon_tiles_for_periods, y
+    sta $2007
+    iny
+    lda sun_moon_tiles_for_periods, y
+    sta $2007
+    iny
+    lda sun_moon_tiles_for_periods, y
+    sta $2007
 
 @exit:
     rts

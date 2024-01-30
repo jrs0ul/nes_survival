@@ -201,67 +201,17 @@ UpdateSprites:
 ;-----------HAMMER
 @hammer:
     lda EquipedItem
-    beq @sunmoon
+    beq @equiped_item
     cmp #ITEM_HAMMER
     beq @ok
     cmp #ITEM_WOOD_HAMMER
-    bne @sunmoon
+    bne @equiped_item
 @ok:
     jsr UpdateHammerSprites
 
-;------------------------------
-;------SUN-MOON INDICATOR
-@sunmoon:
-    inx; next sprite byte
-    lda Hours
-    lsr
-    lsr
-    lsr
-    lsr
-    asl
-    asl
-    tay
-
-    lda #15
-    sta FIRST_SPRITE, x
-    inx
-    iny
-    lda sun_moon_sprites_for_periods, y
-    sta FIRST_SPRITE, x
-    inx
-    lda #0
-    sta FIRST_SPRITE, x
-    inx
-    dey
-    lda sun_moon_sprites_for_periods, y
-    sta FIRST_SPRITE, x
-    inx
-    inc TempSpriteCount
-    iny
-    iny
-    lda sun_moon_sprites_for_periods, y
-    sta TempFrame
-    beq @no_second_celestial_body
-;--
-    iny
-    lda #15
-    sta FIRST_SPRITE, x
-    inx
-    lda sun_moon_sprites_for_periods, y
-    sta FIRST_SPRITE, x
-    inx
-    lda #0
-    sta FIRST_SPRITE, x
-    inx
-    lda TempFrame
-    sta FIRST_SPRITE, x
-
-    inc TempSpriteCount
-
-    inx
 ;---------------------
-@no_second_celestial_body:
-;Equiped item
+@equiped_item:
+    inx
     lda EquipedItem
     beq @no_equiped_item
 
