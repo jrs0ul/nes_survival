@@ -705,9 +705,15 @@ weapon_collision_ptr:
 
 ptr_list:
     .res 2
+MustUpdateMapColumn:
+    .res 1
+OldBgColumnIdxToUpload:
+    .res 1
+OldSourceMapIdx:
+    .res 1
 
 ZPBuffer:
-    .res 102  ; I want to be aware of the free memory
+    .res 99  ; I want to be aware of the free memory
 
 ;--------------
 .segment "BSS" ; variables in ram
@@ -2064,6 +2070,12 @@ UpdateDestructableTiles:
 ;Check and upload background columns from rom map to the PPU
 UploadBgColumns:
 
+    lda MustUpdateMapColumn
+    bne @checkScreenCount
+
+    rts
+
+@checkScreenCount:
     lda ScreenCount
     cmp #3
     bcs @bigmap
@@ -2192,6 +2204,11 @@ UploadBgColumns:
 
     dex
     bne @attribLoop
+
+    lda BgColumnIdxToUpload
+    sta OldBgColumnIdxToUpload
+    lda SourceMapIdx
+    sta OldSourceMapIdx
 
 
 @exit:
@@ -3432,6 +3449,8 @@ RoutinesAfterFadeOut:
     jsr ResetNameTableAdresses
     lda #1
     sta MustLoadSomething ; activate location loading in NMI
+    lda #255
+    sta OldBgColumnIdxToUpload
     jsr CalcMapColumnToUpdate
 
 
@@ -4397,6 +4416,9 @@ ResetPlayerXMovement:
 ;--------------------------------
 CalcMapColumnToUpdate:
 
+    lda #0
+    sta MustUpdateMapColumn
+
     lda ScrollX
     lsr
     lsr
@@ -4451,6 +4473,17 @@ CalcMapColumnToUpdate:
 @storeIdx:
     stx DestScreenAddr
 
+    lda SourceMapIdx
+    cmp OldSourceMapIdx
+    bne @mustUpdate
+    lda BgColumnIdxToUpload
+    cmp OldBgColumnIdxToUpload
+    beq @attr
+@mustUpdate:
+    lda #1
+    sta MustUpdateMapColumn
+
+@attr:
     lda BgColumnIdxToUpload
     lsr
     lsr
