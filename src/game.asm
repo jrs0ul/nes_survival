@@ -707,13 +707,19 @@ ptr_list:
     .res 2
 MustUpdateMapColumn:
     .res 1
+MustUpdateMapAttributeColumn:
+    .res 1
 OldBgColumnIdxToUpload:
+    .res 1
+OldAttribColumnIdxToUpdate:
     .res 1
 OldSourceMapIdx:
     .res 1
+MustUpdateSunMoon:
+    .res 1
 
 ZPBuffer:
-    .res 99  ; I want to be aware of the free memory
+    .res 96  ; I want to be aware of the free memory
 
 ;--------------
 .segment "BSS" ; variables in ram
@@ -2152,6 +2158,9 @@ UploadBgColumns:
     sta $2000
 
 ;update attributes===========================
+    lda MustUpdateMapAttributeColumn
+    beq @done
+
     lda LocationIndex
     asl
     asl
@@ -2204,11 +2213,14 @@ UploadBgColumns:
 
     dex
     bne @attribLoop
+@done:
 
     lda BgColumnIdxToUpload
     sta OldBgColumnIdxToUpload
     lda SourceMapIdx
     sta OldSourceMapIdx
+    lda AttribColumnIdxToUpdate
+    sta OldAttribColumnIdxToUpdate
 
 
 @exit:
@@ -3957,6 +3969,7 @@ AdaptBackgroundPaletteByTime:
     sta PaletteUpdateSize
     lda #1
     sta MustUpdatePalette
+    sta MustUpdateSunMoon
 @exit:
     rts
 
@@ -4418,6 +4431,7 @@ CalcMapColumnToUpdate:
 
     lda #0
     sta MustUpdateMapColumn
+    sta MustUpdateMapAttributeColumn
 
     lda ScrollX
     lsr
@@ -4489,6 +4503,16 @@ CalcMapColumnToUpdate:
     lsr
     sta AttribColumnIdxToUpdate ; attribute id, bg_column / 4
 
+    lda SourceMapIdx
+    cmp OldSourceMapIdx
+    bne @updateAttributes
+    lda AttribColumnIdxToUpdate
+    cmp OldAttribColumnIdxToUpdate
+    beq @exit
+@updateAttributes:
+    lda #1
+    sta MustUpdateMapAttributeColumn
+@exit:
     rts
 ;--------------------------------
 IntroNametableAnimations:
@@ -4673,6 +4697,10 @@ UpdateStatusDigits:
     bcc @FoodLoop
 
 @sunmoon:
+
+    lda MustUpdateSunMoon
+    beq @exit
+
     lda $2002
     lda #$20
     sta $2006
@@ -4698,6 +4726,9 @@ UpdateStatusDigits:
     iny
     lda sun_moon_tiles_for_periods, y
     sta $2007
+
+    lda #0
+    sta MustUpdateSunMoon
 
 @exit:
     rts
