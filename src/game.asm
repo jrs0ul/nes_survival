@@ -718,8 +718,13 @@ OldSourceMapIdx:
 MustUpdateSunMoon:
     .res 1
 
+Stamina:
+    .res 1
+OldStamina:
+    .res 1
+
 ZPBuffer:
-    .res 96  ; I want to be aware of the free memory
+    .res 94  ; I want to be aware of the free memory
 
 ;--------------
 .segment "BSS" ; variables in ram
@@ -801,7 +806,6 @@ TempNpcFrame:
     .res 1
 
 SnowFrame:
-Stamina:
     .res 1
 FoodToStamina:
     .res 1
@@ -3461,6 +3465,7 @@ RoutinesAfterFadeOut:
     jsr ResetNameTableAdresses
     lda #1
     sta MustLoadSomething ; activate location loading in NMI
+    sta MustUpdateSunMoon
     lda #255
     sta OldBgColumnIdxToUpload
     jsr CalcMapColumnToUpdate
@@ -3928,6 +3933,8 @@ RotFood:
 ;-------------------------------
 ;PalettePtr - where to store the modified palette
 AdaptBackgroundPaletteByTime:
+    lda #1
+    sta MustUpdateSunMoon
     lda InHouse
     bne @exit
     lda InVillagerHut
@@ -3969,7 +3976,6 @@ AdaptBackgroundPaletteByTime:
     sta PaletteUpdateSize
     lda #1
     sta MustUpdatePalette
-    sta MustUpdateSunMoon
 @exit:
     rts
 
@@ -4578,6 +4584,10 @@ UpdateStatusDigits:
     lda #0
     sta $2001
 
+    lda Stamina
+    cmp OldStamina
+    beq @Hp
+
     lda $2002
     lda #$20
     sta $2006
@@ -4632,6 +4642,9 @@ UpdateStatusDigits:
     sta $2007
 
 @Hp:
+    lda Stamina
+    sta OldStamina
+
     lda HpUpdated
     beq @warmth
 
