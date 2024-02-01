@@ -209,16 +209,17 @@ TestPointAgainstCollisionMap:
     beq @cont
 
 ;--- ok, this -is- UGLY------------
+    lda #DESTRUCTIBLE_COUNT
     tax
     stx destructableIdx
-@destructablesLoop:
+@destructiblesLoop:
     ldx destructableIdx
     dex
     stx destructableIdx
     bmi @cont
 
     lda Destructables, x
-    beq @destructablesLoop
+    beq @destructiblesLoop
 
     txa
     asl
@@ -236,18 +237,19 @@ TestPointAgainstCollisionMap:
     lsr
     lsr
     lsr
-    cmp destructable_tiles_list, x ; compare with y
-    bne @destructablesLoop
+    cmp destructible_tiles_list, x ; compare with y
+    bne @destructiblesLoop
 
     inx ; move to x
     lda TempPointX
     lsr
     lsr
     lsr
-    cmp destructable_tiles_list, x
-    bne @destructablesLoop
+    cmp destructible_tiles_list, x
+    bne @destructiblesLoop
 
-    lda #DESTRUCTED_TILE_VALUE
+    inx
+    lda destructible_tiles_list, x
     jmp @compare
 
 ;----------------------------

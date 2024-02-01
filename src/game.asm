@@ -223,15 +223,18 @@ fist_collision_pos:
     .byte 2, 18, 6, 18     ;down
 
 
-;data: 
+;Tiles that can be destroyed:
 ;   location,
 ;   tile address high, (in video memory)
 ;   tile address low,
 ;   tile row
 ;   tile column
-destructable_tiles_list:
-    .byte 6, $24, $E7, 7, 7, 0, 0, 0
-    .byte 6, $24, $E8, 7, 8, 0, 0, 0
+;   tile value after destruction
+destructible_tiles_list:
+    .byte 6, $24, $E7, 7,  7,  $14, 0, 0
+    .byte 6, $24, $E8, 7,  8,  $14, 0, 0
+    .byte 10,$25, $0D, 8,  13, $D8, 0, 0
+    .byte 10,$25, $2D, 9,  13, $2A, 0, 0
 
 spearSprites:
           ;+Y,frame,attributes,+X
@@ -339,8 +342,9 @@ sun_moon_tiles_for_periods:
     ROW_TABLE_SIZE             = 240
 
 
-    DESTRUCTABLE_TILE_VALUE    = $F7
-    DESTRUCTED_TILE_VALUE      = $14
+    DESTRUCTIBLE_COUNT         = 4
+
+    DESTRUCTIBLE_TILE_VALUE    = $F7
 
     ROCK_TILE_1                = $DE
     ROCK_TILE_2                = $DF
@@ -1335,7 +1339,7 @@ ProjectileIdx:
     .res 1
 
 Destructables:
-    .res 2  ;two destructables so far, 1 means destroyed
+    .res 4  ;four destructables so far, 1 means destroyed
 
 AttribHighAddress:
     .res 1
@@ -1393,7 +1397,7 @@ EquipNextResetCount:
     .res 1
 
 Buffer:
-    .res 255  ;must see how much is still available
+    .res 253  ;must see how much is still available
 
 ;====================================================================================
 
@@ -2042,7 +2046,7 @@ UpdateDestructableTiles:
     ;lda MustUpdateDestructables
     ;bne @exit
 
-    ldy #2
+    ldy #DESTRUCTIBLE_COUNT
 @loop:
     dey
     bmi @exit
@@ -2054,18 +2058,20 @@ UpdateDestructableTiles:
     asl
     asl
     tax
-    lda destructable_tiles_list, x
+    lda destructible_tiles_list, x
     cmp LocationIndex
     bne @loop
     inx
     lda $2002
-    lda destructable_tiles_list, x
+    lda destructible_tiles_list, x
     sta $2006
     inx
-    lda destructable_tiles_list, x
+    lda destructible_tiles_list, x
     sta $2006
-
-    lda #DESTRUCTED_TILE_VALUE
+    inx
+    inx
+    inx
+    lda destructible_tiles_list, x
     sta $2007
 
 
@@ -5751,7 +5757,7 @@ useHammerOnEnvironment:
 
     lda (pointer), y
 
-    cmp #DESTRUCTABLE_TILE_VALUE
+    cmp #DESTRUCTIBLE_TILE_VALUE
     bne @check_other_tiles
 
     lda EquipedItem
@@ -5768,17 +5774,17 @@ useHammerOnEnvironment:
     asl
     asl
     tax
-    lda destructable_tiles_list, x
+    lda destructible_tiles_list, x
     cmp LocationIndex
     bne @destructable_loop
     inx
     inx
     inx
-    lda destructable_tiles_list, x
+    lda destructible_tiles_list, x
     cmp TempY
     bne @destructable_loop
     inx
-    lda destructable_tiles_list, x
+    lda destructible_tiles_list, x
     cmp TempX
     bne @destructable_loop
 
