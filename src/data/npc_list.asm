@@ -15,6 +15,9 @@ villager3_npcs:
     .byte 1
     .byte %00101001, 104, 94, 0, 100
 
+boss_npcs:
+    .byte 1
+    .byte %00000001, 150, 80, 0, 50
 
 cave_npcs:
     .byte 7

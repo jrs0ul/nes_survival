@@ -134,6 +134,7 @@ FAMISTUDIO_CFG_C_BINDINGS = 0
 .include "data/music.s"
 .include "data/sfx.s"
 .include "famistudio_ca65.asm"
+.include "data/maps/alien_bossroom.asm"
 ;=============================================================
 
 .segment "RODATA" ; ROM7
@@ -384,7 +385,7 @@ sun_moon_tiles_for_periods:
     MAX_TILE_SCROLL_RIGHT      = 8
 
 
-    ENTRY_POINT_COUNT          = 24
+    ENTRY_POINT_COUNT          = 26
 
     SLEEP_POS_X                = 100
     SLEEP_POS_Y                = 72
@@ -413,6 +414,7 @@ sun_moon_tiles_for_periods:
     PLAYER_START_Y             = 200
 
     LOCATION_ALIEN_BASE        = 10
+    LOCATION_BOSS_ROOM         = 12
 
 
     DAMAGE_RED_BLINK_DURATION  = 5
@@ -3438,12 +3440,38 @@ RoutinesAfterFadeOut:
 
     lda ActiveMapEntryIndex
     cmp #21
-    bne @next23
+    bne @next25
 
     lda #1
     sta InCave
 
-@next23:
+    ;25. Boss room entrance
+@next25:
+
+    lda ActiveMapEntryIndex
+    cmp #24
+    bne @next26
+
+    lda #<alien_palette
+    sta CurrentMapPalettePtr
+    lda #>alien_palette
+    sta CurrentMapPalettePtr + 1
+
+    ;26 Boss room exit
+@next26:
+
+    lda ActiveMapEntryIndex
+    cmp #25
+    bne @next27
+
+    lda #<alien_palette
+    sta CurrentMapPalettePtr
+    lda #>alien_palette
+    sta CurrentMapPalettePtr + 1
+
+
+@next27:
+
 
     lda DetectedMapType
     bne @itsAnIndoorMap
@@ -3941,6 +3969,8 @@ AdaptBackgroundPaletteByTime:
     bne @exit
     lda LocationIndex
     cmp #LOCATION_ALIEN_BASE
+    beq @exit
+    cmp #LOCATION_BOSS_ROOM
     beq @exit
 
     ldy #$01 ;keeps the outline for the background objects
@@ -5707,7 +5737,13 @@ useHammerOnEnvironment:
 @checkBase:
     lda LocationIndex
     cmp #LOCATION_ALIEN_BASE
-    bne @cont
+    beq @abort
+    cmp #LOCATION_BOSS_ROOM
+    beq @abort
+
+    jmp @cont
+
+@abort:
     rts
 
 @cont:
@@ -6070,6 +6106,8 @@ CanCastRodHere:
 
     lda LocationIndex
     cmp #LOCATION_ALIEN_BASE
+    beq @exit
+    cmp #LOCATION_BOSS_ROOM
     beq @exit
 
     jsr CalcTileAddressInFrontOfPlayer

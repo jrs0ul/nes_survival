@@ -61,6 +61,11 @@ map_list_low:
     .byte 0
     .byte 0
 
+    .byte <alien_bossroom
+    .byte 0
+    .byte 0
+    .byte 0
+
 
 
 
@@ -121,6 +126,11 @@ map_list_high:
     .byte 0
     
     .byte >location_with_cave
+    .byte 0
+    .byte 0
+    .byte 0
+
+    .byte >alien_bossroom
     .byte 0
     .byte 0
     .byte 0

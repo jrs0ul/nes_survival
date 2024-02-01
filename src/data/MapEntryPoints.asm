@@ -6,8 +6,8 @@
 ;CurrentMapSegmentIndex value,
 ;MinX,
 ;MaxX,
-;GlobalScrollMin,
-;GlobalScrollMax,
+;ScrollX Min,
+;ScrollX Max,
 ;MinY,
 ;MaxY
 
@@ -73,6 +73,11 @@ MapEntryPoints:
     .byte 11, 0, 0, 255, 0,255, 222, 255
     ;23.cave entrance from location 11
     .byte 11, 0, 140, 151, 0, 255, 40, 50
+    ;25. Boss room entrance
+    .byte 10, 1, 234, 255, 0, 255, 112, 127
+    ;-------------------------------------
+    ;26 Boss room exit
+    .byte 12, 0, 0, 16, 0, 255, 112, 127
 
 
 .segment "ROM0"
@@ -180,6 +185,15 @@ MapSpawnPoint:
     ;cave entrance
     .byte 120, 207, 6, OUTDOORS_LOC7_SCREEN_COUNT, <Cave_items, >Cave_items, 4, 194, 0
     .byte 0, 0, 0, 0, <cave_npcs, >cave_npcs, 0
+    ;boss room entrance
+    .byte 20, 120, 12, 1, <House_items, >House_items, 6, 0, 0
+    .byte 0, <alien_bossroom, >alien_bossroom, 0, <boss_npcs, >boss_npcs, 0
+    ;---------------
+    ;boss room exit
+    .byte 223, 120, 10, 2, <House_items, >House_items, 4, 0, 1
+    .byte 0, 0, 0, 0, <alien_base_npcs, >alien_base_npcs, 0
+
+
 
 
 
@@ -200,8 +214,10 @@ LocationScreenCountList:
     .byte 1                          ; 9 granny's hut
     .byte 2                          ; 10 alien base
     .byte 1                          ; 11 location where cave is
+    .byte 1                          ; 12 boss room
 
-;what is index for entry points for each location
+;what is index(0..N) for entry points for each location
+;note: a loction can have multiple entry points
 LocationEntryPointsPos:
     .byte 0   ;0
     .byte 4   ;1
@@ -215,6 +231,7 @@ LocationEntryPointsPos:
     .byte 19  ;9
     .byte 20  ;10
     .byte 22  ;11
+    .byte 25  ;12
 
 
 ;which location in which bank
@@ -231,6 +248,7 @@ LocationBanks:
     .byte 0  ;9
     .byte 4  ;10
     .byte 5  ;11
+    .byte 6  ;12
 
 
 ;indexes in Item_Location1_Collection_times
@@ -244,6 +262,7 @@ LocationItemIndexes:
     .byte ITEM_COUNT_LOC1 + ITEM_COUNT_LOC2 + ITEM_COUNT_LOC3 ;6
     .byte ITEM_COUNT_LOC1 + ITEM_COUNT_LOC2 + ITEM_COUNT_LOC3 + ITEM_COUNT_LOC7 ;7 crashsite
     .byte ITEM_COUNT_LOC1 + ITEM_COUNT_LOC2 + ITEM_COUNT_LOC3 + ITEM_COUNT_LOC7 + ITEM_COUNT_LOC8
+    .byte 0
     .byte 0
     .byte 0
     .byte 0
@@ -261,6 +280,7 @@ LocationItemCounts:
     .byte 0
     .byte 0
     .byte 0
+    .byte 0
 
 LocationsWithRespawnableItems:
     .byte 1 ; 0
@@ -275,4 +295,5 @@ LocationsWithRespawnableItems:
     .byte 1 ; 9 ; granny location
     .byte 0 ; 10
     .byte 0 ; 11
+    .byte 0 ; 12 ; boss
 
