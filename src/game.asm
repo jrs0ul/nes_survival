@@ -529,6 +529,8 @@ sun_moon_tiles_for_periods:
     NPC_TYPE_PASSIVE           = 3
     NPC_TYPE_AGRESSIVE         = 4
 
+    NPC_IDX_BOSS               = 8
+
     DIALOG_TEXT_LENGTH         = 96
 
     RECIPES_SIZE               = 39
@@ -1396,8 +1398,11 @@ PreviouslyEquipedItemIdx:
 EquipNextResetCount:
     .res 1
 
+BossDefeated:
+    .res 1
+
 Buffer:
-    .res 253  ;must see how much is still available
+    .res 252  ;must see how much is still available
 
 ;====================================================================================
 
@@ -3463,6 +3468,15 @@ RoutinesAfterFadeOut:
     lda #>alien_palette
     sta CurrentMapPalettePtr + 1
 
+    lda BossDefeated
+    bne @done26
+    lda #<boss_npcs
+    sta pointer
+    lda #>boss_npcs
+    sta pointer + 1
+    jsr LoadNpcs
+@done26:
+
     ;26 Boss room exit
 @next26:
 
@@ -5025,6 +5039,7 @@ ResetEntityVariables:
     sta StaminaDelay
 
     lda #0
+    sta BossDefeated
     sta menuTileTransferRowIdx
     sta MapTilesetBankNo
     sta MustPlaySample

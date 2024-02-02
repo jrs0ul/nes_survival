@@ -30,6 +30,7 @@ frame_list_index_lookup:
     .byte 46 ; granny
     .byte 54 ; deadman
     .byte 62 ; boar
+    .byte 70  ; boss
 
 
 ;Bunny

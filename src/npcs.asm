@@ -816,6 +816,18 @@ OnCollisionWithAttackRect:
     and #%11111000; drop three last bits that stand for status
     sta Npcs, y
 
+    lda TempNpcIndex
+    cmp #NPC_IDX_BOSS
+    bne @dropStuff
+    lda #1
+    sta BossDefeated
+    sta Destructables + 2
+    sta Destructables + 3
+    lda DestroyedTilesCount
+    clc
+    adc #2
+
+@dropStuff:
     jsr DropItemAfterDeath
     jmp @wearWeapon
 
