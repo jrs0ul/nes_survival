@@ -230,11 +230,12 @@ fist_collision_pos:
 ;   tile row
 ;   tile column
 ;   tile value after destruction
+;   screen
 destructible_tiles_list:
-    .byte 6, $24, $E7, 7,  7,  $14, 0, 0
-    .byte 6, $24, $E8, 7,  8,  $14, 0, 0
-    .byte 10,$25, $0D, 8,  13, $D8, 0, 0
-    .byte 10,$25, $2D, 9,  13, $2A, 0, 0
+    .byte 6, $24, $E7, 7,  7,  $14, 1, 0
+    .byte 6, $24, $E8, 7,  8,  $14, 1, 0
+    .byte 10,$25, $0D, 8,  13, $D8, 1, 0
+    .byte 10,$25, $2D, 9,  13, $2A, 1, 0
 
 spearSprites:
           ;+Y,frame,attributes,+X
@@ -5077,6 +5078,8 @@ ResetEntityVariables:
     ;lda #1 ;COMMENT THIS OUT!
     sta Destructibles
     sta Destructibles + 1
+    sta Destructibles + 2
+    sta Destructibles + 3
     ;lda #2 ;COMMENT THIS OUT!
     sta DestroyedTilesCount
 

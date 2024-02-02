@@ -249,6 +249,12 @@ TestPointAgainstCollisionMap:
     bne @destructiblesLoop
 
     inx
+    inx ;screen
+    lda destructible_tiles_list, x
+    cmp TempScreen
+    bne @destructiblesLoop
+
+    dex ; tile after destruction
     lda destructible_tiles_list, x
     jmp @compare
 
