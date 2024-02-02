@@ -211,14 +211,14 @@ TestPointAgainstCollisionMap:
 ;--- ok, this -is- UGLY------------
     lda #DESTRUCTIBLE_COUNT
     tax
-    stx destructableIdx
+    stx destructibleIdx
 @destructiblesLoop:
-    ldx destructableIdx
+    ldx destructibleIdx
     dex
-    stx destructableIdx
+    stx destructibleIdx
     bmi @cont
 
-    lda Destructables, x
+    lda Destructibles, x
     beq @destructiblesLoop
 
     txa

@@ -819,13 +819,7 @@ OnCollisionWithAttackRect:
     lda TempNpcIndex
     cmp #NPC_IDX_BOSS
     bne @dropStuff
-    lda #1
-    sta BossDefeated
-    sta Destructables + 2
-    sta Destructables + 3
-    lda DestroyedTilesCount
-    clc
-    adc #2
+    jsr OnBossDefeat
 
 @dropStuff:
     jsr DropItemAfterDeath
@@ -834,7 +828,7 @@ OnCollisionWithAttackRect:
 @doneDoingDmg:
 
     jsr PlayDamageSfx
-   
+
     tya
     sec
     sbc #7  ;5
@@ -842,7 +836,7 @@ OnCollisionWithAttackRect:
     lda Npcs, y
     and #%11111000
     eor #%00000111 ; setting agitation bit + damaged state
-    
+
     sta Npcs, y
     iny
     iny
@@ -861,6 +855,18 @@ OnCollisionWithAttackRect:
 @exit:
 
     rts
+;------------------------------------
+OnBossDefeat:
+    lda #1
+    sta BossDefeated
+    sta Destructibles + 2
+    sta Destructibles + 3
+    lda DestroyedTilesCount
+    clc
+    adc #2
+    sta DestroyedTilesCount
+    rts
+
 ;------------------------------------
 PlayDamageSfx:
     sty TempY

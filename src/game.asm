@@ -644,7 +644,7 @@ NMINotFinished: ;to figure if another nmi called during nmi :/
     .res 1
 MustUpdatePalette: ;flag that signals the palette update
     .res 1
-MustUpdateDestructables:
+MustUpdateDestructibles:
     .res 1
 
 HP:
@@ -1340,8 +1340,8 @@ ProjectileCount:
 ProjectileIdx:
     .res 1
 
-Destructables:
-    .res 4  ;four destructables so far, 1 means destroyed
+Destructibles:
+    .res 4  ;four destructibles so far, 1 means destroyed
 
 AttribHighAddress:
     .res 1
@@ -1360,7 +1360,7 @@ TempCollisionVar:
 DestroyedTilesCount:
     .res 1
 
-destructableIdx:
+destructibleIdx:
     .res 1
 
 RLETag:
@@ -2019,7 +2019,7 @@ LoadBackgroundsIfNeeded:
     rts
 
 ;---------------------------------
-ResetNameTableAdresses:
+ResetNameTableAddresses:
 
     lda #$20
     sta FirstNametableAddr
@@ -2055,7 +2055,7 @@ UpdateDestructableTiles:
 @loop:
     dey
     bmi @exit
-    lda Destructables, y
+    lda Destructibles, y
     beq @loop
 
     tya
@@ -3488,6 +3488,7 @@ RoutinesAfterFadeOut:
     sta CurrentMapPalettePtr
     lda #>alien_palette
     sta CurrentMapPalettePtr + 1
+    jsr FlipStartingNametable ; for the locked door, so the second screen would always be in adress $24**
 
 
 @next27:
@@ -3510,7 +3511,6 @@ RoutinesAfterFadeOut:
     sta MustLoadHouseInterior
 
 @finish:
-    jsr ResetNameTableAdresses
     lda #1
     sta MustLoadSomething ; activate location loading in NMI
     sta MustUpdateSunMoon
@@ -3665,6 +3665,7 @@ CommonLocationRoutine:
 
 
     jsr BuildRowTable
+    jsr ResetNameTableAddresses
 
 
     rts
@@ -5074,8 +5075,8 @@ ResetEntityVariables:
     sta EquipedClothing
     sta EquipedClothing + 1
     ;lda #1 ;COMMENT THIS OUT!
-    sta Destructables
-    sta Destructables + 1
+    sta Destructibles
+    sta Destructibles + 1
     ;lda #2 ;COMMENT THIS OUT!
     sta DestroyedTilesCount
 
@@ -5805,13 +5806,13 @@ useHammerOnEnvironment:
 
 
     lda #1
-    sta Destructables, y
+    sta Destructibles, y
     inc DestroyedTilesCount
 
 
-    ;TODO: update destructabe tiles
+    ;TODO: update destructible tiles
     lda #1
-    sta MustUpdateDestructables
+    sta MustUpdateDestructibles
     jmp @exit
 
 @check_other_tiles:
