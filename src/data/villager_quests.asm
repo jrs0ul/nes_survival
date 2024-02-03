@@ -400,7 +400,7 @@ goal_items_list:
 
 .segment "RODATA"
 reward_items_list:
-    .byte 0, ITEM_HIDE, ITEM_FISHING_ROD, ITEM_HAMMER
+    .byte 0, ITEM_HIDE, ITEM_FISHING_ROD, ITEM_LAMP
     .byte 0, ITEM_ROWAN_BERRIES, ITEM_PIE, ITEM_COAT
     .byte 0, ITEM_JAM, 0, ITEM_PIE
 

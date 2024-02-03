@@ -487,6 +487,7 @@ sun_moon_tiles_for_periods:
     ITEM_SLINGSHOT             = 22
     ITEM_PIE                   = 23
     ITEM_LETTER                = 24
+    ITEM_LAMP                  = 26
 
     PROJECTILE_SPEED           = 3
 
@@ -3453,7 +3454,7 @@ RoutinesAfterFadeOut:
 
     lda ActiveMapEntryIndex
     cmp #21
-    bne @next25
+    bne @next24
 
     lda #1
     sta InCave

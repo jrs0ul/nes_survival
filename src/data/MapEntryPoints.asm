@@ -51,7 +51,7 @@ MapEntryPoints:
     ;14.dark cave entrance bottom
     .byte 6, 1, 232, 255, 0, 255, 160, 199
     ;15.alien base entrance top
-    .byte 6, 2, 232, 255, 0, 255, 88, 111
+    .byte 6, 1, 232, 255, 0, 255, 24, 55
     ;--------------------------
     ;16.crashsite exit to cave
     .byte 7, 0, 0, 255, 0, 255, 222, 255
@@ -80,9 +80,9 @@ MapEntryPoints:
     .byte 12, 0, 0, 16, 0, 255, 112, 127
     ;-------------------------------------
     ;26 Dark cave exit to light cave
-    .byte 13, 0, 0, 5, 0, 255, 160, 200
+    .byte 13, 0, 0, 5, 0, 255, 32, 55
     ;27 alien base entrance bottom
-    .byte 13, 1, 232, 255, 0, 255, 160, 199
+    .byte 13, 1, 232, 255, 0, 255, 32, 55
 
 
 .segment "ROM0"
@@ -155,9 +155,9 @@ MapSpawnPoint:
     ;cave exit to cave location
     .byte 144, 63, 11, 1, <House_items, >House_items, 5, 0, 0
     .byte 0, 0, 0, 0, 0, 0, 0
-    ;dark cave entrance bottom
-    .byte 15, 185, 13, 2, <House_items, >House_items, 4, 0, 0
-    .byte 0, 0, 0, 0, 0, 0, 0
+    ;dark cave entrance
+    .byte 15, 50, 13, 2, <House_items, >House_items, 4, 0, 0
+    .byte 0, 0, 0, 0, <dark_cave_npcs, >dark_cave_npcs, 0
     ;alien base entrance top
     .byte 15, 90, 10, 2, <House_items, >House_items, 4, 0, 0
     .byte 0, 0, 0, 0, <alien_base_npcs, >alien_base_npcs, 0
@@ -178,11 +178,11 @@ MapSpawnPoint:
     .byte 0, 0, 0, 2, 0, 0, 0
     ;------------
     ;alien base exit top
-    .byte 230, 100, 6, OUTDOORS_LOC7_SCREEN_COUNT, <Cave_items, >Cave_items, 4, 0, 1
+    .byte 230, 50, 6, OUTDOORS_LOC7_SCREEN_COUNT, <Cave_items, >Cave_items, 4, 0, 1
     .byte 0, 0, 0, 0, <cave_npcs, >cave_npcs, 0
-    ;alien base exit bottom
-    .byte 230, 180, 13, 2, <House_items, >House_items, 4, 0, 1
-    .byte 0, 0, 0, 0, 0, 0, 0
+    ;alien base exit to dark cave
+    .byte 230, 50, 13, 2, <House_items, >House_items, 4, 0, 1
+    .byte 0, 0, 0, 0, <dark_cave_npcs, >dark_cave_npcs, 0
     ;--------------
     ;exit from cave location to bjorn's location
     .byte 135, 38, 1, OUTDOORS_LOC2_SCREEN_COUNT, <Outside2_items, >Outside2_items, 5, 0, 0
