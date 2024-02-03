@@ -70,7 +70,8 @@ main_tiles_chr2: .incbin "alien.chr"
 .include "data/maps/alien_base2.asm"
 .include "data/maps/cave0.asm"
 .include "data/maps/cave1.asm"
-.include "data/maps/cave2.asm"
+.include "data/maps/dark_cave0.asm"
+.include "data/maps/dark_cave1.asm"
 
 
 ;=============================================================
@@ -390,7 +391,7 @@ sun_moon_tiles_for_periods:
     MAX_TILE_SCROLL_RIGHT      = 8
 
 
-    ENTRY_POINT_COUNT          = 26
+    ENTRY_POINT_COUNT          = 28
 
     SLEEP_POS_X                = 100
     SLEEP_POS_Y                = 72
@@ -414,7 +415,7 @@ sun_moon_tiles_for_periods:
     OUTDOORS_LOC1_SCREEN_COUNT = 4
     OUTDOORS_LOC2_SCREEN_COUNT = 2
     OUTDOORS_LOC3_SCREEN_COUNT = 2
-    OUTDOORS_LOC7_SCREEN_COUNT = 3 ; cave
+    OUTDOORS_LOC7_SCREEN_COUNT = 2 ; cave
     PLAYER_START_X             = $50
     PLAYER_START_Y             = 200
 
@@ -3405,11 +3406,11 @@ RoutinesAfterFadeOut:
 
     jsr OnExitVillagerHut
     ;-----------------------------
-    ;14.alien base entrance bottom
+    ;27.alien base entrance bottom
 @next19:
 
     lda ActiveMapEntryIndex
-    cmp #14
+    cmp #27
     bne @next20
 
     lda #0
@@ -3457,12 +3458,12 @@ RoutinesAfterFadeOut:
     lda #1
     sta InCave
 
-    ;25. Boss room entrance
-@next25:
+    ;24. Boss room entrance
+@next24:
 
     lda ActiveMapEntryIndex
     cmp #24
-    bne @next26
+    bne @next25
 
     lda #<alien_palette
     sta CurrentMapPalettePtr
@@ -3470,20 +3471,19 @@ RoutinesAfterFadeOut:
     sta CurrentMapPalettePtr + 1
 
     lda BossDefeated
-    bne @done26
+    bne @next25
     lda #<boss_npcs
     sta pointer
     lda #>boss_npcs
     sta pointer + 1
     jsr LoadNpcs
-@done26:
 
-    ;26 Boss room exit
-@next26:
+    ;25 Boss room exit
+@next25:
 
     lda ActiveMapEntryIndex
     cmp #25
-    bne @next27
+    bne @next26
 
     lda #<alien_palette
     sta CurrentMapPalettePtr
@@ -3492,8 +3492,16 @@ RoutinesAfterFadeOut:
     jsr FlipStartingNametable ; for the locked door, so the second screen would always be in adress $24**
 
 
-@next27:
+@next26:
+    lda ActiveMapEntryIndex
+    cmp #26
+    bne @next27
 
+    lda #1
+    sta InCave
+
+
+@next27:
 
     lda DetectedMapType
     bne @itsAnIndoorMap

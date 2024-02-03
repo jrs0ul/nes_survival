@@ -33,7 +33,7 @@ map_list_low:
 
     .byte <cave0
     .byte <cave1
-    .byte <cave2
+    .byte 0
     .byte 0
 
     .byte <crashsite0
@@ -66,6 +66,10 @@ map_list_low:
     .byte 0
     .byte 0
 
+    .byte <dark_cave0
+    .byte <dark_cave1
+    .byte 0
+    .byte 0
 
 
 
@@ -102,7 +106,7 @@ map_list_high:
 
     .byte >cave0
     .byte >cave1
-    .byte >cave2
+    .byte 0
     .byte 0
 
     .byte >crashsite0
@@ -132,5 +136,10 @@ map_list_high:
 
     .byte >alien_bossroom
     .byte 0
+    .byte 0
+    .byte 0
+
+    .byte >dark_cave0
+    .byte >dark_cave1
     .byte 0
     .byte 0
