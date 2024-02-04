@@ -3451,12 +3451,15 @@ RoutinesAfterFadeOut:
     lda #1
     sta InCave
     ;--------------------------
-    ;21.alien base exit bottom
+    ;21.alien base exit to the dark cave
 @next22:
 
     lda ActiveMapEntryIndex
     cmp #21
     bne @next24
+
+    jsr IsLampInInventory
+    bne @next24 ; it is
 
     lda #<dark_cave_palette
     sta CurrentMapPalettePtr
@@ -3506,10 +3509,14 @@ RoutinesAfterFadeOut:
     lda #1
     sta InCave
 
+    ;14 dark cave entrance
 @next27:
     lda ActiveMapEntryIndex
     cmp #14
     bne @next28
+
+    jsr IsLampInInventory
+    bne @next28 ; it is
 
     lda #<dark_cave_palette
     sta CurrentMapPalettePtr
@@ -3694,6 +3701,30 @@ CommonLocationRoutine:
 
 
     rts
+;-------------------------------
+IsLampInInventory:
+
+    ldy #INVENTORY_MAX_ITEMS - 1
+@loop:
+    tya
+    asl
+    tax
+    lda Inventory, x
+    cmp #ITEM_LAMP
+    beq @found
+    dey
+    bpl @loop
+
+    lda #0
+    jmp @end
+
+@found:
+    lda #1
+
+@end:
+    rts
+
+
 ;-------------------------------
 OnExitVillagerHut:
     lda ItemIGave
