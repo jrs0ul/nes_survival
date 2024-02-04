@@ -194,6 +194,7 @@ stamina_segment_values:
 .include "data/house_palette.asm"
 .include "data/main_palette.asm"
 .include "data/alien_palette.asm"
+.include "data/dark_cave_palette.asm"
 
 game_over_palette:
     .byte $0f,$0c,$11,$16,$0f,$0c,$35,$31,$0f,$0c,$16,$31,$0f,$0c,$11,$31
@@ -421,6 +422,7 @@ sun_moon_tiles_for_periods:
 
     LOCATION_ALIEN_BASE        = 10
     LOCATION_BOSS_ROOM         = 12
+    LOCATION_DARK_CAVE         = 13
 
 
     DAMAGE_RED_BLINK_DURATION  = 5
@@ -3027,10 +3029,7 @@ DoPaletteFades:
     lda GameState
     cmp #STATE_GAME
     bne @continue
-    lda RamPalette
-    cmp #$0C
-    beq @checkFade
-@checkFade:
+
     lda PaletteFadeAnimationState
     bne @continue
 
@@ -3050,9 +3049,12 @@ DoPaletteFades:
 @checkRed:
     dec RedCounter
     lda RedCounter
-    bne @exit
+    beq @resetRed
 
-    lda #$0C
+    rts
+@resetRed:
+    ldy #0
+    lda (CurrentMapPalettePtr), y
     sta RamPalette
     lda #1
     sta MustUpdatePalette
@@ -3456,8 +3458,11 @@ RoutinesAfterFadeOut:
     cmp #21
     bne @next24
 
-    lda #1
-    sta InCave
+    lda #<dark_cave_palette
+    sta CurrentMapPalettePtr
+    lda #>dark_cave_palette
+    sta CurrentMapPalettePtr + 1
+
 
     ;24. Boss room entrance
 @next24:
@@ -3492,7 +3497,7 @@ RoutinesAfterFadeOut:
     sta CurrentMapPalettePtr + 1
     jsr FlipStartingNametable ; for the locked door, so the second screen would always be in adress $24**
 
-
+    ;26 exit to light cave
 @next26:
     lda ActiveMapEntryIndex
     cmp #26
@@ -3501,8 +3506,18 @@ RoutinesAfterFadeOut:
     lda #1
     sta InCave
 
-
 @next27:
+    lda ActiveMapEntryIndex
+    cmp #14
+    bne @next28
+
+    lda #<dark_cave_palette
+    sta CurrentMapPalettePtr
+    lda #>dark_cave_palette
+    sta CurrentMapPalettePtr + 1
+
+
+@next28:
 
     lda DetectedMapType
     bne @itsAnIndoorMap
@@ -4006,11 +4021,21 @@ AdaptBackgroundPaletteByTime:
 
     ldy #$01 ;keeps the outline for the background objects
 
+    lda LocationIndex
+    cmp #LOCATION_DARK_CAVE
+    beq @dark_cave
+
     lda InCave
     beq @calc ; if not in cave, we need to use lookup table to get certain fade level
 
 
     ldx #5 ; evening time index
+    lda palette_fade_for_periods, x
+    jmp @cont
+
+@dark_cave:
+
+    ldx #0 ; evening time index
     lda palette_fade_for_periods, x
     jmp @cont
 

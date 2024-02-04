@@ -209,11 +209,6 @@ MapSpawnPoint:
 
 
 
-
-
-
-
-
 .segment "RODATA"
 
 LocationScreenCountList:
