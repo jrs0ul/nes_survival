@@ -779,7 +779,11 @@ OnCollisionWithAttackRect:
     cmp #NPC_TYPE_VILLAGER
     beq @doneDoingDmg
     cmp #NPC_TYPE_PASSIVE
-    beq @exit
+    bne @continue
+    
+    rts
+
+@continue:
 
     inc NpcsHitByPlayer
 
@@ -792,7 +796,21 @@ OnCollisionWithAttackRect:
     sbc TempPlayerAttk ;dmg
     sta Npcs, y
     cmp #0
+    beq @instaKill
+
+    lda EquipedItem
+    cmp #ITEM_SPEAR
     bne @doneDoingDmg
+
+    ;if spear is equiped and you didn't kill the npc
+    lda #0
+    sta EquipedItem
+    sta EquipedItem + 1
+    sta SpearData
+
+    jmp @doneDoingDmg
+
+
 
 @instaKill:
 
