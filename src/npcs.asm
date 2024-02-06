@@ -1291,13 +1291,13 @@ UpdateSingleNpcSprites:
     lda Npcs, y; y
     sta TempPointY ; save y
 
+    ;----
     jsr GetSpriteDataPointer
 
     lda Temp ; row count
     sta TempRowIndex
 
-
-    ;add to y reg particular ammount of rows to get the right frame
+    ;add a particular ammount of rows to the register A to get the right frame
     ;npc_height_in_rows * frame_index
     lda Temp
     asl
@@ -1311,10 +1311,6 @@ UpdateSingleNpcSprites:
 
     ldy TempNpcFrame
     lda (ptr_list), y
-
-    asl ; let's assume that a row is 2 sprites portrayed by 8 bytes
-    asl
-    asl
     tay ; index for our sprite data
 
 @rowloop:
@@ -1389,6 +1385,8 @@ CollectSingleNpcData:
     asl
     asl
     tay
+    lda npc_data, y ; tiles per row
+    sta TempNpcTilesInARow
     iny
     lda npc_data, y ; tile rows for the npc
     ldy Temp; restore Npcs index
@@ -1436,8 +1434,10 @@ CollectSingleNpcData:
 ;Update two npc sprites
 UpdateNpcRow:
 
-    ;Sprite 1
+    lda TempNpcTilesInARow
+    sta CurrentSpritesInRow
 
+@nextSprite:
     lda TempPointY
     clc
     adc (character_sprite_data_ptr), y
@@ -1464,47 +1464,28 @@ UpdateNpcRow:
     inx
     iny
 
-    ;SECOND SPRITE -----------------------------------
+    dec CurrentSpritesInRow
+    beq @exit
 
-    lda TempPointX ; check if the second sprite is still in screen
+
+    lda CurrentSpritesInRow
+    asl
+    asl
+    asl
     clc
-    adc #8
+    adc TempPointX
     bcs @skipThatSprite
-    ;----
 
-    lda TempPointY
-    clc
-    adc (character_sprite_data_ptr), y
-    sta FIRST_SPRITE, x ; y coordinate
-    inx
-    iny
+    jmp @nextSprite
 
-    lda (character_sprite_data_ptr), y
-    sta FIRST_SPRITE, x ; tile index
-    inx
-    iny
-
-    lda (character_sprite_data_ptr), y
-    eor DamagedPaletteMask
-    sta FIRST_SPRITE, x ; sprite attributes
-    inx
-    iny
-    ;X coord------------------
-    lda TempPointX
-    clc
-    adc (character_sprite_data_ptr), y
-    sta FIRST_SPRITE, x ; x coordinate
-    inc TempSpriteCount
-    inx
-    iny
-
-    jmp @exit
 @skipThatSprite:
 
     iny
     iny
     iny
     iny
+    dec CurrentSpritesInRow
+    bne @nextSprite
 
 @exit:
 

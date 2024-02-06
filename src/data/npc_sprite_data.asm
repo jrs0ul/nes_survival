@@ -1,24 +1,34 @@
-npc_anim_3_row_sequence:
+npc_anim_2_3_row_sequence: ; 3 rows * ( 4 * 2 )
     .byte 0
-    .byte 3
-    .byte 6
-    .byte 9
-    .byte 12
-    .byte 15
+    .byte 24
+    .byte 48
+    .byte 72
+    .byte 96
+    .byte 120
 
-npc_anim_2_row_sequence:
+npc_anim_2_2_row_sequence: ; 2 rows * ( 4 * 2 )
     .byte 0
-    .byte 2
-    .byte 4
-    .byte 6
-    .byte 8
-    .byte 10
+    .byte 16
+    .byte 32
+    .byte 48
+    .byte 64
+    .byte 80
+
+npc_anim_3_5_row_sequence: ;5 rows * ( 4 * 3 )
+    .byte 0
+    .byte 60
+    .byte 120
+    .byte 180
+    .byte 240
+    .byte 240 ;should be 300
 
 npc_anim_rows:
     .byte 0,                        0
     .byte 0,                        0
-    .byte <npc_anim_2_row_sequence, >npc_anim_2_row_sequence
-    .byte <npc_anim_3_row_sequence, >npc_anim_3_row_sequence
+    .byte <npc_anim_2_2_row_sequence, >npc_anim_2_2_row_sequence
+    .byte <npc_anim_2_3_row_sequence, >npc_anim_2_3_row_sequence
+    .byte 0,                        0
+    .byte <npc_anim_3_5_row_sequence, >npc_anim_3_5_row_sequence
 
 ;lookup table for framelist indexes in npc_data
 frame_list_index_lookup:
@@ -30,7 +40,7 @@ frame_list_index_lookup:
     .byte 46 ; granny
     .byte 54 ; deadman
     .byte 62 ; boar
-    .byte 70  ; boss
+    .byte 70 ; boss
 
 
 ;Bunny

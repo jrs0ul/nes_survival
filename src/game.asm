@@ -1406,8 +1406,14 @@ EquipNextResetCount:
 BossDefeated:
     .res 1
 
+TempNpcTilesInARow:
+    .res 1
+
+CurrentSpritesInRow:
+    .res 1
+
 Buffer:
-    .res 252  ;must see how much is still available
+    .res 250  ;must see how much is still available
 
 ;====================================================================================
 
