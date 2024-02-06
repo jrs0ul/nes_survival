@@ -1297,21 +1297,7 @@ UpdateSingleNpcSprites:
     lda Temp ; row count
     sta TempRowIndex
 
-    ;add a particular ammount of rows to the register A to get the right frame
-    ;npc_height_in_rows * frame_index
-    lda Temp
-    asl
-    tay
-    lda npc_anim_rows, y
-    sta ptr_list
-    iny
-    lda npc_anim_rows, y
-    sta ptr_list + 1
-
-
-    ldy TempNpcFrame
-    lda (ptr_list), y
-    tay ; index for our sprite data
+    ldy #0
 
 @rowloop:
     jsr UpdateNpcRow
@@ -1353,9 +1339,18 @@ GetSpriteDataPointer:
     asl
     tay
     lda (ptr_list), y
-    sta character_sprite_data_ptr
+    sta pointer
     iny
     lda (ptr_list), y
+    sta pointer + 1
+
+    lda TempNpcFrame
+    asl
+    tay
+    lda (pointer), y
+    sta character_sprite_data_ptr
+    iny
+    lda (pointer), y
     sta character_sprite_data_ptr + 1
 
     rts
