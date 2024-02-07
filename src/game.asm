@@ -382,6 +382,7 @@ sun_moon_tiles_for_periods:
     PLAYER_COLLISION_LINE_X2   = 13 ;16 - 3
     PLAYER_COLLISION_LINE_Y1   = 8
     PLAYER_WIDTH               = 16
+    PLAYER_HEIGHT              = 16
     PLAYER_STAMINA_SIZE        = 128
 
     STAMINA_END_SPRITE         = $FD
@@ -1408,12 +1409,14 @@ BossDefeated:
 
 TempNpcTilesInARow:
     .res 1
+TempNpcWidth:
+    .res 1
 
 CurrentSpritesInRow:
     .res 1
 
 Buffer:
-    .res 250  ;must see how much is still available
+    .res 249  ;must see how much is still available
 
 ;====================================================================================
 

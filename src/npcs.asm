@@ -328,6 +328,11 @@ SingleNpcVSPlayerCollision:
     asl
     asl
     tay
+    lda npc_data, y ; tiles in a row
+    asl
+    asl
+    asl ; multiply by 8
+    sta TempNpcWidth
     iny
     lda npc_data, y ; tile rows
     sta TempNpcRows ; save row count
@@ -393,7 +398,7 @@ PlayerNpcCollision:
 
     lda TempPointX
     clc
-    adc #16
+    adc TempNpcWidth
     sta TempPointX2
 
     stx Temp
@@ -418,7 +423,7 @@ PlayerNpcCollision:
 
     lda PlayerX
     clc
-    adc #16
+    adc #PLAYER_WIDTH
     cmp TempPointX
     bcc @exit
     beq @exit
@@ -429,7 +434,7 @@ PlayerNpcCollision:
 
     lda PlayerY
     clc
-    adc #16
+    adc #PLAYER_HEIGHT
     cmp TempPointY
     bcc @exit
     beq @exit
@@ -559,7 +564,7 @@ CollisionWithProjectiles:
 
     lda TempPointX
     clc
-    adc #16
+    adc TempNpcWidth
     sta TempPointX2
 
     lda TempPointY
@@ -712,7 +717,7 @@ AttackBoxNpcsCollision:
     
     lda TempPointX
     clc
-    adc #16
+    adc TempNpcWidth
     sta TempPointX2
 
     lda TempPointY
@@ -1581,6 +1586,11 @@ FetchNpcVars:
     asl
     tax
     stx TempNpcDataIndex
+    lda npc_data, x
+    asl
+    asl
+    asl
+    sta TempNpcWidth
     inx
     lda npc_data, x; rows
     sta TempNpcRows
@@ -1798,30 +1808,34 @@ CalcNPCXYOnScreen:
 ;A=1 -> fail
 CanNpcFacingRightHitPlayer:
 
-    ;playerX < NpcX + 24 AND playerX + 16 > NpcX
-    ;playerY < NpcY + 24 AND playerY + 16 > NpcY
+    ;playerX < NpcX + width + 8 AND playerX + 16 > NpcX
+    ;playerY < NpcY + width + 8 AND playerY + 16 > NpcY
 
     lda TempPointX
     clc
-    adc #24
+    adc TempNpcWidth
+    clc
+    adc #8
     cmp PlayerX
     bcc @fail
 
     lda PlayerX
     clc
-    adc #16
+    adc #PLAYER_WIDTH
     cmp TempPointX
     bcc @fail
 
     lda TempPointY
     clc
-    adc #24
+    adc TempNpcWidth
+    clc
+    adc #8
     cmp PlayerY
     bcc @fail
 
     lda PlayerY
     clc
-    adc #16
+    adc #PLAYER_WIDTH
     cmp TempPointY
     bcc @fail
 
@@ -1852,7 +1866,7 @@ CanNpcFacingLeftHitPlayer:
 
     lda TempPointX
     clc
-    adc #16
+    adc TempNpcWidth
     cmp PlayerX
     bcc @fail
 
@@ -1864,7 +1878,7 @@ CanNpcFacingLeftHitPlayer:
 
     lda PlayerY
     clc
-    adc #16
+    adc #PLAYER_HEIGHT
     cmp TempPointY
     bcc @fail
 
@@ -1892,7 +1906,7 @@ CanNpcFacingUpHitPlayer:
 
     lda TempPointX
     clc
-    adc #16
+    adc TempNpcWidth
     cmp PlayerX
     bcc @fail
 
@@ -1931,19 +1945,19 @@ CanNpcFacingDownHitPlayer:
 
     lda PlayerX
     clc
-    adc #16
+    adc #PLAYER_WIDTH
     cmp TempPointX
     bcc @fail
 
     lda TempPointX
     clc
-    adc #16
+    adc TempNpcWidth
     cmp PlayerX
     bcc @fail
 
     lda PlayerY
     clc
-    adc #16
+    adc #PLAYER_HEIGHT
     cmp TempPointY
     bcc @fail
 
@@ -2576,7 +2590,7 @@ SetDirectionForTimidNpc:
 TestCollisionGoingRight:
     sta TempX ; save modified x
     clc
-    adc #16 ; npc width
+    adc TempNpcWidth ; npc width
     sta TempPointX
     bcs @incrementScreen ; it's more than 256
 
@@ -2663,12 +2677,12 @@ OnCollisionWithPlayer:
     ;calc player box
     lda PlayerX
     clc
-    adc #16
+    adc #PLAYER_WIDTH
     sta TempX
 
     lda PlayerY
     clc
-    adc #16
+    adc #PLAYER_HEIGHT
     sta TempY
     ;---------------
 
@@ -2708,7 +2722,7 @@ OnCollisionWithPlayer:
 
     lda TempPointX
     clc
-    adc #16 ; two tiles
+    adc TempNpcWidth
     cmp PlayerX
     bcc @exit
     beq @exit
