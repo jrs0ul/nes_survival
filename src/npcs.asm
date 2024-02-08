@@ -1860,7 +1860,7 @@ CanNpcFacingLeftHitPlayer:
     sta TempPointX2
     lda PlayerX
     clc
-    adc #16
+    adc #PLAYER_WIDTH
     cmp TempPointX2
     bcc @fail
 
@@ -1900,7 +1900,7 @@ CanNpcFacingUpHitPlayer:
 
     lda PlayerX
     clc
-    adc #16
+    adc #PLAYER_WIDTH
     cmp TempPointX
     bcc @fail
 
@@ -1925,7 +1925,6 @@ CanNpcFacingUpHitPlayer:
     adc #24
     cmp PlayerY
     bcc @fail
-
 
 
     lda #0
@@ -2416,9 +2415,11 @@ SetDirectionForBoar:
 ;x reg value is at the x coordinate index of that npc
 PredatorDirectionChangePrep:
 
-    lda Npcs, x; x
+    lda TempNpcWidth
+    lsr ; middle of width
     clc
-    adc #8
+    adc Npcs, x; x
+
     sta TempPointX
     inx
     lda Npcs, x; y
@@ -2431,7 +2432,7 @@ PredatorDirectionChangePrep:
 
     lda PlayerX
     clc
-    adc #16
+    adc #PLAYER_WIDTH
     sta Temp
 
     lda #0
@@ -2439,7 +2440,7 @@ PredatorDirectionChangePrep:
 
     lda PlayerY
     clc
-    adc #16
+    adc #PLAYER_HEIGHT
     sta TempPlayerY2
 
     lda PlayerY
