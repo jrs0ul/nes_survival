@@ -3496,6 +3496,11 @@ RoutinesAfterFadeOut:
     sta pointer + 1
     jsr LoadNpcs
 
+    lda #6
+    sta SongName
+    lda #1
+    sta MustPlayNewSong
+
     ;25 Boss room exit
 @next25:
 
@@ -3508,6 +3513,11 @@ RoutinesAfterFadeOut:
     lda #>alien_palette
     sta CurrentMapPalettePtr + 1
     jsr FlipStartingNametable ; for the locked door, so the second screen would always be in adress $24**
+
+    lda #0
+    sta SongName
+    lda #1
+    sta MustPlayNewSong
 
     ;26 exit to light cave
 @next26:

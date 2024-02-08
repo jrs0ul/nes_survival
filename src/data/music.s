@@ -5,7 +5,7 @@
 .endif
 
 music_data_untitled:
-	.byte 6
+	.byte 7
 	.word @instruments
 	.word @samples-52
 	.word @song0ch0,@song0ch1,@song0ch2,@song0ch3,@song0ch4 ; 00 : Outside
@@ -19,6 +19,8 @@ music_data_untitled:
 	.word @song4ch0,@song4ch1,@song4ch2,@song4ch3,@song4ch4 ; 04 : Howl
 	.byte .lobyte(@tempo_env_1_mid), .hibyte(@tempo_env_1_mid), 0, 0
 	.word @song5ch0,@song5ch1,@song5ch2,@song5ch3,@song5ch4 ; 05 : Defeat
+	.byte .lobyte(@tempo_env_1_mid), .hibyte(@tempo_env_1_mid), 0, 0
+	.word @song6ch0,@song6ch1,@song6ch2,@song6ch3,@song6ch4 ; 06 : Boss
 	.byte .lobyte(@tempo_env_1_mid), .hibyte(@tempo_env_1_mid), 0, 0
 
 .export music_data_untitled
@@ -537,3 +539,55 @@ music_data_untitled:
 	.word @song5ref70
 	.byte $42
 	.word @song5ch4loop
+@song6ch0:
+@song6ch0loop:
+	.byte $46, .lobyte(@tempo_env_1_mid), .hibyte(@tempo_env_1_mid), $8a
+@song6ref6:
+	.byte $0d, $91, $0d, $91, $02, $91, $01, $91, $0d, $91, $0d, $91, $04, $91, $01, $91, $0d, $91, $0d, $91, $02, $91, $01, $91
+	.byte $0d, $91, $0d, $91, $00, $a5, $47, $0f, $91, $0e, $91, $0d, $91, $0c, $91, $0f, $91, $0e, $91, $0d, $91, $0c, $91, $0f
+	.byte $91, $0e, $91, $0d, $91, $0c, $91, $0f, $91, $0e, $91, $0d, $91, $0c, $91, $47
+	.byte $41, $3e
+	.word @song6ref6
+	.byte $47
+	.byte $41, $3e
+	.word @song6ref6
+	.byte $42
+	.word @song6ch0loop
+@song6ch1:
+@song6ch1loop:
+@song6ref81:
+	.byte $ff, $ff, $bf, $ff, $ff, $bf, $ff, $ff, $bf, $ff, $ff, $bf, $ff, $ff, $bf, $ff, $ff, $bf, $42
+	.word @song6ch1loop
+@song6ch2:
+@song6ch2loop:
+	.byte $41, $12
+	.word @song6ref81
+	.byte $42
+	.word @song6ch2loop
+@song6ch3:
+@song6ch3loop:
+	.byte $86
+@song6ref111:
+	.byte $14, $91, $20, $91, $00, $91, $20, $91, $14, $91, $20, $91, $00, $91, $20, $91, $14, $91, $20, $91, $00, $91, $20, $91
+	.byte $41, $18
+	.word @song6ref111
+	.byte $41, $18
+	.word @song6ref111
+	.byte $41, $18
+	.word @song6ref111
+	.byte $41, $18
+	.word @song6ref111
+	.byte $41, $18
+	.word @song6ref111
+	.byte $41, $18
+	.word @song6ref111
+	.byte $41, $18
+	.word @song6ref111
+	.byte $42
+	.word @song6ch3loop
+@song6ch4:
+@song6ch4loop:
+	.byte $41, $12
+	.word @song6ref81
+	.byte $42
+	.word @song6ch4loop
