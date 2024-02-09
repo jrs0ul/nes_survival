@@ -32,8 +32,8 @@ MapEntryPoints:
     ;----------------------------------------
     ;7.Exit point of third location
     .byte 2, 0, 0, 255, 0, 255, 0,   20
-    ;8.Second villager's house
-    .byte 2, 0, 118, 124, 126, 129, 122, 142
+    ;8.Erika's house
+    .byte 2, 0, 117, 124, 126, 135, 122, 135
     ;------------------------
     ;9.Bjorn's house exit
     .byte 3, 0, 0, 255, 0, 255, 152, 255
@@ -74,10 +74,10 @@ MapEntryPoints:
     ;23.cave entrance from location 11
     .byte 11, 0, 140, 151, 0, 255, 40, 50
     ;24. Boss room entrance
-    .byte 10, 1, 234, 255, 0, 255, 112, 127
+    .byte 10, 1, 238, 255, 0, 255, 112, 128
     ;-------------------------------------
     ;25 Boss room exit
-    .byte 12, 0, 0, 16, 0, 255, 112, 127
+    .byte 12, 0, 0, 4, 0, 255, 112, 127
     ;-------------------------------------
     ;26 Dark cave exit to light cave
     .byte 13, 0, 0, 5, 0, 255, 32, 55
