@@ -401,19 +401,15 @@ PlayerNpcCollision:
     adc TempNpcWidth
     sta TempPointX2
 
-    stx Temp
     lda TempNpcRows
     sec
     sbc #1
-    tax
-    lda TempPointY
-
-@addRowsLoop:
+    asl
+    asl
+    asl ; (rows - 1) * 8
     clc
-    adc #8
-    dex
-    bne @addRowsLoop
-    ldx Temp
+    adc TempPointY
+
     sta TempPointY2
 
 ;--
@@ -567,13 +563,12 @@ CollisionWithProjectiles:
     adc TempNpcWidth
     sta TempPointX2
 
-    lda TempPointY
-    ldx TempNpcRows
-@addRowsLoop:
+    lda TempNpcRows
+    asl
+    asl
+    asl
     clc
-    adc #8
-    dex
-    bne @addRowsLoop
+    adc TempPointY ; TempPointY2 = rows * 8 + y
     sta TempPointY2
 
 
@@ -720,16 +715,13 @@ AttackBoxNpcsCollision:
     adc TempNpcWidth
     sta TempPointX2
 
-    lda TempPointY
-    ldx TempNpcRows
-@addRowsLoop:
+    lda TempNpcRows
+    asl
+    asl
+    asl
     clc
-    adc #8
-    dex
-    bne @addRowsLoop
-    sta TempPointY2
-
-
+    adc TempPointY
+    sta TempPointY2 ; TempPointY2 = y + 8 * rows
 
     ;attack box Point1 vs npc point1-poin2
     lda AttackBottomRightX
@@ -2424,7 +2416,7 @@ PredatorDirectionChangePrep:
     inx
     lda Npcs, x; y
     clc
-    adc #16
+    adc #16 ; TODO: WTF?!
     sta TempPointY
 
     inx ;screen
@@ -2701,19 +2693,15 @@ OnCollisionWithPlayer:
     inx
     inx ; back to screen idx
 ;-----
-    stx TempNpcCollisionXReg
+
     lda TempNpcRows
     sec
     sbc #1
-    tax ;npc sprite rows - 1
-
-    lda TempPointY
-@addRowsLoop:
+    asl
+    asl
+    asl ;(row_count - 1) * 8
     clc
-    adc #8
-    dex
-    bne @addRowsLoop
-    ldx TempNpcCollisionXReg
+    adc TempPointY
     sta TempPointY2
 
 ;--collision check
