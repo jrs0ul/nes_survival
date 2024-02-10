@@ -1862,9 +1862,14 @@ CanNpcFacingLeftHitPlayer:
     cmp PlayerX
     bcc @fail
 
-    lda TempPointY
+
+    lda TempNpcRows
+    asl
+    asl
+    asl
     clc
-    adc #24
+    adc TempPointY
+
     cmp PlayerY
     bcc @fail
 
@@ -1952,9 +1957,16 @@ CanNpcFacingDownHitPlayer:
     cmp TempPointY
     bcc @fail
 
-    lda TempPointY
+
+    lda TempNpcRows
     clc
-    adc #32
+    adc #1
+    asl
+    asl
+    asl
+    clc
+    adc TempPointY ; y + (rows + 1) * 8
+
     cmp PlayerY
     bcc @fail
 
@@ -2414,9 +2426,20 @@ PredatorDirectionChangePrep:
 
     sta TempPointX
     inx
-    lda Npcs, x; y
+
+    lda TempNpcRows
+    cmp #3
+    bcs @minusOne ; if more than 2 rows subtract 1
+    jmp @cont
+@minusOne:
+    sec
+    sbc #1
+@cont: ;rows * 8
+    asl
+    asl
+    asl
     clc
-    adc #16 ; TODO: WTF?!
+    adc Npcs, x; y
     sta TempPointY
 
     inx ;screen
@@ -2521,7 +2544,7 @@ SetDirectionForTimidNpc:
 
     lda PlayerX
     clc
-    adc #16
+    adc #PLAYER_WIDTH
     sta Temp
 
     lda #0
@@ -2546,7 +2569,7 @@ SetDirectionForTimidNpc:
 @compareY:
     lda PlayerY
     clc
-    adc #16
+    adc #PLAYER_HEIGHT
     sta Temp
 
 
@@ -2651,7 +2674,9 @@ TestCollisionGoingVerticaly:
 
     lda TempPointX
     clc
-    adc #12
+    adc TempNpcWidth
+    sec
+    sbc #4 ;2+2 from both sides
     sta TempPointX
     lda NewNpcScreen
     sta TempScreen
