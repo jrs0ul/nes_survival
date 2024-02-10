@@ -5570,6 +5570,9 @@ CheckStartButton:
 
 @equipNext:
 
+    lda FishingRodActive
+    bne @exit
+
     jsr EquipNext
 
 @exit:
@@ -5627,13 +5630,13 @@ EquipNext:
     ldx TempItemIndex
     jsr EquipItem
     beq @exit
-    ;dex
+
     stx PreviouslyEquipedItemIdx
     lda #0
     sta Inventory, x
     inx
     sta Inventory, x
-    
+
 
 @exit:
     ldy oldbank
@@ -5644,12 +5647,13 @@ EquipNext:
 ;--------------------------------------
 
 ProcessButtons:
-    lda #0
-    sta DirectionX
-    sta DirectionY
 
     lda FishingRodActive
     bne @exit
+
+    lda #0
+    sta DirectionX
+    sta DirectionY
 
     lda #1
     sta PlayerSpeed
