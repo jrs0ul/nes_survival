@@ -593,53 +593,40 @@ music_data_untitled:
 @song6ch2loop:
 	.byte $ff, $ff, $bf, $ff, $ff, $bf, $ff, $ff, $bf, $ff, $ef, $80
 @song6ref159:
-	.byte $0f, $91, $0e, $91, $0d, $91, $0c, $91, $0d, $a5, $02, $91, $00, $e1, $0d, $a5, $02, $91, $00, $e1, $ff, $ef
-	.byte $41, $16
+	.byte $0f, $91, $0e, $91, $0d, $91, $0c, $91, $0d, $a5, $02, $91, $00, $91, $0d, $a5, $00, $a5, $0d, $a5, $02, $91, $00, $91
+	.byte $0d, $a5, $00, $a5, $ff, $ef
+	.byte $41, $1e
 	.word @song6ref159
-	.byte $41, $15
+	.byte $41, $1d
 	.word @song6ref159
 	.byte $ff, $bf, $42
 	.word @song6ch2loop
 @song6ch3:
 @song6ch3loop:
-	.byte $86, $14, $91, $1e, $91, $00, $a5, $14, $91, $1e, $91, $00, $a5, $14, $91, $1e, $91, $00, $a5
-@song6ref212:
-	.byte $14, $91, $1e, $91, $00, $a5, $14, $91, $1e, $91, $00, $91, $20, $91
+	.byte $86, $14, $91, $14, $91, $00, $a5, $14, $91, $16, $91, $00, $a5, $14, $91, $14, $91, $00, $a5
+@song6ref220:
+	.byte $14, $91, $16, $91, $00, $a5, $14, $91, $14, $91, $00, $91, $20, $91
 	.byte $41, $0e
-	.word @song6ref212
-	.byte $41, $0e
-	.word @song6ref212
-@song6ref232:
-	.byte $14, $91, $1e, $91, $00, $91, $20, $91, $14, $91, $1e, $91, $00, $91, $20, $91
-	.byte $41, $10
-	.word @song6ref232
-	.byte $41, $10
-	.word @song6ref232
-	.byte $41, $10
-	.word @song6ref232
-	.byte $41, $10
-	.word @song6ref232
-	.byte $41, $10
-	.word @song6ref232
-	.byte $41, $10
-	.word @song6ref232
-	.byte $41, $10
-	.word @song6ref232
-	.byte $41, $10
-	.word @song6ref232
-	.byte $41, $10
-	.word @song6ref232
-	.byte $41, $10
-	.word @song6ref232
-	.byte $41, $10
-	.word @song6ref232
-	.byte $41, $10
-	.word @song6ref232
-	.byte $41, $10
-	.word @song6ref232
-	.byte $41, $10
-	.word @song6ref232
-	.byte $14, $91, $1e, $91, $00, $91, $20, $91, $42
+	.word @song6ref220
+	.byte $14, $91, $16, $91, $00, $a5
+@song6ref243:
+	.byte $14, $91, $14, $91, $00, $91, $22, $91, $14, $91, $00, $a5, $22, $91, $14, $91, $00, $a5, $22, $91, $14, $91, $00, $a5
+	.byte $22, $91
+	.byte $41, $1a
+	.word @song6ref243
+	.byte $41, $1a
+	.word @song6ref243
+	.byte $41, $1a
+	.word @song6ref243
+	.byte $41, $1a
+	.word @song6ref243
+	.byte $41, $1a
+	.word @song6ref243
+	.byte $41, $1a
+	.word @song6ref243
+	.byte $41, $1a
+	.word @song6ref243
+	.byte $42
 	.word @song6ch3loop
 @song6ch4:
 @song6ch4loop:
