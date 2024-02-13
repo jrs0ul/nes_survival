@@ -923,7 +923,7 @@ DropItemAfterDeath:
     cmp #NPC_TYPE_PREDATOR
     beq @spawnHide
     cmp #NPC_TYPE_AGRESSIVE
-    beq @specialRewardItem
+    beq @jumbo
 
 
     lda NpcsHitByPlayer
@@ -940,6 +940,7 @@ DropItemAfterDeath:
     and #3
     cmp #2
     bcs @spawnHide
+@jumbo:
     lda #ITEM_RAW_JUMBO_MEAT
     asl
     ora #1
@@ -955,7 +956,6 @@ DropItemAfterDeath:
 @storeItem:
 
     sta TempItemIndex
-
 
     jsr ItemSpawnPrep
 
