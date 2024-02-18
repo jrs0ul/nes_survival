@@ -946,6 +946,9 @@ DropItemAfterDeath:
     ora #1
     jmp @storeItem
 @spawnHide:
+    lda TempNpcIndex
+    cmp #NPC_IDX_HOUND
+    bne @exit ; hide will be spawned only after killing hounds
     jsr UpdateRandomNumber
     and #3
     cmp #2

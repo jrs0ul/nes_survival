@@ -535,6 +535,7 @@ sun_moon_tiles_for_periods:
     NPC_TYPE_PASSIVE           = 3
     NPC_TYPE_AGRESSIVE         = 4
 
+    NPC_IDX_HOUND              = 3
     NPC_IDX_BOSS               = 8
 
     DIALOG_TEXT_LENGTH         = 96
