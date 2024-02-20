@@ -163,7 +163,7 @@ MapSpawnPoint:
     .byte 0, 0, 0, 0, <alien_base_npcs, >alien_base_npcs, 0
     ;---------------------
     ;crashsite exit to cave
-    .byte 121, 34, 6, OUTDOORS_LOC7_SCREEN_COUNT, <Cave_items, >Cave_items, 4, 194, 0
+    .byte 56, 34, 6, OUTDOORS_LOC7_SCREEN_COUNT, <Cave_items, >Cave_items, 4, 0, 0
     .byte 0, 0, 0, 0, <cave_npcs, >cave_npcs, 0
     ;---------------------
     ;exit from granny's location to main
@@ -188,7 +188,7 @@ MapSpawnPoint:
     .byte 135, 38, 1, OUTDOORS_LOC2_SCREEN_COUNT, <Outside2_items, >Outside2_items, 5, 0, 0
     .byte 0, 0, 0, 3, 0, 0, 0
     ;cave entrance
-    .byte 120, 207, 6, OUTDOORS_LOC7_SCREEN_COUNT, <Cave_items, >Cave_items, 4, 194, 0
+    .byte 88, 207, 6, OUTDOORS_LOC7_SCREEN_COUNT, <Cave_items, >Cave_items, 4, 0, 0
     .byte 0, 0, 0, 0, <cave_npcs, >cave_npcs, 0
     ;boss room entrance
     .byte 20, 120, 12, 1, <House_items, >House_items, 6, 0, 0
