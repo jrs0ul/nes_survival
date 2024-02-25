@@ -41,9 +41,6 @@ LoadMenu:
 
     jsr ResetMenuVars
 
-    lda #STATE_MENU
-    sta GameState
-
     lda #0
     sta MustUpdatePalette
     sta MustLoadSomething

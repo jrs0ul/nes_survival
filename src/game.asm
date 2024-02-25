@@ -5568,6 +5568,8 @@ CheckStartButton:
     lda #1
     sta MustLoadMenu
     sta MustLoadSomething
+    lda #STATE_MENU
+    sta GameState
     jmp @exit
 
 @checkSelect:
