@@ -358,6 +358,8 @@ sun_moon_tiles_for_periods:
     INTRO_SCENE_MAX            = 7
     OUTRO_SCENE_MAX            = 4
 
+    
+
 
     DAYTIME_NIGHT              = $40
 
@@ -424,6 +426,8 @@ sun_moon_tiles_for_periods:
     LOCATION_ALIEN_BASE        = 10
     LOCATION_BOSS_ROOM         = 12
     LOCATION_DARK_CAVE         = 13
+
+    MIN_SCREEN_COUNT_TO_UPDATE = 3
 
 
     DAMAGE_RED_BLINK_DURATION  = 5
@@ -2109,13 +2113,11 @@ UpdateDestructableTiles:
 UploadBgColumns:
 
     lda MustUpdateMapColumn
-    bne @checkScreenCount
+    beq @updateAttributes
 
-    rts
-
-@checkScreenCount:
+@checkScreenCount: ;we might not need to update columns for 2 screens
     lda ScreenCount
-    cmp #3
+    cmp #MIN_SCREEN_COUNT_TO_UPDATE
     bcs @bigmap
 
     rts
@@ -2189,9 +2191,20 @@ UploadBgColumns:
     lda PPUCTRL ; restore normal ppu addressing
     sta $2000
 
-;update attributes===========================
+    
+    lda BgColumnIdxToUpload
+    sta OldBgColumnIdxToUpload
+    lda SourceMapIdx
+    sta OldSourceMapIdx
+    lda #0
+    sta MustUpdateMapColumn
+
+@updateAttributes:
     lda MustUpdateMapAttributeColumn
-    beq @done
+    beq @exit
+
+    lda #0
+    sta $2001
 
     lda LocationIndex
     asl
@@ -2247,12 +2260,12 @@ UploadBgColumns:
     bne @attribLoop
 @done:
 
-    lda BgColumnIdxToUpload
-    sta OldBgColumnIdxToUpload
     lda SourceMapIdx
     sta OldSourceMapIdx
     lda AttribColumnIdxToUpdate
     sta OldAttribColumnIdxToUpdate
+    lda #0
+    sta MustUpdateMapAttributeColumn
 
 
 @exit:
@@ -3568,7 +3581,12 @@ RoutinesAfterFadeOut:
     sta MustUpdateSunMoon
     lda #255
     sta OldBgColumnIdxToUpload
+    sta OldSourceMapIdx
+    sta OldAttribColumnIdxToUpdate
     jsr CalcMapColumnToUpdate
+    lda #1
+    sta MustUpdateMapColumn
+    sta MustUpdateMapAttributeColumn
 
 
     rts

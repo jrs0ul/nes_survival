@@ -3938,6 +3938,13 @@ ExitMenuState:
     ldy LocationBanks, x
     jsr bankswitch_y
 
+
+    lda #255
+    sta OldBgColumnIdxToUpload
+    sta OldSourceMapIdx
+    sta OldAttribColumnIdxToUpdate
+    jsr CalcMapColumnToUpdate
+
     rts
 ;-------------------------------------
 
