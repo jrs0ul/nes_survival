@@ -386,6 +386,10 @@ sun_moon_tiles_for_periods:
     PLAYER_WIDTH               = 16
     PLAYER_HEIGHT              = 16
     PLAYER_STAMINA_SIZE        = 128
+    PLAYER_SPEED_WALK_BASE     = 0
+    PLAYER_SPEED_WALK_FRACTION = 199
+    PLAYER_SPEED_RUN_BASE      = 1
+    PLAYER_SPEED_RUN_FRACTION  = 128
 
     STAMINA_END_SPRITE         = $FD
     STAMINA_SEGMENT_START      = $56 ; lower adress where first stamina segment should be placed
@@ -752,9 +756,9 @@ CurrentPaletteDecrementValue: ;a helper value to prevent doing too much of palet
     .res 1
 
 OldScrollX:
-    .res 1
+    .res 2
 ScrollX:
-    .res 1
+    .res 2
 
 ScrollY:
     .res 1
@@ -798,18 +802,17 @@ NametableAddress:
 
 
 OldPlayerX:
-    .res 1
+    .res 2
 OldPlayerY:
-    .res 1
+    .res 2
 
 PlayerX:
-    .res 1
+    .res 2
 PlayerY:
-    .res 1
+    .res 2
 
-SnowDelay:
 PlayerSpeed:
-    .res 1
+    .res 2
 
 PlayerAnimationRowIndex: ;which animation row to use for player sprites at the moment
     .res 1
@@ -1326,10 +1329,10 @@ Item_Location9_Collection_times:
     .res ITEM_COUNT_LOC9
 
 Npcs:   ;animals and stuff
-    .res 128 ; max 16 npcs * 8 bytes:
+    .res 160 ; max 16 npcs * 10 bytes:
             ;   (npc type(5 bits) + agitatded?(1bit) + state(2 bit, 0 - dead, 1 - alive/idle, 2 - attacks, 3 - damaged),
-            ;   x,
-            ;   y,
+            ;   x (2 bytes),
+            ;   y (2 bytes),
             ;   screen_index
             ;   direction(0000(unused bits) 00(Vertical) 00(horizonatal))
             ;   frame
@@ -1339,11 +1342,11 @@ NpcCount:
     .res 1
 
 Projectiles:
-    .res 4 * PROJECTILE_MAX_COUNT ;  4 bytes * 4 projectiles
+    .res 6 * PROJECTILE_MAX_COUNT ;  4 bytes * 4 projectiles
                                   ;  direction(7bit) + state (1bit)
-                                  ;  x
+                                  ;  x (2 bytes)
                                   ;  screen
-                                  ;  y
+                                  ;  y (2 bytes)
 
 ProjectileCount:
     .res 1
@@ -1420,8 +1423,11 @@ TempNpcWidth:
 CurrentSpritesInRow:
     .res 1
 
+SnowDelay:
+    .res 1
+
 Buffer:
-    .res 249  ;must see how much is still available
+    .res 189  ;must see how much is still available
 
 ;====================================================================================
 
@@ -4360,7 +4366,7 @@ AnimateWalk:
     inc WalkTimer
 
     lda PlayerSpeed
-    cmp #2
+    cmp #PLAYER_SPEED_RUN_BASE
     beq @fastAnimation
     lda WalkTimer
     cmp #8
@@ -4405,8 +4411,10 @@ HandleInput:
     lda Buttons
     bne @checkAttackTimer ; something is pressed
     ;NO INPUT
-    lda #1
+    lda #PLAYER_SPEED_WALK_BASE
     sta PlayerSpeed
+    lda #PLAYER_SPEED_WALK_FRACTION
+    sta PlayerSpeed + 1
     jmp @finishInput ; no input at all
 
 @checkAttackTimer:
@@ -5051,8 +5059,12 @@ ResetEntityVariables:
     lda #MAX_SPRITE_COUNT
     sta TaintedSprites
 
-    lda #1
+    lda #PLAYER_SPEED_WALK_BASE
     sta PlayerSpeed
+    lda #PLAYER_SPEED_WALK_FRACTION
+    sta PlayerSpeed + 1
+
+    lda #1
     sta HP
     sta Warmth
     sta Food
@@ -5676,8 +5688,10 @@ ProcessButtons:
     sta DirectionX
     sta DirectionY
 
-    lda #1
+    lda #PLAYER_SPEED_WALK_BASE
     sta PlayerSpeed
+    lda #PLAYER_SPEED_WALK_FRACTION
+    sta PlayerSpeed + 1
     jsr CheckA ; speed up only active if dpad is used
 
 ;Check if LEFT is pressed
@@ -5698,8 +5712,13 @@ ProcessButtons:
     lda #1
     sta PlayerFrame
 
-    lda PlayerY
+
+    lda PlayerY + 1 ; fraction
     sec
+    sbc PlayerSpeed + 1
+    sta PlayerY + 1
+
+    lda PlayerY
     sbc PlayerSpeed
     sta PlayerY
 
@@ -5714,8 +5733,12 @@ ProcessButtons:
     sta PlayerFrame
 
 
-    lda PlayerY
+    lda PlayerY + 1 ; fraction
     clc
+    adc PlayerSpeed + 1
+    sta PlayerY + 1
+
+    lda PlayerY
     adc PlayerSpeed
     sta PlayerY
 @exit:
@@ -5733,8 +5756,10 @@ CheckA:
     beq @exit ; no stamina
 
     dec Stamina
-    lda #2
+    lda #PLAYER_SPEED_RUN_BASE
     sta PlayerSpeed
+    lda #PLAYER_SPEED_RUN_FRACTION
+    sta PlayerSpeed + 1
 
 @exit:
     rts
