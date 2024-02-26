@@ -335,8 +335,6 @@ sun_moon_tiles_for_periods:
 
     MAX_V_SCROLL               = 255
 
-    ANIM_FRAME_BLOODSTAIN      = $B8
-
     MAX_QUEST                  = 4
 
 
@@ -357,8 +355,6 @@ sun_moon_tiles_for_periods:
 
     INTRO_SCENE_MAX            = 7
     OUTRO_SCENE_MAX            = 4
-
-    
 
 
     DAYTIME_NIGHT              = $40
@@ -6491,60 +6487,46 @@ CheckLeft:
     cmp #120    ;check if player is in the left side of the screen
     bcs @moveLeft
 
-@cont:
-    lda CurrentMapSegmentIndex ; CurrentMapSegment < 1 -> do not scroll
-    beq @firstScreen
-
-;--
-@ScrollGlobalyLeft:
-    lda ScrollX
-    cmp PlayerSpeed
-    bcc @clamp
-
-    sec
-    sbc PlayerSpeed
-    jmp @save
-@clamp:
-
-    dec CurrentMapSegmentIndex
-
-    lda #1
-    sta CurrentScreenWasDecremented
-
-    lda ScrollX
-    sec
-    sbc PlayerSpeed
-    jmp @save
-
-
-@firstScreen:
-
+    lda CurrentMapSegmentIndex ; is first screen
+    bne @cont                  ; nope
     lda ScrollX
     beq @moveLeft
+@cont:
 
-
-    lda ScrollX
-    cmp PlayerSpeed
-    bcc @clamp1
-
-    lda ScrollX
+    lda ScrollX + 1
     sec
+    sbc PlayerSpeed + 1
+    sta ScrollX + 1
+
+    lda ScrollX
     sbc PlayerSpeed
-    jmp @save
 
-@clamp1:
+    sta ScrollX
+    bcs @exit
 
+
+    lda CurrentMapSegmentIndex
+    beq @firstScreen
+    dec CurrentMapSegmentIndex
+    lda #1
+    sta CurrentScreenWasDecremented
+    jmp @exit
+@firstScreen:
     lda #0
-
-@save:
     sta ScrollX
 
     jmp @exit
 
 @moveLeft:
+
+    lda PlayerX + 1 ; fraction
+    sec
+    sbc PlayerSpeed + 1
+    sta PlayerX + 1
+
     lda PlayerX
     beq @exit ; already x=0
-    sec
+
     sbc PlayerSpeed
     sta PlayerX
 
@@ -6581,26 +6563,16 @@ CheckRight:
     cmp ScreenCount
     beq @moveRight
 
+    lda ScrollX + 1
+    clc
+    adc PlayerSpeed + 1
+    sta ScrollX + 1
 
     lda ScrollX
-    cmp #MAX_V_SCROLL
-    bcs @ScrollGlobalyRight
-
-@ScrollGlobalyRight:
-
-    lda #MAX_V_SCROLL
-    sec
-    sbc PlayerSpeed
-    clc
-    adc #1
-    cmp ScrollX
-    bcc @clamp
-    beq @clamp
-
-    lda ScrollX
-    clc
     adc PlayerSpeed
-    jmp @save
+    sta ScrollX
+
+    bcc @exit ; no overflow
 @clamp:
     inc CurrentMapSegmentIndex
     lda #1
@@ -6612,32 +6584,33 @@ CheckRight:
     cmp ScreenCount
     beq @preLastScreen
 
-    lda ScrollX
-    clc
-    adc PlayerSpeed
-    jmp @save
+    jmp @exit
+
 @preLastScreen:
-    lda #0          ;finshed to the last screen, set globalscroll to zero
-
-
-@save:
+    lda #0          ;finshed to the last screen, set scroll to zero
     sta ScrollX
 
     jmp @exit
 
 @moveRight:
-    lda #0
-    sec
-    sbc PlayerSpeed
-    sec 
-    sbc #PLAYER_WIDTH
-    cmp PlayerX
 
-    beq @exit
-    lda PlayerX
+    lda PlayerX + 1
     clc
+    adc PlayerSpeed + 1
+    sta PlayerX + 1
+
+    lda PlayerX
     adc PlayerSpeed
     sta PlayerX
+
+    adc #PLAYER_WIDTH
+    bcc @exit ; not greater than 255? Then fine
+
+    lda #$FF
+    sec
+    sbc #PLAYER_WIDTH
+    sta PlayerX
+
 @exit:
 
     rts
