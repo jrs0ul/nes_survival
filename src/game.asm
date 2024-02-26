@@ -382,10 +382,18 @@ sun_moon_tiles_for_periods:
     PLAYER_WIDTH               = 16
     PLAYER_HEIGHT              = 16
     PLAYER_STAMINA_SIZE        = 128
+
+.if FAMISTUDIO_CFG_PAL_SUPPORT
+    PLAYER_SPEED_WALK_BASE     = 0
+    PLAYER_SPEED_WALK_FRACTION = 239
+    PLAYER_SPEED_RUN_BASE      = 1
+    PLAYER_SPEED_RUN_FRACTION  = 154
+.else
     PLAYER_SPEED_WALK_BASE     = 0
     PLAYER_SPEED_WALK_FRACTION = 199
     PLAYER_SPEED_RUN_BASE      = 1
     PLAYER_SPEED_RUN_FRACTION  = 128
+.endif
 
     STAMINA_END_SPRITE         = $FD
     STAMINA_SEGMENT_START      = $56 ; lower adress where first stamina segment should be placed
@@ -4467,8 +4475,7 @@ HandleInput:
     lda #0
     sta PlayerFrame
 @resetJustY:
-    lda OldPlayerY
-    sta PlayerY
+    jsr ResetOnlyPlayerY
 
     jmp @contInput
 
@@ -4488,8 +4495,7 @@ HandleInput:
 @resetStuff:
     ;obstacle ahead, restore previous position
     jsr ResetPlayerXMovement
-    lda OldPlayerY
-    sta PlayerY
+    jsr ResetOnlyPlayerY
 
     jmp @finishInput
 
@@ -4506,18 +4512,32 @@ HandleInput:
     lda #INPUT_DELAY
     sta InputUpdateDelay
     rts
+;-------------------------------
+ResetOnlyPlayerY:
+    lda OldPlayerY
+    sta PlayerY
+    lda OldPlayerY + 1
+    sta PlayerY + 1
+
+    rts
 
 ;--------------------------------
 BackupMovement:
 
     lda PlayerX
     sta OldPlayerX
+    lda PlayerX + 1
+    sta OldPlayerX + 1
 
     lda PlayerY
     sta OldPlayerY
+    lda PlayerY + 1
+    sta OldPlayerY + 1
 
     lda ScrollX
     sta OldScrollX
+    lda ScrollX + 1
+    sta OldScrollX + 1
 
     lda ScrollDirection
     sta OldScrollDirection
@@ -4572,8 +4592,12 @@ ResetPlayerXMovement:
 
     lda OldPlayerX
     sta PlayerX
+    lda OldPlayerX + 1
+    sta PlayerX + 1
     lda OldScrollX
     sta ScrollX
+    lda OldScrollX + 1
+    sta OldScrollX + 1
     lda OldScrollDirection
     sta ScrollDirection
     lda OldCurrentMapSegmentIndex
