@@ -298,7 +298,23 @@ sun_moon_tiles_for_periods:
     .byte $00, $22, $23, $00 ;$40
     .byte $00, $22, $23, $00 ;$40
 
-
+npcs_ram_lookup:
+    .byte 0
+    .byte 10
+    .byte 20
+    .byte 30
+    .byte 40
+    .byte 50
+    .byte 60
+    .byte 70
+    .byte 80
+    .byte 90
+    .byte 100
+    .byte 110
+    .byte 120
+    .byte 130
+    .byte 140
+    .byte 150
 
 ;--------------
 ; CONSTANTS
@@ -384,15 +400,18 @@ sun_moon_tiles_for_periods:
     PLAYER_STAMINA_SIZE        = 128
 
 .if FAMISTUDIO_CFG_PAL_SUPPORT
+
     PLAYER_SPEED_WALK_BASE     = 0
     PLAYER_SPEED_WALK_FRACTION = 239
     PLAYER_SPEED_RUN_BASE      = 1
     PLAYER_SPEED_RUN_FRACTION  = 154
+
 .else
     PLAYER_SPEED_WALK_BASE     = 0
     PLAYER_SPEED_WALK_FRACTION = 199
     PLAYER_SPEED_RUN_BASE      = 1
     PLAYER_SPEED_RUN_FRACTION  = 128
+
 .endif
 
     STAMINA_END_SPRITE         = $FD

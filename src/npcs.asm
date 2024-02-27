@@ -14,15 +14,17 @@ LoadNpcs:
     inx
     iny
     lda (pointer), y
-    sta Npcs, x
+    sta Npcs, x ;x
     iny
     inx
-    lda (pointer), y
-    sta Npcs, x
-    iny
     inx
     lda (pointer), y
-    sta Npcs, x
+    sta Npcs, x ; y
+    iny
+    inx
+    inx
+    lda (pointer), y
+    sta Npcs, x ; screen
     iny
     inx
     lda #1
@@ -224,7 +226,7 @@ EliminateInactiveNpcs:
     lda InCave
     bne @exit
     lda LocationIndex
-    cmp #10 ; alien base
+    cmp #LOCATION_ALIEN_BASE ; alien base
     beq @exit
 
     ldy NpcCount
@@ -238,21 +240,20 @@ EliminateInactiveNpcs:
     dey
 
 @npcLoop:
-    tya
-    asl
-    asl
-    asl
-    tax
+    ldx npcs_ram_lookup, y
     stx TempEliminationDest
 
-    lda Npcs, x 
+    lda Npcs, x ; status
     and #%00000111
     cmp #0
     beq @next
-    inx
-    inx
-    inx
-    lda Npcs, x
+
+    txa
+    clc
+    adc #5
+    tax
+
+    lda Npcs, x ;screen
     cmp CurrentMapSegmentIndex
     bcc @eliminate
     cmp FarOffNpcScreen
@@ -1241,10 +1242,8 @@ UpdateNpcSpritesInWorldAtoZ:
 
 ;------------------------------------
 UpdateSingleNpcSprites:
-    tya
-    asl
-    asl
-    asl ; a * 8
+
+    lda npcs_ram_lookup, y ; y is npc index
     tay
 
     lda Npcs, y ; index + agitation + state
@@ -1287,6 +1286,7 @@ UpdateSingleNpcSprites:
     sbc ScrollX
     sta TempPointX
 @calcY:
+    iny
     iny
     lda Npcs, y; y
     sta TempPointY ; save y
@@ -1388,9 +1388,11 @@ CollectSingleNpcData:
 
     sta Temp; store tile rows
 
-    iny
-    iny
-    iny
+    tya
+    clc
+    adc #5
+    tay
+
     lda Npcs, y ; screen index where npc resides
     sta ItemMapScreenIndex
     clc
@@ -1419,7 +1421,7 @@ CollectSingleNpcData:
 
     tya
     sec
-    sbc #5
+    sbc #7 ; back to npcs's x coord
     tay
 
 @exit:
@@ -1494,7 +1496,7 @@ doNpcAI:
     beq @exit ; no npcs here
     dey; npcCount - 1, first index
 @npcLoop:
-    
+
     tya
     asl
     asl
