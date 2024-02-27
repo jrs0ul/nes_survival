@@ -1449,8 +1449,11 @@ CurrentSpritesInRow:
 SnowDelay:
     .res 1
 
+TempScreenPos:
+    .res 1
+
 Buffer:
-    .res 189  ;must see how much is still available
+    .res 188  ;must see how much is still available
 
 ;====================================================================================
 
@@ -1591,7 +1594,7 @@ checkItems:
     dec ItemUpdateDelay
     bne npcElimination
 
-    jsr ItemCollisionCheck
+    ;jsr ItemCollisionCheck
 
 npcElimination:
     dec NpcEliminationDelay

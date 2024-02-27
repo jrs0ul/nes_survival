@@ -188,11 +188,13 @@ GenerateSingleNpc:
     lda (AnimalSpawnPointsPtr), y
     sta Npcs, x
     inx
+    inx
 
     ;y
     iny
     lda (AnimalSpawnPointsPtr), y
     sta Npcs, x
+    inx
     inx
 
     ;screen
@@ -1497,10 +1499,7 @@ doNpcAI:
     dey; npcCount - 1, first index
 @npcLoop:
 
-    tya
-    asl
-    asl
-    asl ; a * 8
+    lda npcs_ram_lookup, y ;npc start
     tax
 
     lda Npcs, x ;type + active
@@ -1513,7 +1512,7 @@ doNpcAI:
     
     txa
     clc
-    adc #6 ;timer
+    adc #8 ;go to timer
     tax
 
     lda Npcs, x
@@ -1526,11 +1525,15 @@ doNpcAI:
 
 @cont:
     jsr FetchNpcVars
-    
-    inx
-    inx
-    inx
+
+    txa
+    clc
+    adc #5 ; go to screen value
+    tax
+
     lda Npcs, x; screen
+    dex
+    dex
     dex
     dex
 
@@ -1554,8 +1557,10 @@ doNpcAI:
 ;-----------end of filter----------
 
 @doAI:
-    inx
-    inx
+    inx ;x2
+    inx ;y
+    inx ;y2
+    inx ;screen
     sty TempPush
     jsr SingleNpcAI
     ldy TempPush
@@ -1572,11 +1577,11 @@ doNpcAI:
 
 ;-----------------------------------
 FetchNpcVars:
-    lda Npcs, x
+    lda Npcs, x ;type & status
     lsr
     lsr
     lsr
-    sta TempNpcIndex
+    sta TempNpcIndex ;extracted type index
     stx TempIndex
     asl
     asl
@@ -1670,7 +1675,7 @@ SingleNpcAI:
     ;return x from "timer" back to "state"
     txa
     sec
-    sbc #6
+    sbc #8
     tax
 
     lda Npcs, x
@@ -1763,6 +1768,8 @@ CalcNPCXYOnScreen:
     lda Npcs, x ; screen index where npc resides
     dex
     dex
+    dex
+    dex
 
 
     jsr ScreenFilter
@@ -1788,6 +1795,7 @@ CalcNPCXYOnScreen:
     sta TempPointX
 
 @calcY: ; Y1
+    inx
     inx
     lda Npcs, x ; y
     sta TempPointY
@@ -2013,11 +2021,11 @@ NpcMovement:
 @saveTimer:
     sta Npcs, x; tics
     sta TempNpcTimer
-    dex ; frame
-    dex ; direction
-    dex ; screen
-    dex ; y
-    dex ; x
+
+    txa
+    sec
+    sbc #7 ;move from 'frame' to 'x coord'
+    tax
     stx NpcXPosition ; index at x
 
     lda #NPC_SPEED
@@ -2045,8 +2053,10 @@ NpcMovement:
     lda Npcs, x
     sta NewNpcX
     inx
+    inx
     lda Npcs, x
     sta NewNpcY
+    inx
     inx
     lda Npcs, x
     sta NewNpcScreen
@@ -2074,8 +2084,10 @@ NpcMovement:
     sta NewNpcX
     ;increase npc screen if needed
 
-    inx
-    inx
+    inx ;x2
+    inx ;y
+    inx ;y2
+    inx ;screen
     lda Npcs, x
     clc
     adc #1
@@ -2100,7 +2112,9 @@ NpcMovement:
 
     sta NewNpcX
     ;decrease npc screen if needed
+    inx ;x2
     inx ;y
+    inx ;y2
     inx ;screen
     lda Npcs, x; current screen
     sec
@@ -2118,8 +2132,9 @@ NpcMovement:
     ;calculate Y going up
 
     ldx NpcXPosition
+    inx
     inx ; move to y
-    lda Npcs, x
+    lda Npcs, x ; y coord
 
     sec
     sbc TempNpcSpeed
@@ -2134,8 +2149,9 @@ NpcMovement:
     ;calculate Y going down
 
     ldx NpcXPosition
+    inx
     inx ; move to y
-    lda Npcs, x
+    lda Npcs, x ; y coord
     clc
     adc TempNpcSpeed
 
@@ -2146,7 +2162,9 @@ NpcMovement:
     ;--------------
     ;let's check collision with the player
     ldx NpcXPosition
+    inx ;x2
     inx ;y
+    inx ;y2
     inx ;screen
 
     jsr OnCollisionWithPlayer
@@ -2177,7 +2195,8 @@ NpcMovement:
     cmp #1
     beq @changeDir
     lda TempZ;stored Y
-    dex
+    dex ;y2
+    dex ;y
     sta Npcs, x ; y
 
     jmp @nextNpc
@@ -2188,7 +2207,8 @@ NpcMovement:
     cmp #1
     beq @changeDir
     lda TempZ
-    dex
+    dex ;y2
+    dex ;y
     sta Npcs, x; y
     jmp @nextNpc
 ;-------------
@@ -2390,28 +2410,28 @@ ChangeNpcDirection:
     rts
 ;------------------------------
 SetDirectionForBoar:
-    
 
-    dex
-    dex
-    dex
+    stx TempScreenPos
+
+    txa
+    sec
+    sbc #5 ;from screen to npc status
+    tax
+
     lda Npcs, x
     and #%00000100
     beq @doRandom
 
 
 @done:
-    inx ; x
-    inx ; y
-    inx ; screen
+    ldx TempScreenPos
     jsr SetDirectionsForPredatorNpc
     lda #0
     jmp @end
 
 @doRandom:
-    inx
-    inx
-    inx
+
+    ldx TempScreenPos
     lda #1
 @end:
 
@@ -2431,6 +2451,7 @@ PredatorDirectionChangePrep:
 
     sta TempPointX
     inx
+    inx
 
     lda TempNpcRows
     cmp #3
@@ -2447,6 +2468,7 @@ PredatorDirectionChangePrep:
     adc Npcs, x; y
     sta TempPointY
 
+    inx ;y2
     inx ;screen
     inx ;direction
 
@@ -2473,7 +2495,9 @@ PredatorDirectionChangePrep:
 ;-------------------------------
 SetDirectionsForPredatorNpc:
 
-    dex
+    dex ; y2
+    dex ; y
+    dex ; x2
     dex ; x
 
     jsr PredatorDirectionChangePrep

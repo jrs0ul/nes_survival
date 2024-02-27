@@ -90,38 +90,38 @@ LoadItems:
 
     rts
 ;======================================================
-ItemCollisionCheck:
-    lda #ITEM_DELAY
-    sta ItemUpdateDelay
+;ItemCollisionCheck:
+;    lda #ITEM_DELAY
+;    sta ItemUpdateDelay
 
-    lda ItemCount
-    beq @exit
+;    lda ItemCount
+;    beq @exit
 
-    ldy #0
-@itemLoop:
-    tya
-    asl
-    asl ;y * 4
-    tax
-    lda Items, x ; index + active?
-    lsr
-    bcc @nextItem ; inactive
-    inx
-    lda Items, x ;screen index
-    inx
+;    ldy #0
+;@itemLoop:
+;    tya
+;    asl
+;    asl ;y * 4
+;    tax
+;    lda Items, x ; index + active?
+;    lsr
+;    bcc @nextItem ; inactive
+;    inx
+;    lda Items, x ;screen index
+;    inx
 
-    jsr ScreenFilter
-    bne @nextItem
+;    jsr ScreenFilter
+;    bne @nextItem
 
-    jsr CheckItemsXY
+;    jsr CheckItemsXY
 
-@nextItem:
-    iny
-    cpy ItemCount
-    bcc @itemLoop
+;@nextItem:
+;    iny
+;    cpy ItemCount
+;    bcc @itemLoop
 
-@exit:
-    rts
+;@exit:
+;    rts
 ;----------------------------------
 ;TODO: Optimize !!!!
 CheckItemsXY:
