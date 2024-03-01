@@ -2673,8 +2673,10 @@ TestCollisionGoingRight:
 
     jsr TestPointAgainstCollisionMap
     ldx NpcXPosition
-    inx
-    inx ;increment to screen idx
+    inx ;x2
+    inx ;y
+    inx ;y2
+    inx ;screen
     ;collision result is in A
 
     rts
@@ -2694,7 +2696,9 @@ TestCollisionGoingLeft:
     jsr TestPointAgainstCollisionMap
     ldx TempIndex
     inx
+    inx ;y
     inx
+    inx ; screen
     ;collision result is in A
     rts
 ;--------------------------------------
@@ -2729,7 +2733,9 @@ TestCollisionGoingVerticaly:
 
 @exit:
     ldx NpcXPosition
-    inx
+    inx ; x2
+    inx ; y
+    inx ; y2
     inx ; screen
 
     rts
@@ -2816,7 +2822,7 @@ OnCollisionWithPlayer:
 
     txa
     clc
-    adc #5 ;move from "state" to "frame"
+    adc #7 ;move from "state" to "frame"
     tax 
 
     lda #NPC_ATTACK_FRAME

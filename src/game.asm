@@ -1594,7 +1594,7 @@ checkItems:
     dec ItemUpdateDelay
     bne npcElimination
 
-    ;jsr ItemCollisionCheck
+    jsr ItemCollisionCheck
 
 npcElimination:
     dec NpcEliminationDelay

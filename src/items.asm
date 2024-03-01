@@ -90,9 +90,9 @@ LoadItems:
 
     rts
 ;======================================================
-;ItemCollisionCheck:
-;    lda #ITEM_DELAY
-;    sta ItemUpdateDelay
+ItemCollisionCheck:
+    lda #ITEM_DELAY
+    sta ItemUpdateDelay
 
 ;    lda ItemCount
 ;    beq @exit
@@ -120,8 +120,8 @@ LoadItems:
 ;    cpy ItemCount
 ;    bcc @itemLoop
 
-;@exit:
-;    rts
+@exit:
+    rts
 ;----------------------------------
 ;TODO: Optimize !!!!
 CheckItemsXY:
