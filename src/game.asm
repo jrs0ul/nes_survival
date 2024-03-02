@@ -135,7 +135,9 @@ FAMISTUDIO_CFG_C_BINDINGS = 0
 .include "data/music.s"
 .include "data/sfx.s"
 .include "famistudio_ca65.asm"
+
 .include "data/maps/alien_bossroom.asm"
+.include "data/AnimalSpawnPositions.asm"
 ;=============================================================
 
 .segment "RODATA" ; ROM7
@@ -155,7 +157,6 @@ banktable:              ; Write to this table to switch banks.
 
 .include "data/villager_quests.asm"
 .include "data/MapEntryPoints.asm"
-.include "data/AnimalSpawnPositions.asm"
 
 ;collision lookup table positions
 row_table_screens:

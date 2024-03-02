@@ -47,11 +47,29 @@ LoadNpcs:
 @exit:
 
     rts
+
+;-----------------
+; Calls the routine from the BANK 6
+GenerateNpcs:
+
+    ldy current_bank
+    sty oldbank
+    ldy #6
+    jsr bankswitch_y
+
+    jsr GenNpcs
+
+    ldy oldbank
+    jsr bankswitch_y
+
+    rts
+
+.SEGMENT "ROM6"
 ;-------------------------------------
 ;Parameters: TempNpcCnt - npc number
 ;            TempIndex  - location screen index
 ;Generate random npcs
-GenerateNpcs:
+GenNpcs:
 
     lda InCave
     bne @exit
@@ -217,6 +235,8 @@ GenerateSingleNpc:
 
 
     rts
+
+.SEGMENT "CODE"
 ;---------------------------------
 EliminateInactiveNpcs:
 

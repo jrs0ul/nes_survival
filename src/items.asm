@@ -81,7 +81,7 @@ LoadItems:
     sta Items, y
     iny
     sta Items, y
-    
+
 @decrementItemIndex:
     inx
     cpx ItemCount
@@ -94,39 +94,47 @@ ItemCollisionCheck:
     lda #ITEM_DELAY
     sta ItemUpdateDelay
 
-;    lda ItemCount
-;    beq @exit
+    lda ItemCount
+    beq @exit
 
-;    ldy #0
-;@itemLoop:
-;    tya
-;    asl
-;    asl ;y * 4
-;    tax
-;    lda Items, x ; index + active?
-;    lsr
-;    bcc @nextItem ; inactive
-;    inx
-;    lda Items, x ;screen index
-;    inx
+    lda PlayerX
+    clc
+    adc #4
+    sta TempPlayerRangeX1
+    lda PlayerX
+    clc
+    adc #12
+    sta TempPlayerRangeX2
 
-;    jsr ScreenFilter
-;    bne @nextItem
+    ldy #0
+@itemLoop:
+    tya
+    asl
+    asl ;y * 4
+    tax
+    lda Items, x ; index + active?
+    lsr
+    bcc @nextItem ; inactive
+    inx
+    lda Items, x ;screen index
+    inx
 
-;    jsr CheckItemsXY
+    jsr ScreenFilter
+    bne @nextItem
 
-;@nextItem:
-;    iny
-;    cpy ItemCount
-;    bcc @itemLoop
+    jsr CheckItemsXY
+
+@nextItem:
+    iny
+    cpy ItemCount
+    bcc @itemLoop
 
 @exit:
     rts
 ;----------------------------------
-;TODO: Optimize !!!!
 CheckItemsXY:
 
-    lda Items, x
+    lda Items, x ; x coord
     sta TempX
 
     lda CurrentMapSegmentIndex
@@ -138,49 +146,44 @@ CheckItemsXY:
     sbc ScrollX
     bcs @exit ; x > 255 ?
     sta TempPointX
-    lda PlayerX
-    clc
-    adc #12
+    lda TempPlayerRangeX2 ; playerx + 12
     cmp TempPointX
-    bcs @checkX2
-    jmp @exit
+    bcc @exit
 
 @checkX2:
-    lda TempX
+    lda TempX ; itemx
     clc
     adc #16
     sec
     sbc ScrollX
     bcs @exit ; x > 255 ?
     sta TempPointX
-    lda PlayerX
-    clc
-    adc #4
+    lda TempPlayerRangeX1 ; playerx + 4
     cmp TempPointX
     bcs @exit
     jmp @checkY
 
 @ItemMatchesScreen:
+
     lda TempX
     cmp ScrollX
     bcc @exit
     sec
     sbc ScrollX
     sta TempPointX
-    lda PlayerX
-    clc
-    adc #12
+
+    lda TempPlayerRangeX2 ; playerx + 12
     cmp TempPointX
-    bcs @CheckX2Match
-    jmp @exit
+    bcc @exit
+
 @CheckX2Match:
 
     sty TempIndex
     lda TempX
     clc
     adc #16
-    bcs @checkIfLastScreen
-    jmp @cont
+    bcc @cont
+
 @checkIfLastScreen:
 
     jsr LastScreenCheck
@@ -195,9 +198,7 @@ CheckItemsXY:
     sbc ScrollX
 
     sta TempPointX
-    lda PlayerX
-    clc
-    adc #4
+    lda TempPlayerRangeX1 ;playerx + 4
     cmp TempPointX
     bcs @exit
 @checkY:
