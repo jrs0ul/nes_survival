@@ -2411,8 +2411,9 @@ ChangeNpcDirection:
 @timid:
 
     jsr SetDirectionForTimidNpc
-    beq @storeDirection ; else do random
+    beq @storeDirection ; if 0 in register A
 
+    ;else do random
 @randomDir:
     inx ; increase to direction
     ;just random movement
@@ -2599,8 +2600,9 @@ SetDirectionForTimidNpc:
     clc
     adc #8
     sta TempZ
-
+    inx ;x2
     inx ;y
+    inx ;y2
     inx ;screen
     inx ;direction
 
@@ -2655,6 +2657,7 @@ SetDirectionForTimidNpc:
 @done:
     lda #0
     jmp @end
+
 @doRandom:
     txa
     clc
