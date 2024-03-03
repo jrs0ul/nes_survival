@@ -345,8 +345,17 @@ npcs_ram_lookup:
 
     PROJECTILE_MAX_COUNT       = 10
 
+.if FAMISTUDIO_CFG_PAL_SUPPORT
     NPC_SPEED                  = 1
-    NPC_SPEED_AGITATED         = 2
+    NPC_SPEED_FRACTION         = 44
+    NPC_SPEED_AGITATED         = 1
+    NPC_SPEED_AGITATED_FRACTION= 154
+.else
+    NPC_SPEED                  = 0
+    NPC_SPEED_FRACTION         = 250
+    NPC_SPEED_AGITATED         = 1
+    NPC_SPEED_AGITATED_FRACTION= 128
+.endif
 
     MAX_SPRITE_COUNT           = 64
 
@@ -1215,7 +1224,7 @@ TempNpcTimer:
 TempNpcRows:
     .res 1
 TempNpcSpeed:
-    .res 1
+    .res 2
 TempFrameOffset:
     .res 1
 TempPointX2:
@@ -1261,9 +1270,9 @@ ProjectileY:
 
                 ;for npc collision
 NewNpcX:
-    .res 1
+    .res 2
 NewNpcY:
-    .res 1
+    .res 2
 NewNpcScreen:
     .res 1
 
@@ -1453,8 +1462,11 @@ SnowDelay:
 TempScreenPos:
     .res 1
 
+TempNpcPosInRam:
+    .res 1
+
 Buffer:
-    .res 188  ;must see how much is still available
+    .res 184  ;must see how much is still available
 
 ;====================================================================================
 

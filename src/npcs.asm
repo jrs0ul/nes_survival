@@ -505,7 +505,7 @@ CheckSingleNpcAgainstPlayerHit:
     lsr
     lsr ;eliminate 3 state bits
 
-    sty Temp
+    sty TempNpcPosInRam
     asl
     asl
     asl
@@ -517,23 +517,20 @@ CheckSingleNpcAgainstPlayerHit:
     iny
     lda npc_data, y ; npc type
     sta TempNpcType
-    ldy Temp
+    ldy TempNpcPosInRam
 
-    iny
-    iny
-    iny
-    iny
-    iny
+    tya
+    clc
+    adc #5
+    tay
     lda Npcs, y ; screen index where npc resides
-    dey
-    dey
-    dey
-    dey
+    ldy TempNpcPosInRam
+    iny
 
     jsr ScreenFilter
     bne @exit
 
-    lda Npcs, y
+    lda Npcs, y ; x coord
     sta DropedItemX ; store this for item droping
 
     lda CurrentMapSegmentIndex
@@ -804,7 +801,7 @@ OnCollisionWithAttackRect:
     beq @doneDoingDmg
     cmp #NPC_TYPE_PASSIVE
     bne @continue
-    
+
     rts
 
 @continue:
@@ -2054,6 +2051,8 @@ NpcMovement:
 
     lda #NPC_SPEED
     sta TempNpcSpeed
+    lda #NPC_SPEED_FRACTION
+    sta TempNpcSpeed + 1
 
 
     lda TempNpcType
@@ -2067,22 +2066,29 @@ NpcMovement:
     beq @done_timid ; not agitated
     lda #NPC_SPEED_AGITATED ; if agitated, go realy fast
     sta TempNpcSpeed
+    lda #NPC_SPEED_AGITATED_FRACTION
+    sta TempNpcSpeed + 1
 @done_timid:
     inx
 @continue_move:
     ;Calculate npcs new X and Y using the movement direction
     ;----------
     ;store the new coordinates, because there might not be any direction
-    ;but we need the collision detection working
-    lda Npcs, x
+    ;but we still need the collision detection working
+
+    lda Npcs, x ; x integer part
     sta NewNpcX
     inx
+    lda Npcs, x ; fraction
+    sta NewNpcX + 1
     inx
-    lda Npcs, x
+    lda Npcs, x ; y integer part
     sta NewNpcY
     inx
+    lda Npcs, x ; y fraction
+    sta NewNpcY + 1
     inx
-    lda Npcs, x
+    lda Npcs, x ; screen
     sta NewNpcScreen
     ;now let's see if the npc is moving any of the directions
     ldx NpcXPosition
@@ -2096,8 +2102,13 @@ NpcMovement:
 
     ;calculate X going right
 
-    lda Npcs, x ; load x
+    inx
+    lda Npcs, x ; load x fraction
     clc
+    adc TempNpcSpeed + 1
+    sta NewNpcX + 1
+    dex
+    lda Npcs, x ; load x
     adc TempNpcSpeed
     bcs @IncreaseScreen
     sta NewNpcX
@@ -2122,12 +2133,14 @@ NpcMovement:
 @movingLeft:
     ;calculate X going left
 
-    lda Npcs, x ; load x
-    sta Temp
+    inx
+    lda Npcs, x ; load x fraction
     sec
+    sbc TempNpcSpeed + 1
+    dex
+    lda Npcs, x ; load x
     sbc TempNpcSpeed
-    cmp Temp
-    bcs @DecreaseScreen
+    bcc @DecreaseScreen
 
     sta NewNpcX
     jmp @movesVerticaly
@@ -2153,16 +2166,20 @@ NpcMovement:
     cmp #1
     bne @movesDown
 
-    ;calculate Y going up
+;calculate Y going up
 
     ldx NpcXPosition
     inx
     inx ; move to y
-    lda Npcs, x ; y coord
+    inx ; fraction
+    lda Npcs, x ; y coord fraction
 
     sec
+    sbc TempNpcSpeed + 1
+    sta NewNpcY + 1
+    dex ;main y
+    lda Npcs, x; y
     sbc TempNpcSpeed
-
     sta NewNpcY
 
     jmp @doneCallculation
@@ -2175,10 +2192,14 @@ NpcMovement:
     ldx NpcXPosition
     inx
     inx ; move to y
+    inx ; fraction
     lda Npcs, x ; y coord
     clc
+    adc TempNpcSpeed + 1
+    sta NewNpcY + 1
+    dex
+    lda Npcs, x
     adc TempNpcSpeed
-
     sta NewNpcY
 
 
@@ -2218,10 +2239,12 @@ NpcMovement:
     jsr TestCollisionGoingVerticaly
     cmp #1
     beq @changeDir
-    lda TempZ;stored Y
-    dex ;y2
+    lda NewNpcY + 1
+    dex
+    sta Npcs, x ; y fraction
     dex ;y
-    sta Npcs, x ; y
+    lda NewNpcY
+    sta Npcs, x ; integer y
 
     jmp @nextNpc
 @goDown:
@@ -2230,9 +2253,11 @@ NpcMovement:
     jsr TestCollisionGoingVerticaly
     cmp #1
     beq @changeDir
-    lda TempZ
     dex ;y2
+    lda NewNpcY + 1
+    sta Npcs, x ; y fraction
     dex ;y
+    lda NewNpcY
     sta Npcs, x; y
     jmp @nextNpc
 ;-------------
@@ -2340,10 +2365,7 @@ HorizontalMovement:
     inx ;
     inx ;screen
     sta Npcs, x ;save screen
-    dex
-    dex
-    dex
-    dex
+    ldx NpcXPosition
 
     jmp @YMovement
 
@@ -2367,10 +2389,7 @@ HorizontalMovement:
     inx ;y2
     inx ;screen
     sta Npcs, x ;save the screen
-    dex
-    dex
-    dex
-    dex
+    ldx NpcXPosition
 
     jmp @YMovement
 
@@ -2384,8 +2403,12 @@ HorizontalMovement:
 ;--------------------------
 SaveX:
     ldx NpcXPosition
-    lda TempX
+    lda NewNpcX
     sta Npcs, x ;save x
+    inx
+    lda NewNpcX + 1
+    sta Npcs, x
+    ldx NpcXPosition
 
     rts
 
