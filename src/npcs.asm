@@ -619,15 +619,14 @@ CollisionWithProjectiles:
 SingleProjectileCollision:
 
 
-    lda ProjectileIdx
-    asl
-    asl
+    ldy ProjectileIdx
+    lda projectiles_ram_lookup, y
     tay
 
     lda Projectiles, y ; dir + status
     lsr
     bcs @proceed
-    
+
     rts
 
 @proceed:
@@ -648,6 +647,7 @@ SingleProjectileCollision:
     ;don't match
 
     dey
+    dey
     lda Projectiles, y ; x
     sec
     sbc ScrollX
@@ -656,6 +656,7 @@ SingleProjectileCollision:
     jmp @cont
 @ProjectileMatchesScreen:
 
+    dey
     dey
     lda Projectiles, y ; x
     cmp ScrollX
@@ -709,9 +710,8 @@ SingleProjectileCollision:
 
 @collisionDetected:
 
-    lda ProjectileIdx
-    asl
-    asl
+    ldy ProjectileIdx
+    lda projectiles_ram_lookup, y
     tay
     lda #0
     sta Projectiles, y

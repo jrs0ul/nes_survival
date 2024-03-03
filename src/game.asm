@@ -299,7 +299,7 @@ sun_moon_tiles_for_periods:
     .byte $00, $22, $23, $00 ;$40
     .byte $00, $22, $23, $00 ;$40
 
-npcs_ram_lookup:
+npcs_ram_lookup: ;npc position in ram by index, max 16 npcs
     .byte 0
     .byte 10
     .byte 20
@@ -316,6 +316,18 @@ npcs_ram_lookup:
     .byte 130
     .byte 140
     .byte 150
+
+projectiles_ram_lookup: ; max 10 projectiles
+    .byte 0
+    .byte 6
+    .byte 12
+    .byte 18
+    .byte 24
+    .byte 30
+    .byte 36
+    .byte 42
+    .byte 48
+    .byte 54
 
 ;--------------
 ; CONSTANTS
@@ -892,8 +904,8 @@ FishingDelay:
 FishBiteDuration:   ;for how long a fish will bite
     .res 1
 
-SpearData: ; Direction(7bit) + Active(1bit), X, Screen, Y
-    .res 4
+SpearData: ; Direction(7bit) + Active(1bit), X(2 bytes), Screen, Y(2bytes)
+    .res 6
 
 ;attack square
 AttackTopLeftX:
@@ -1375,7 +1387,8 @@ NpcCount:
     .res 1
 
 Projectiles:
-    .res 6 * PROJECTILE_MAX_COUNT ;  4 bytes * 4 projectiles
+    .res 6 * PROJECTILE_MAX_COUNT ;  6 bytes:
+                                  ;---------------------------------
                                   ;  direction(7bit) + state (1bit)
                                   ;  x (2 bytes)
                                   ;  screen
@@ -1466,7 +1479,7 @@ TempNpcPosInRam:
     .res 1
 
 Buffer:
-    .res 184  ;must see how much is still available
+    .res 182  ;must see how much is still available
 
 ;====================================================================================
 
@@ -2641,9 +2654,8 @@ UpdateProjectiles:
     sty ProjectileIdx
 
 @projectileLoop:
-    lda ProjectileIdx
-    asl
-    asl
+    ldy ProjectileIdx
+    lda projectiles_ram_lookup, y
     tay
 
     jsr UpdateSingleProjectile
@@ -2692,9 +2704,10 @@ UpdateSingleProjectile:
 
 @otherDir:
 
-    iny
-    iny
-    iny
+    iny ; x
+    iny ; x2
+    iny ; screen
+    iny ; y
     jsr MoveProjectileVerticaly
     cmp #1
     beq @disable
@@ -2712,32 +2725,32 @@ UpdateSingleProjectile:
 ;-----------------------------
 DisableProjectiles:
 
-    lda ProjectileIdx
-    asl
-    asl
+    ldy ProjectileIdx
+    lda projectiles_ram_lookup, y
     tay
     sty TempYOffset
 
     iny
     lda Projectiles, y
-    sta TempPointY
-    iny
-    lda Projectiles, y
     sta TempPointX
+    iny
     iny
     lda Projectiles, y
     sta TempScreen
+    iny
+    lda Projectiles, y
+    sta TempPointY
 
     lda #%00001101 ; 7 + active bit
     sta TempItemIndex
     jsr ItemSpawnPrep
+    lda TempScreen
+    sta Items, y
+    iny
     lda TempPointX
     sta Items, y
     iny
     lda TempPointY
-    sta Items, y
-    iny
-    lda TempScreen
     sta Items, y
 
 
@@ -2800,6 +2813,7 @@ MoveProjectileRight:
     ;---
     sta TempPointX
     iny
+    iny
     lda (ProjectilePtr), y ; screen
     sta TempScreen
     iny
@@ -2834,6 +2848,7 @@ MoveProjectileRight:
     sta TempPointX
 
     iny
+    iny
     lda (ProjectilePtr), y ;screen
     clc
     adc #1
@@ -2855,6 +2870,7 @@ MoveProjectileRight:
     bcc @cont
     dec TempScreen
 @cont:
+    iny
     iny
     lda TempScreen
     sta (ProjectilePtr), y
@@ -2936,6 +2952,7 @@ MoveProjectileLeft:
 
     sta TempPointX
     iny
+    iny
     lda (ProjectilePtr), y ; screen
     sta TempScreen
     iny
@@ -2964,6 +2981,7 @@ MoveProjectileLeft:
 
     ;decrease screen idx
     iny
+    iny
     lda (ProjectilePtr), y
     sec
     sbc #1
@@ -2980,6 +2998,7 @@ MoveProjectileLeft:
     ldy TempYOffset ; restore x coord pos
     lda TempPointX
     sta (ProjectilePtr), y
+    iny
     iny
     lda TempScreen
     sta (ProjectilePtr), y
@@ -3005,13 +3024,13 @@ DisableSpear:
     lda #%00001111 ; 7 + active bit
     sta TempItemIndex
     jsr ItemSpawnPrep
-    lda SpearData + 2
+    lda SpearData + 3 ; screen
     sta Items, y
     iny
-    lda SpearData + 1
+    lda SpearData + 1 ; x
     sta Items, y
     iny
-    lda SpearData + 3
+    lda SpearData + 4 ; y
     sta Items, y
 
 @simplyRemove:
@@ -3036,6 +3055,7 @@ MoveProjectileVerticaly:
     dey
     lda(ProjectilePtr), y ;screen
     sta TempScreen
+    dey
     dey
     lda (ProjectilePtr), y; x
     sta TempPointX
@@ -3066,6 +3086,7 @@ MoveProjectileVerticaly:
     lda(ProjectilePtr), y ;screen
     sta TempScreen
     dey
+    dey
     lda (ProjectilePtr), y; x
     sta TempPointX
 
@@ -3078,7 +3099,6 @@ MoveProjectileVerticaly:
     sta (ProjectilePtr), y ; Y
     cmp #PROJECTILE_SPEED
     bcc @return_disable
-
 
     lda #0
     jmp @exit
@@ -6397,9 +6417,7 @@ ShootSlingshot:
     dey
 @checkLoop:
 
-    tya
-    asl
-    asl
+    lda projectiles_ram_lookup, y
     tax
     lda Projectiles, x
     lsr
@@ -6409,9 +6427,8 @@ ShootSlingshot:
     bpl @checkLoop
 
 @isEmpty:
-    lda ProjectileCount
-    asl
-    asl
+    ldx ProjectileCount
+    lda projectiles_ram_lookup, x
     tax
 
     lda ProjectileCount
@@ -6447,6 +6464,7 @@ ShootSlingshot:
 
     sta Projectiles, x
     lda CurrentMapSegmentIndex
+    inx ;x2
     inx ;screen
     sta Projectiles, x
     jmp @writeY
@@ -6457,6 +6475,7 @@ ShootSlingshot:
     lda CurrentMapSegmentIndex
     clc
     adc #1
+    inx
     inx ; screen
     sta Projectiles, x
 
