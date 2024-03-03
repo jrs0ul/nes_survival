@@ -6515,7 +6515,7 @@ LaunchSpear:
     lda PlayerY
     clc
     adc #8
-    sta SpearData + 3
+    sta SpearData + 4
 
     lda PlayerX
     clc
@@ -6523,10 +6523,9 @@ LaunchSpear:
     adc ScrollX
     bcs @incrementScreen
 
-
     sta SpearData + 1
     lda CurrentMapSegmentIndex
-    sta SpearData + 2 ; screen
+    sta SpearData + 3 ; screen
     jmp @exit
 
 @incrementScreen:
@@ -6535,7 +6534,7 @@ LaunchSpear:
     lda CurrentMapSegmentIndex
     clc
     adc #1
-    sta SpearData + 2 ; screen
+    sta SpearData + 3 ; screen
 
 @exit:
 

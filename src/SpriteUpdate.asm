@@ -131,7 +131,7 @@ UpdateSprites:
     lsr
     bcc @projectiles
 
-    lda SpearData + 2 ; screen
+    lda SpearData + 3 ; screen
 
     jsr ScreenFilter
     bne @projectiles
@@ -476,7 +476,7 @@ SetTwoSpearSprites:
 
 @spearLoop:
     inx
-    lda SpearData + 3; Y
+    lda SpearData + 4; Y
     clc
     adc spearSprites, y
     sta FIRST_SPRITE, x

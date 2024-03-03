@@ -630,8 +630,9 @@ SingleProjectileCollision:
     rts
 
 @proceed:
-    iny
-    iny
+    iny;x
+    iny;x2
+    iny;screen
 
     lda Projectiles, y ; screen
     jsr ScreenFilter
@@ -646,8 +647,8 @@ SingleProjectileCollision:
     beq @ProjectileMatchesScreen
     ;don't match
 
-    dey
-    dey
+    dey ;x2
+    dey ;x
     lda Projectiles, y ; x
     sec
     sbc ScrollX
@@ -666,8 +667,9 @@ SingleProjectileCollision:
 
 @cont:
     sta ProjectileX
-    iny
-    iny
+    iny ;x2
+    iny ;screen
+    iny ;y
     lda Projectiles, y ; y
     sta ProjectileY
 
