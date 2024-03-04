@@ -2923,7 +2923,7 @@ UpdateSpear:
 
 @otherDir:
 
-    ldy #3 ; set to Y
+    ldy #4 ; set to Y
 
     jsr MoveProjectileVerticaly
     cmp #1

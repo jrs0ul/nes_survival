@@ -1156,7 +1156,7 @@ BuildSpearAttackSquare:
     lsr
     bcc @exit
 
-    lda SpearData + 2 ; screen
+    lda SpearData + 3 ; screen
 
     jsr ScreenFilter
     bne @exit
@@ -1191,7 +1191,7 @@ BuildSpearAttackSquare:
     asl
     tay
 
-    lda SpearData + 3 ; Y
+    lda SpearData + 4 ; Y
     clc
     adc spearSprites, y
     sta AttackTopLeftY
@@ -1206,7 +1206,7 @@ BuildSpearAttackSquare:
 
     iny
 
-    lda SpearData + 3 ; Y
+    lda SpearData + 4 ; Y
     clc
     adc spearSprites, y
     sta AttackBottomRightY
