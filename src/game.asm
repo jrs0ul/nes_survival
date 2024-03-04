@@ -422,7 +422,6 @@ projectiles_ram_lookup: ; max 10 projectiles
     PLAYER_STAMINA_SIZE        = 128
 
 .if FAMISTUDIO_CFG_PAL_SUPPORT
-
     PLAYER_SPEED_WALK_BASE     = 0
     PLAYER_SPEED_WALK_FRACTION = 239
     PLAYER_SPEED_RUN_BASE      = 1
@@ -545,8 +544,14 @@ projectiles_ram_lookup: ; max 10 projectiles
     ITEM_LETTER                = 24
     ITEM_LAMP                  = 26
 
+
+.if FAMISTUDIO_CFG_PAL_SUPPORT
+    PROJECTILE_SPEED_INT       = 2
+    PROJECTILE_SPEED_FRAC      = 228
+.else
     PROJECTILE_SPEED_INT       = 2
     PROJECTILE_SPEED_FRAC      = 190
+.endif
 
     ITEM_COUNT_MAX             = 25
 
@@ -2801,16 +2806,18 @@ MoveProjectileRight:
 
     iny
     sty TempYOffset
-    lda (ProjectilePtr), y ; x
+    iny
+    lda (ProjectilePtr), y ; y fraction
     clc
+    adc #PROJECTILE_SPEED_FRAC
+    sta (ProjectilePtr), y
+    dey
+    lda (ProjectilePtr), y ; x
     adc ProjectileWidth
     bcs @more
-    cmp #255 - PROJECTILE_SPEED_INT
-    bcs @more
-
     clc
     adc #PROJECTILE_SPEED_INT
-
+    bcs @more
     ;---
     sta TempPointX
     iny
@@ -3042,8 +3049,12 @@ MoveProjectileVerticaly:
     cmp #PROJECTILE_DIR_DOWN
     bne @checkUp
 
-    lda (ProjectilePtr), y ; Y
+    iny
+    lda (ProjectilePtr), y ; y fraction
     clc
+    adc #PROJECTILE_SPEED_FRAC
+    dey
+    lda (ProjectilePtr), y ; Y
     adc #PROJECTILE_SPEED_INT
 
     sta TempPointY
@@ -3071,9 +3082,12 @@ MoveProjectileVerticaly:
     cmp #PROJECTILE_DIR_UP
     bne @exit
 
-    lda (ProjectilePtr), y ; y
-
+    iny
+    lda (ProjectilePtr), y ; y fraction
     sec
+    sbc #PROJECTILE_SPEED_FRAC
+    dey
+    lda (ProjectilePtr), y ; y
     sbc #PROJECTILE_SPEED_INT
 
     sta TempPointY
