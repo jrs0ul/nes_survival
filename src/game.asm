@@ -545,7 +545,8 @@ projectiles_ram_lookup: ; max 10 projectiles
     ITEM_LETTER                = 24
     ITEM_LAMP                  = 26
 
-    PROJECTILE_SPEED           = 3
+    PROJECTILE_SPEED_INT       = 2
+    PROJECTILE_SPEED_FRAC      = 190
 
     ITEM_COUNT_MAX             = 25
 
@@ -2804,11 +2805,11 @@ MoveProjectileRight:
     clc
     adc ProjectileWidth
     bcs @more
-    cmp #255 - PROJECTILE_SPEED
+    cmp #255 - PROJECTILE_SPEED_INT
     bcs @more
 
     clc
-    adc #PROJECTILE_SPEED
+    adc #PROJECTILE_SPEED_INT
 
     ;---
     sta TempPointX
@@ -2841,7 +2842,7 @@ MoveProjectileRight:
     sec
     sbc ProjectileWidth
     sta Temp
-    lda #PROJECTILE_SPEED
+    lda #PROJECTILE_SPEED_INT
     sec
     sbc Temp
 
@@ -2943,14 +2944,18 @@ MoveProjectileLeft:
 
     iny
     sty TempYOffset ; store x coord position
+
+    iny; x fraction
     lda (ProjectilePtr), y
-    cmp #PROJECTILE_SPEED
+    sec
+    sbc #PROJECTILE_SPEED_FRAC
+    sta (ProjectilePtr), y
+    dey ;x integer part
+    lda (ProjectilePtr), y
+    sbc #PROJECTILE_SPEED_INT
+    sta TempPointX
     bcc @less
 
-    sec
-    sbc #PROJECTILE_SPEED
-
-    sta TempPointX
     iny
     iny
     lda (ProjectilePtr), y ; screen
@@ -2969,15 +2974,6 @@ MoveProjectileLeft:
     jmp @filter
 
 @less:
-    lda #PROJECTILE_SPEED
-    sec
-    sbc (ProjectilePtr), y
-    sta Temp
-    lda #255
-    sec
-    sbc Temp
-
-    sta TempPointX
 
     ;decrease screen idx
     iny
@@ -3048,7 +3044,7 @@ MoveProjectileVerticaly:
 
     lda (ProjectilePtr), y ; Y
     clc
-    adc #PROJECTILE_SPEED
+    adc #PROJECTILE_SPEED_INT
 
     sta TempPointY
     sty TempYOffset
@@ -3078,7 +3074,7 @@ MoveProjectileVerticaly:
     lda (ProjectilePtr), y ; y
 
     sec
-    sbc #PROJECTILE_SPEED
+    sbc #PROJECTILE_SPEED_INT
 
     sta TempPointY
     sty TempYOffset
@@ -3097,7 +3093,7 @@ MoveProjectileVerticaly:
     ldy TempYOffset
 
     sta (ProjectilePtr), y ; Y
-    cmp #PROJECTILE_SPEED
+    cmp #PROJECTILE_SPEED_INT
     bcc @return_disable
 
     lda #0
