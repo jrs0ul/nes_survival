@@ -6737,6 +6737,8 @@ CheckBed:
     sta PlayerInteractedWithBed
     ldy #1
     jsr bankswitch_y
+    lda #STATE_MENU
+    sta GameState
 
     lda #1
     jmp @exit
@@ -6766,6 +6768,8 @@ CheckFireplace:
     sta PlayerInteractedWithFireplace
     ldy #1
     jsr bankswitch_y
+    lda #STATE_MENU
+    sta GameState
 
 
     jmp @exit
@@ -6795,6 +6799,8 @@ CheckStashBox:
     sta PlayerInteractedWithStorage
     ldy #1
     jsr bankswitch_y
+    lda #STATE_MENU
+    sta GameState
 
 
     jmp @exit
@@ -6825,6 +6831,8 @@ CheckToolTable:
     sta PlayerInteractedWithTooltable
     ldy #1
     jsr bankswitch_y
+    lda #STATE_MENU
+    sta GameState
 
 
     jmp @exit
