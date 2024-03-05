@@ -342,6 +342,11 @@ projectiles_ram_lookup: ; max 10 projectiles
     STATE_INTRO                = 4
     STATE_OUTRO                = 5
 
+    BUTTON_RIGHT_DOWN_MASK     = %00000101
+    BUTTON_RIGHT_UP_MASK       = %00001001
+    BUTTON_LEFT_DOWN_MASK      = %00000110
+    BUTTON_LEFT_UP_MAK         = %00001010
+
     BUTTON_RIGHT_MASK          = %00000001
     BUTTON_LEFT_MASK           = %00000010
     BUTTON_DOWN_MASK           = %00000100
@@ -427,11 +432,22 @@ projectiles_ram_lookup: ; max 10 projectiles
     PLAYER_SPEED_RUN_BASE      = 1
     PLAYER_SPEED_RUN_FRACTION  = 154
 
+    PLAYER_SPEED_DIAG_WALK_BASE     = 0
+    PLAYER_SPEED_DIAG_WALK_FRACTION = 169
+    PLAYER_SPEED_DIAG_RUN_BASE      = 1
+    PLAYER_SPEED_DIAG_RUN_FRACTION  = 34
+
 .else
     PLAYER_SPEED_WALK_BASE     = 0
     PLAYER_SPEED_WALK_FRACTION = 199
     PLAYER_SPEED_RUN_BASE      = 1
     PLAYER_SPEED_RUN_FRACTION  = 128
+
+    PLAYER_SPEED_DIAG_WALK_BASE     = 0
+    PLAYER_SPEED_DIAG_WALK_FRACTION = 141 ; sqrt((speed * speed)/2)
+    PLAYER_SPEED_DIAG_RUN_BASE      = 1
+    PLAYER_SPEED_DIAG_RUN_FRACTION  = 16
+
 
 .endif
 
@@ -796,9 +812,11 @@ Stamina:
     .res 1
 OldStamina:
     .res 1
+PlayerMovesDiagonaly:
+    .res 1
 
 ZPBuffer:
-    .res 94  ; I want to be aware of the free memory
+    .res 93  ; I want to be aware of the free memory
 
 ;--------------
 .segment "BSS" ; variables in ram
@@ -5761,7 +5779,34 @@ EquipNext:
     jsr bankswitch_y
 
     rts
+;--------------------------------------
+CheckDiagonal:
+    lda #0
+    sta PlayerMovesDiagonaly
 
+    lda Buttons
+    and #BUTTON_RIGHT_DOWN_MASK
+    cmp #BUTTON_RIGHT_DOWN_MASK
+    beq @found
+    lda Buttons
+    and #BUTTON_RIGHT_UP_MASK
+    cmp #BUTTON_RIGHT_UP_MASK
+    beq @found
+    lda Buttons
+    and #BUTTON_LEFT_DOWN_MASK
+    cmp #BUTTON_LEFT_DOWN_MASK
+    beq @found
+    lda Buttons
+    and #BUTTON_LEFT_UP_MAK
+    cmp #BUTTON_LEFT_UP_MAK
+    bne @exit
+
+@found:
+    lda #1
+    sta PlayerMovesDiagonaly
+
+@exit:
+    rts
 ;--------------------------------------
 
 ProcessButtons:
@@ -5773,10 +5818,24 @@ ProcessButtons:
     sta DirectionX
     sta DirectionY
 
+    jsr CheckDiagonal
+
+    lda PlayerMovesDiagonaly
+    beq @normalSpeed
+
+    lda #PLAYER_SPEED_DIAG_WALK_BASE
+    sta PlayerSpeed
+    lda #PLAYER_SPEED_DIAG_WALK_FRACTION
+    sta PlayerSpeed + 1
+    jmp @checkA
+
+@normalSpeed:
     lda #PLAYER_SPEED_WALK_BASE
     sta PlayerSpeed
     lda #PLAYER_SPEED_WALK_FRACTION
     sta PlayerSpeed + 1
+
+@checkA:
     jsr CheckA ; speed up only active if dpad is used
 
 ;Check if LEFT is pressed
@@ -5841,6 +5900,17 @@ CheckA:
     beq @exit ; no stamina
 
     dec Stamina
+    lda PlayerMovesDiagonaly
+    beq @notdiagonal
+
+    lda #PLAYER_SPEED_DIAG_RUN_BASE
+    sta PlayerSpeed
+    lda #PLAYER_SPEED_DIAG_RUN_FRACTION
+    sta PlayerSpeed + 1
+    jmp @exit
+
+
+@notdiagonal:
     lda #PLAYER_SPEED_RUN_BASE
     sta PlayerSpeed
     lda #PLAYER_SPEED_RUN_FRACTION
