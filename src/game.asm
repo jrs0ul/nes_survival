@@ -135,7 +135,9 @@ FAMISTUDIO_CFG_C_BINDINGS = 0
 .include "data/music.s"
 .include "data/sfx.s"
 .include "famistudio_ca65.asm"
+
 .include "data/maps/alien_bossroom.asm"
+.include "data/AnimalSpawnPositions.asm"
 ;=============================================================
 
 .segment "RODATA" ; ROM7
@@ -155,7 +157,6 @@ banktable:              ; Write to this table to switch banks.
 
 .include "data/villager_quests.asm"
 .include "data/MapEntryPoints.asm"
-.include "data/AnimalSpawnPositions.asm"
 
 ;collision lookup table positions
 row_table_screens:
@@ -298,7 +299,35 @@ sun_moon_tiles_for_periods:
     .byte $00, $22, $23, $00 ;$40
     .byte $00, $22, $23, $00 ;$40
 
+npcs_ram_lookup: ;npc position in ram by index, max 16 npcs
+    .byte 0
+    .byte 10
+    .byte 20
+    .byte 30
+    .byte 40
+    .byte 50
+    .byte 60
+    .byte 70
+    .byte 80
+    .byte 90
+    .byte 100
+    .byte 110
+    .byte 120
+    .byte 130
+    .byte 140
+    .byte 150
 
+projectiles_ram_lookup: ; max 10 projectiles
+    .byte 0
+    .byte 6
+    .byte 12
+    .byte 18
+    .byte 24
+    .byte 30
+    .byte 36
+    .byte 42
+    .byte 48
+    .byte 54
 
 ;--------------
 ; CONSTANTS
@@ -328,14 +357,21 @@ sun_moon_tiles_for_periods:
 
     PROJECTILE_MAX_COUNT       = 10
 
+.if FAMISTUDIO_CFG_PAL_SUPPORT
     NPC_SPEED                  = 1
-    NPC_SPEED_AGITATED         = 2
+    NPC_SPEED_FRACTION         = 44
+    NPC_SPEED_AGITATED         = 1
+    NPC_SPEED_AGITATED_FRACTION= 154
+.else
+    NPC_SPEED                  = 0
+    NPC_SPEED_FRACTION         = 250
+    NPC_SPEED_AGITATED         = 1
+    NPC_SPEED_AGITATED_FRACTION= 128
+.endif
 
     MAX_SPRITE_COUNT           = 64
 
     MAX_V_SCROLL               = 255
-
-    ANIM_FRAME_BLOODSTAIN      = $B8
 
     MAX_QUEST                  = 4
 
@@ -357,8 +393,6 @@ sun_moon_tiles_for_periods:
 
     INTRO_SCENE_MAX            = 7
     OUTRO_SCENE_MAX            = 4
-
-    
 
 
     DAYTIME_NIGHT              = $40
@@ -386,6 +420,20 @@ sun_moon_tiles_for_periods:
     PLAYER_WIDTH               = 16
     PLAYER_HEIGHT              = 16
     PLAYER_STAMINA_SIZE        = 128
+
+.if FAMISTUDIO_CFG_PAL_SUPPORT
+    PLAYER_SPEED_WALK_BASE     = 0
+    PLAYER_SPEED_WALK_FRACTION = 239
+    PLAYER_SPEED_RUN_BASE      = 1
+    PLAYER_SPEED_RUN_FRACTION  = 154
+
+.else
+    PLAYER_SPEED_WALK_BASE     = 0
+    PLAYER_SPEED_WALK_FRACTION = 199
+    PLAYER_SPEED_RUN_BASE      = 1
+    PLAYER_SPEED_RUN_FRACTION  = 128
+
+.endif
 
     STAMINA_END_SPRITE         = $FD
     STAMINA_SEGMENT_START      = $56 ; lower adress where first stamina segment should be placed
@@ -496,7 +544,14 @@ sun_moon_tiles_for_periods:
     ITEM_LETTER                = 24
     ITEM_LAMP                  = 26
 
-    PROJECTILE_SPEED           = 3
+
+.if FAMISTUDIO_CFG_PAL_SUPPORT
+    PROJECTILE_SPEED_INT       = 2
+    PROJECTILE_SPEED_FRAC      = 228
+.else
+    PROJECTILE_SPEED_INT       = 2
+    PROJECTILE_SPEED_FRAC      = 190
+.endif
 
     ITEM_COUNT_MAX             = 25
 
@@ -752,9 +807,9 @@ CurrentPaletteDecrementValue: ;a helper value to prevent doing too much of palet
     .res 1
 
 OldScrollX:
-    .res 1
+    .res 2
 ScrollX:
-    .res 1
+    .res 2
 
 ScrollY:
     .res 1
@@ -798,18 +853,17 @@ NametableAddress:
 
 
 OldPlayerX:
-    .res 1
+    .res 2
 OldPlayerY:
-    .res 1
+    .res 2
 
 PlayerX:
-    .res 1
+    .res 2
 PlayerY:
-    .res 1
+    .res 2
 
-SnowDelay:
 PlayerSpeed:
-    .res 1
+    .res 2
 
 PlayerAnimationRowIndex: ;which animation row to use for player sprites at the moment
     .res 1
@@ -856,8 +910,8 @@ FishingDelay:
 FishBiteDuration:   ;for how long a fish will bite
     .res 1
 
-SpearData: ; Direction(7bit) + Active(1bit), X, Screen, Y
-    .res 4
+SpearData: ; Direction(7bit) + Active(1bit), X(2 bytes), Screen, Y(2bytes)
+    .res 6
 
 ;attack square
 AttackTopLeftX:
@@ -1188,7 +1242,7 @@ TempNpcTimer:
 TempNpcRows:
     .res 1
 TempNpcSpeed:
-    .res 1
+    .res 2
 TempFrameOffset:
     .res 1
 TempPointX2:
@@ -1234,9 +1288,9 @@ ProjectileY:
 
                 ;for npc collision
 NewNpcX:
-    .res 1
+    .res 2
 NewNpcY:
-    .res 1
+    .res 2
 NewNpcScreen:
     .res 1
 
@@ -1326,10 +1380,10 @@ Item_Location9_Collection_times:
     .res ITEM_COUNT_LOC9
 
 Npcs:   ;animals and stuff
-    .res 128 ; max 16 npcs * 8 bytes:
+    .res 160 ; max 16 npcs * 10 bytes:
             ;   (npc type(5 bits) + agitatded?(1bit) + state(2 bit, 0 - dead, 1 - alive/idle, 2 - attacks, 3 - damaged),
-            ;   x,
-            ;   y,
+            ;   x (2 bytes),
+            ;   y (2 bytes),
             ;   screen_index
             ;   direction(0000(unused bits) 00(Vertical) 00(horizonatal))
             ;   frame
@@ -1339,11 +1393,12 @@ NpcCount:
     .res 1
 
 Projectiles:
-    .res 4 * PROJECTILE_MAX_COUNT ;  4 bytes * 4 projectiles
+    .res 6 * PROJECTILE_MAX_COUNT ;  6 bytes:
+                                  ;---------------------------------
                                   ;  direction(7bit) + state (1bit)
-                                  ;  x
+                                  ;  x (2 bytes)
                                   ;  screen
-                                  ;  y
+                                  ;  y (2 bytes)
 
 ProjectileCount:
     .res 1
@@ -1420,8 +1475,17 @@ TempNpcWidth:
 CurrentSpritesInRow:
     .res 1
 
+SnowDelay:
+    .res 1
+
+TempScreenPos:
+    .res 1
+
+TempNpcPosInRam:
+    .res 1
+
 Buffer:
-    .res 249  ;must see how much is still available
+    .res 182  ;must see how much is still available
 
 ;====================================================================================
 
@@ -2596,9 +2660,8 @@ UpdateProjectiles:
     sty ProjectileIdx
 
 @projectileLoop:
-    lda ProjectileIdx
-    asl
-    asl
+    ldy ProjectileIdx
+    lda projectiles_ram_lookup, y
     tay
 
     jsr UpdateSingleProjectile
@@ -2647,9 +2710,10 @@ UpdateSingleProjectile:
 
 @otherDir:
 
-    iny
-    iny
-    iny
+    iny ; x
+    iny ; x2
+    iny ; screen
+    iny ; y
     jsr MoveProjectileVerticaly
     cmp #1
     beq @disable
@@ -2667,32 +2731,32 @@ UpdateSingleProjectile:
 ;-----------------------------
 DisableProjectiles:
 
-    lda ProjectileIdx
-    asl
-    asl
+    ldy ProjectileIdx
+    lda projectiles_ram_lookup, y
     tay
     sty TempYOffset
 
     iny
     lda Projectiles, y
-    sta TempPointY
-    iny
-    lda Projectiles, y
     sta TempPointX
+    iny
     iny
     lda Projectiles, y
     sta TempScreen
+    iny
+    lda Projectiles, y
+    sta TempPointY
 
     lda #%00001101 ; 7 + active bit
     sta TempItemIndex
     jsr ItemSpawnPrep
+    lda TempScreen
+    sta Items, y
+    iny
     lda TempPointX
     sta Items, y
     iny
     lda TempPointY
-    sta Items, y
-    iny
-    lda TempScreen
     sta Items, y
 
 
@@ -2742,18 +2806,21 @@ MoveProjectileRight:
 
     iny
     sty TempYOffset
-    lda (ProjectilePtr), y ; x
+    iny
+    lda (ProjectilePtr), y ; y fraction
     clc
+    adc #PROJECTILE_SPEED_FRAC
+    sta (ProjectilePtr), y
+    dey
+    lda (ProjectilePtr), y ; x
     adc ProjectileWidth
     bcs @more
-    cmp #255 - PROJECTILE_SPEED
-    bcs @more
-
     clc
-    adc #PROJECTILE_SPEED
-
+    adc #PROJECTILE_SPEED_INT
+    bcs @more
     ;---
     sta TempPointX
+    iny
     iny
     lda (ProjectilePtr), y ; screen
     sta TempScreen
@@ -2782,12 +2849,13 @@ MoveProjectileRight:
     sec
     sbc ProjectileWidth
     sta Temp
-    lda #PROJECTILE_SPEED
+    lda #PROJECTILE_SPEED_INT
     sec
     sbc Temp
 
     sta TempPointX
 
+    iny
     iny
     lda (ProjectilePtr), y ;screen
     clc
@@ -2810,6 +2878,7 @@ MoveProjectileRight:
     bcc @cont
     dec TempScreen
 @cont:
+    iny
     iny
     lda TempScreen
     sta (ProjectilePtr), y
@@ -2862,7 +2931,7 @@ UpdateSpear:
 
 @otherDir:
 
-    ldy #3 ; set to Y
+    ldy #4 ; set to Y
 
     jsr MoveProjectileVerticaly
     cmp #1
@@ -2882,14 +2951,19 @@ MoveProjectileLeft:
 
     iny
     sty TempYOffset ; store x coord position
+
+    iny; x fraction
     lda (ProjectilePtr), y
-    cmp #PROJECTILE_SPEED
+    sec
+    sbc #PROJECTILE_SPEED_FRAC
+    sta (ProjectilePtr), y
+    dey ;x integer part
+    lda (ProjectilePtr), y
+    sbc #PROJECTILE_SPEED_INT
+    sta TempPointX
     bcc @less
 
-    sec
-    sbc #PROJECTILE_SPEED
-
-    sta TempPointX
+    iny
     iny
     lda (ProjectilePtr), y ; screen
     sta TempScreen
@@ -2907,17 +2981,9 @@ MoveProjectileLeft:
     jmp @filter
 
 @less:
-    lda #PROJECTILE_SPEED
-    sec
-    sbc (ProjectilePtr), y
-    sta Temp
-    lda #255
-    sec
-    sbc Temp
-
-    sta TempPointX
 
     ;decrease screen idx
+    iny
     iny
     lda (ProjectilePtr), y
     sec
@@ -2935,6 +3001,7 @@ MoveProjectileLeft:
     ldy TempYOffset ; restore x coord pos
     lda TempPointX
     sta (ProjectilePtr), y
+    iny
     iny
     lda TempScreen
     sta (ProjectilePtr), y
@@ -2960,13 +3027,13 @@ DisableSpear:
     lda #%00001111 ; 7 + active bit
     sta TempItemIndex
     jsr ItemSpawnPrep
-    lda SpearData + 2
+    lda SpearData + 3 ; screen
     sta Items, y
     iny
-    lda SpearData + 1
+    lda SpearData + 1 ; x
     sta Items, y
     iny
-    lda SpearData + 3
+    lda SpearData + 4 ; y
     sta Items, y
 
 @simplyRemove:
@@ -2982,15 +3049,20 @@ MoveProjectileVerticaly:
     cmp #PROJECTILE_DIR_DOWN
     bne @checkUp
 
-    lda (ProjectilePtr), y ; Y
+    iny
+    lda (ProjectilePtr), y ; y fraction
     clc
-    adc #PROJECTILE_SPEED
+    adc #PROJECTILE_SPEED_FRAC
+    dey
+    lda (ProjectilePtr), y ; Y
+    adc #PROJECTILE_SPEED_INT
 
     sta TempPointY
     sty TempYOffset
     dey
     lda(ProjectilePtr), y ;screen
     sta TempScreen
+    dey
     dey
     lda (ProjectilePtr), y; x
     sta TempPointX
@@ -3010,16 +3082,20 @@ MoveProjectileVerticaly:
     cmp #PROJECTILE_DIR_UP
     bne @exit
 
-    lda (ProjectilePtr), y ; y
-
+    iny
+    lda (ProjectilePtr), y ; y fraction
     sec
-    sbc #PROJECTILE_SPEED
+    sbc #PROJECTILE_SPEED_FRAC
+    dey
+    lda (ProjectilePtr), y ; y
+    sbc #PROJECTILE_SPEED_INT
 
     sta TempPointY
     sty TempYOffset
     dey
     lda(ProjectilePtr), y ;screen
     sta TempScreen
+    dey
     dey
     lda (ProjectilePtr), y; x
     sta TempPointX
@@ -3031,9 +3107,8 @@ MoveProjectileVerticaly:
     ldy TempYOffset
 
     sta (ProjectilePtr), y ; Y
-    cmp #PROJECTILE_SPEED
+    cmp #PROJECTILE_SPEED_INT
     bcc @return_disable
-
 
     lda #0
     jmp @exit
@@ -4360,7 +4435,7 @@ AnimateWalk:
     inc WalkTimer
 
     lda PlayerSpeed
-    cmp #2
+    cmp #PLAYER_SPEED_RUN_BASE
     beq @fastAnimation
     lda WalkTimer
     cmp #8
@@ -4405,8 +4480,10 @@ HandleInput:
     lda Buttons
     bne @checkAttackTimer ; something is pressed
     ;NO INPUT
-    lda #1
+    lda #PLAYER_SPEED_WALK_BASE
     sta PlayerSpeed
+    lda #PLAYER_SPEED_WALK_FRACTION
+    sta PlayerSpeed + 1
     jmp @finishInput ; no input at all
 
 @checkAttackTimer:
@@ -4463,8 +4540,7 @@ HandleInput:
     lda #0
     sta PlayerFrame
 @resetJustY:
-    lda OldPlayerY
-    sta PlayerY
+    jsr ResetOnlyPlayerY
 
     jmp @contInput
 
@@ -4484,8 +4560,7 @@ HandleInput:
 @resetStuff:
     ;obstacle ahead, restore previous position
     jsr ResetPlayerXMovement
-    lda OldPlayerY
-    sta PlayerY
+    jsr ResetOnlyPlayerY
 
     jmp @finishInput
 
@@ -4502,18 +4577,32 @@ HandleInput:
     lda #INPUT_DELAY
     sta InputUpdateDelay
     rts
+;-------------------------------
+ResetOnlyPlayerY:
+    lda OldPlayerY
+    sta PlayerY
+    lda OldPlayerY + 1
+    sta PlayerY + 1
+
+    rts
 
 ;--------------------------------
 BackupMovement:
 
     lda PlayerX
     sta OldPlayerX
+    lda PlayerX + 1
+    sta OldPlayerX + 1
 
     lda PlayerY
     sta OldPlayerY
+    lda PlayerY + 1
+    sta OldPlayerY + 1
 
     lda ScrollX
     sta OldScrollX
+    lda ScrollX + 1
+    sta OldScrollX + 1
 
     lda ScrollDirection
     sta OldScrollDirection
@@ -4568,8 +4657,12 @@ ResetPlayerXMovement:
 
     lda OldPlayerX
     sta PlayerX
+    lda OldPlayerX + 1
+    sta PlayerX + 1
     lda OldScrollX
     sta ScrollX
+    lda OldScrollX + 1
+    sta OldScrollX + 1
     lda OldScrollDirection
     sta ScrollDirection
     lda OldCurrentMapSegmentIndex
@@ -5051,8 +5144,12 @@ ResetEntityVariables:
     lda #MAX_SPRITE_COUNT
     sta TaintedSprites
 
-    lda #1
+    lda #PLAYER_SPEED_WALK_BASE
     sta PlayerSpeed
+    lda #PLAYER_SPEED_WALK_FRACTION
+    sta PlayerSpeed + 1
+
+    lda #1
     sta HP
     sta Warmth
     sta Food
@@ -5676,8 +5773,10 @@ ProcessButtons:
     sta DirectionX
     sta DirectionY
 
-    lda #1
+    lda #PLAYER_SPEED_WALK_BASE
     sta PlayerSpeed
+    lda #PLAYER_SPEED_WALK_FRACTION
+    sta PlayerSpeed + 1
     jsr CheckA ; speed up only active if dpad is used
 
 ;Check if LEFT is pressed
@@ -5698,8 +5797,13 @@ ProcessButtons:
     lda #1
     sta PlayerFrame
 
-    lda PlayerY
+
+    lda PlayerY + 1 ; fraction
     sec
+    sbc PlayerSpeed + 1
+    sta PlayerY + 1
+
+    lda PlayerY
     sbc PlayerSpeed
     sta PlayerY
 
@@ -5714,8 +5818,12 @@ ProcessButtons:
     sta PlayerFrame
 
 
-    lda PlayerY
+    lda PlayerY + 1 ; fraction
     clc
+    adc PlayerSpeed + 1
+    sta PlayerY + 1
+
+    lda PlayerY
     adc PlayerSpeed
     sta PlayerY
 @exit:
@@ -5733,8 +5841,10 @@ CheckA:
     beq @exit ; no stamina
 
     dec Stamina
-    lda #2
+    lda #PLAYER_SPEED_RUN_BASE
     sta PlayerSpeed
+    lda #PLAYER_SPEED_RUN_FRACTION
+    sta PlayerSpeed + 1
 
 @exit:
     rts
@@ -6317,9 +6427,7 @@ ShootSlingshot:
     dey
 @checkLoop:
 
-    tya
-    asl
-    asl
+    lda projectiles_ram_lookup, y
     tax
     lda Projectiles, x
     lsr
@@ -6329,9 +6437,8 @@ ShootSlingshot:
     bpl @checkLoop
 
 @isEmpty:
-    lda ProjectileCount
-    asl
-    asl
+    ldx ProjectileCount
+    lda projectiles_ram_lookup, x
     tax
 
     lda ProjectileCount
@@ -6367,6 +6474,7 @@ ShootSlingshot:
 
     sta Projectiles, x
     lda CurrentMapSegmentIndex
+    inx ;x2
     inx ;screen
     sta Projectiles, x
     jmp @writeY
@@ -6377,6 +6485,7 @@ ShootSlingshot:
     lda CurrentMapSegmentIndex
     clc
     adc #1
+    inx
     inx ; screen
     sta Projectiles, x
 
@@ -6416,7 +6525,7 @@ LaunchSpear:
     lda PlayerY
     clc
     adc #8
-    sta SpearData + 3
+    sta SpearData + 4
 
     lda PlayerX
     clc
@@ -6424,10 +6533,9 @@ LaunchSpear:
     adc ScrollX
     bcs @incrementScreen
 
-
     sta SpearData + 1
     lda CurrentMapSegmentIndex
-    sta SpearData + 2 ; screen
+    sta SpearData + 3 ; screen
     jmp @exit
 
 @incrementScreen:
@@ -6436,7 +6544,7 @@ LaunchSpear:
     lda CurrentMapSegmentIndex
     clc
     adc #1
-    sta SpearData + 2 ; screen
+    sta SpearData + 3 ; screen
 
 @exit:
 
@@ -6466,60 +6574,46 @@ CheckLeft:
     cmp #120    ;check if player is in the left side of the screen
     bcs @moveLeft
 
-@cont:
-    lda CurrentMapSegmentIndex ; CurrentMapSegment < 1 -> do not scroll
-    beq @firstScreen
-
-;--
-@ScrollGlobalyLeft:
-    lda ScrollX
-    cmp PlayerSpeed
-    bcc @clamp
-
-    sec
-    sbc PlayerSpeed
-    jmp @save
-@clamp:
-
-    dec CurrentMapSegmentIndex
-
-    lda #1
-    sta CurrentScreenWasDecremented
-
-    lda ScrollX
-    sec
-    sbc PlayerSpeed
-    jmp @save
-
-
-@firstScreen:
-
+    lda CurrentMapSegmentIndex ; is first screen
+    bne @cont                  ; nope
     lda ScrollX
     beq @moveLeft
+@cont:
 
-
-    lda ScrollX
-    cmp PlayerSpeed
-    bcc @clamp1
-
-    lda ScrollX
+    lda ScrollX + 1
     sec
+    sbc PlayerSpeed + 1
+    sta ScrollX + 1
+
+    lda ScrollX
     sbc PlayerSpeed
-    jmp @save
 
-@clamp1:
+    sta ScrollX
+    bcs @exit
 
+
+    lda CurrentMapSegmentIndex
+    beq @firstScreen
+    dec CurrentMapSegmentIndex
+    lda #1
+    sta CurrentScreenWasDecremented
+    jmp @exit
+@firstScreen:
     lda #0
-
-@save:
     sta ScrollX
 
     jmp @exit
 
 @moveLeft:
+
+    lda PlayerX + 1 ; fraction
+    sec
+    sbc PlayerSpeed + 1
+    sta PlayerX + 1
+
     lda PlayerX
     beq @exit ; already x=0
-    sec
+
     sbc PlayerSpeed
     sta PlayerX
 
@@ -6556,26 +6650,16 @@ CheckRight:
     cmp ScreenCount
     beq @moveRight
 
+    lda ScrollX + 1
+    clc
+    adc PlayerSpeed + 1
+    sta ScrollX + 1
 
     lda ScrollX
-    cmp #MAX_V_SCROLL
-    bcs @ScrollGlobalyRight
-
-@ScrollGlobalyRight:
-
-    lda #MAX_V_SCROLL
-    sec
-    sbc PlayerSpeed
-    clc
-    adc #1
-    cmp ScrollX
-    bcc @clamp
-    beq @clamp
-
-    lda ScrollX
-    clc
     adc PlayerSpeed
-    jmp @save
+    sta ScrollX
+
+    bcc @exit ; no overflow
 @clamp:
     inc CurrentMapSegmentIndex
     lda #1
@@ -6587,32 +6671,33 @@ CheckRight:
     cmp ScreenCount
     beq @preLastScreen
 
-    lda ScrollX
-    clc
-    adc PlayerSpeed
-    jmp @save
+    jmp @exit
+
 @preLastScreen:
-    lda #0          ;finshed to the last screen, set globalscroll to zero
-
-
-@save:
+    lda #0          ;finshed to the last screen, set scroll to zero
     sta ScrollX
 
     jmp @exit
 
 @moveRight:
-    lda #0
-    sec
-    sbc PlayerSpeed
-    sec 
-    sbc #PLAYER_WIDTH
-    cmp PlayerX
 
-    beq @exit
-    lda PlayerX
+    lda PlayerX + 1
     clc
+    adc PlayerSpeed + 1
+    sta PlayerX + 1
+
+    lda PlayerX
     adc PlayerSpeed
     sta PlayerX
+
+    adc #PLAYER_WIDTH
+    bcc @exit ; not greater than 255? Then fine
+
+    lda #$FF
+    sec
+    sbc #PLAYER_WIDTH
+    sta PlayerX
+
 @exit:
 
     rts
@@ -6652,6 +6737,8 @@ CheckBed:
     sta PlayerInteractedWithBed
     ldy #1
     jsr bankswitch_y
+    lda #STATE_MENU
+    sta GameState
 
     lda #1
     jmp @exit
@@ -6681,6 +6768,8 @@ CheckFireplace:
     sta PlayerInteractedWithFireplace
     ldy #1
     jsr bankswitch_y
+    lda #STATE_MENU
+    sta GameState
 
 
     jmp @exit
@@ -6710,6 +6799,8 @@ CheckStashBox:
     sta PlayerInteractedWithStorage
     ldy #1
     jsr bankswitch_y
+    lda #STATE_MENU
+    sta GameState
 
 
     jmp @exit
@@ -6740,6 +6831,8 @@ CheckToolTable:
     sta PlayerInteractedWithTooltable
     ldy #1
     jsr bankswitch_y
+    lda #STATE_MENU
+    sta GameState
 
 
     jmp @exit

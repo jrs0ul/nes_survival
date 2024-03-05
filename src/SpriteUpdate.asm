@@ -131,7 +131,7 @@ UpdateSprites:
     lsr
     bcc @projectiles
 
-    lda SpearData + 2 ; screen
+    lda SpearData + 3 ; screen
 
     jsr ScreenFilter
     bne @projectiles
@@ -476,7 +476,7 @@ SetTwoSpearSprites:
 
 @spearLoop:
     inx
-    lda SpearData + 3; Y
+    lda SpearData + 4; Y
     clc
     adc spearSprites, y
     sta FIRST_SPRITE, x
@@ -570,15 +570,15 @@ UpdateProjectileSprites:
 
 @projectileLoop:
 
-    lda ProjectileIdx
-    asl
-    asl
+    ldy ProjectileIdx
+    lda projectiles_ram_lookup, y
     tay
 
     lda Projectiles, y
     lsr
     bcc @next ; this projectile is inactive
 
+    iny
     iny
     iny
     lda Projectiles, y ;screen
@@ -591,14 +591,17 @@ UpdateProjectileSprites:
     beq @projectileMatchesScreen
 
     dey
+    dey
     lda Projectiles, y ; x
     sec
     sbc ScrollX
     bcs @next
     sta TempPointX
+    iny
     iny ; screen
     jmp @continueUpdate
 @projectileMatchesScreen:
+    dey
     dey
     lda Projectiles, y ; x
     cmp ScrollX
@@ -606,6 +609,7 @@ UpdateProjectileSprites:
     sec
     sbc ScrollX
     sta TempPointX
+    iny
     iny; screen
 
 @continueUpdate:

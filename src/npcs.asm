@@ -14,15 +14,17 @@ LoadNpcs:
     inx
     iny
     lda (pointer), y
-    sta Npcs, x
+    sta Npcs, x ;x
     iny
     inx
-    lda (pointer), y
-    sta Npcs, x
-    iny
     inx
     lda (pointer), y
-    sta Npcs, x
+    sta Npcs, x ; y
+    iny
+    inx
+    inx
+    lda (pointer), y
+    sta Npcs, x ; screen
     iny
     inx
     lda #1
@@ -45,11 +47,29 @@ LoadNpcs:
 @exit:
 
     rts
+
+;-----------------
+; Calls the routine from the BANK 6
+GenerateNpcs:
+
+    ldy current_bank
+    sty oldbank
+    ldy #6
+    jsr bankswitch_y
+
+    jsr GenNpcs
+
+    ldy oldbank
+    jsr bankswitch_y
+
+    rts
+
+.SEGMENT "ROM6"
 ;-------------------------------------
 ;Parameters: TempNpcCnt - npc number
 ;            TempIndex  - location screen index
 ;Generate random npcs
-GenerateNpcs:
+GenNpcs:
 
     lda InCave
     bne @exit
@@ -82,11 +102,9 @@ GenerateNpcs:
 
 @npcLoop:
 
-    lda TempNpcGenerationIdx
-    asl
-    asl
-    asl
-    tax ; npc slot * 8
+    ldx TempNpcGenerationIdx ; npc slot
+    lda npcs_ram_lookup, x
+    tax
 
     lda TempNpcGenerationIdx
     cmp NpcCount
@@ -186,11 +204,13 @@ GenerateSingleNpc:
     lda (AnimalSpawnPointsPtr), y
     sta Npcs, x
     inx
+    inx
 
     ;y
     iny
     lda (AnimalSpawnPointsPtr), y
     sta Npcs, x
+    inx
     inx
 
     ;screen
@@ -215,6 +235,8 @@ GenerateSingleNpc:
 
 
     rts
+
+.SEGMENT "CODE"
 ;---------------------------------
 EliminateInactiveNpcs:
 
@@ -224,7 +246,7 @@ EliminateInactiveNpcs:
     lda InCave
     bne @exit
     lda LocationIndex
-    cmp #10 ; alien base
+    cmp #LOCATION_ALIEN_BASE ; alien base
     beq @exit
 
     ldy NpcCount
@@ -238,21 +260,20 @@ EliminateInactiveNpcs:
     dey
 
 @npcLoop:
-    tya
-    asl
-    asl
-    asl
-    tax
+    ldx npcs_ram_lookup, y
     stx TempEliminationDest
 
-    lda Npcs, x 
+    lda Npcs, x ; status
     and #%00000111
     cmp #0
     beq @next
-    inx
-    inx
-    inx
-    lda Npcs, x
+
+    txa
+    clc
+    adc #5
+    tax
+
+    lda Npcs, x ;screen
     cmp CurrentMapSegmentIndex
     bcc @eliminate
     cmp FarOffNpcScreen
@@ -305,10 +326,7 @@ IsPlayerCollidingWithNpcs:
 ;-------------------------------------
 SingleNpcVSPlayerCollision:
 
-    tya
-    asl
-    asl
-    asl ; y * 8
+    lda npcs_ram_lookup, y
     tay
 
     lda Npcs, y; let's get the state
@@ -345,9 +363,13 @@ SingleNpcVSPlayerCollision:
     iny
     iny
     iny
+    iny
+    iny
     lda Npcs, y ; screen index where npc resides
-    dey
-    dey
+    dey ;y2
+    dey ;y
+    dey ;x2
+    dey ;x
 
     jsr ScreenFilter
     bne @exit
@@ -375,7 +397,8 @@ SingleNpcVSPlayerCollision:
     sta TempPointX
 
 @calcY: ; Y1
-    iny
+    iny ;x2
+    iny ;y
     lda Npcs, y ; y
     sta TempPointY
 ;-------
@@ -466,24 +489,23 @@ PlayerHitsNpcs:
     rts
 ;-------------------------------------
 CheckSingleNpcAgainstPlayerHit:
-    tya
-    asl
-    asl
-    asl ; y * 8
+    lda npcs_ram_lookup, y
     tay
 
     lda Npcs, y; let's get the state
     and #%00000011 ; ignoring the agitation bit
     sta TempNpcState
     cmp #0
-    beq @exit ; it's dead
+    bne  @cont
 
+    rts ; it's dead
+@cont:
     lda Npcs, y ; let's get DB index
     lsr
     lsr
     lsr ;eliminate 3 state bits
 
-    sty Temp
+    sty TempNpcPosInRam
     asl
     asl
     asl
@@ -495,19 +517,20 @@ CheckSingleNpcAgainstPlayerHit:
     iny
     lda npc_data, y ; npc type
     sta TempNpcType
-    ldy Temp
+    ldy TempNpcPosInRam
 
-    iny
-    iny
-    iny
+    tya
+    clc
+    adc #5
+    tay
     lda Npcs, y ; screen index where npc resides
-    dey
-    dey
+    ldy TempNpcPosInRam
+    iny
 
     jsr ScreenFilter
     bne @exit
 
-    lda Npcs, y
+    lda Npcs, y ; x coord
     sta DropedItemX ; store this for item droping
 
     lda CurrentMapSegmentIndex
@@ -530,6 +553,7 @@ CheckSingleNpcAgainstPlayerHit:
     sta TempPointX
 
 @calcY: ; Y1
+    iny
     iny
     lda Npcs, y ; y
     sta TempPointY
@@ -595,20 +619,20 @@ CollisionWithProjectiles:
 SingleProjectileCollision:
 
 
-    lda ProjectileIdx
-    asl
-    asl
+    ldy ProjectileIdx
+    lda projectiles_ram_lookup, y
     tay
 
     lda Projectiles, y ; dir + status
     lsr
     bcs @proceed
-    
+
     rts
 
 @proceed:
-    iny
-    iny
+    iny;x
+    iny;x2
+    iny;screen
 
     lda Projectiles, y ; screen
     jsr ScreenFilter
@@ -623,7 +647,8 @@ SingleProjectileCollision:
     beq @ProjectileMatchesScreen
     ;don't match
 
-    dey
+    dey ;x2
+    dey ;x
     lda Projectiles, y ; x
     sec
     sbc ScrollX
@@ -633,6 +658,7 @@ SingleProjectileCollision:
 @ProjectileMatchesScreen:
 
     dey
+    dey
     lda Projectiles, y ; x
     cmp ScrollX
     bcc @exit
@@ -641,8 +667,9 @@ SingleProjectileCollision:
 
 @cont:
     sta ProjectileX
-    iny
-    iny
+    iny ;x2
+    iny ;screen
+    iny ;y
     lda Projectiles, y ; y
     sta ProjectileY
 
@@ -685,9 +712,8 @@ SingleProjectileCollision:
 
 @collisionDetected:
 
-    lda ProjectileIdx
-    asl
-    asl
+    ldy ProjectileIdx
+    lda projectiles_ram_lookup, y
     tay
     lda #0
     sta Projectiles, y
@@ -769,7 +795,7 @@ OnCollisionWithAttackRect:
 
     tya
     clc
-    adc #5
+    adc #6 ; go to hp
     tay
 
     lda TempNpcType
@@ -777,7 +803,7 @@ OnCollisionWithAttackRect:
     beq @doneDoingDmg
     cmp #NPC_TYPE_PASSIVE
     bne @continue
-    
+
     rts
 
 @continue:
@@ -824,7 +850,7 @@ OnCollisionWithAttackRect:
 
     tya
     sec
-    sbc #5 ; go to status
+    sbc #7 ; go to status from fame
     tay
 
     lda Npcs, y
@@ -846,7 +872,7 @@ OnCollisionWithAttackRect:
 
     tya
     sec
-    sbc #7  ;5
+    sbc #9 ; going back to status from hp
     tay
     lda Npcs, y
     and #%11111000
@@ -1130,7 +1156,7 @@ BuildSpearAttackSquare:
     lsr
     bcc @exit
 
-    lda SpearData + 2 ; screen
+    lda SpearData + 3 ; screen
 
     jsr ScreenFilter
     bne @exit
@@ -1165,7 +1191,7 @@ BuildSpearAttackSquare:
     asl
     tay
 
-    lda SpearData + 3 ; Y
+    lda SpearData + 4 ; Y
     clc
     adc spearSprites, y
     sta AttackTopLeftY
@@ -1180,7 +1206,7 @@ BuildSpearAttackSquare:
 
     iny
 
-    lda SpearData + 3 ; Y
+    lda SpearData + 4 ; Y
     clc
     adc spearSprites, y
     sta AttackBottomRightY
@@ -1241,10 +1267,8 @@ UpdateNpcSpritesInWorldAtoZ:
 
 ;------------------------------------
 UpdateSingleNpcSprites:
-    tya
-    asl
-    asl
-    asl ; a * 8
+
+    lda npcs_ram_lookup, y ; y is npc index
     tay
 
     lda Npcs, y ; index + agitation + state
@@ -1287,6 +1311,7 @@ UpdateSingleNpcSprites:
     sbc ScrollX
     sta TempPointX
 @calcY:
+    iny
     iny
     lda Npcs, y; y
     sta TempPointY ; save y
@@ -1388,9 +1413,11 @@ CollectSingleNpcData:
 
     sta Temp; store tile rows
 
-    iny
-    iny
-    iny
+    tya
+    clc
+    adc #5
+    tay
+
     lda Npcs, y ; screen index where npc resides
     sta ItemMapScreenIndex
     clc
@@ -1419,7 +1446,7 @@ CollectSingleNpcData:
 
     tya
     sec
-    sbc #5
+    sbc #7 ; back to npcs's x coord
     tay
 
 @exit:
@@ -1494,11 +1521,8 @@ doNpcAI:
     beq @exit ; no npcs here
     dey; npcCount - 1, first index
 @npcLoop:
-    
-    tya
-    asl
-    asl
-    asl ; a * 8
+
+    lda npcs_ram_lookup, y ;npc start
     tax
 
     lda Npcs, x ;type + active
@@ -1511,7 +1535,7 @@ doNpcAI:
     
     txa
     clc
-    adc #6 ;timer
+    adc #8 ;go to timer
     tax
 
     lda Npcs, x
@@ -1524,11 +1548,15 @@ doNpcAI:
 
 @cont:
     jsr FetchNpcVars
-    
-    inx
-    inx
-    inx
+
+    txa
+    clc
+    adc #5 ; go to screen value
+    tax
+
     lda Npcs, x; screen
+    dex
+    dex
     dex
     dex
 
@@ -1552,8 +1580,10 @@ doNpcAI:
 ;-----------end of filter----------
 
 @doAI:
-    inx
-    inx
+    inx ;x2
+    inx ;y
+    inx ;y2
+    inx ;screen
     sty TempPush
     jsr SingleNpcAI
     ldy TempPush
@@ -1570,11 +1600,11 @@ doNpcAI:
 
 ;-----------------------------------
 FetchNpcVars:
-    lda Npcs, x
+    lda Npcs, x ;type & status
     lsr
     lsr
     lsr
-    sta TempNpcIndex
+    sta TempNpcIndex ;extracted type index
     stx TempIndex
     asl
     asl
@@ -1668,7 +1698,7 @@ SingleNpcAI:
     ;return x from "timer" back to "state"
     txa
     sec
-    sbc #6
+    sbc #8
     tax
 
     lda Npcs, x
@@ -1761,6 +1791,8 @@ CalcNPCXYOnScreen:
     lda Npcs, x ; screen index where npc resides
     dex
     dex
+    dex
+    dex
 
 
     jsr ScreenFilter
@@ -1786,6 +1818,7 @@ CalcNPCXYOnScreen:
     sta TempPointX
 
 @calcY: ; Y1
+    inx
     inx
     lda Npcs, x ; y
     sta TempPointY
@@ -2011,15 +2044,17 @@ NpcMovement:
 @saveTimer:
     sta Npcs, x; tics
     sta TempNpcTimer
-    dex ; frame
-    dex ; direction
-    dex ; screen
-    dex ; y
-    dex ; x
+
+    txa
+    sec
+    sbc #7 ;move from 'timer' to 'x coord'
+    tax
     stx NpcXPosition ; index at x
 
     lda #NPC_SPEED
     sta TempNpcSpeed
+    lda #NPC_SPEED_FRACTION
+    sta TempNpcSpeed + 1
 
 
     lda TempNpcType
@@ -2033,20 +2068,29 @@ NpcMovement:
     beq @done_timid ; not agitated
     lda #NPC_SPEED_AGITATED ; if agitated, go realy fast
     sta TempNpcSpeed
+    lda #NPC_SPEED_AGITATED_FRACTION
+    sta TempNpcSpeed + 1
 @done_timid:
     inx
 @continue_move:
     ;Calculate npcs new X and Y using the movement direction
     ;----------
     ;store the new coordinates, because there might not be any direction
-    ;but we need the collision detection working
-    lda Npcs, x
+    ;but we still need the collision detection working
+
+    lda Npcs, x ; x integer part
     sta NewNpcX
     inx
-    lda Npcs, x
+    lda Npcs, x ; fraction
+    sta NewNpcX + 1
+    inx
+    lda Npcs, x ; y integer part
     sta NewNpcY
     inx
-    lda Npcs, x
+    lda Npcs, x ; y fraction
+    sta NewNpcY + 1
+    inx
+    lda Npcs, x ; screen
     sta NewNpcScreen
     ;now let's see if the npc is moving any of the directions
     ldx NpcXPosition
@@ -2060,8 +2104,13 @@ NpcMovement:
 
     ;calculate X going right
 
-    lda Npcs, x ; load x
+    inx
+    lda Npcs, x ; load x fraction
     clc
+    adc TempNpcSpeed + 1
+    sta NewNpcX + 1
+    dex
+    lda Npcs, x ; load x
     adc TempNpcSpeed
     bcs @IncreaseScreen
     sta NewNpcX
@@ -2072,8 +2121,10 @@ NpcMovement:
     sta NewNpcX
     ;increase npc screen if needed
 
-    inx
-    inx
+    inx ;x2
+    inx ;y
+    inx ;y2
+    inx ;screen
     lda Npcs, x
     clc
     adc #1
@@ -2084,12 +2135,14 @@ NpcMovement:
 @movingLeft:
     ;calculate X going left
 
-    lda Npcs, x ; load x
-    sta Temp
+    inx
+    lda Npcs, x ; load x fraction
     sec
+    sbc TempNpcSpeed + 1
+    dex
+    lda Npcs, x ; load x
     sbc TempNpcSpeed
-    cmp Temp
-    bcs @DecreaseScreen
+    bcc @DecreaseScreen
 
     sta NewNpcX
     jmp @movesVerticaly
@@ -2098,7 +2151,9 @@ NpcMovement:
 
     sta NewNpcX
     ;decrease npc screen if needed
+    inx ;x2
     inx ;y
+    inx ;y2
     inx ;screen
     lda Npcs, x; current screen
     sec
@@ -2113,15 +2168,20 @@ NpcMovement:
     cmp #1
     bne @movesDown
 
-    ;calculate Y going up
+;calculate Y going up
 
     ldx NpcXPosition
+    inx
     inx ; move to y
-    lda Npcs, x
+    inx ; fraction
+    lda Npcs, x ; y coord fraction
 
     sec
+    sbc TempNpcSpeed + 1
+    sta NewNpcY + 1
+    dex ;main y
+    lda Npcs, x; y
     sbc TempNpcSpeed
-
     sta NewNpcY
 
     jmp @doneCallculation
@@ -2132,11 +2192,16 @@ NpcMovement:
     ;calculate Y going down
 
     ldx NpcXPosition
+    inx
     inx ; move to y
-    lda Npcs, x
+    inx ; fraction
+    lda Npcs, x ; y coord
     clc
+    adc TempNpcSpeed + 1
+    sta NewNpcY + 1
+    dex
+    lda Npcs, x
     adc TempNpcSpeed
-
     sta NewNpcY
 
 
@@ -2144,7 +2209,9 @@ NpcMovement:
     ;--------------
     ;let's check collision with the player
     ldx NpcXPosition
+    inx ;x2
     inx ;y
+    inx ;y2
     inx ;screen
 
     jsr OnCollisionWithPlayer
@@ -2174,9 +2241,12 @@ NpcMovement:
     jsr TestCollisionGoingVerticaly
     cmp #1
     beq @changeDir
-    lda TempZ;stored Y
+    lda NewNpcY + 1
     dex
-    sta Npcs, x ; y
+    sta Npcs, x ; y fraction
+    dex ;y
+    lda NewNpcY
+    sta Npcs, x ; integer y
 
     jmp @nextNpc
 @goDown:
@@ -2185,8 +2255,11 @@ NpcMovement:
     jsr TestCollisionGoingVerticaly
     cmp #1
     beq @changeDir
-    lda TempZ
-    dex
+    dex ;y2
+    lda NewNpcY + 1
+    sta Npcs, x ; y fraction
+    dex ;y
+    lda NewNpcY
     sta Npcs, x; y
     jmp @nextNpc
 ;-------------
@@ -2199,7 +2272,6 @@ NpcMovement:
 
 CheckAgitationByPlayer:
     ; x reg at x coord
-
     stx TempRegX
 
     lda PlayerY
@@ -2247,12 +2319,13 @@ CheckAgitationByPlayer:
     cmp TempPlayerRangeX1
     bcc @exit
 
+    inx ; y2
     inx ; y
-    lda Npcs, x
+    lda Npcs, x ; y coord
     cmp TempPlayerRangeY2
     bcs @exit
 
-    lda Npcs, x
+    lda Npcs, x ; y coord
     clc
     adc #16
     cmp TempPlayerRangeY1
@@ -2289,11 +2362,12 @@ HorizontalMovement:
     cmp ScreenCount
     bcs @changeDir
 
+    inx
     inx ;y
+    inx ;
     inx ;screen
-    sta Npcs, x
-    dex
-    dex
+    sta Npcs, x ;save screen
+    ldx NpcXPosition
 
     jmp @YMovement
 
@@ -2306,17 +2380,18 @@ HorizontalMovement:
     jsr TestCollisionGoingLeft
     cmp #1 
     beq @changeDir ;collides
-    jsr SaveX
+    jsr SaveX ; sets x to x coord
 
     lda NewNpcScreen
     cmp ScreenCount
     bcs @changeDir
 
+    inx ;x2
     inx ;y
+    inx ;y2
     inx ;screen
-    sta Npcs, x
-    dex
-    dex
+    sta Npcs, x ;save the screen
+    ldx NpcXPosition
 
     jmp @YMovement
 
@@ -2330,8 +2405,12 @@ HorizontalMovement:
 ;--------------------------
 SaveX:
     ldx NpcXPosition
-    lda TempX
+    lda NewNpcX
     sta Npcs, x ;save x
+    inx
+    lda NewNpcX + 1
+    sta Npcs, x
+    ldx NpcXPosition
 
     rts
 
@@ -2357,8 +2436,9 @@ ChangeNpcDirection:
 @timid:
 
     jsr SetDirectionForTimidNpc
-    beq @storeDirection ; else do random
+    beq @storeDirection ; if 0 in register A
 
+    ;else do random
 @randomDir:
     inx ; increase to direction
     ;just random movement
@@ -2388,28 +2468,28 @@ ChangeNpcDirection:
     rts
 ;------------------------------
 SetDirectionForBoar:
-    
 
-    dex
-    dex
-    dex
+    stx TempScreenPos
+
+    txa
+    sec
+    sbc #5 ;from screen to npc status
+    tax
+
     lda Npcs, x
     and #%00000100
     beq @doRandom
 
 
 @done:
-    inx ; x
-    inx ; y
-    inx ; screen
+    ldx TempScreenPos
     jsr SetDirectionsForPredatorNpc
     lda #0
     jmp @end
 
 @doRandom:
-    inx
-    inx
-    inx
+
+    ldx TempScreenPos
     lda #1
 @end:
 
@@ -2425,9 +2505,10 @@ PredatorDirectionChangePrep:
     lda TempNpcWidth
     lsr ; middle of width
     clc
-    adc Npcs, x; x
+    adc Npcs, x; x coord
 
     sta TempPointX
+    inx
     inx
 
     lda TempNpcRows
@@ -2445,6 +2526,7 @@ PredatorDirectionChangePrep:
     adc Npcs, x; y
     sta TempPointY
 
+    inx ;y2
     inx ;screen
     inx ;direction
 
@@ -2471,7 +2553,9 @@ PredatorDirectionChangePrep:
 ;-------------------------------
 SetDirectionsForPredatorNpc:
 
-    dex
+    dex ; y2
+    dex ; y
+    dex ; x2
     dex ; x
 
     jsr PredatorDirectionChangePrep
@@ -2517,10 +2601,11 @@ SetDirectionsForPredatorNpc:
 ;if A is 0 then direction is set
 ;----------------------
 SetDirectionForTimidNpc:
-
-    dex
-    dex
-    dex ; index + status
+    ;x is at screen
+    txa
+    sec
+    sbc #5 ; go back to status
+    tax
     lda Npcs, x
     and #%00000100 ; check the agitation bit
     beq @doRandom
@@ -2540,8 +2625,9 @@ SetDirectionForTimidNpc:
     clc
     adc #8
     sta TempZ
-
+    inx ;x2
     inx ;y
+    inx ;y2
     inx ;screen
     inx ;direction
 
@@ -2596,10 +2682,12 @@ SetDirectionForTimidNpc:
 @done:
     lda #0
     jmp @end
+
 @doRandom:
-    inx ;x
-    inx ;y
-    inx ; screen
+    txa
+    clc
+    adc #5 ; move to 'screen' from 'status'
+    tax
     lda #1
 @end:
 
@@ -2625,6 +2713,7 @@ TestCollisionGoingRight:
 @cont:
     ldx NpcXPosition
     inx
+    inx
     lda Npcs, x ;y
     clc
     adc TempYOffset
@@ -2632,8 +2721,10 @@ TestCollisionGoingRight:
 
     jsr TestPointAgainstCollisionMap
     ldx NpcXPosition
-    inx
-    inx ;increment to screen idx
+    inx ;x2
+    inx ;y
+    inx ;y2
+    inx ;screen
     ;collision result is in A
 
     rts
@@ -2642,6 +2733,7 @@ TestCollisionGoingLeft:
     stx TempIndex ; save x reg
     sta TempX
     sta TempPointX
+    inx
     inx
     lda Npcs, x ; y
     clc
@@ -2652,7 +2744,9 @@ TestCollisionGoingLeft:
     jsr TestPointAgainstCollisionMap
     ldx TempIndex
     inx
+    inx ;y
     inx
+    inx ; screen
     ;collision result is in A
     rts
 ;--------------------------------------
@@ -2687,14 +2781,16 @@ TestCollisionGoingVerticaly:
 
 @exit:
     ldx NpcXPosition
-    inx
+    inx ; x2
+    inx ; y
+    inx ; y2
     inx ; screen
 
     rts
 ;-----------------------------------------------------
 ;does an npc collide with the player
 OnCollisionWithPlayer:
-
+    ;x is at screen
     ;calc player box
     lda PlayerX
     clc
@@ -2707,19 +2803,20 @@ OnCollisionWithPlayer:
     sta TempY
     ;---------------
 
-    dex
+    ;dex ;y2
+    ;dex ;y
     lda NewNpcY
     sta TempPointY
 
 ;----x position to check
-    dex
-
+    ;dex ;x2
+    ;dex ;x
     lda NewNpcX
     sec
     sbc ScrollX
     sta TempPointX
-    inx
-    inx ; back to screen idx
+    ;inx
+    ;inx ; back to screen idx
 ;-----
 
     lda TempNpcRows
@@ -2773,7 +2870,7 @@ OnCollisionWithPlayer:
 
     txa
     clc
-    adc #5 ;move from "state" to "frame"
+    adc #7 ;move from "state" to "frame"
     tax 
 
     lda #NPC_ATTACK_FRAME
