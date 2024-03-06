@@ -2020,9 +2020,19 @@ CanNpcFacingDownHitPlayer:
 ;---------------------------
 
 NpcMovement:
+    lda #0
+    sta TempNpcMovesDiagonaly
     inx
     lda Npcs, x ; load dir
     sta TempDir
+    ;let's detect if the npc moves diagonaly
+    cmp #4
+    bcc @notDiagonalDir
+    and #%00000011
+    beq @notDiagonalDir
+    lda #1
+    sta TempNpcMovesDiagonaly
+@notDiagonalDir:
     inx
     lda Npcs, x ; frame, 0..128, step 2
     clc
@@ -2051,6 +2061,13 @@ NpcMovement:
     tax
     stx NpcXPosition ; index at x
 
+    lda TempNpcMovesDiagonaly
+    beq @movesNormaly
+    lda #NPC_SPEED_DIAG
+    sta TempNpcSpeed
+    lda #NPC_SPEED_DIAG_FRACTION
+    sta TempNpcSpeed + 1
+@movesNormaly:
     lda #NPC_SPEED
     sta TempNpcSpeed
     lda #NPC_SPEED_FRACTION
@@ -2066,6 +2083,14 @@ NpcMovement:
     lda Npcs, x ; index and stuff
     and #%00000100 ; check agitated bit
     beq @done_timid ; not agitated
+
+    lda TempNpcMovesDiagonaly
+    beq @movesnormalyagitated
+    lda #NPC_SPEED_AGITATED_DIAG ; if agitated, go realy fast
+    sta TempNpcSpeed
+    lda #NPC_SPEED_AGITATED_DIAG_FRACTION
+    sta TempNpcSpeed + 1
+@movesnormalyagitated:
     lda #NPC_SPEED_AGITATED ; if agitated, go realy fast
     sta TempNpcSpeed
     lda #NPC_SPEED_AGITATED_FRACTION

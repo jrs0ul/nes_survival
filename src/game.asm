@@ -367,11 +367,22 @@ projectiles_ram_lookup: ; max 10 projectiles
     NPC_SPEED_FRACTION         = 44
     NPC_SPEED_AGITATED         = 1
     NPC_SPEED_AGITATED_FRACTION= 154
+
+    NPC_SPEED_DIAG                   = 0
+    NPC_SPEED_DIAG_FRACTION          = 212
+    NPC_SPEED_AGITATED_DIAG          = 1
+    NPC_SPEED_AGITATED_DIAG_FRACTION = 34
+
 .else
     NPC_SPEED                  = 0
     NPC_SPEED_FRACTION         = 250
     NPC_SPEED_AGITATED         = 1
     NPC_SPEED_AGITATED_FRACTION= 128
+
+    NPC_SPEED_DIAG                   = 0
+    NPC_SPEED_DIAG_FRACTION          = 177
+    NPC_SPEED_AGITATED_DIAG          = 1
+    NPC_SPEED_AGITATED_DIAG_FRACTION = 16
 .endif
 
     MAX_SPRITE_COUNT           = 64
@@ -1502,8 +1513,11 @@ TempScreenPos:
 TempNpcPosInRam:
     .res 1
 
+TempNpcMovesDiagonaly:
+    .res 1
+
 Buffer:
-    .res 182  ;must see how much is still available
+    .res 181  ;must see how much is still available
 
 ;====================================================================================
 
