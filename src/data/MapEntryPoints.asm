@@ -60,28 +60,30 @@ MapEntryPoints:
     .byte 8, 0, 0, 255, 0, 255, 0, 32
     ;18.granny's house
     .byte 8, 0, 118, 122, 150, 155, 104, 111
+    ;19.secret cave
+    .byte 8, 2, 160, 176,   0,   0, 144, 152
     ;-------------------
-    ;19.exit from grannys house
+    ;20.exit from grannys house
     .byte 9, 0, 0, 255, 0, 255, 151, 255
     ;--------------------
-    ;20.alien base exit top
+    ;21.alien base exit top
     .byte 10, 0, 0, 5, 0, 255, 88, 111
-    ;21.alien base exit bottom
+    ;22.alien base exit bottom
     .byte 10, 0, 0, 5, 0, 255, 160, 200
     ;--------------------------
-    ;22.exit from cave location to bjorn's location
+    ;23.exit from cave location to bjorn's location
     .byte 11, 0, 0, 255, 0,255, 222, 255
-    ;23.cave entrance from location 11
+    ;24.cave entrance from location 11
     .byte 11, 0, 140, 151, 0, 255, 40, 50
-    ;24. Boss room entrance
+    ;25. Boss room entrance
     .byte 10, 1, 238, 255, 0, 255, 112, 128
     ;-------------------------------------
-    ;25 Boss room exit
+    ;26 Boss room exit
     .byte 12, 0, 0, 4, 0, 255, 112, 127
     ;-------------------------------------
-    ;26 Dark cave exit to light cave
+    ;27 Dark cave exit to light cave
     .byte 13, 0, 0, 5, 0, 255, 32, 55
-    ;27 alien base entrance bottom
+    ;28 alien base entrance bottom
     .byte 13, 1, 232, 255, 0, 255, 32, 55
 
 
@@ -117,7 +119,7 @@ MapSpawnPoint:
     .byte 100, 48, 2, OUTDOORS_LOC3_SCREEN_COUNT, <Outside3_items, >Outside3_items, 0, 0, 0
     .byte 0, 0, 0, 2, 0, 0, 0
     ;granny location
-    .byte 77, 42, 8, 2, <granny_location_items, >granny_location_items, 5,  0, 0
+    .byte 77, 42, 8, OUTDOORS_LOC9_SCREEN_COUNT, <granny_location_items, >granny_location_items, 5,  0, 0
     .byte 0, 0, 0, 2, 0, 0, 0
     ;---------------------
     ;Bear's house entrance
@@ -172,9 +174,12 @@ MapSpawnPoint:
     ;granny's house
     .byte 123, 148, 9, 1, <House_items, >House_items, 0, 0, 0
     .byte 1, <grannys_hut, >grannys_hut, 0, <villager3_npcs, >villager3_npcs, 0
+    ;secret cave
+    .byte 100, 100, 14, 1, <House_items, >House_items, 0, 0, 0
+    .byte 0, 0, 0, 0, 0, 0, 0
     ;--------------------
     ;granny's house exit to the location 8
-    .byte 119, 126, 8, 2, <granny_location_items, >granny_location_items, 5, 154, 0
+    .byte 119, 126, 8, OUTDOORS_LOC9_SCREEN_COUNT, <granny_location_items, >granny_location_items, 5, 154, 0
     .byte 0, 0, 0, 2, 0, 0, 0
     ;------------
     ;alien base exit top
@@ -220,12 +225,13 @@ LocationScreenCountList:
     .byte 1                          ; 5 Hedgehog
     .byte OUTDOORS_LOC7_SCREEN_COUNT ; 6 cave
     .byte 2                          ; 7 crashsite
-    .byte 2                          ; 8 granny location
+    .byte OUTDOORS_LOC9_SCREEN_COUNT ; 8 granny location
     .byte 1                          ; 9 granny's hut
     .byte 2                          ; 10 alien base
     .byte 1                          ; 11 location where cave is
     .byte 1                          ; 12 boss room
     .byte 2                          ; 13 dark cave
+    .byte 1                          ; 14 secret cave
 
 ;what is index(0..N) for entry points for each location
 ;note: a loction can have multiple entry points
@@ -239,11 +245,12 @@ LocationEntryPointsPos:
     .byte 12  ;6
     .byte 16  ;7
     .byte 17  ;8
-    .byte 19  ;9
-    .byte 20  ;10
-    .byte 22  ;11
-    .byte 25  ;12
-    .byte 26  ;13
+    .byte 20  ;9
+    .byte 21  ;10
+    .byte 23  ;11
+    .byte 26  ;12
+    .byte 27  ;13
+    .byte 29  ;14
 
 
 ;which location in which bank
@@ -262,6 +269,7 @@ LocationBanks:
     .byte 5  ;11
     .byte 6  ;12
     .byte 4  ;13
+    .byte 6  ;14
 
 
 ;indexes in Item_Location1_Collection_times
@@ -275,6 +283,7 @@ LocationItemIndexes:
     .byte ITEM_COUNT_LOC1 + ITEM_COUNT_LOC2 + ITEM_COUNT_LOC3 ;6
     .byte ITEM_COUNT_LOC1 + ITEM_COUNT_LOC2 + ITEM_COUNT_LOC3 + ITEM_COUNT_LOC7 ;7 crashsite
     .byte ITEM_COUNT_LOC1 + ITEM_COUNT_LOC2 + ITEM_COUNT_LOC3 + ITEM_COUNT_LOC7 + ITEM_COUNT_LOC8
+    .byte 0
     .byte 0
     .byte 0
     .byte 0
@@ -296,6 +305,7 @@ LocationItemCounts:
     .byte 0
     .byte 0
     .byte 0
+    .byte 0
 
 LocationsWithRespawnableItems:
     .byte 1 ; 0
@@ -312,4 +322,5 @@ LocationsWithRespawnableItems:
     .byte 0 ; 11
     .byte 0 ; 12  boss
     .byte 0 ; 13  dark cave
+    .byte 0 ; 14
 

@@ -95,10 +95,10 @@ spawnpoints_loc_9:
     .byte 48, 128
     .byte 98, 160
 
-    .byte 0, 0
-    .byte 0, 0
-    .byte 0, 0
-    .byte 0, 0
+    .byte 120, 72
+    .byte 138, 184
+    .byte 48, 128
+    .byte 98, 160
 
     .byte 0, 0
     .byte 0, 0

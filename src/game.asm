@@ -125,6 +125,7 @@ game_over_sprites:
 .include "data/maps/crashsite.asm"
 .include "data/maps/babloc1.asm"
 .include "data/maps/babloc2.asm"
+.include "data/maps/babloc3.asm"
 .include "data/maps/location_with_cave.asm"
 
 ;=============================================================
@@ -137,6 +138,7 @@ FAMISTUDIO_CFG_C_BINDINGS = 0
 .include "famistudio_ca65.asm"
 
 .include "data/maps/alien_bossroom.asm"
+.include "data/maps/secret_cave0.asm"
 .include "data/AnimalSpawnPositions.asm"
 ;=============================================================
 
@@ -470,7 +472,7 @@ projectiles_ram_lookup: ; max 10 projectiles
     MAX_TILE_SCROLL_RIGHT      = 8
 
 
-    ENTRY_POINT_COUNT          = 28
+    ENTRY_POINT_COUNT          = 29
 
     SLEEP_POS_X                = 100
     SLEEP_POS_Y                = 72
@@ -495,6 +497,8 @@ projectiles_ram_lookup: ; max 10 projectiles
     OUTDOORS_LOC2_SCREEN_COUNT = 2
     OUTDOORS_LOC3_SCREEN_COUNT = 2
     OUTDOORS_LOC7_SCREEN_COUNT = 2 ; cave
+    OUTDOORS_LOC9_SCREEN_COUNT = 3 ; granny's
+
     PLAYER_START_X             = $50
     PLAYER_START_Y             = 200
 
@@ -2314,7 +2318,6 @@ UploadBgColumns:
     adc #$C0
     sta pointer
     lda map_list_high, y
-    clc
     adc #$3
     sta pointer + 1
 

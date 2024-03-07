@@ -43,7 +43,7 @@ map_list_low:
 
     .byte <babloc1
     .byte <babloc2
-    .byte 0
+    .byte <babloc3
     .byte 0
 
     .byte <grannys_hut
@@ -68,6 +68,11 @@ map_list_low:
 
     .byte <dark_cave0
     .byte <dark_cave1
+    .byte 0
+    .byte 0
+
+    .byte <secret_cave0
+    .byte 0
     .byte 0
     .byte 0
 
@@ -116,7 +121,7 @@ map_list_high:
 
     .byte >babloc1
     .byte >babloc2
-    .byte 0
+    .byte >babloc3
     .byte 0
 
     .byte >grannys_hut
@@ -141,5 +146,10 @@ map_list_high:
 
     .byte >dark_cave0
     .byte >dark_cave1
+    .byte 0
+    .byte 0
+
+    .byte >secret_cave0
+    .byte 0
     .byte 0
     .byte 0
