@@ -2208,10 +2208,6 @@ UpdateDestructableTiles:
 ;Check and upload background columns from rom map to the PPU
 UploadBgColumns:
 
-    lda MustUpdateMapColumn
-    beq @updateAttributes
-
-@checkScreenCount: ;we might not need to update columns for 2 screens
     lda ScreenCount
     cmp #MIN_SCREEN_COUNT_TO_UPDATE
     bcs @bigmap
@@ -2219,6 +2215,10 @@ UploadBgColumns:
     rts
 
 @bigmap:
+
+    lda MustUpdateMapColumn
+    beq @updateAttributes
+
     lda LocationIndex
     asl
     asl
