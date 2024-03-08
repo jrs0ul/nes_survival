@@ -35,6 +35,14 @@ Outside2_items:
     .byte %00100001, 1, 200, 144
     .byte %00001001, 1, 160, 72
 
+secret_cave_items:
+    .byte ITEM_COUNT_LOC14
+    .byte %00001111, 0, 200, 60
+    .byte %00001111, 0, 220, 68
+    .byte %00001111, 0, 180, 76
+    .byte %00001111, 0, 200, 78
+    .byte %00001111, 0, 150, 65
+
 Outside3_items:
     .byte ITEM_COUNT_LOC3
     .byte %00001101, 0, 50, 150

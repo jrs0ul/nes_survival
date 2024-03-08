@@ -61,7 +61,7 @@ MapEntryPoints:
     ;18.granny's house
     .byte 8, 0, 118, 122, 150, 155, 104, 111
     ;19.secret cave
-    .byte 8, 2, 160, 176,   0,   0, 144, 152
+    .byte 8, 2, 156, 167,   0,   255, 130, 135
     ;-------------------
     ;20.exit from grannys house
     .byte 9, 0, 0, 255, 0, 255, 151, 255
@@ -85,6 +85,9 @@ MapEntryPoints:
     .byte 13, 0, 0, 5, 0, 255, 32, 55
     ;28 alien base entrance bottom
     .byte 13, 1, 232, 255, 0, 255, 32, 55
+    ;-------------------------------------
+    ;29 Secret cave exit
+    .byte 14, 0, 0, 255, 0, 255, 222, 255
 
 
 .segment "ROM0"
@@ -175,7 +178,7 @@ MapSpawnPoint:
     .byte 123, 148, 9, 1, <House_items, >House_items, 0, 0, 0
     .byte 1, <grannys_hut, >grannys_hut, 0, <villager3_npcs, >villager3_npcs, 0
     ;secret cave
-    .byte 100, 100, 14, 1, <House_items, >House_items, 0, 0, 0
+    .byte 127, 209, 14, 1, <secret_cave_items, >secret_cave_items, 0, 0, 0
     .byte 0, 0, 0, 0, 0, 0, 0
     ;--------------------
     ;granny's house exit to the location 8
@@ -210,6 +213,10 @@ MapSpawnPoint:
     ;alien base entrance bottom
     .byte 15, 170, 10, 2, <House_items, >House_items, 4, 0, 0
     .byte 0, 0, 0, 0, <alien_base_npcs, >alien_base_npcs, 0
+    ;---------------------
+    ;secret cave exit to location 8
+    .byte 156, 140, 8, OUTDOORS_LOC9_SCREEN_COUNT, <granny_location_items, >granny_location_items, 5, 0 ,2
+    .byte 0, 0, 0, 2, 0, 0, 0
 
 
 
@@ -288,7 +295,7 @@ LocationItemIndexes:
     .byte 0
     .byte 0
     .byte 0
-    .byte 0
+    .byte ITEM_COUNT_LOC1 + ITEM_COUNT_LOC2 + ITEM_COUNT_LOC3 + ITEM_COUNT_LOC7 + ITEM_COUNT_LOC8 + ITEM_COUNT_LOC9
 
 LocationItemCounts:
     .byte ITEM_COUNT_LOC1  ; 0
@@ -299,13 +306,13 @@ LocationItemCounts:
     .byte 0                ; 5
     .byte ITEM_COUNT_LOC7  ; 6 cave
     .byte ITEM_COUNT_LOC8  ; 7 crashsite
-    .byte ITEM_COUNT_LOC9  ; 9 granny location
-    .byte 0
-    .byte 0
-    .byte 0
-    .byte 0
-    .byte 0
-    .byte 0
+    .byte ITEM_COUNT_LOC9  ; 8 granny location
+    .byte 0                ; 9
+    .byte 0                ; 10
+    .byte 0                ; 11
+    .byte 0                ; 12
+    .byte 0                ; 13
+    .byte ITEM_COUNT_LOC14 ; 14 secret cave
 
 LocationsWithRespawnableItems:
     .byte 1 ; 0

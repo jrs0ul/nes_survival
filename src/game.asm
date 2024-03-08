@@ -472,7 +472,7 @@ projectiles_ram_lookup: ; max 10 projectiles
     MAX_TILE_SCROLL_RIGHT      = 8
 
 
-    ENTRY_POINT_COUNT          = 29
+    ENTRY_POINT_COUNT          = 30
 
     SLEEP_POS_X                = 100
     SLEEP_POS_Y                = 72
@@ -592,6 +592,7 @@ projectiles_ram_lookup: ; max 10 projectiles
     ITEM_COUNT_LOC7            = 3
     ITEM_COUNT_LOC8            = 1
     ITEM_COUNT_LOC9            = 1
+    ITEM_COUNT_LOC14           = 5
 
     ITEM_NEVER_BEEN_PICKED     = 255
 
@@ -1411,6 +1412,8 @@ Item_Location8_Collection_times:
     .res ITEM_COUNT_LOC8
 Item_Location9_Collection_times:
     .res ITEM_COUNT_LOC9
+Item_Location14_Collection_times:
+    .res ITEM_COUNT_LOC14
 
 Npcs:   ;animals and stuff
     .res 160 ; max 16 npcs * 10 bytes:
@@ -1521,7 +1524,7 @@ TempNpcMovesDiagonaly:
     .res 1
 
 Buffer:
-    .res 181  ;must see how much is still available
+    .res 176  ;must see how much is still available
 
 ;====================================================================================
 
@@ -3452,10 +3455,10 @@ RoutinesAfterFadeOut:
 
     jsr OnExitVillagerHut
     ;----------------------------
-    ;23.cave entrance from location 11
+    ;24.cave entrance from location 11
 @next11:
     lda ActiveMapEntryIndex
-    cmp #23
+    cmp #24
     bne @next12
 
     lda #1
@@ -3531,10 +3534,10 @@ RoutinesAfterFadeOut:
     jsr SpawnSpecialItemOwnerReward
 
     ;-------------------------------
-    ;19.exit from grannys house
+    ;20.exit from grannys house
 @next18:
     lda ActiveMapEntryIndex
-    cmp #19
+    cmp #20
     bne @next19
 
     lda #2
@@ -3542,11 +3545,11 @@ RoutinesAfterFadeOut:
 
     jsr OnExitVillagerHut
     ;-----------------------------
-    ;27.alien base entrance bottom
+    ;28.alien base entrance bottom
 @next19:
 
     lda ActiveMapEntryIndex
-    cmp #27
+    cmp #28
     bne @next20
 
     lda #0
@@ -3574,21 +3577,21 @@ RoutinesAfterFadeOut:
 
 
     ;--------------------
-    ;20.alien base exit top
+    ;21.alien base exit top
 @next21:
 
     lda ActiveMapEntryIndex
-    cmp #20
+    cmp #21
     bne @next22
 
     lda #1
     sta InCave
     ;--------------------------
-    ;21.alien base exit to the dark cave
+    ;22.alien base exit to the dark cave
 @next22:
 
     lda ActiveMapEntryIndex
-    cmp #21
+    cmp #22
     bne @next24
 
     jsr IsLampInInventory
@@ -3600,11 +3603,11 @@ RoutinesAfterFadeOut:
     sta CurrentMapPalettePtr + 1
 
 
-    ;24. Boss room entrance
+    ;25. Boss room entrance
 @next24:
 
     lda ActiveMapEntryIndex
-    cmp #24
+    cmp #25
     bne @next25
 
     lda #<alien_palette
@@ -3625,11 +3628,11 @@ RoutinesAfterFadeOut:
     lda #1
     sta MustPlayNewSong
 
-    ;25 Boss room exit
+    ;26 Boss room exit
 @next25:
 
     lda ActiveMapEntryIndex
-    cmp #25
+    cmp #26
     bne @next26
 
     lda #<alien_palette
@@ -3643,10 +3646,10 @@ RoutinesAfterFadeOut:
     lda #1
     sta MustPlayNewSong
 
-    ;26 exit to light cave
+    ;27 exit to light cave
 @next26:
     lda ActiveMapEntryIndex
-    cmp #26
+    cmp #27
     bne @next27
 
     lda #1
@@ -3668,7 +3671,26 @@ RoutinesAfterFadeOut:
 
 
 @next28:
+    lda ActiveMapEntryIndex
+    cmp #19
+    bne @next29
 
+    lda #4
+    sta MapTilesetBankNo
+    lda #1
+    sta MustCopyMainChr
+
+
+@next29:
+    lda ActiveMapEntryIndex
+    cmp #29
+    bne @next30
+
+    lda #1
+    sta MustCopyMainChr
+
+
+@next30:
     lda DetectedMapType
     bne @itsAnIndoorMap
     lda #1
