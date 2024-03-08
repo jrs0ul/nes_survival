@@ -74,9 +74,15 @@ LoadOutsideMap:
     cmp #3
     bcc @loadRest ; stuff bellow is not needed if there are 2 screens max
 
+    lda LocationIndex
+    asl
+    asl ; index * 4 , because max 4 screens for location
+    sta TempLocationPos
+
     lda BgColumnIdxToUpload
     cmp #16
     bcc @lowerRange
+
 
 ;*****UPPER RANGE***********************
     lda ScrollDirection
@@ -183,7 +189,10 @@ ReloadLowerColumnRange_movingRight:
     cmp ScreenCount
     bcs @exit
 
-    jsr PrepairDestAndSource
+    clc
+    adc TempLocationPos
+
+    jsr PrepareDestAndSource
 
     lda #SCREEN_COLUMN_COUNT
     sta TempZ
@@ -198,6 +207,8 @@ ReloadLowerColumnRange_movingRight:
     lda CurrentMapSegmentIndex
     clc
     adc #2
+    clc
+    adc TempLocationPos
     jsr CopyAttributes
 
 @exit:
@@ -208,9 +219,12 @@ ReloadLowerColumnRange_movingLeft:
     ;copy tiles to screen's columns 0.. BgColumnIdxToUpload(0..15)
     ;from CurrentMapScreen
 
-    lda CurrentMapSegmentIndex ; screen we're copying
 
-    jsr PrepairDestAndSource
+    lda CurrentMapSegmentIndex ; screen we're copying
+    clc
+    adc TempLocationPos
+
+    jsr PrepareDestAndSource
 
     lda #SCREEN_COLUMN_COUNT
     sec
@@ -229,6 +243,8 @@ ReloadLowerColumnRange_movingLeft:
 
     jsr CopyTilesToScreen
     lda CurrentMapSegmentIndex
+    clc
+    adc TempLocationPos
     jsr CopyAttributes
 
 @exit:
@@ -242,9 +258,12 @@ ReloadUpperColumnRange_movingLeft:
     lda CurrentMapSegmentIndex
     beq @exit
 
+    clc
+    adc TempLocationPos
+
     sec
     sbc #1 ; rom screen idx
-    jsr PrepairDestAndSource
+    jsr PrepareDestAndSource
 
     lda #SCREEN_COLUMN_COUNT
     sec
@@ -261,6 +280,8 @@ ReloadUpperColumnRange_movingLeft:
     lda CurrentMapSegmentIndex
     sec
     sbc #1
+    clc
+    adc TempLocationPos
     jsr CopyAttributes
 
 @exit:
@@ -276,7 +297,10 @@ ReloadUpperColumnRange_movingRight:
     cmp ScreenCount
     bcs @exit
 
-    jsr PrepairDestAndSource
+    clc
+    adc TempLocationPos
+
+    jsr PrepareDestAndSource
 
     lda BgColumnIdxToUpload
     sec
@@ -293,6 +317,8 @@ ReloadUpperColumnRange_movingRight:
     lda CurrentMapSegmentIndex
     clc
     adc #1
+    clc
+    adc TempLocationPos
     jsr CopyAttributes
 
 @exit:
@@ -357,7 +383,6 @@ CopyAttributes:
     adc #$C0
     sta pointer
     lda map_list_high, y
-    clc
     adc #$3
     sta pointer + 1
 
@@ -440,8 +465,8 @@ CopyTilesToScreen:
 
     rts
 ;----------------------------------
-;a - screen index
-PrepairDestAndSource:
+;a - location * 4 + screen index
+PrepareDestAndSource:
 
     tay
     lda map_list_low, y

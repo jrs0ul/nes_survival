@@ -26,14 +26,12 @@
 
 main_tiles_chr: .incbin "main.chr"
 
-.include "data/maps/LOC3_bg1.asm"
-.include "data/maps/LOC3_bg0.asm"
 .include "data/maps/field_bg.asm"
 .include "data/maps/field_bg1.asm"
 .include "data/maps/field_bg2.asm"
 .include "data/maps/field_bg4.asm"
-
-
+.include "data/maps/LOC3_bg1.asm"
+.include "data/maps/LOC3_bg0.asm"
 
 ;===========================================================
 .segment "ROM1"
@@ -118,14 +116,13 @@ game_over_sprites:
 .include "data/game_over_comp.asm"
 .include "data/CutsceneData.asm"
 ;--------- maps
-
+.include "data/maps/babloc1.asm"
+.include "data/maps/babloc2.asm"
+.include "data/maps/babloc3.asm"
 .include "data/maps/field2_bg.asm"
 .include "data/maps/field2_bg1.asm"
 .include "data/maps/crashsite0.asm"
 .include "data/maps/crashsite.asm"
-.include "data/maps/babloc1.asm"
-.include "data/maps/babloc2.asm"
-.include "data/maps/babloc3.asm"
 .include "data/maps/location_with_cave.asm"
 
 ;=============================================================
@@ -1523,8 +1520,11 @@ TempNpcPosInRam:
 TempNpcMovesDiagonaly:
     .res 1
 
+TempLocationPos:
+    .res 1
+
 Buffer:
-    .res 176  ;must see how much is still available
+    .res 175  ;must see how much is still available
 
 ;====================================================================================
 
