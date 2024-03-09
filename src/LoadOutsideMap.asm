@@ -74,9 +74,8 @@ LoadOutsideMap:
     cmp #3
     bcc @loadRest ; stuff bellow is not needed if there are 2 screens max
 
-    lda LocationIndex
-    asl
-    asl ; index * 4 , because max 4 screens for location
+    ldy LocationIndex
+    lda location_map_pos, y
     sta TempLocationPos
 
     lda BgColumnIdxToUpload
@@ -163,9 +162,8 @@ LoadOutsideMap:
 ;TempY - map segment index
 CalcMapAddress:
 
-    lda LocationIndex
-    asl
-    asl
+    ldy LocationIndex
+    lda location_map_pos, y
     clc
     adc TempY
     tay

@@ -2226,9 +2226,8 @@ UploadBgColumns:
     lda MustUpdateMapColumn
     beq @updateAttributes
 
-    lda LocationIndex
-    asl
-    asl
+    ldy LocationIndex
+    lda location_map_pos, y
     tay
 
     lda SourceMapIdx
@@ -2309,9 +2308,8 @@ UploadBgColumns:
     lda #0
     sta $2001
 
-    lda LocationIndex
-    asl
-    asl
+    ldy LocationIndex
+    lda location_map_pos, y
     clc
     adc SourceMapIdx
     tay

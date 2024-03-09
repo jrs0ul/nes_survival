@@ -280,9 +280,8 @@ BuildRowTable:
     ldx #0
 @screenLoop:
 
-    lda LocationIndex
-    asl
-    asl ; locationindex * 4
+    ldy LocationIndex
+    lda location_map_pos, y
     sta Temp
     txa
     clc
