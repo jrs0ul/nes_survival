@@ -1512,9 +1512,8 @@ UpdateNpcRow:
 @exit:
 
     rts
-
+;---------------
 .SEGMENT "CODE"
-;----------------------------------
 doNpcAI:
 
     ldy NpcCount
