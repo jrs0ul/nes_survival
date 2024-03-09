@@ -1,7 +1,7 @@
 location_spawns_low:
     .byte <spawnpoints_base_loc_1
-    .byte <spawnpoints_loc_2 ;bears hut is here
-    .byte <spawnpoints_loc_3 ; headgehog
+    .byte <spawnpoints_loc_2 ;Bjorn's hut is here
+    .byte <spawnpoints_loc_3 ; Erika's location
     .byte 0
     .byte 0
     .byte 0
@@ -53,16 +53,6 @@ spawnpoints_loc_2:
     .byte 184, 192
     .byte 216, 96
 
-    .byte 0, 0
-    .byte 0, 0
-    .byte 0, 0
-    .byte 0, 0
-
-    .byte 0, 0
-    .byte 0, 0
-    .byte 0, 0
-    .byte 0, 0
-
 spawnpoints_loc_3:
     .byte 64, 180
     .byte 232, 72
@@ -73,16 +63,6 @@ spawnpoints_loc_3:
     .byte 168, 184
     .byte 48, 128
     .byte 98, 160
-
-    .byte 0, 0
-    .byte 0, 0
-    .byte 0, 0
-    .byte 0, 0
-
-    .byte 0, 0
-    .byte 0, 0
-    .byte 0, 0
-    .byte 0, 0
 
 spawnpoints_loc_9:
     .byte 64, 180
@@ -95,17 +75,8 @@ spawnpoints_loc_9:
     .byte 48, 128
     .byte 98, 160
 
-    .byte 120, 72
-    .byte 138, 184
-    .byte 48, 128
-    .byte 98, 160
-
-    .byte 0, 0
-    .byte 0, 0
-    .byte 0, 0
-    .byte 0, 0
-
-
-
-
+    .byte 120, 160
+    .byte 8,   64
+    .byte 48,  72
+    .byte 98,  168
 

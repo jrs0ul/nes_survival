@@ -178,7 +178,7 @@ MapSpawnPoint:
     .byte 123, 148, 9, 1, <House_items, >House_items, 0, 0, 0
     .byte 1, <grannys_hut, >grannys_hut, 0, <villager3_npcs, >villager3_npcs, 0
     ;secret cave
-    .byte 127, 209, 14, 1, <secret_cave_items, >secret_cave_items, 0, 0, 0
+    .byte 127, 209, 14, 1, <secret_cave_items, >secret_cave_items, 6, 0, 0
     .byte 0, 0, 0, 0, 0, 0, 0
     ;--------------------
     ;granny's house exit to the location 8
@@ -216,10 +216,10 @@ MapSpawnPoint:
     ;---------------------
     ;secret cave exit to location 8
     .byte 156, 140, 8, OUTDOORS_LOC9_SCREEN_COUNT, <granny_location_items, >granny_location_items, 5, 0 ,2
-    .byte 0, 0, 0, 2, 0, 0, 0
+    .byte 0, 0, 0, 2, 0, 0, 2
 
 
-
+;after adding new locations don't forget to change MAX_LOCATIONS
 
 .segment "RODATA"
 

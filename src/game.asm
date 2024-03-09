@@ -502,6 +502,7 @@ projectiles_ram_lookup: ; max 10 projectiles
     LOCATION_ALIEN_BASE        = 10
     LOCATION_BOSS_ROOM         = 12
     LOCATION_DARK_CAVE         = 13
+    LOCATION_SECRET_CAVE       = 14
 
     MIN_SCREEN_COUNT_TO_UPDATE = 3
 
@@ -643,7 +644,7 @@ projectiles_ram_lookup: ; max 10 projectiles
     FADE_DELAY_SLEEP           = 10
     MAX_VILLAGERS              = 3
 
-    MAX_LOCATIONS              = 11
+    MAX_LOCATIONS              = 15
 
     SUBMENU_FOOD               = 1
     SUBMENU_STASH_FOOD         = 2
@@ -3667,7 +3668,7 @@ RoutinesAfterFadeOut:
     lda #>dark_cave_palette
     sta CurrentMapPalettePtr + 1
 
-
+    ;19 secret cave entrance
 @next28:
     lda ActiveMapEntryIndex
     cmp #19
@@ -3678,7 +3679,15 @@ RoutinesAfterFadeOut:
     lda #1
     sta MustCopyMainChr
 
+    jsr IsLampInInventory
+    bne @next29 ; it is
 
+    lda #<dark_cave_palette
+    sta CurrentMapPalettePtr
+    lda #>dark_cave_palette
+    sta CurrentMapPalettePtr + 1
+
+    ;29 secret cave exit
 @next29:
     lda ActiveMapEntryIndex
     cmp #29
@@ -4222,6 +4231,8 @@ AdaptBackgroundPaletteByTime:
 
     lda LocationIndex
     cmp #LOCATION_DARK_CAVE
+    beq @dark_cave
+    cmp #LOCATION_SECRET_CAVE
     beq @dark_cave
 
     lda InCave
