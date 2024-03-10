@@ -502,8 +502,13 @@ OldStamina:
 PlayerMovesDiagonaly:
     .res 1
 
+MapColumnData:
+    .res SCREEN_ROW_COUNT - 4 ; 26
+MapColumnAttributes:
+    .res 8
+
 ZPBuffer:
-    .res 92  ; I want to be aware of the free memory
+    .res 58  ; I want to be aware of the free memory
 
 ;--------------
 .segment "BSS" ; variables in ram
@@ -1900,9 +1905,6 @@ UploadBgColumns:
     lda MustUpdateMapColumn
     beq @updateAttributes
 
-    ldy LocationIndex
-    lda location_map_pos, y
-    tay
 
     lda SourceMapIdx
     cmp ScreenCount
@@ -1911,22 +1913,8 @@ UploadBgColumns:
     rts
 
 @doUpdates:
-    tya
-    clc
-    adc SourceMapIdx
-    tay
 
-    ;calculate source address
-
-    lda map_list_low, y
-    clc
-    adc BgColumnIdxToUpload
-    sta pointer
-    lda map_list_high, y
-    sta pointer + 1
-
-@start:
-    ;calculate source address
+    ;calculate destination address
     lda #128 ; skip four rows
     clc
     adc BgColumnIdxToUpload
@@ -1945,29 +1933,20 @@ UploadBgColumns:
     lda pointer2
     sta $2006
 
-    ldx #SCREEN_ROW_COUNT - 4 ; skip 4 status bar rows (2 are invisible for NTSC)
+    ldx #0
     ldy #128  ;  skip four rows
 @loop:
-    lda (pointer), y
+    lda MapColumnData, x
     sta $2007
 
-    tya
-    clc
-    adc #32 ;increment the data index for the next value in column
-    tay
-
-    cpy #0
-    bne @cont
-    inc pointer + 1
-
 @cont:
-    dex
-    bne @loop
+    inx
+    cpx #SCREEN_ROW_COUNT - 4
+    bcc @loop
 
     lda PPUCTRL ; restore normal ppu addressing
     sta $2000
 
-    
     lda BgColumnIdxToUpload
     sta OldBgColumnIdxToUpload
     lda SourceMapIdx
@@ -1982,27 +1961,7 @@ UploadBgColumns:
     lda #0
     sta $2001
 
-    ldy LocationIndex
-    lda location_map_pos, y
-    clc
-    adc SourceMapIdx
-    tay
-
-    lda map_list_low, y
-    clc
-    adc #$C0
-    sta pointer
-    lda map_list_high, y
-    adc #$3
-    sta pointer + 1
-
-
-    lda pointer
-    clc
-    adc AttribColumnIdxToUpdate
-    sta pointer
-
-    ldx #8 ;
+    ldx #0 ;
     lda #$C0
     clc
     adc AttribColumnIdxToUpdate
@@ -2023,15 +1982,13 @@ UploadBgColumns:
     adc #8
     sta tmpAttribAddress
 
-    lda (pointer), y
+    lda MapColumnAttributes, x
     sta $2007
 
-    tya
-    adc #8
-    tay
 
-    dex
-    bne @attribLoop
+    inx
+    cpx #8
+    bcc @attribLoop
 @done:
 
     lda SourceMapIdx
@@ -4500,6 +4457,41 @@ CalcMapColumnToUpdate:
     cmp OldBgColumnIdxToUpload
     beq @attr
 @mustUpdate:
+
+    ;collect column data
+    ldy LocationIndex
+    lda location_map_pos, y
+    clc
+    adc SourceMapIdx
+    tay
+    lda map_list_low, y
+    clc
+    adc BgColumnIdxToUpload
+    sta pointer
+    lda map_list_high, y
+    sta pointer + 1
+
+    ldx #0
+    ldy #128  ;  skip four rows
+@loop:
+    lda (pointer), y
+    sta MapColumnData, x
+    tya
+    clc
+    adc #32 ;increment the data index for the next value in column
+    tay
+
+    cpy #0
+    bne @cont
+    inc pointer + 1
+
+@cont:
+    inx
+    cpx #SCREEN_ROW_COUNT - 4
+    bcc @loop
+    ;------------------
+
+
     lda #1
     sta MustUpdateMapColumn
 
@@ -4516,6 +4508,52 @@ CalcMapColumnToUpdate:
     cmp OldAttribColumnIdxToUpdate
     beq @exit
 @updateAttributes:
+
+    ;------------
+    ldy LocationIndex
+    lda location_map_pos, y
+    clc
+    adc SourceMapIdx
+    tay
+
+    lda map_list_low, y
+    clc
+    adc #$C0
+    sta pointer
+    lda map_list_high, y
+    adc #$3
+    sta pointer + 1
+
+
+    lda pointer
+    clc
+    adc AttribColumnIdxToUpdate
+    sta pointer
+
+    ldx #0 ;
+    lda #$C0
+    clc
+    adc AttribColumnIdxToUpdate
+    sta tmpAttribAddress
+    lda DestScreenAddr
+    clc
+    adc #3
+    sta AttribHighAddress
+    ldy #0
+@attribLoop:
+
+
+    lda (pointer), y
+    sta MapColumnAttributes, x
+
+    tya
+    adc #8
+    tay
+
+    inx
+    cpx #8
+    bcc @attribLoop
+    ;------------
     lda #1
     sta MustUpdateMapAttributeColumn
 @exit:

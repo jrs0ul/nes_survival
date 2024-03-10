@@ -48,6 +48,31 @@ LoadNpcs:
 
     rts
 
+;------------------------------------
+PlayDamageSfx:
+    sty TempY
+    stx TempRegX
+
+    ldy current_bank
+    sty oldbank
+    ldy #6
+    jsr bankswitch_y
+
+    lda #2
+    ldx #FAMISTUDIO_SFX_CH1
+    jsr famistudio_sfx_play
+    ldy oldbank
+    jsr bankswitch_y
+
+
+    ldy TempY
+    ldx TempRegX
+
+
+    rts
+
+
+
 ;-----------------
 ; Calls the routine from the BANK 6
 GenerateNpcs:
@@ -466,10 +491,24 @@ PlayerNpcCollision:
     lda #0
 @end:
     rts
-
 ;-------------------------------------
-;Player's attack box collides with all the npcs
 PlayerHitsNpcs:
+
+    lda current_bank
+    sta bankBeforeStatusBarLoad
+    ldy #6
+    jsr bankswitch_y
+
+    jsr PlayerNpcsHitDectect
+
+    ldy bankBeforeStatusBarLoad
+    jsr bankswitch_y
+
+    rts
+;-------------------------------------
+.segment "ROM6"
+;Player's attack box collides with all the npcs
+PlayerNpcsHitDectect:
 
     ldy NpcCount
     beq @exit ; no npcs
@@ -487,6 +526,7 @@ PlayerHitsNpcs:
     lda NPC_COLLISION_DELAY
     sta NpcCollisionDelay
     rts
+
 ;-------------------------------------
 CheckSingleNpcAgainstPlayerHit:
     lda npcs_ram_lookup, y
@@ -906,29 +946,6 @@ OnBossDefeat:
     clc
     adc #2
     sta DestroyedTilesCount
-    rts
-
-;------------------------------------
-PlayDamageSfx:
-    sty TempY
-    stx TempRegX
-
-    ldy current_bank
-    sty oldbank
-    ldy #6
-    jsr bankswitch_y
-
-    lda #2
-    ldx #FAMISTUDIO_SFX_CH1
-    jsr famistudio_sfx_play
-    ldy oldbank
-    jsr bankswitch_y
-
-
-    ldy TempY
-    ldx TempRegX
-
-
     rts
 
 ;-------------------------------------
