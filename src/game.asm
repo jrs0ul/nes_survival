@@ -134,6 +134,17 @@ FAMISTUDIO_CFG_C_BINDINGS = 0
 .include "data/sfx.s"
 .include "famistudio_ca65.asm"
 
+zerosprite:
+    .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
+    .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
+    .byte $72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72
+    .byte $72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$2d,$7e,$7e,$7e,$7e,$2c
+    .byte $00,$00,$00,$00,$57,$31,$30,$30,$00,$00,$56,$30,$36,$37,$00,$00
+    .byte $55,$30,$38,$33,$00,$00,$00,$00,$00,$00,$7c,$00,$00,$00,$00,$8b
+    .byte $70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70
+    .byte $70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$2e,$7d,$7d,$7d,$7d,$24
+
+
 .include "data/maps/alien_bossroom.asm"
 .include "data/maps/secret_cave0.asm"
 .include "data/AnimalSpawnPositions.asm"
@@ -163,17 +174,6 @@ row_table_screens:
     .byte 60
     .byte 120
     .byte 180
-
-
-zerosprite:
-    .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
-    .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
-    .byte $72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$72
-    .byte $72,$72,$72,$72,$72,$72,$72,$72,$72,$72,$2d,$7e,$7e,$7e,$7e,$2c
-    .byte $00,$00,$00,$00,$57,$31,$30,$30,$00,$00,$56,$30,$36,$37,$00,$00
-    .byte $55,$30,$38,$33,$00,$00,$00,$00,$00,$00,$7c,$00,$00,$00,$00,$8b
-    .byte $70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$70
-    .byte $70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$2e,$7d,$7d,$7d,$7d,$24
 
 
 stamina_sprite_lookup:
@@ -245,7 +245,6 @@ spearSprites:
     .byte 248, $E3, %10000000, 252, 0, $E2, %10000000, 252 ;down
     .byte 252, $E0, %00000000, 248, 252, $E1, %00000000, 0 ;left
     .byte 252, $E1, %01000000, 248, 252, $E0, %01000000, 0 ;right
-
 
 
 npc_direction_list:
@@ -335,6 +334,8 @@ projectiles_ram_lookup: ; max 10 projectiles
 current_bank: ;active bank
     .res 1
 oldbank:
+    .res 1
+bankBeforeStatusBarLoad:
     .res 1
 bankBeforeNMI: ;bank that was active before NMI, so it could be set back
     .res 1
@@ -502,7 +503,7 @@ PlayerMovesDiagonaly:
     .res 1
 
 ZPBuffer:
-    .res 93  ; I want to be aware of the free memory
+    .res 92  ; I want to be aware of the free memory
 
 ;--------------
 .segment "BSS" ; variables in ram
@@ -2060,7 +2061,6 @@ Logics:
     rts
 
 @gameOn:
-
     ;-----------
     lda current_bank
     sta oldbank
@@ -2068,83 +2068,24 @@ Logics:
     jsr bankswitch_y
     ;----- switching to bank 1
 
-
-
-    lda PlayerAlive
-    bne @cont
-;----activate fading out for the game over
-    lda MustLoadGameOver
+    jsr FadingOutForGameOver
     bne @doneLogics
-    lda PaletteFadeAnimationState
-    bne @cont
-    lda #1
-    sta PaletteFadeAnimationState
-    sta MustLoadGameOverAfterFadeOut
-    lda #0
-    sta PaletteFadeTimer
-    sta FadeIdx
-    lda #FADE_DELAY_GAME_OVER
-    sta PaletteAnimDelay
-;---
-@cont:
-    lda PlayerWins
-    beq @cont2
+    jsr ActivateYouWin   ; bank 1
+    jsr UpdateIndoorFire ; bank 1
 
-    jsr ActivateYouWin
+    jsr PlayerHPCheck ; bank 1
+    bne @doneLogics ; player was killed
 
-@cont2:
-
-    dec FireFrameDelay
-    lda FireFrameDelay
-    bne @HpCheck
-    lda #FIRE_ANIMATION_DELAY
-    sta FireFrameDelay
-    inc FireFrame
-    lda FireFrame
-    cmp #2
-    bne @HpCheck
-    lda #0
-    sta FireFrame
-
-@HpCheck:
-    lda HP
-    clc
-    adc HP + 1
-    adc HP + 2
-    cmp #0
-    beq @killPlayer
-    jmp @checkFuel
-@killPlayer:
-    lda #0
-    sta PlayerAlive
-    jmp @doneLogics
-
-@checkFuel:
     jsr DecreaseFuel ;bank 1
-@checkWarmth:
     jsr WarmthLogics ;bank 1
-@checkFood:
     jsr FoodLogics   ;bank 1
 
     jsr RunTime        ; bank 1
     jsr RestoreStamina ; bank 1
 
-
 @doneLogics:
-
     jsr UpdateFishingRod ; bank 1
-
-    lda AttackTimer
-    beq @noAttack
-    dec AttackTimer
-    lda AttackTimer
-    beq @hideAttackAnim
-    jmp @noAttack
-@hideAttackAnim:
-    lda #1
-    sta PlayerAnimationRowIndex
-@noAttack:
-
+    jsr UpdateAttackTimer; bank 1
     jsr CheckEntryPoints ; bank 1
 
     ;-----------------
@@ -2155,14 +2096,52 @@ Logics:
     jsr UpdateProjectiles
     jsr UpdateSpear
 
-
 @exit:
-
     rts
 ;------------------------------
 .segment "ROM1"
+;if a has 1 at the end must abort logics
+FadingOutForGameOver:
+    lda PlayerAlive
+    bne @exit
+;----activate fading out for the game over
+    lda MustLoadGameOver
+    bne @abort
+    lda PaletteFadeAnimationState
+    bne @exit
+    lda #1
+    sta PaletteFadeAnimationState
+    sta MustLoadGameOverAfterFadeOut
+    lda #0
+    sta PaletteFadeTimer
+    sta FadeIdx
+    lda #FADE_DELAY_GAME_OVER
+    sta PaletteAnimDelay
 
+@abort:
+    lda #1
+    jmp @done
+@exit:
+    lda #0
+@done:
+    rts
+;------------------------------
+UpdateAttackTimer:
+    lda AttackTimer
+    beq @noAttack
+    dec AttackTimer
+    lda AttackTimer
+    beq @hideAttackAnim
+    jmp @noAttack
+@hideAttackAnim:
+    lda #1
+    sta PlayerAnimationRowIndex
+@noAttack:
+    rts
+;------------------------------
 ActivateYouWin:
+    lda PlayerWins
+    beq @exit
     lda PaletteFadeAnimationState
     bne @exit
     lda #1
@@ -2175,7 +2154,42 @@ ActivateYouWin:
     sta PaletteAnimDelay
 @exit:
     rts
+;---------------------------------
+UpdateIndoorFire:
+    dec FireFrameDelay
+    lda FireFrameDelay
+    bne @exit
+    lda #FIRE_ANIMATION_DELAY
+    sta FireFrameDelay
+    inc FireFrame
+    lda FireFrame
+    cmp #2
+    bne @exit
+    lda #0
+    sta FireFrame
+@exit:
 
+    rts
+;----------------------------------
+;if a register is 1, logics needs to be aborted
+PlayerHPCheck:
+    lda HP
+    clc
+    adc HP + 1
+    adc HP + 2
+    cmp #0
+    bne @exit
+
+;Kill player
+    lda #0
+    sta PlayerAlive
+    lda #1
+    jmp @done
+
+@exit:
+    lda #0
+@done:
+    rts
 
 ;-----------------------------------
 RestoreStamina:
@@ -4734,6 +4748,10 @@ UpdateStatusDigits:
 
 ;-----------------------------------
 LoadStatusBar:
+    lda current_bank
+    sta bankBeforeStatusBarLoad
+    ldy #6 ; bank 6 where the status bar data is
+    jsr bankswitch_y
     ldy #$00
     ldx #128 ;tiles
     lda $2002
@@ -4757,6 +4775,8 @@ InitializeStatusBarLoop:     ; copy status bar to first nametable
     sta HpUpdated
     sta FoodUpdated
     sta WarmthUpdated
+    ldy bankBeforeStatusBarLoad
+    jsr bankswitch_y
     rts
 
 ;--------------------------------------------
