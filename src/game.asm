@@ -32,6 +32,9 @@ main_tiles_chr: .incbin "main.chr"
 .include "data/maps/field_bg4.asm"
 .include "data/maps/LOC3_bg1.asm"
 .include "data/maps/LOC3_bg0.asm"
+.include "data/Outside1_items.asm"
+.include "data/Outside3_items.asm"
+
 
 ;===========================================================
 .segment "ROM1"
@@ -4392,6 +4395,13 @@ ResetPlayerXMovement:
 ;--------------------------------
 CalcMapColumnToUpdate:
 
+    lda ScreenCount
+    cmp #MIN_SCREEN_COUNT_TO_UPDATE
+    bcs @start
+
+    rts
+
+@start:
     lda #0
     sta MustUpdateMapColumn
     sta MustUpdateMapAttributeColumn

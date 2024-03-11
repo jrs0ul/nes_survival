@@ -89,13 +89,32 @@ LoadItems:
 @exit:
 
     rts
-;======================================================
+;--------------------------------------
 ItemCollisionCheck:
     lda #ITEM_DELAY
     sta ItemUpdateDelay
 
     lda ItemCount
     beq @exit
+
+    lda current_bank
+    sta bankBeforeStatusBarLoad
+
+    ldy #6
+    jsr bankswitch_y
+
+    jsr ItemCollision
+
+    ldy bankBeforeStatusBarLoad
+    jsr bankswitch_y
+@exit:
+
+    rts
+
+
+;======================================================
+.segment "ROM6"
+ItemCollision:
 
     lda PlayerX
     clc
@@ -131,6 +150,7 @@ ItemCollisionCheck:
 
 @exit:
     rts
+
 ;----------------------------------
 CheckItemsXY:
 
@@ -247,42 +267,6 @@ CheckYPoints:
 
     rts
 
-;-------------------------------------
-ResetTimesWhenItemsWerePicked:
-
-    ldy #0
-@loop:
-    lda LocationItemCounts, y
-    beq @nextLocation
-    tax
-    dex
-    stx TempItemLoadX
-
-    lda InitiateCompleteItemRespawn
-    bne @location_loop
-    lda LocationsWithRespawnableItems, y
-    beq @nextLocation
-
-@location_loop:
-
-    lda LocationItemIndexes, y
-    clc
-    adc TempItemLoadX
-    tax
-
-    lda #ITEM_NEVER_BEEN_PICKED
-    sta Item_Location1_Collection_times, x
-
-    dec TempItemLoadX
-    bpl @location_loop
-
-@nextLocation:
-    iny
-    cpy #MAX_LOCATIONS
-    bcc @loop
-
-    rts
-
 ;-----------------------------------
 AddAndDeactivateItems:
 
@@ -362,6 +346,43 @@ AddAndDeactivateItems:
 @exit:
     ldy TempY
     rts
+.segment "CODE"
+;-------------------------------------
+ResetTimesWhenItemsWerePicked:
+
+    ldy #0
+@loop:
+    lda LocationItemCounts, y
+    beq @nextLocation
+    tax
+    dex
+    stx TempItemLoadX
+
+    lda InitiateCompleteItemRespawn
+    bne @location_loop
+    lda LocationsWithRespawnableItems, y
+    beq @nextLocation
+
+@location_loop:
+
+    lda LocationItemIndexes, y
+    clc
+    adc TempItemLoadX
+    tax
+
+    lda #ITEM_NEVER_BEEN_PICKED
+    sta Item_Location1_Collection_times, x
+
+    dec TempItemLoadX
+    bpl @location_loop
+
+@nextLocation:
+    iny
+    cpy #MAX_LOCATIONS
+    bcc @loop
+
+    rts
+
 
 ;===================================================
 .SEGMENT "ROM1"
