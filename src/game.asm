@@ -1205,8 +1205,11 @@ TempNpcMovesDiagonaly:
 TempLocationPos:
     .res 1
 
+DialogTextContainer:
+    .res 96
+
 Buffer:
-    .res 175  ;must see how much is still available
+    .res 79  ;must see how much is still available
 
 ;====================================================================================
 
@@ -3369,9 +3372,6 @@ RoutinesAfterFadeOut:
     sta OldSourceMapIdx
     sta OldAttribColumnIdxToUpdate
     jsr CalcMapColumnToUpdate
-    lda #1
-    sta MustUpdateMapColumn
-    sta MustUpdateMapAttributeColumn
 
 
     rts
@@ -4607,7 +4607,7 @@ UpdateTextBaloon:
 
     ldy TextBaloonIndex
 
-    lda (TextPtr), y
+    lda DialogTextContainer, y
     sta $2007
 
 

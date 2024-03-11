@@ -176,6 +176,7 @@ ShowThanksText:
     sta TextPtr + 1
     lda #DIALOG_TEXT_LENGTH
     sta TextLength
+    jsr CopyTextToRam
 
     rts
 ;---------------------------------
@@ -289,6 +290,7 @@ SetupVillagerText:
     sta TextPtr + 1
     lda #DIALOG_TEXT_LENGTH
     sta TextLength
+    jsr CopyTextToRam
 
     lda VillagerIndex
     jmp @exit
@@ -310,9 +312,26 @@ SetupVillagerText:
     sta TextPtr + 1
     lda #DIALOG_TEXT_LENGTH
     sta TextLength
+    jsr CopyTextToRam
 
 @exit:
     rts
+;------------------------------
+;Text length must be in A
+CopyTextToRam:
+    tax
+    ldy #0
+@loop:
+    lda (TextPtr), y
+    sta DialogTextContainer, y
+    iny
+    dex
+    bne @loop
+
+
+    rts
+
+
 ;------------------------------
 RegularQuestText:
     lda VillagerIndex
@@ -329,6 +348,7 @@ RegularQuestText:
     sta TextPtr + 1
     lda #DIALOG_TEXT_LENGTH
     sta TextLength
+    jsr CopyTextToRam
 
     rts
 ;---------------------------------------
@@ -342,6 +362,7 @@ SpecialQuestReminder:
     sta TextPtr + 1
     lda #DIALOG_TEXT_LENGTH
     sta TextLength
+    jsr CopyTextToRam
 
     rts
 
