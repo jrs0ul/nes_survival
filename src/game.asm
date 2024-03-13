@@ -2935,14 +2935,7 @@ DoPaletteFades:
     rts
 
 ;------------------------------
-RoutinesAfterFadeOut:
-
-    lda IsLocationRoutine
-    bne @locationRoutines
-
-    ;fade in after sleep
-    lda MustSleepAfterFadeOut
-    beq @next
+FadeAfterSleep:
     ldy current_bank
     sty oldbank
     ldy #3
@@ -2956,6 +2949,18 @@ RoutinesAfterFadeOut:
     sta PaletteFadeAnimationState
     lda #PALETTE_FADE_MAX_ITERATION
     sta FadeIdx
+    rts
+
+;------------------------------
+RoutinesAfterFadeOut:
+
+    lda IsLocationRoutine
+    bne @locationRoutines
+
+    ;fade in after sleep
+    lda MustSleepAfterFadeOut
+    beq @next
+    jsr FadeAfterSleep
     rts
 
 @next: ;game over
@@ -3006,6 +3011,14 @@ RoutinesAfterFadeOut:
 
 
 @afterIntro:
+
+    lda KilledByBoss
+    beq @newGame
+
+    jsr LoadCheckPoint
+    rts
+
+@newGame:
     jsr StartGame
     rts
 
@@ -5545,7 +5558,60 @@ LoadOutro:
 
 @exit:
     rts
+;-------------------------------------
+LoadCheckPoint:
 
+    jsr LoadGame
+
+    ldx #0
+    jsr initZeroSprite
+    lda #STATE_GAME
+    sta GameState
+
+    lda #1
+    sta PlayerAlive
+
+    lda #6
+    sta LocationIndex
+    lda #2
+    sta ScreenCount
+    lda #1
+    sta CurrentMapSegmentIndex
+    lda #4
+    sta LocationBankNo
+    lda #0
+    sta ScrollX
+    lda #$77
+    sta PlayerX
+    lda #$70
+    sta PlayerY
+
+    ldy LocationBankNo
+    jsr bankswitch_y
+
+    lda #<Cave_items
+    sta pointer
+    lda #>Cave_items
+    sta pointer + 1
+    jsr LoadItems
+
+    lda #<alien_palette
+    sta CurrentMapPalettePtr
+    lda #>alien_palette
+    sta CurrentMapPalettePtr + 1
+
+
+    lda #0
+    sta NpcCount
+
+    jsr BuildRowTable
+
+    lda #1
+    sta InCave
+    sta MustLoadOutside
+    sta MustLoadSomething
+
+    rts
 
 ;-------------------------------------
 StartGame:
