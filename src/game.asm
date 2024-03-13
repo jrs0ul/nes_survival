@@ -510,8 +510,11 @@ MapColumnData:
 MapColumnAttributes:
     .res 8
 
+KilledByBoss:
+    .res 1
+
 ZPBuffer:
-    .res 58  ; I want to be aware of the free memory
+    .res 57  ; I want to be aware of the free memory
 
 ;--------------
 .segment "BSS" ; variables in ram
@@ -1208,8 +1211,11 @@ TempLocationPos:
 DialogTextContainer:
     .res 96
 
+SaveData: ; inventory         HP | Food | Fuel | Warmth | Time | Equipment | quest info         |  not respawnable items
+    .res INVENTORY_MAX_SIZE + 3  +   3 +   3   +   3    +   5  +    4      +   4 * MAX_VILLAGERS +   ONE_TIME_ITEM_COUNT
+
 Buffer:
-    .res 79  ;must see how much is still available
+    .res 17  ;must see how much is still available
 
 ;====================================================================================
 
@@ -2074,7 +2080,14 @@ FadingOutForGameOver:
     bne @exit
     lda #1
     sta PaletteFadeAnimationState
+
+    lda KilledByBoss
+    beq @gameOver
+    jmp @cont
+@gameOver:
+    lda #1
     sta MustLoadGameOverAfterFadeOut
+@cont:
     lda #0
     sta PaletteFadeTimer
     sta FadeIdx
@@ -3310,12 +3323,17 @@ RoutinesAfterFadeOut:
     bne @next28
 
     jsr IsLampInInventory
-    bne @next28 ; it is
+    bne @saveTheGame ; it is
 
     lda #<dark_cave_palette
     sta CurrentMapPalettePtr
     lda #>dark_cave_palette
     sta CurrentMapPalettePtr + 1
+@saveTheGame:
+    lda BossDefeated
+    bne @next28
+
+    jsr SaveGame
 
     ;19 secret cave entrance
 @next28:
@@ -4944,9 +4962,220 @@ LoadGameOver:
 
 @exit:
     rts
+;------------------------------------
+LoadGame:
+
+;inventory
+    lda #INVENTORY_MAX_SIZE
+    tax
+    tay
+    dex
+    dey
+@InventoryLoop:
+    lda SaveData, y
+    sta Inventory, x
+    dey
+    dex
+    bpl @InventoryLoop
+
+    ldy #INVENTORY_MAX_SIZE
+
+    ldx #0
+@HPLoop:
+    lda SaveData, y
+    sta HP, x
+    iny
+    inx
+    cpx #3
+    bcc @HPLoop
+
+    ldx #0
+@FoodLoop:
+    lda SaveData, y
+    sta Food, x
+    iny
+    inx
+    cpx #3
+    bcc @FoodLoop
+
+    ldx #0
+@FuelLoop:
+    lda SaveData, y
+    sta Fuel, x
+    iny
+    inx
+    cpx #3
+    bcc @FuelLoop
+
+    ldx #0
+@WarmthLoop:
+    lda SaveData, y
+    sta Fuel, x
+    iny
+    inx
+    cpx #3
+    bcc @WarmthLoop
+;Time
+    ldx #0
+@DaysLoop:
+    lda SaveData, y
+    sta Days, x
+    iny
+    inx
+    cpx #3
+    bcc @DaysLoop
+
+    lda SaveData, y
+    sta Hours
+    iny
+    lda SaveData, y
+    sta Minutes
+    iny
+
+
+
+    rts
+
+
+
 
 ;-------------------------------------
-ResetEntityVariables:
+SaveGame:
+
+    lda #INVENTORY_MAX_SIZE
+    tax
+    tay
+    dex
+    dey
+@InventoryLoop:
+    lda Inventory, x
+    sta SaveData, y
+
+    dey
+    dex
+    bpl @InventoryLoop
+
+    ;HP/Food/Fuel/Warmth
+    ldy #INVENTORY_MAX_SIZE
+
+    ldx #0
+@HPLoop:
+    lda HP, x
+    sta SaveData, y
+    iny
+    inx
+    cpx #3
+    bcc @HPLoop
+
+    ldx #0
+@FoodLoop:
+    lda Food, x
+    sta SaveData, y
+    iny
+    inx
+    cpx #3
+    bcc @FoodLoop
+
+    ldx #0
+@FuelLoop:
+    lda Fuel, x
+    sta SaveData, y
+    iny
+    inx
+    cpx #3
+    bcc @FuelLoop
+
+    ldx #0
+@WarmthLoop:
+    lda Fuel, x
+    sta SaveData, y
+    iny
+    inx
+    cpx #3
+    bcc @WarmthLoop
+;Time
+    ldx #0
+@DaysLoop:
+    lda Days, x
+    sta SaveData, y
+    iny
+    inx
+    cpx #3
+    bcc @DaysLoop
+
+    lda Hours
+    sta SaveData, y
+    iny
+    lda Minutes
+    sta SaveData, y
+    iny
+;Equipment
+    lda EquipedItem
+    sta SaveData, y
+    iny
+    lda EquipedItem + 1
+    sta SaveData, y
+    iny
+    lda EquipedClothing
+    sta SaveData, y
+    iny
+    lda EquipedClothing + 1
+    sta SaveData, y
+    iny
+;quest info
+    ldx #0
+@questLoop:
+    lda ActiveVillagerQuests, x
+    sta SaveData, y
+    iny
+    lda TakenQuestItems, x
+    sta SaveData, y
+    iny
+    lda SpecialItemsDelivered, x
+    sta SaveData, y
+    iny
+    lda CompletedSpecialQuests, x
+    sta SaveData, y
+    iny
+    inx
+    cpx #MAX_VILLAGERS
+    bcc @questLoop
+;items
+
+    ldx #0
+@locationLoop:
+    lda LocationsWithRespawnableItems, x
+    bne @nextLocation ; we don't care about respawnable items
+
+    lda LocationItemCounts, x
+    beq @nextLocation ; no items here, move to the next one
+
+    sta TempItemIndex ; just the count
+    stx TempRegX
+
+    lda LocationItemIndexes, x
+    tax
+@itemLoop:
+    lda Item_Location1_Collection_times, x
+    sta SaveData, y
+    inx
+    iny
+    dec TempItemIndex
+    bne @itemLoop
+
+    ldx TempRegX
+
+@nextLocation:
+    inx
+    cpx #MAX_LOCATIONS
+    bcc @locationLoop
+
+
+    rts
+
+
+;-------------------------------------
+ResetVariables:
     lda #MAX_SPRITE_COUNT
     sta TaintedSprites
 
@@ -5047,6 +5276,7 @@ ResetEntityVariables:
     sta StaminaDelay
 
     lda #0
+    sta KilledByBoss
     sta BossDefeated
     sta menuTileTransferRowIdx
     sta MapTilesetBankNo
@@ -5325,7 +5555,7 @@ StartGame:
     lda #1
     sta InitiateCompleteItemRespawn
 
-    jsr ResetEntityVariables
+    jsr ResetVariables
 
 
     lda #<Outside1_items
