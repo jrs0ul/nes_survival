@@ -3033,20 +3033,6 @@ DamagePlayer:
     lda #32
     sta PaletteUpdateSize
 
-    lda HP
-    clc
-    adc HP + 1
-    adc HP + 2
-    cmp #1
-    bcs @exit
-
-    lda TempNpcIndex
-    cmp #NPC_IDX_BOSS
-    bne @exit
-
-    lda #1
-    sta KilledByBoss
-
 @exit:
 
     rts

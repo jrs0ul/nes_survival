@@ -510,7 +510,7 @@ MapColumnData:
 MapColumnAttributes:
     .res 8
 
-KilledByBoss:
+CheckpointSaved:
     .res 1
 
 ZPBuffer:
@@ -1211,11 +1211,10 @@ TempLocationPos:
 DialogTextContainer:
     .res 96
 
-SaveData: ; inventory         HP | Food | Fuel | Warmth | Time | Equipment | quest info         |  not respawnable items
-    .res INVENTORY_MAX_SIZE + 3  +   3 +   3   +   3    +   5  +    4      +   4 * MAX_VILLAGERS +   ONE_TIME_ITEM_COUNT
-
+SaveData: ; inventory         HP | Food | Fuel | Warmth | Time | Equipment
+    .res INVENTORY_MAX_SIZE + 3  +   3 +   3   +   3    +   5  +    4
 Buffer:
-    .res 17  ;must see how much is still available
+    .res 38  ;must see how much is still available
 
 ;====================================================================================
 
@@ -2081,7 +2080,7 @@ FadingOutForGameOver:
     lda #1
     sta PaletteFadeAnimationState
 
-    lda KilledByBoss
+    lda CheckpointSaved
     beq @gameOver
     jmp @cont
 @gameOver:
@@ -3012,7 +3011,7 @@ RoutinesAfterFadeOut:
 
 @afterIntro:
 
-    lda KilledByBoss
+    lda CheckpointSaved
     beq @newGame
 
     jsr LoadCheckPoint
@@ -3191,6 +3190,8 @@ RoutinesAfterFadeOut:
 
     lda #1
     sta MustCopyMainChr
+    lda #0
+    sta CheckpointSaved
 
     ;----------------------------
     ;18.granny's house
@@ -3342,11 +3343,16 @@ RoutinesAfterFadeOut:
     sta CurrentMapPalettePtr
     lda #>dark_cave_palette
     sta CurrentMapPalettePtr + 1
+    jmp @next28
 @saveTheGame:
     lda BossDefeated
     bne @next28
+    lda CheckpointSaved
+    bne @next28
 
     jsr SaveGame
+    lda #1
+    sta CheckpointSaved
 
     ;19 secret cave entrance
 @next28:
@@ -5044,12 +5050,20 @@ LoadGame:
     lda SaveData, y
     sta Minutes
     iny
-
-
+;Equipment
+    lda SaveData, y
+    sta EquipedItem
+    iny
+    lda SaveData, y
+    sta EquipedItem + 1
+    iny
+    lda SaveData, y
+    sta EquipedClothing
+    iny
+    lda SaveData, y
+    sta EquipedClothing + 1
 
     rts
-
-
 
 
 ;-------------------------------------
@@ -5134,55 +5148,6 @@ SaveGame:
     iny
     lda EquipedClothing + 1
     sta SaveData, y
-    iny
-;quest info
-    ldx #0
-@questLoop:
-    lda ActiveVillagerQuests, x
-    sta SaveData, y
-    iny
-    lda TakenQuestItems, x
-    sta SaveData, y
-    iny
-    lda SpecialItemsDelivered, x
-    sta SaveData, y
-    iny
-    lda CompletedSpecialQuests, x
-    sta SaveData, y
-    iny
-    inx
-    cpx #MAX_VILLAGERS
-    bcc @questLoop
-;items
-
-    ldx #0
-@locationLoop:
-    lda LocationsWithRespawnableItems, x
-    bne @nextLocation ; we don't care about respawnable items
-
-    lda LocationItemCounts, x
-    beq @nextLocation ; no items here, move to the next one
-
-    sta TempItemIndex ; just the count
-    stx TempRegX
-
-    lda LocationItemIndexes, x
-    tax
-@itemLoop:
-    lda Item_Location1_Collection_times, x
-    sta SaveData, y
-    inx
-    iny
-    dec TempItemIndex
-    bne @itemLoop
-
-    ldx TempRegX
-
-@nextLocation:
-    inx
-    cpx #MAX_LOCATIONS
-    bcc @locationLoop
-
 
     rts
 
@@ -5289,7 +5254,7 @@ ResetVariables:
     sta StaminaDelay
 
     lda #0
-    sta KilledByBoss
+    sta CheckpointSaved
     sta BossDefeated
     sta menuTileTransferRowIdx
     sta MapTilesetBankNo
@@ -5600,9 +5565,13 @@ LoadCheckPoint:
     lda #>alien_palette
     sta CurrentMapPalettePtr + 1
 
+    lda #<cave_npcs
+    sta pointer
+    lda #>cave_npcs
+    sta pointer + 1
 
-    lda #0
-    sta NpcCount
+    jsr LoadNpcs
+
 
     jsr BuildRowTable
 
