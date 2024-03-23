@@ -1945,7 +1945,6 @@ UploadBgColumns:
     sta $2006
 
     ldx #0
-    ldy #128  ;  skip four rows
 @loop:
     lda MapColumnData, x
     sta $2007
