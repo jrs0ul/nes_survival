@@ -5564,6 +5564,12 @@ LoadCheckPoint:
     lda #>alien_palette
     sta CurrentMapPalettePtr + 1
 
+    lda #0
+    sta SongName
+    lda #1
+    sta MustPlayNewSong
+
+
     lda #<cave_npcs
     sta pointer
     lda #>cave_npcs
