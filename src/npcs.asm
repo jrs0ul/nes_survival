@@ -1420,7 +1420,7 @@ CollectSingleNpcData:
     sta TempNpcIndex ; what kind of npc is this ?
     asl
     asl
-    asl
+    asl ; index * 8
     tay
     lda npc_data, y ; tiles per row
     sta TempNpcTilesInARow
@@ -1686,10 +1686,35 @@ SingleNpcAI:
     inx ; dir 
     inx ; frame
     inx ; timer
+
+    lda TempNpcIndex
+    cmp #NPC_IDX_BOSS
+    bne @regularNpcAttack
+
+    lda bossWarning
+    bne @regularNpcAttack
+
     lda Npcs, x
     clc
     adc #1
-    cmp #NPC_DELAY_ATTACK
+    cmp #20
+    sta Npcs, x
+    bcc @nextNpc
+
+    dex
+    lda #160    ; boss attack frame
+    sta Npcs, x
+    inx
+    lda #0
+    sta Npcs, x ; reset the timer
+    lda #1
+    sta bossWarning
+
+@regularNpcAttack:
+    lda Npcs, x
+    clc
+    adc #1
+    cmp #NPC_DURATION_ATTACK
     bcs @resetState
     sta Npcs, x
     cmp #15; delay between the npc being agitated and actualy attacking player
@@ -1707,7 +1732,20 @@ SingleNpcAI:
     sta Npcs, x
     jmp @nextNpc
 
-@resetState:
+@resetState: ; exit to IDLE state from whatever state we were in
+    jsr ResetNpcState
+    jmp @nextNpc
+
+@damage:
+
+    jsr CheckNpcAttackBoxWithPlayer
+
+@nextNpc:
+
+    rts
+;--------------------------
+;x is at npc timer
+ResetNpcState:
     lda #0
     sta Npcs, x ;reset timer
 
@@ -1721,14 +1759,6 @@ SingleNpcAI:
     and #%11111100 ;clear state
     eor #000000001 ;idle state
     sta Npcs, x
-
-    jmp @nextNpc
-
-@damage:
-
-    jsr CheckNpcAttackBoxWithPlayer
-
-@nextNpc:
 
     rts
 ;--------------------------
@@ -2919,6 +2949,7 @@ OnCollisionWithPlayer:
     inx ; timer
     lda #0
     sta Npcs, x
+    sta bossWarning ; reset the boss warning
     dex ;frame
     dex ;direction
     dex ;screen

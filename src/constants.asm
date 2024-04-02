@@ -281,7 +281,7 @@
 
     NPC_STEPS_BEFORE_REDIRECT  = 16
 
-    NPC_DELAY_ATTACK           = 64
+    NPC_DURATION_ATTACK        = 64
     NPC_DELAY_DAMAGED          = 32
 
     NPC_ATTACK_FRAME           = 128

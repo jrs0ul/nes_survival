@@ -825,6 +825,7 @@ npc_BOSS_frame_LEFT:
     .byte <npc_BOSS_frame_LEFT_1,   >npc_BOSS_frame_LEFT_1
     .byte <npc_BOSS_frame_LEFT_2,   >npc_BOSS_frame_LEFT_2
     .byte <npc_BOSS_frame_LEFT_1,   >npc_BOSS_frame_LEFT_1
+    .byte <npc_BOSS_frame_LEFT_WARN,>npc_BOSS_frame_LEFT_WARN
     .byte <npc_BOSS_frame_LEFT_ATK, >npc_BOSS_frame_LEFT_ATK
     .byte <npc_BOSS_frame_DTH,      >npc_BOSS_frame_DTH
 
@@ -907,6 +908,28 @@ npc_BOSS_frame_LEFT_2:
     .byte 32, $db, %00000000, 16
     .byte 32, $bb, %00000000, 24
 
+npc_BOSS_frame_LEFT_WARN:
+    .byte    0, $6e, 0          ,   0
+    .byte    0, $5a, 0          ,   8
+    .byte    0, $7e, 0          ,  16
+    .byte    0, $0f, %11000000  ,  24
+    .byte    8, $7c, %11000000  ,  24
+    .byte    8, $5b, 0          ,   0
+    .byte    8, $6a, 0          ,   8
+    .byte    8, $6b, 0          ,  16
+    .byte    8, $9f, 0          ,  24
+    .byte   16, $fe, 0          ,   0
+    .byte   16, $ca, 0          ,   8
+    .byte   16, $af, 0          ,  16
+    .byte   16, $8b, 0          ,  24
+    .byte  240, $9c, %11000000  ,  24
+    .byte   24, $ea, 0          ,  16
+    .byte   24, $ab, 0          ,  24
+    .byte  248, $8c, %10000000  ,  24
+    .byte   32, $fe, 0          ,   8
+    .byte   32, $ba, 0          ,  16
+    .byte   32, $bb, 0          ,  24
+
 npc_BOSS_frame_LEFT_ATK:
     .byte 0,  $6e, %00000000, 0
     .byte 0,  $5a, %00000000, 8
@@ -939,6 +962,7 @@ npc_BOSS_frame_RIGHT:
     .byte <npc_BOSS_frame_RIGHT_1,   >npc_BOSS_frame_RIGHT_1
     .byte <npc_BOSS_frame_RIGHT_2,   >npc_BOSS_frame_RIGHT_2
     .byte <npc_BOSS_frame_RIGHT_1,   >npc_BOSS_frame_RIGHT_1
+    .byte <npc_BOSS_frame_RIGHT_WARN,>npc_BOSS_frame_RIGHT_WARN
     .byte <npc_BOSS_frame_RIGHT_ATK, >npc_BOSS_frame_RIGHT_ATK
     .byte <npc_BOSS_frame_DTH,       >npc_BOSS_frame_DTH
 
@@ -1021,6 +1045,29 @@ npc_BOSS_frame_RIGHT_2:
     .byte 32, $db, %01000000, 8
     .byte 32, $bb, %01000000, 0
 
+npc_BOSS_frame_RIGHT_WARN:
+    .byte    0,$6e, %01000000,24
+    .byte    0,$5a, %01000000,16
+    .byte    0,$7e, %01000000, 8
+    .byte    0,$0f, %10000000, 0
+    .byte    8,$7c, %10000000, 0
+    .byte    8,$5b, %01000000,24
+    .byte    8,$6a, %01000000,16
+    .byte    8,$6b, %01000000, 8
+    .byte    8,$9f, %01000000, 0
+    .byte   16,$fe, %01000000,24
+    .byte   16,$ca, %01000000,16
+    .byte   16,$af, %01000000, 8
+    .byte   16,$8b, %01000000, 0
+    .byte  240,$9c, %10000000, 0
+    .byte   24,$ea, %01000000, 8
+    .byte   24,$ab, %01000000, 0
+    .byte  248,$8c, %11000000, 0
+    .byte   32,$fe, %01000000,16
+    .byte   32,$ba, %01000000, 8
+    .byte   32,$bb, %01000000, 0
+
+
 npc_BOSS_frame_RIGHT_ATK:
     .byte 0,  $6e, %01000000, 24
     .byte 0,  $5a, %01000000, 16
@@ -1053,6 +1100,7 @@ npc_BOSS_frame_UP:
     .byte <npc_BOSS_frame_UP_1,   >npc_BOSS_frame_UP_1
     .byte <npc_BOSS_frame_UP_2,   >npc_BOSS_frame_UP_2
     .byte <npc_BOSS_frame_UP_1,   >npc_BOSS_frame_UP_1
+    .byte <npc_BOSS_frame_UP_WARN,>npc_BOSS_frame_UP_WARN
     .byte <npc_BOSS_frame_UP_ATK, >npc_BOSS_frame_UP_ATK
     .byte <npc_BOSS_frame_DTH,    >npc_BOSS_frame_DTH
 
@@ -1134,32 +1182,50 @@ npc_BOSS_frame_UP_2:
     .byte 32, $ed, %01000000, 16
     .byte 32, $9c, %01000000, 24
 
+npc_BOSS_frame_UP_WARN:
+    .byte    0,$6c, 0        , 0
+    .byte    0,$6d, 0        , 8
+    .byte    0,$6d, %01000000,16
+    .byte    0,$6c, %01000000,24
+    .byte    8,$5e, %01000000, 0
+    .byte    8,$bd, 0        , 8
+    .byte    8,$7d, %01000000,16
+    .byte    8,$bf, 0        ,24
+    .byte    0,$0f, %10000000, 2
+    .byte   16,$8d, 0        , 8
+    .byte   16,$ce, 0        ,16
+    .byte   16,$cf, 0        ,24
+    .byte  249,$1f, %11000000, 3
+    .byte   24,$dd, 0        , 8
+    .byte   24,$de, 0        ,16
+    .byte   24,$df, 0        ,24
+    .byte  241,$2f, %11000000, 3
+    .byte   32,$ed, 0        , 8
+    .byte   32,$ee, 0        ,16
+    .byte   32,$ef, %01000000,24
+
 
 npc_BOSS_frame_UP_ATK:
-    .byte 0,  $6c, %00000000, 0
-    .byte 0,  $6d, %00000000, 8
-    .byte 0,  $6d, %01000000, 16
-    .byte 0,  $6c, %01000000, 24
-
-    .byte 8,  $bc, %00000000, 0
-    .byte 8,  $bd, %00000000, 8
-    .byte 8,  $7d, %01000000, 16
-    .byte 8,  $bf, %00000000, 24
-
-    .byte 16, $cc, %00000000, 0
-    .byte 16, $cd, %00000000, 8
-    .byte 16, $ce, %00000000, 16
-    .byte 16, $cf, %00000000, 24
-
-    .byte 24, $fe, %00000000, 0
-    .byte 24, $dd, %00000000, 8
-    .byte 24, $de, %00000000, 16
-    .byte 24, $df, %00000000, 24
-
-    .byte 32, $fe, %00000000, 0
-    .byte 32, $ed, %00000000, 8
-    .byte 32, $ee, %00000000, 16
-    .byte 32, $ef, %01000000, 24
+    .byte   0, $6c, 0        ,  0
+    .byte   0, $6d, 0        ,  8
+    .byte   0, $6d, %01000000, 16
+    .byte   0, $6c, %01000000, 24
+    .byte   8, $5e, %01000000,  0
+    .byte   8, $bd, 0        ,  8
+    .byte   8, $7d, %01000000, 16
+    .byte   8, $bf, 0        , 24
+    .byte   0, $7c, 0        ,  0
+    .byte  16, $8d, 0        ,  8
+    .byte  16, $ce, 0        , 16
+    .byte  16, $cf, 0        , 24
+    .byte 252, $5d, %11000000,  8
+    .byte  24, $dd, 0        ,  8
+    .byte  24, $de, 0        , 16
+    .byte  24, $df, 0        , 24
+    .byte 252, $5c, %11000000, 16
+    .byte  32, $ed, 0        ,  8
+    .byte  32, $ee, 0        , 16
+    .byte  32, $ef, %01000000, 24
 
 
 npc_BOSS_frame_DOWN:
@@ -1167,6 +1233,7 @@ npc_BOSS_frame_DOWN:
     .byte <npc_BOSS_frame_DOWN_1,   >npc_BOSS_frame_DOWN_1
     .byte <npc_BOSS_frame_DOWN_2,   >npc_BOSS_frame_DOWN_2
     .byte <npc_BOSS_frame_DOWN_1,   >npc_BOSS_frame_DOWN_1
+    .byte <npc_BOSS_frame_DOWN_WARN,>npc_BOSS_frame_DOWN_WARN
     .byte <npc_BOSS_frame_DOWN_ATK, >npc_BOSS_frame_DOWN_ATK
     .byte <npc_BOSS_frame_DTH,      >npc_BOSS_frame_DTH
 
@@ -1248,29 +1315,47 @@ npc_BOSS_frame_DOWN_2:
     .byte 32, $2c, %00000000, 16
     .byte 32, $2f, %00000000, 24
 
+npc_BOSS_frame_DOWN_WARN:
+    .byte   0,$2d, %01000000,  0
+    .byte   0,$0c, %01000000,  8
+    .byte   0,$0c, 0        , 16
+    .byte   0,$4f, %11000000, 24
+    .byte   8,$3f, 0        ,  0
+    .byte   8,$3c, %01000000,  8
+    .byte   8,$3c, 0        , 16
+    .byte   8,$3f, %11000000, 24
+    .byte  16,$4f, 0        ,  0
+    .byte  16,$4c, 0        ,  8
+    .byte  16,$0e, 0        , 16
+    .byte 240,$2f, %10000000, 24
+    .byte  24,$5f, 0        ,  0
+    .byte  24,$1e, %01000000,  8
+    .byte  24,$1e, 0        , 16
+    .byte  32,$fe, 0        ,  0
+    .byte  32,$2e, %01000000,  8
+    .byte  32,$2e, 0        , 16
+    .byte   0,$2d, 0        , 24
+    .byte 248,$8c, %10000000, 24
+
+
 npc_BOSS_frame_DOWN_ATK:
-    .byte 0,  $2d, %01000000, 0
-    .byte 0,  $0c, %01000000, 8
-    .byte 0,  $0c, %00000000, 16
-    .byte 0,  $2d, %00000000, 24
-
-    .byte 8,  $3f, %00000000, 0
-    .byte 8,  $3c, %01000000, 8
-    .byte 8,  $3c, %00000000, 16
-    .byte 8,  $3d, %00000000, 24
-
-    .byte 16, $4f, %00000000, 0
-    .byte 16, $4c, %00000000, 8
-    .byte 16, $4d, %00000000, 16
-    .byte 16, $4e, %00000000, 24
-
-    .byte 24, $5f, %00000000, 0
-    .byte 24, $5c, %00000000, 8
-    .byte 24, $5d, %00000000, 16
-    .byte 24, $5e, %00000000, 24
-
-    .byte 32, $fe, %00000000, 0
-    .byte 32, $3e, %00000000, 8
-    .byte 32, $2c, %00000000, 16
-    .byte 32, $fe, %00000000, 24
-
+    .byte  0, $2d, %01000000   ,  0
+    .byte  0, $0c, %01000000   ,  8
+    .byte  0, $0c, 0           , 16
+    .byte  0, $2d, 0           , 24
+    .byte  8, $3f, 0           ,  0
+    .byte  8, $3c, %01000000   ,  8
+    .byte  8, $3c, 0           , 16
+    .byte  8, $3d, 0           , 24
+    .byte 16, $4f, 0           ,  0
+    .byte 16, $4c, 0           ,  8
+    .byte 16, $4d, 0           , 16
+    .byte 16, $4e, 0           , 24
+    .byte 24, $5f, 0           ,  0
+    .byte 24, $5c, 0           ,  8
+    .byte 24, $5d, 0           , 16
+    .byte 24, $5e, 0           , 24
+    .byte 32, $fe, 0           ,  0
+    .byte 32, $3e, 0           ,  8
+    .byte 32, $2c, 0           , 16
+    .byte 24, $1e, 0           , 16
