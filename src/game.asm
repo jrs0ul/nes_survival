@@ -1211,10 +1211,13 @@ TempLocationPos:
 DialogTextContainer:
     .res 96
 
+bossWarning:
+    .res 1
+
 SaveData: ; inventory         HP | Food | Fuel | Warmth | Time | Equipment
     .res INVENTORY_MAX_SIZE + 3  +   3 +   3   +   3    +   5  +    4
 Buffer:
-    .res 38  ;must see how much is still available
+    .res 37  ;must see how much is still available
 
 ;====================================================================================
 
@@ -5028,7 +5031,7 @@ LoadGame:
     ldx #0
 @WarmthLoop:
     lda SaveData, y
-    sta Fuel, x
+    sta Warmth, x
     iny
     inx
     cpx #3
