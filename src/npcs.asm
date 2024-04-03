@@ -1805,12 +1805,26 @@ CheckNpcAttackBoxWithPlayer:
     jsr CanNpcFacingUpHitPlayer
     bne @fail
 
+    lda #1
+    sta hadKnockBack
+    lda #254
+    sta KnockBackY
+    lda #0
+    sta KnockBackY + 1
+
     jmp @doDmg
 
 @facesDown:
 
     jsr CanNpcFacingDownHitPlayer
     bne @fail
+
+    lda #1
+    sta hadKnockBack
+    lda #2
+    sta KnockBackY
+    lda #0
+    sta KnockBackY + 1
 
     jmp @doDmg
 

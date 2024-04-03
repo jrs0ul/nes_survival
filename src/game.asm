@@ -513,8 +513,17 @@ MapColumnAttributes:
 CheckpointSaved:
     .res 1
 
+KnockBackY:
+    .res 2
+KnockBackX:
+    .res 2
+
+hadKnockBack:
+    .res 1
+
+
 ZPBuffer:
-    .res 57  ; I want to be aware of the free memory
+    .res 52  ; I want to be aware of the free memory
 
 ;--------------
 .segment "BSS" ; variables in ram
@@ -4235,7 +4244,6 @@ HandleInput:
     sta PlayerSpeed
     lda #PLAYER_SPEED_WALK_FRACTION
     sta PlayerSpeed + 1
-    jmp @finishInput ; no input at all
 
 @checkAttackTimer:
     lda AttackTimer
@@ -4245,6 +4253,9 @@ HandleInput:
     bne @finishInput
 
     jsr CheckB
+
+    lda hadKnockBack
+    bne @continueInput
 
     lda Buttons
     and #%00001111
@@ -4262,6 +4273,8 @@ HandleInput:
 
     ;gamepad button processing, the player could be moved here
     jsr ProcessButtons
+
+    jsr addKnockBack
 
     jsr IsPlayerCollidingWithNpcs
     bne @resetStuff
@@ -5869,7 +5882,35 @@ CheckDiagonal:
 @exit:
     rts
 ;--------------------------------------
+addKnockBack:
 
+    lda FishingRodActive
+    bne @exit
+
+    lda PlayerY + 1
+    clc
+    adc KnockBackY + 1
+    sta PlayerY + 1
+
+    lda PlayerY
+    adc KnockBackY
+    sta PlayerY
+
+
+
+    lda #0
+    sta KnockBackY
+    sta KnockBackY + 1
+    sta KnockBackX
+    sta KnockBackX + 1
+    sta hadKnockBack
+
+
+@exit:
+    rts
+
+
+;--------------------------------------
 ProcessButtons:
 
     lda FishingRodActive
