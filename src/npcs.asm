@@ -1690,26 +1690,26 @@ SingleNpcAI:
     lda TempNpcIndex
     cmp #NPC_IDX_BOSS
     bne @regularNpcAttack
-
+    ;Attack warning (BOSS only)
     lda bossWarning
     bne @regularNpcAttack
 
     lda Npcs, x
     clc
     adc #1
-    cmp #20
+    cmp #BOSS_DURATION_WARNING
     sta Npcs, x
     bcc @nextNpc
 
     dex
-    lda #160    ; boss attack frame
+    lda #BOSS_ATTACK_FRAME    ; boss attack frame
     sta Npcs, x
     inx
     lda #0
     sta Npcs, x ; reset the timer
     lda #1
     sta bossWarning
-
+    ;end of attack warning code
 @regularNpcAttack:
     lda Npcs, x
     clc
@@ -1723,12 +1723,12 @@ SingleNpcAI:
     bcc @nextNpc
 @resetAttackFrame:
 
-    dex
+    dex ;hop back to 'frame'
     lda Npcs, x
-    cmp #32
+    cmp #NPC_IDLE_FRAME
     beq @nextNpc
 
-    lda #32
+    lda #NPC_IDLE_FRAME
     sta Npcs, x
     jmp @nextNpc
 
