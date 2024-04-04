@@ -1787,12 +1787,12 @@ CheckNpcAttackBoxWithPlayer:
 
     lda #1
     sta hadKnockBack
-    lda #4
-    sta KnockBackX
+    lda #2
     sta KnockBackDirectionX
     lda #0
-    sta KnockBackX + 1
-
+    sta KnockBackIndex
+    sta KnockBackDirectionY
+    sta KnockBackDelay
 
     jmp @doDmg
 
@@ -1804,10 +1804,11 @@ CheckNpcAttackBoxWithPlayer:
     lda #1
     sta hadKnockBack
     sta KnockBackDirectionX
-    lda #4
-    sta KnockBackX
+
     lda #0
-    sta KnockBackX + 1
+    sta KnockBackIndex
+    sta KnockBackDirectionY
+    sta KnockBackDelay
 
     jmp @doDmg
 
@@ -1824,11 +1825,11 @@ CheckNpcAttackBoxWithPlayer:
 
     lda #1
     sta hadKnockBack
-    lda #252
-    sta KnockBackY
+    sta KnockBackDirectionY
     lda #0
-    sta KnockBackY + 1
     sta KnockBackDirectionX
+    sta KnockBackIndex
+    sta KnockBackDelay
 
     jmp @doDmg
 
@@ -1839,11 +1840,12 @@ CheckNpcAttackBoxWithPlayer:
 
     lda #1
     sta hadKnockBack
-    lda #4
-    sta KnockBackY
     lda #0
-    sta KnockBackY + 1
     sta KnockBackDirectionX
+    sta KnockBackIndex
+    sta KnockBackDelay
+    lda #2
+    sta KnockBackDirectionY
 
     jmp @doDmg
 

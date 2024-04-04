@@ -193,6 +193,21 @@ stamina_segment_values:
     .byte 96
     .byte 128
 
+knockBackValuesInteger:
+    .byte 2
+    .byte 1
+    .byte 0
+    .byte 0
+    .byte 0
+
+knockBackValuesFractions:
+    .byte 200
+    .byte 250
+    .byte 180
+    .byte 10
+    .byte 10
+
+
 
 .include "data/house_palette.asm"
 .include "data/main_palette.asm"
@@ -513,20 +528,21 @@ MapColumnAttributes:
 CheckpointSaved:
     .res 1
 
-KnockBackY:
-    .res 2
-KnockBackX:
-    .res 2
-
 hadKnockBack:
     .res 1
 KnockBackDirectionX:
+    .res 1
+KnockBackDirectionY:
+    .res 1
+KnockBackIndex:
+    .res 1
+KnockBackDelay:
     .res 1
 OldDirectionX:
     .res 1
 
 ZPBuffer:
-    .res 50  ; I want to be aware of the free memory
+    .res 51  ; I want to be aware of the free memory
 
 ;--------------
 .segment "BSS" ; variables in ram
@@ -5272,6 +5288,7 @@ ResetVariables:
     sta StaminaDelay
 
     lda #0
+    sta hadKnockBack
     sta CheckpointSaved
     sta BossDefeated
     sta menuTileTransferRowIdx
@@ -5563,6 +5580,7 @@ LoadCheckPoint:
     lda #4
     sta LocationBankNo
     lda #0
+    sta hadKnockBack
     sta ScrollX
     lda #$77
     sta PlayerX
@@ -5904,14 +5922,15 @@ KnockedBackLeft:
     beq @moveLeft
 @scrollLeft:
 
+    ldy KnockBackIndex
 
     lda ScrollX + 1
     sec
-    sbc KnockBackX + 1
+    sbc knockBackValuesFractions, y
     sta ScrollX + 1
 
     lda ScrollX
-    sbc KnockBackX
+    sbc knockBackValuesInteger, y
     sta ScrollX
 
     bcs @end
@@ -5931,19 +5950,20 @@ KnockedBackLeft:
 
 @moveLeft:
 
+    ldy KnockBackIndex
     lda PlayerX + 1
     sec
-    sbc KnockBackX + 1
+    sbc knockBackValuesFractions, y
     sta PlayerX + 1
 
     lda PlayerX
     beq @end
-    sbc KnockBackX
+    sbc knockBackValuesInteger, y
     sta PlayerX
 @end:
     rts
 ;--------------------------------------
-
+;TODO: same here as above
 KnockedBackRight:
 
     lda #2
@@ -5963,14 +5983,15 @@ KnockedBackRight:
     cmp ScreenCount
     beq @moveRight
 
+    ldy KnockBackIndex
 
     lda ScrollX + 1
     clc
-    adc KnockBackX + 1
+    adc knockBackValuesFractions, y
     sta ScrollX + 1
 
     lda ScrollX
-    adc KnockBackX
+    adc knockBackValuesInteger, y
     sta ScrollX
 
     bcc @end
@@ -5996,13 +6017,14 @@ KnockedBackRight:
 
 
 @moveRight:
+    ldy KnockBackIndex
     lda PlayerX + 1
     clc
-    adc KnockBackX + 1
+    adc knockBackValuesFractions, y
     sta PlayerX + 1
 
     lda PlayerX
-    adc KnockBackX
+    adc knockBackValuesInteger, y
     sta PlayerX
     adc #PLAYER_WIDTH
     bcc @end
@@ -6032,15 +6054,40 @@ addKnockBack:
     rts
 
 @cont:
+
+    lda KnockBackDirectionY
+    cmp #1
+    bne @knockBackDown
+    ;knockBackUp
+
+    ldy KnockBackIndex
+
     lda PlayerY + 1
-    clc
-    adc KnockBackY + 1
+    sec
+    sbc knockBackValuesFractions, y
     sta PlayerY + 1
 
     lda PlayerY
-    adc KnockBackY
+    sbc knockBackValuesInteger, y
     sta PlayerY
+    jmp @end
 
+@knockBackDown:
+    cmp #2
+    bne @horizontal
+    ldy KnockBackIndex
+
+    lda PlayerY + 1
+    clc
+    adc knockBackValuesFractions, y
+    sta PlayerY + 1
+
+    lda PlayerY
+    adc knockBackValuesInteger, y
+    sta PlayerY
+    jmp @end
+;------
+@horizontal:
     lda KnockBackDirectionX
     beq @end ; no direction
     cmp #1 ; left
@@ -6055,11 +6102,22 @@ addKnockBack:
    jsr KnockedBackRight
 
 @end:
+    inc KnockBackDelay
+    lda KnockBackDelay
+    cmp #2
+    bcc @exit
+
     lda #0
-    sta KnockBackY
-    sta KnockBackY + 1
-    sta KnockBackX
-    sta KnockBackX + 1
+    sta KnockBackDelay
+    inc KnockBackIndex
+    lda KnockBackIndex
+    cmp #5
+    bcs @reset
+
+    jmp @exit
+
+@reset:
+    lda #0
     sta hadKnockBack
 
 
@@ -6071,6 +6129,8 @@ addKnockBack:
 ProcessButtons:
 
     lda FishingRodActive
+    bne @exit
+    lda hadKnockBack
     bne @exit
 
     lda DirectionX
