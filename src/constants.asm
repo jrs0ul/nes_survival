@@ -182,6 +182,8 @@
     SCREEN_ROW_COUNT           = 30
     SCREEN_COLUMN_COUNT        = 32
 
+    SCREEN_MIDDLE              = 120
+
     CHARACTER_ZERO             = $30
 
     MAX_WARMTH_DELAY_OUTSIDE   = 60 ; how fast you lose warmth

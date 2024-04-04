@@ -520,10 +520,13 @@ KnockBackX:
 
 hadKnockBack:
     .res 1
-
+KnockBackDirectionX:
+    .res 1
+OldDirectionX:
+    .res 1
 
 ZPBuffer:
-    .res 52  ; I want to be aware of the free memory
+    .res 50  ; I want to be aware of the free memory
 
 ;--------------
 .segment "BSS" ; variables in ram
@@ -5881,12 +5884,154 @@ CheckDiagonal:
 
 @exit:
     rts
+;-------------------------------------
+;TODO: too similar to CheckLeft, should be merged
+KnockedBackLeft:
+
+    lda #1
+    sta ScrollDirection
+
+    lda OldDirectionX
+    sta DirectionX
+
+    lda PlayerX
+    cmp #SCREEN_MIDDLE
+    bcs @moveLeft
+
+    lda CurrentMapSegmentIndex ; is first screen
+    bne @scrollLeft                  ; nope
+    lda ScrollX
+    beq @moveLeft
+@scrollLeft:
+
+
+    lda ScrollX + 1
+    sec
+    sbc KnockBackX + 1
+    sta ScrollX + 1
+
+    lda ScrollX
+    sbc KnockBackX
+    sta ScrollX
+
+    bcs @end
+
+    lda CurrentMapSegmentIndex
+    beq @firstScreen
+    dec CurrentMapSegmentIndex
+    lda #1
+    sta CurrentScreenWasDecremented
+    jmp @end
+@firstScreen:
+    lda #0
+    sta ScrollX
+
+    jmp @end
+
+
+@moveLeft:
+
+    lda PlayerX + 1
+    sec
+    sbc KnockBackX + 1
+    sta PlayerX + 1
+
+    lda PlayerX
+    beq @end
+    sbc KnockBackX
+    sta PlayerX
+@end:
+    rts
+;--------------------------------------
+
+KnockedBackRight:
+
+    lda #2
+    sta ScrollDirection
+
+    lda OldDirectionX
+    sta DirectionX
+
+
+    lda PlayerX
+    cmp #SCREEN_MIDDLE
+    bcc @moveRight
+
+    lda CurrentMapSegmentIndex ; CurrentMapSegment + 1 == ScreenCount -> do not scroll
+    clc
+    adc #1
+    cmp ScreenCount
+    beq @moveRight
+
+
+    lda ScrollX + 1
+    clc
+    adc KnockBackX + 1
+    sta ScrollX + 1
+
+    lda ScrollX
+    adc KnockBackX
+    sta ScrollX
+
+    bcc @end
+
+    inc CurrentMapSegmentIndex
+    lda #1
+    sta CurrentScreenWasIncremented
+
+    lda CurrentMapSegmentIndex
+    clc
+    adc #1
+    cmp ScreenCount
+    beq @preLastScreen
+
+    jmp @end
+
+@preLastScreen:
+    lda #0          ;finshed to the last screen, set scroll to zero
+    sta ScrollX
+
+    jmp @end
+
+
+
+@moveRight:
+    lda PlayerX + 1
+    clc
+    adc KnockBackX + 1
+    sta PlayerX + 1
+
+    lda PlayerX
+    adc KnockBackX
+    sta PlayerX
+    adc #PLAYER_WIDTH
+    bcc @end
+
+    lda #$FF
+    sec
+    sbc #PLAYER_WIDTH
+    sta PlayerX
+
+
+@end:
+
+    rts
+
 ;--------------------------------------
 addKnockBack:
 
-    lda FishingRodActive
-    bne @exit
+    lda hadKnockBack
+    bne @continue
 
+    rts
+
+@continue:
+    lda FishingRodActive
+    beq @cont
+
+    rts
+
+@cont:
     lda PlayerY + 1
     clc
     adc KnockBackY + 1
@@ -5896,8 +6041,20 @@ addKnockBack:
     adc KnockBackY
     sta PlayerY
 
+    lda KnockBackDirectionX
+    beq @end ; no direction
+    cmp #1 ; left
+    bne @knockedRight
 
+    jsr KnockedBackLeft
 
+    jmp @end
+
+@knockedRight:
+
+   jsr KnockedBackRight
+
+@end:
     lda #0
     sta KnockBackY
     sta KnockBackY + 1
@@ -5916,6 +6073,8 @@ ProcessButtons:
     lda FishingRodActive
     bne @exit
 
+    lda DirectionX
+    sta OldDirectionX
     lda #0
     sta DirectionX
     sta DirectionY
@@ -6743,7 +6902,7 @@ CheckLeft:
     jsr SetupCheckLeft
 
     lda PlayerX
-    cmp #120    ;check if player is in the left side of the screen
+    cmp #SCREEN_MIDDLE    ;check if player is in the left side of the screen
     bcs @moveLeft
 
     lda CurrentMapSegmentIndex ; is first screen
@@ -6813,7 +6972,7 @@ CheckRight:
     jsr SetupCheckRight
 
     lda PlayerX
-    cmp #120
+    cmp #SCREEN_MIDDLE
     bcc @moveRight  ;not gonna scroll until playerx + 8 >= 128
 
     lda CurrentMapSegmentIndex ; CurrentMapSegment + 1 == ScreenCount -> do not scroll
@@ -6832,7 +6991,7 @@ CheckRight:
     sta ScrollX
 
     bcc @exit ; no overflow
-@clamp:
+
     inc CurrentMapSegmentIndex
     lda #1
     sta CurrentScreenWasIncremented
