@@ -723,6 +723,7 @@ npc_BOAR_frames_UP:
     .byte <npc_BOAR_frame_UP_1,   >npc_BOAR_frame_UP_1
     .byte <npc_BOAR_frame_UP_2,   >npc_BOAR_frame_UP_2
     .byte <npc_BOAR_frame_UP_1,   >npc_BOAR_frame_UP_1
+    .byte <npc_BOAR_frame_UP_WARN,>npc_BOAR_frame_UP_WARN
     .byte <npc_BOAR_frame_UP_ATK, >npc_BOAR_frame_UP_ATK
     .byte <npc_BOAR_frame_DTH,    >npc_BOAR_frame_DTH
 
@@ -744,11 +745,18 @@ npc_BOAR_frame_UP_2:
     .byte 8, $9B, %00000000, 0
     .byte 8, $9C, %00000000, 8
 
-npc_BOAR_frame_UP_ATK:
+npc_BOAR_frame_UP_WARN:
     .byte 0, $5C, %00000000, 0
     .byte 0, $5D, %00000000, 8
     .byte 8, $6C, %00000000, 0
     .byte 8, $6D, %00000000, 8
+
+npc_BOAR_frame_UP_ATK:
+    .byte 0, $8D, %00000000, 0
+    .byte 0, $8E, %00000000, 8
+    .byte 8, $6C, %00000000, 0
+    .byte 8, $6D, %00000000, 8
+
 
 ;------------------------------
 npc_BOAR_frames_DOWN:
@@ -756,6 +764,7 @@ npc_BOAR_frames_DOWN:
     .byte <npc_BOAR_frame_DOWN_1,   >npc_BOAR_frame_DOWN_1
     .byte <npc_BOAR_frame_DOWN_2,   >npc_BOAR_frame_DOWN_2
     .byte <npc_BOAR_frame_DOWN_1,   >npc_BOAR_frame_DOWN_1
+    .byte <npc_BOAR_frame_DOWN_WARN,>npc_BOAR_frame_DOWN_WARN
     .byte <npc_BOAR_frame_DOWN_ATK, >npc_BOAR_frame_DOWN_ATK
     .byte <npc_BOAR_frame_DTH,      >npc_BOAR_frame_DTH
 
@@ -777,11 +786,18 @@ npc_BOAR_frame_DOWN_2:
     .byte 8, $2D, %00000000, 0
     .byte 8, $8A, %01000000, 8
 
-npc_BOAR_frame_DOWN_ATK:
+npc_BOAR_frame_DOWN_WARN:
     .byte 0, $3F, %00000000, 0
     .byte 0, $3F, %01000000, 8
     .byte 8, $4F, %00000000, 0
     .byte 8, $4F, %01000000, 8
+
+npc_BOAR_frame_DOWN_ATK:
+    .byte 0, $3F, %00000000, 0
+    .byte 0, $3F, %01000000, 8
+    .byte 8, $4C, %00000000, 0
+    .byte 8, $4C, %01000000, 8
+
 
 ;=======================================================
 ;BOSS
