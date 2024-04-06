@@ -887,7 +887,7 @@ OnCollisionWithAttackRect:
     lda #32
     sta Npcs, y ;timer
     dey
-    lda #5*32
+    lda #NPC_DEATH_FRAME
     sta Npcs, y ;frame
 
     tya
@@ -1760,7 +1760,7 @@ npcGoToAttackStateFromWarning:
     clc
     adc #7 ; move to frame
     tax
-    lda #BOSS_ATTACK_FRAME    ; boss attack frame
+    lda #NPC_ATTACK_FRAME    ; boss attack frame
     sta Npcs, x
     inx
     lda #0
@@ -2608,8 +2608,8 @@ SetDirectionForBoar:
     tax
 
     lda Npcs, x
-    and #%00000100
-    beq @doRandom
+    and #%00001000 ; check the agitation bit
+    beq @doRandom  ; if not set move randomly
 
 
 @done:
@@ -3004,7 +3004,7 @@ OnCollisionWithPlayer:
     adc #7 ;move from "state" to "frame"
     tax 
 
-    lda #NPC_ATTACK_FRAME
+    lda #NPC_WARNING_FRAME
     sta Npcs, x ;attack frame
     inx ; timer
     lda #0

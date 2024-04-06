@@ -41,6 +41,7 @@ npc_BUNNY_frame_LEFT:
     .byte <npc_BUNNY_frame_LEFT_2,   >npc_BUNNY_frame_LEFT_2
     .byte <npc_BUNNY_frame_LEFT_1,   >npc_BUNNY_frame_LEFT_1
     .byte                       0,   0
+    .byte                       0,   0
     .byte <npc_BUNNY_frame_DTH,      >npc_BUNNY_frame_DTH
 
 
@@ -68,6 +69,7 @@ npc_BUNNY_frame_RIGHT:
     .byte <npc_BUNNY_frame_RIGHT_1,  >npc_BUNNY_frame_RIGHT_1
     .byte <npc_BUNNY_frame_RIGHT_2,  >npc_BUNNY_frame_RIGHT_2
     .byte <npc_BUNNY_frame_RIGHT_1,  >npc_BUNNY_frame_RIGHT_1
+    .byte                        0,  0
     .byte                        0,  0
     .byte <npc_BUNNY_frame_DTH,      >npc_BUNNY_frame_DTH
 
@@ -97,6 +99,7 @@ npc_BUNNY_frame_UP:
     .byte <npc_BUNNY_frame_UP_2,  >npc_BUNNY_frame_UP_2
     .byte <npc_BUNNY_frame_UP_1,  >npc_BUNNY_frame_UP_1
     .byte                     0,  0
+    .byte                     0,  0
     .byte <npc_BUNNY_frame_DTH,   >npc_BUNNY_frame_DTH
 
 npc_BUNNY_frame_UP_0:
@@ -123,6 +126,7 @@ npc_BUNNY_frame_DOWN:
     .byte <npc_BUNNY_frame_DOWN_1,  >npc_BUNNY_frame_DOWN_1
     .byte <npc_BUNNY_frame_DOWN_2,  >npc_BUNNY_frame_DOWN_2
     .byte <npc_BUNNY_frame_DOWN_1,  >npc_BUNNY_frame_DOWN_1
+    .byte                       0,  0
     .byte                       0,  0
     .byte <npc_BUNNY_frame_DTH,     >npc_BUNNY_frame_DTH
 

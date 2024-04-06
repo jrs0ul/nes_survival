@@ -287,8 +287,9 @@
     NPC_DELAY_DAMAGED          = 32
 
     NPC_IDLE_FRAME             = 32
-    NPC_ATTACK_FRAME           = 128
-    BOSS_ATTACK_FRAME          = 160
+    NPC_WARNING_FRAME          = 128
+    NPC_ATTACK_FRAME           = 160
+    NPC_DEATH_FRAME            = 6 * 32
     BOSS_DURATION_WARNING      = 20
 
     NPC_STATE_DAMAGED          = 3
