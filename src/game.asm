@@ -1127,7 +1127,13 @@ Item_Location14_Collection_times:
 
 Npcs:   ;animals and stuff
     .res 160 ; max 16 npcs * 10 bytes:
-            ;   (npc type(5 bits) + agitatded?(1bit) + state(2 bit, 0 - dead, 1 - alive/idle, 2 - attacks, 3 - damaged),
+            ;   (npc type(4 bits) + agitatded?(1bit) + state(3 bit,
+            ;                                                0 - dead,
+            ;                                                1 - alive/idle,
+            ;                                                2 - attacks,
+            ;                                                3 - damaged,
+            ;                                                4 - warning
+            ;       ),
             ;   x (2 bytes),
             ;   y (2 bytes),
             ;   screen_index
@@ -1239,13 +1245,10 @@ TempLocationPos:
 DialogTextContainer:
     .res 96
 
-bossWarning:
-    .res 1
-
 SaveData: ; inventory         HP | Food | Fuel | Warmth | Time | Equipment
     .res INVENTORY_MAX_SIZE + 3  +   3 +   3   +   3    +   5  +    4
 Buffer:
-    .res 37  ;must see how much is still available
+    .res 38  ;must see how much is still available
 
 ;====================================================================================
 

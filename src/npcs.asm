@@ -181,7 +181,7 @@ GenerateSingleNpc:
     ldy #12
     lda npc_data, y
     sta TempHp
-    lda #%00001001
+    lda #%00010001
     jmp @storeType
 @makeWolf:
     ldy #1
@@ -207,7 +207,7 @@ GenerateSingleNpc:
     ldy #60
     lda npc_data, y
     sta TempHp
-    lda #%00111001
+    lda #%01110001
     jmp @storeType
 
 @makeCanid:
@@ -219,7 +219,7 @@ GenerateSingleNpc:
     ldy #28
     lda npc_data, y
     sta TempHp
-    lda #%00011001
+    lda #%00110001
 @storeType:
     sta Npcs, x
     inx
@@ -355,7 +355,7 @@ SingleNpcVSPlayerCollision:
     tay
 
     lda Npcs, y; let's get the state
-    and #%00000011 ; let's ignore agitation bit
+    and #%00000111 ; let's ignore agitation bit
     sta TempNpcState
     cmp #0
     beq @exit ; it's dead
@@ -363,7 +363,8 @@ SingleNpcVSPlayerCollision:
     lda Npcs, y ; let's get DB index
     lsr
     lsr
-    lsr ;eliminate 3 state bits
+    lsr
+    lsr;eliminate 4 state bits
 
 
     sty TempNpcDataIdxForCollision
@@ -533,7 +534,7 @@ CheckSingleNpcAgainstPlayerHit:
     tay
 
     lda Npcs, y; let's get the state
-    and #%00000011 ; ignoring the agitation bit
+    and #%00000111 ; ignoring the agitation bit
     sta TempNpcState
     cmp #0
     bne  @cont
@@ -541,6 +542,7 @@ CheckSingleNpcAgainstPlayerHit:
     rts ; it's dead
 @cont:
     lda Npcs, y ; let's get DB index
+    lsr
     lsr
     lsr
     lsr ;eliminate 3 state bits
@@ -894,7 +896,7 @@ OnCollisionWithAttackRect:
     tay
 
     lda Npcs, y
-    and #%11111000; drop three last bits that stand for status
+    and #%11110000; drop 4 last bits that stand for status
     sta Npcs, y
 
     lda TempNpcIndex
@@ -915,8 +917,8 @@ OnCollisionWithAttackRect:
     sbc #9 ; going back to status from hp
     tay
     lda Npcs, y
-    and #%11111000
-    eor #%00000111 ; setting agitation bit + damaged state
+    and #%11110000
+    eor #%00001011 ; setting agitation bit + damaged state
 
     sta Npcs, y
     iny
@@ -1289,7 +1291,7 @@ UpdateSingleNpcSprites:
     tay
 
     lda Npcs, y ; index + agitation + state
-    and #%00000011
+    and #%00000111
     sta TempNpcState
 
     jsr CollectSingleNpcData
@@ -1415,6 +1417,7 @@ CollectSingleNpcData:
     lsr
     lsr
     lsr
+    lsr ; push out 3bit status and agitation bit
 
     sty Temp; store Npcs index
     sta TempNpcIndex ; what kind of npc is this ?
@@ -1542,7 +1545,7 @@ doNpcAI:
     tax
 
     lda Npcs, x ;type + active
-    and #%00000011
+    and #%00000111
     sta TempNpcState
     cmp #0
     bne @cont ; not dead
@@ -1620,6 +1623,7 @@ FetchNpcVars:
     lsr
     lsr
     lsr
+    lsr
     sta TempNpcIndex ;extracted type index
     stx TempIndex
     asl
@@ -1650,10 +1654,12 @@ FetchNpcVars:
 SingleNpcAI:
 
     lda TempNpcState
-    cmp #NPC_STATE_ATTACK  ;is attack?
-    beq @attackState
-    cmp #NPC_STATE_DAMAGED ;is damaged?
+    cmp #NPC_STATE_WARNING  ;npc shows it is about to attack
+    beq @warningState
+    cmp #NPC_STATE_DAMAGED  ;is damaged?
     beq @damagedState
+    cmp #NPC_STATE_ATTACK   ;npc is attacking
+    beq @attackState
 
 @idleState:
     lda TempNpcType
@@ -1682,17 +1688,17 @@ SingleNpcAI:
 
     jmp @nextNpc
 
-@attackState:
+@warningState:
     inx ; dir 
     inx ; frame
     inx ; timer
 
-    lda TempNpcIndex
-    cmp #NPC_IDX_BOSS
-    bne @regularNpcAttack
+    ;lda TempNpcIndex
+    ;cmp #NPC_IDX_BOSS
+    ;bne @regularNpcAttack
     ;Attack warning (BOSS only)
-    lda bossWarning
-    bne @regularNpcAttack
+    ;lda bossWarning
+    ;bne @regularNpcAttack
 
     lda Npcs, x
     clc
@@ -1701,16 +1707,13 @@ SingleNpcAI:
     sta Npcs, x
     bcc @nextNpc
 
-    dex
-    lda #BOSS_ATTACK_FRAME    ; boss attack frame
-    sta Npcs, x
-    inx
-    lda #0
-    sta Npcs, x ; reset the timer
-    lda #1
-    sta bossWarning
+    jsr npcGoToAttackStateFromWarning
+    jmp @nextNpc
     ;end of attack warning code
-@regularNpcAttack:
+@attackState:
+    inx ; dir
+    inx ;frame
+    inx ;timer
     lda Npcs, x
     clc
     adc #1
@@ -1743,6 +1746,28 @@ SingleNpcAI:
 @nextNpc:
 
     rts
+;---------------------------
+npcGoToAttackStateFromWarning:
+    txa
+    sec
+    sbc #8 ; move to state
+    tax
+    lda Npcs, x
+    and #%11111000
+    eor #%00000010 ; attack state
+    sta Npcs, x
+    txa
+    clc
+    adc #7 ; move to frame
+    tax
+    lda #BOSS_ATTACK_FRAME    ; boss attack frame
+    sta Npcs, x
+    inx
+    lda #0
+    sta Npcs, x ; reset the timer
+
+    rts
+
 ;--------------------------
 ;x is at npc timer
 ResetNpcState:
@@ -1756,7 +1781,7 @@ ResetNpcState:
     tax
 
     lda Npcs, x
-    and #%11111100 ;clear state
+    and #%11111000 ;clear state
     eor #000000001 ;idle state
     sta Npcs, x
 
@@ -2441,8 +2466,8 @@ CheckAgitationByPlayer:
     dex ;state
     ;set agitated
     lda Npcs, x
-    and #%11111011
-    eor #%00000100
+    and #%11110111
+    eor #%00001000
     sta Npcs, x
 
 @exit:
@@ -2965,13 +2990,13 @@ OnCollisionWithPlayer:
     dex ;status
     lda Npcs, x
 
-    and #%00000011
+    and #%00000111
     cmp #NPC_STATE_DAMAGED
     beq @collides ; don't attack if in damaged state
 
     lda Npcs, x     ;  reload the status
-    and #%11111100  ;  remove previous status
-    eor #%00000010  ;  set the attack state
+    and #%11111000  ;  remove previous status
+    eor #%00000100  ;  set the warning state
     sta Npcs, x
 
     txa
@@ -2984,7 +3009,6 @@ OnCollisionWithPlayer:
     inx ; timer
     lda #0
     sta Npcs, x
-    sta bossWarning ; reset the boss warning
     dex ;frame
     dex ;direction
     dex ;screen

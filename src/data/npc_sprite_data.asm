@@ -168,6 +168,7 @@ npc_DOGMAN_frame_LEFT:
     .byte <npc_DOGMAN_frame_LEFT_1,   >npc_DOGMAN_frame_LEFT_1
     .byte <npc_DOGMAN_frame_LEFT_2,   >npc_DOGMAN_frame_LEFT_2
     .byte <npc_DOGMAN_frame_LEFT_1,   >npc_DOGMAN_frame_LEFT_1
+    .byte <npc_DOGMAN_frame_LEFT_1,   >npc_DOGMAN_frame_LEFT_1 ; warning
     .byte <npc_DOGMAN_frame_LEFT_ATK, >npc_DOGMAN_frame_LEFT_ATK
     .byte <npc_DOGMAN_frame_DTH,      >npc_DOGMAN_frame_DTH
 
@@ -210,6 +211,7 @@ npc_DOGMAN_frame_RIGHT:
     .byte <npc_DOGMAN_frame_RIGHT_1,   >npc_DOGMAN_frame_RIGHT_1
     .byte <npc_DOGMAN_frame_RIGHT_2,   >npc_DOGMAN_frame_RIGHT_2
     .byte <npc_DOGMAN_frame_RIGHT_1,   >npc_DOGMAN_frame_RIGHT_1
+    .byte <npc_DOGMAN_frame_RIGHT_1,   >npc_DOGMAN_frame_RIGHT_1 ; warning
     .byte <npc_DOGMAN_frame_RIGHT_ATK, >npc_DOGMAN_frame_RIGHT_ATK
     .byte <npc_DOGMAN_frame_DTH,       >npc_DOGMAN_frame_DTH
 
@@ -251,6 +253,7 @@ npc_DOGMAN_frame_UP:
     .byte <npc_DOGMAN_frame_UP_1,   >npc_DOGMAN_frame_UP_1
     .byte <npc_DOGMAN_frame_UP_2,   >npc_DOGMAN_frame_UP_2
     .byte <npc_DOGMAN_frame_UP_1,   >npc_DOGMAN_frame_UP_1
+    .byte <npc_DOGMAN_frame_UP_1,   >npc_DOGMAN_frame_UP_1 ; warning
     .byte <npc_DOGMAN_frame_UP_ATK, >npc_DOGMAN_frame_UP_ATK
     .byte <npc_DOGMAN_frame_DTH,    >npc_DOGMAN_frame_DTH
 
@@ -292,6 +295,7 @@ npc_DOGMAN_frame_DOWN:
     .byte <npc_DOGMAN_frame_DOWN_1,   >npc_DOGMAN_frame_DOWN_1
     .byte <npc_DOGMAN_frame_DOWN_2,   >npc_DOGMAN_frame_DOWN_2
     .byte <npc_DOGMAN_frame_DOWN_1,   >npc_DOGMAN_frame_DOWN_1
+    .byte <npc_DOGMAN_frame_DOWN_1,   >npc_DOGMAN_frame_DOWN_1 ; warning
     .byte <npc_DOGMAN_frame_DOWN_ATK, >npc_DOGMAN_frame_DOWN_ATK
     .byte <npc_DOGMAN_frame_DTH,      >npc_DOGMAN_frame_DTH
 
@@ -349,6 +353,7 @@ npc_HOUND_frame_LEFT:
     .byte <npc_HOUND_frame_LEFT_1,   >npc_HOUND_frame_LEFT_1
     .byte <npc_HOUND_frame_LEFT_2,   >npc_HOUND_frame_LEFT_2
     .byte <npc_HOUND_frame_LEFT_1,   >npc_HOUND_frame_LEFT_1
+    .byte <npc_HOUND_frame_LEFT_WARN,>npc_HOUND_frame_LEFT_WARN
     .byte <npc_HOUND_frame_LEFT_ATK, >npc_HOUND_frame_LEFT_ATK
     .byte <npc_HOUND_frame_DTH,      >npc_HOUND_frame_DTH
 
@@ -370,11 +375,17 @@ npc_HOUND_frame_LEFT_2:
     .byte 8, $CA, %00000000, 0
     .byte 8, $CB, %00000000, 8
 
-npc_HOUND_frame_LEFT_ATK:
+npc_HOUND_frame_LEFT_WARN:
     .byte 0, $DA, %00000000, 0
     .byte 0, $DB, %00000000, 8
     .byte 8, $EA, %00000000, 0
     .byte 8, $EB, %00000000, 8
+npc_HOUND_frame_LEFT_ATK:
+    .byte 0, $AC, %00000000, 0
+    .byte 0, $DB, %00000000, 8
+    .byte 8, $EA, %00000000, 0
+    .byte 8, $EB, %00000000, 8
+
 
 
 npc_HOUND_frame_RIGHT:
@@ -382,6 +393,7 @@ npc_HOUND_frame_RIGHT:
     .byte <npc_HOUND_frame_RIGHT_1,   >npc_HOUND_frame_RIGHT_1
     .byte <npc_HOUND_frame_RIGHT_2,   >npc_HOUND_frame_RIGHT_2
     .byte <npc_HOUND_frame_RIGHT_1,   >npc_HOUND_frame_RIGHT_1
+    .byte <npc_HOUND_frame_RIGHT_WARN,>npc_HOUND_frame_RIGHT_WARN
     .byte <npc_HOUND_frame_RIGHT_ATK, >npc_HOUND_frame_RIGHT_ATK
     .byte <npc_HOUND_frame_DTH,       >npc_HOUND_frame_DTH
 
@@ -403,17 +415,25 @@ npc_HOUND_frame_RIGHT_2:
     .byte 8, $CB, %01000000, 0
     .byte 8, $CA, %01000000, 8
 
-npc_HOUND_frame_RIGHT_ATK:
+npc_HOUND_frame_RIGHT_WARN:
     .byte 0, $DB, %01000000, 0
     .byte 0, $DA, %01000000, 8
     .byte 8, $EB, %01000000, 0
     .byte 8, $EA, %01000000, 8
+
+npc_HOUND_frame_RIGHT_ATK:
+    .byte 0, $DB, %01000000, 0
+    .byte 0, $AC, %01000000, 8
+    .byte 8, $EB, %01000000, 0
+    .byte 8, $EA, %01000000, 8
+
 
 npc_HOUND_frame_UP:
     .byte <npc_HOUND_frame_UP_0,   >npc_HOUND_frame_UP_0
     .byte <npc_HOUND_frame_UP_1,   >npc_HOUND_frame_UP_1
     .byte <npc_HOUND_frame_UP_2,   >npc_HOUND_frame_UP_2
     .byte <npc_HOUND_frame_UP_1,   >npc_HOUND_frame_UP_1
+    .byte <npc_HOUND_frame_UP_WARN,>npc_HOUND_frame_UP_WARN
     .byte <npc_HOUND_frame_UP_ATK, >npc_HOUND_frame_UP_ATK
     .byte <npc_HOUND_frame_DTH,    >npc_HOUND_frame_DTH
 
@@ -435,17 +455,25 @@ npc_HOUND_frame_UP_2:
     .byte 8, $CC, %00000000, 0
     .byte 8, $AF, %01000000, 8
 
-npc_HOUND_frame_UP_ATK:
+npc_HOUND_frame_UP_WARN:
     .byte 0, $DC, %00000000, 0
     .byte 0, $DD, %00000000, 8
     .byte 8, $EC, %00000000, 0
     .byte 8, $ED, %00000000, 8
+
+npc_HOUND_frame_UP_ATK:
+    .byte 0, $8F, %00000000, 0
+    .byte 0, $8F, %01000000, 8
+    .byte 8, $EC, %00000000, 0
+    .byte 8, $ED, %00000000, 8
+
 
 npc_HOUND_frame_DOWN:
     .byte <npc_HOUND_frame_DOWN_0,   >npc_HOUND_frame_DOWN_0
     .byte <npc_HOUND_frame_DOWN_1,   >npc_HOUND_frame_DOWN_1
     .byte <npc_HOUND_frame_DOWN_2,   >npc_HOUND_frame_DOWN_2
     .byte <npc_HOUND_frame_DOWN_1,   >npc_HOUND_frame_DOWN_1
+    .byte <npc_HOUND_frame_DOWN_WARN,>npc_HOUND_frame_DOWN_WARN
     .byte <npc_HOUND_frame_DOWN_ATK, >npc_HOUND_frame_DOWN_ATK
     .byte <npc_HOUND_frame_DTH,      >npc_HOUND_frame_DTH
 
@@ -467,11 +495,18 @@ npc_HOUND_frame_DOWN_2:
     .byte 8, $EF, %00000000, 0
     .byte 8, $CF, %01000000, 8
 
-npc_HOUND_frame_DOWN_ATK:
+npc_HOUND_frame_DOWN_WARN:
     .byte 0, $DE, %00000000, 0
     .byte 0, $DE, %01000000, 8
     .byte 8, $EE, %00000000, 0
     .byte 8, $EE, %01000000, 8
+
+npc_HOUND_frame_DOWN_ATK:
+    .byte 0, $CD, %00000000, 0
+    .byte 0, $CD, %01000000, 8
+    .byte 8, $EE, %00000000, 0
+    .byte 8, $EE, %01000000, 8
+
 
 
 ;================================================
@@ -657,6 +692,7 @@ npc_BOAR_frames_LEFT:
     .byte <npc_BOAR_frame_LEFT_1,   >npc_BOAR_frame_LEFT_1
     .byte <npc_BOAR_frame_LEFT_2,   >npc_BOAR_frame_LEFT_2
     .byte <npc_BOAR_frame_LEFT_1,   >npc_BOAR_frame_LEFT_1
+    .byte <npc_BOAR_frame_LEFT_WARN,>npc_BOAR_frame_LEFT_WARN
     .byte <npc_BOAR_frame_LEFT_ATK, >npc_BOAR_frame_LEFT_ATK
     .byte <npc_BOAR_frame_DTH,      >npc_BOAR_frame_DTH
 
@@ -678,11 +714,18 @@ npc_BOAR_frame_LEFT_2:
     .byte 8, $2E, %00000000, 0
     .byte 8, $2F, %00000000, 8
 
-npc_BOAR_frame_LEFT_ATK:
+npc_BOAR_frame_LEFT_WARN:
     .byte 0, $5A, %00000000, 0
     .byte 0, $5B, %00000000, 8
     .byte 8, $6A, %00000000, 0
     .byte 8, $6B, %00000000, 8
+
+npc_BOAR_frame_LEFT_ATK:
+    .byte 0, $5A, %00000000, 0
+    .byte 0, $5F, %00000000, 8
+    .byte 8, $6E, %00000000, 0
+    .byte 8, $6F, %00000000, 8
+
 
 ;----------------------------------
 npc_BOAR_frames_RIGHT:
@@ -690,6 +733,7 @@ npc_BOAR_frames_RIGHT:
     .byte <npc_BOAR_frame_RIGHT_1,   >npc_BOAR_frame_RIGHT_1
     .byte <npc_BOAR_frame_RIGHT_2,   >npc_BOAR_frame_RIGHT_2
     .byte <npc_BOAR_frame_RIGHT_1,   >npc_BOAR_frame_RIGHT_1
+    .byte <npc_BOAR_frame_RIGHT_WARN,>npc_BOAR_frame_RIGHT_WARN
     .byte <npc_BOAR_frame_RIGHT_ATK, >npc_BOAR_frame_RIGHT_ATK
     .byte <npc_BOAR_frame_DTH,       >npc_BOAR_frame_DTH
 
@@ -711,11 +755,18 @@ npc_BOAR_frame_RIGHT_2:
     .byte 8, $2F, %01000000, 0
     .byte 8, $2E, %01000000, 8
 
-npc_BOAR_frame_RIGHT_ATK:
+npc_BOAR_frame_RIGHT_WARN:
     .byte 0, $5B, %01000000, 0
     .byte 0, $5A, %01000000, 8
     .byte 8, $6B, %01000000, 0
     .byte 8, $6A, %01000000, 8
+
+npc_BOAR_frame_RIGHT_ATK:
+    .byte 0, $5F, %01000000, 0
+    .byte 0, $5A, %01000000, 8
+    .byte 8, $6F, %01000000, 0
+    .byte 8, $6E, %01000000, 8
+
 
 ;-------------------------------
 npc_BOAR_frames_UP:

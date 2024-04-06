@@ -293,6 +293,7 @@
 
     NPC_STATE_DAMAGED          = 3
     NPC_STATE_ATTACK           = 2
+    NPC_STATE_WARNING          = 4
 
     NPC_TYPE_TIMID             = 0
     NPC_TYPE_PREDATOR          = 1
