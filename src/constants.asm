@@ -26,9 +26,12 @@
     BUTTON_B_MASK              = %01000000
     BUTTON_A_MASK              = %10000000
 
-    NPC_MAX_COUNT              = 16
 
     PROJECTILE_MAX_COUNT       = 10
+
+    NPC_MAX_COUNT              = 16
+
+    NPC_AGITATION_BIT          = %00001000
 
 .if FAMISTUDIO_CFG_PAL_SUPPORT
     NPC_SPEED                  = 1
@@ -290,7 +293,8 @@
     NPC_WARNING_FRAME          = 128
     NPC_ATTACK_FRAME           = 160
     NPC_DEATH_FRAME            = 6 * 32
-    BOSS_DURATION_WARNING      = 20
+    NPC_DURATION_WARNING       = 10
+    NPC_BOSS_DURATION_WARNING  = 20
 
     NPC_STATE_DAMAGED          = 3
     NPC_STATE_ATTACK           = 2

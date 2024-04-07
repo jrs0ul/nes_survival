@@ -443,6 +443,7 @@ SingleNpcVSPlayerCollision:
     rts
 ;-------------------------------------
 ;Does player collides with an npc?
+;oposite subroutine is OnCollisionWithPlayer
 PlayerNpcCollision:
 
     lda TempPointX
@@ -463,18 +464,20 @@ PlayerNpcCollision:
 
 ;--
     lda PlayerX
-    cmp TempPointX2
+    clc
+    adc #3
+    cmp TempPointX2 ; Little bit more than just PlayerX
     bcs @exit
 
     lda PlayerX
     clc
-    adc #PLAYER_WIDTH
+    adc #PLAYER_WIDTH - 3 ; and less than a full player width
     cmp TempPointX
     bcc @exit
     beq @exit
 
     lda PlayerY
-    cmp TempPointY2
+    cmp TempPointY2 
     bcs @exit
 
     lda PlayerY
@@ -1666,8 +1669,9 @@ SingleNpcAI:
     cmp #NPC_TYPE_VILLAGER
     beq @changeDir
     cmp #NPC_TYPE_PASSIVE
-    beq @nextNpc
-    jmp @moveNpc
+    bne @moveNpc
+
+    rts
 
 @changeDir:
     jsr ChangeNpcDirection
@@ -1693,20 +1697,30 @@ SingleNpcAI:
     inx ; frame
     inx ; timer
 
-    ;lda TempNpcIndex
-    ;cmp #NPC_IDX_BOSS
-    ;bne @regularNpcAttack
-    ;Attack warning (BOSS only)
-    ;lda bossWarning
-    ;bne @regularNpcAttack
+    lda TempNpcIndex
+    cmp #NPC_IDX_BOSS
+
+    beq @bossWarning
 
     lda Npcs, x
     clc
     adc #1
-    cmp #BOSS_DURATION_WARNING
     sta Npcs, x
-    bcc @nextNpc
 
+    cmp #NPC_DURATION_WARNING
+    bcc @nextNpc
+    jmp @enterAttackState
+
+@bossWarning:
+
+    lda Npcs, x
+    clc
+    adc #1
+    sta Npcs, x
+
+    cmp #NPC_BOSS_DURATION_WARNING
+    bcc @nextNpc
+@enterAttackState:
     jsr npcGoToAttackStateFromWarning
     jmp @nextNpc
     ;end of attack warning code
@@ -1746,6 +1760,7 @@ SingleNpcAI:
 @nextNpc:
 
     rts
+
 ;---------------------------
 npcGoToAttackStateFromWarning:
     txa
@@ -2187,7 +2202,7 @@ NpcMovement:
 
     dex; state (was at x coord)
     lda Npcs, x ; index and stuff
-    and #%00000100 ; check agitated bit
+    and #NPC_AGITATION_BIT ; check the agitation bit
     beq @done_timid ; not agitated
 
     lda TempNpcMovesDiagonaly
@@ -2467,7 +2482,7 @@ CheckAgitationByPlayer:
     ;set agitated
     lda Npcs, x
     and #%11110111
-    eor #%00001000
+    eor #NPC_AGITATION_BIT
     sta Npcs, x
 
 @exit:
@@ -2608,7 +2623,7 @@ SetDirectionForBoar:
     tax
 
     lda Npcs, x
-    and #%00001000 ; check the agitation bit
+    and #NPC_AGITATION_BIT ; check the agitation bit
     beq @doRandom  ; if not set move randomly
 
 
@@ -2738,8 +2753,8 @@ SetDirectionForTimidNpc:
     sbc #5 ; go back to status
     tax
     lda Npcs, x
-    and #%00000100 ; check the agitation bit
-    beq @doRandom
+    and #NPC_AGITATION_BIT ; is npc agitated ?
+    beq @doRandom  ; no ? then move randomly
 
     inx ; x
     inx ; y
@@ -2925,8 +2940,13 @@ OnCollisionWithPlayer:
     ;calc player box
     lda PlayerX
     clc
-    adc #PLAYER_WIDTH
+    adc #PLAYER_WIDTH - 3  ;bit less than full player width
     sta TempX
+
+    lda PlayerX
+    clc
+    adc #3
+    sta TempPointX2 ; bit more than just PlayerX
 
     lda PlayerY
     clc
@@ -2934,20 +2954,14 @@ OnCollisionWithPlayer:
     sta TempY
     ;---------------
 
-    ;dex ;y2
-    ;dex ;y
     lda NewNpcY
     sta TempPointY
 
 ;----x position to check
-    ;dex ;x2
-    ;dex ;x
     lda NewNpcX
     sec
     sbc ScrollX
     sta TempPointX
-    ;inx
-    ;inx ; back to screen idx
 ;-----
 
     lda TempNpcRows
@@ -2968,7 +2982,7 @@ OnCollisionWithPlayer:
     lda TempPointX
     clc
     adc TempNpcWidth
-    cmp PlayerX
+    cmp TempPointX2
     bcc @exit
     beq @exit
 
