@@ -40,6 +40,9 @@ LoadNpcs:
     sta Npcs, x ; hp
     inx
     iny
+    lda #0
+    sta Npcs, x ; clear the dmg timer
+    inx
 
     dec TempNpcCnt
     lda TempNpcCnt
@@ -355,7 +358,7 @@ SingleNpcVSPlayerCollision:
     tay
 
     lda Npcs, y; let's get the state
-    and #%00000111 ; let's ignore agitation bit
+    and #%00000011 ; let's ignore agitation and damage bits
     sta TempNpcState
     cmp #0
     beq @exit ; it's dead
@@ -537,7 +540,7 @@ CheckSingleNpcAgainstPlayerHit:
     tay
 
     lda Npcs, y; let's get the state
-    and #%00000111 ; ignoring the agitation bit
+    and #%00000011 ; ignoring the agitation and damage bits
     sta TempNpcState
     cmp #0
     bne  @cont
@@ -920,12 +923,23 @@ OnCollisionWithAttackRect:
     sbc #9 ; going back to status from hp
     tay
     lda Npcs, y
-    and #%11110000
-    eor #%00001011 ; setting agitation bit + damaged state
+    and #%11110011 ; just clear the bits, preserve the state
+    eor #%00001100 ; setting agitation bit + damaged bit
 
     sta Npcs, y
-    iny
-    iny
+
+    tya
+    clc
+    adc #10; go to damage timer
+    tay
+    lda #0
+    sta Npcs, y  ;reset it
+
+    tya
+    sec
+    sbc #8
+    tay
+
 
 @wearWeapon:
 
@@ -1293,8 +1307,8 @@ UpdateSingleNpcSprites:
     lda npcs_ram_lookup, y ; y is npc index
     tay
 
-    lda Npcs, y ; index + agitation + state
-    and #%00000111
+    lda Npcs, y ; index + agitation + damaged + state
+    and #%00000011
     sta TempNpcState
 
     jsr CollectSingleNpcData
@@ -1406,7 +1420,9 @@ GetSpriteDataPointer:
 ;-----------------------------------
 CollectSingleNpcData:
 
-    cmp #NPC_STATE_DAMAGED
+    lda Npcs, y
+    and #%00000100
+    cmp #4 ; damaged ?
     bne @cont
 
     lda #1
@@ -1548,13 +1564,13 @@ doNpcAI:
     tax
 
     lda Npcs, x ;type + active
-    and #%00000111
+    and #%00000011
     sta TempNpcState
     cmp #0
     bne @cont ; not dead
 
 ;deadState
-    
+
     txa
     clc
     adc #8 ;go to timer
@@ -1622,11 +1638,20 @@ doNpcAI:
 
 ;-----------------------------------
 FetchNpcVars:
+    lda Npcs, x
+    and #NPC_DAMAGED_BIT
+    beq @not_damaged
+    lda #1
+    jmp @cont
+@not_damaged:
+    lda #0
+@cont:
+    sta TempNpcDamaged
     lda Npcs, x ;type & status
     lsr
     lsr
     lsr
-    lsr
+    lsr ;strip last 4 bits
     sta TempNpcIndex ;extracted type index
     stx TempIndex
     asl
@@ -1656,11 +1681,46 @@ FetchNpcVars:
 ;-----------------------------------
 SingleNpcAI:
 
+    ;x is at screen index
+
+    lda TempNpcDamaged
+    beq @continue
+
+    txa
+    clc
+    adc #5 ;move to damage timer
+    tax
+    lda Npcs, x
+    clc
+    adc #1
+    cmp #NPC_DELAY_DAMAGED
+    bcs @resetDmgBit
+    sta Npcs, x
+
+    txa
+    sec
+    sbc #5 ; move to screen index
+    tax
+
+    jmp @continue
+
+@resetDmgBit:
+    txa
+    sec
+    sbc #10 ; move to index
+    tax
+    lda Npcs, x
+    and #%11111011
+    sta Npcs, x
+    txa
+    clc
+    adc #5
+    tax
+
+@continue:
     lda TempNpcState
     cmp #NPC_STATE_WARNING  ;npc shows it is about to attack
     beq @warningState
-    cmp #NPC_STATE_DAMAGED  ;is damaged?
-    beq @damagedState
     cmp #NPC_STATE_ATTACK   ;npc is attacking
     beq @attackState
 
@@ -1678,18 +1738,6 @@ SingleNpcAI:
     jmp @nextNpc
 @moveNpc:
     jsr NpcMovement
-    jmp @nextNpc
-@damagedState:
-    inx ; dir 
-    inx ; frame
-    inx ; timer
-    lda Npcs, x
-    clc
-    adc #1
-    cmp #NPC_DELAY_DAMAGED
-    bcs @resetState
-    sta Npcs, x
-
     jmp @nextNpc
 
 @warningState:
@@ -3002,15 +3050,15 @@ OnCollisionWithPlayer:
 
     ldx NpcXPosition
     dex ;status
-    lda Npcs, x
+    ;lda Npcs, x
 
-    and #%00000111
-    cmp #NPC_STATE_DAMAGED
-    beq @collides ; don't attack if in damaged state
+    ;and #%00000111
+    ;cmp #NPC_STATE_DAMAGED
+    ;beq @collides ; don't attack if in damaged state
 
     lda Npcs, x     ;  reload the status
-    and #%11111000  ;  remove previous status
-    eor #%00000100  ;  set the warning state
+    and #%11111100  ;  remove previous status
+    eor #NPC_STATE_WARNING  ;  set the warning state
     sta Npcs, x
 
     txa

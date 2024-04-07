@@ -317,21 +317,21 @@ sun_moon_tiles_for_periods:
 
 npcs_ram_lookup: ;npc position in ram by index, max 16 npcs
     .byte 0
-    .byte 10
-    .byte 20
-    .byte 30
-    .byte 40
-    .byte 50
-    .byte 60
-    .byte 70
-    .byte 80
-    .byte 90
-    .byte 100
+    .byte 11
+    .byte 22
+    .byte 33
+    .byte 44
+    .byte 55
+    .byte 66
+    .byte 77
+    .byte 88
+    .byte 99
     .byte 110
-    .byte 120
-    .byte 130
-    .byte 140
-    .byte 150
+    .byte 121
+    .byte 132
+    .byte 143
+    .byte 154
+    .byte 165
 
 projectiles_ram_lookup: ; max 10 projectiles
     .byte 0
@@ -1126,13 +1126,12 @@ Item_Location14_Collection_times:
     .res ITEM_COUNT_LOC14
 
 Npcs:   ;animals and stuff
-    .res 160 ; max 16 npcs * 10 bytes:
-            ;   (npc type(4 bits) + agitatded?(1bit) + state(3 bit,
-            ;                                                0 - dead,
-            ;                                                1 - alive/idle,
-            ;                                                2 - attacks,
-            ;                                                3 - damaged,
-            ;                                                4 - warning
+    .res 176 ; max 16 npcs * 11 bytes:
+            ;   (npc type(4 bits) + agitatded?(1bit) + damaged?(1bit) + state(2 bit,
+            ;                                                           0 - dead,
+            ;                                                           1 - alive/idle,
+            ;                                                           2 - attacks,
+            ;                                                           3 - warning
             ;       ),
             ;   x (2 bytes),
             ;   y (2 bytes),
@@ -1141,6 +1140,7 @@ Npcs:   ;animals and stuff
             ;   frame
             ;   timer
             ;   hp
+            ;   dammage timer (for how long a npc should stay red)
 NpcCount:
     .res 1
 
@@ -1242,13 +1242,16 @@ TempNpcMovesDiagonaly:
 TempLocationPos:
     .res 1
 
+TempNpcDamaged:
+    .res 1
+
 DialogTextContainer:
     .res 96
 
 SaveData: ; inventory         HP | Food | Fuel | Warmth | Time | Equipment
     .res INVENTORY_MAX_SIZE + 3  +   3 +   3   +   3    +   5  +    4
 Buffer:
-    .res 38  ;must see how much is still available
+    .res 21  ;must see how much is still available
 
 ;====================================================================================
 

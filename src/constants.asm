@@ -31,7 +31,8 @@
 
     NPC_MAX_COUNT              = 16
 
-    NPC_AGITATION_BIT          = %00001000
+    NPC_AGITATION_BIT          = %00001000 ; is this npc agitated
+    NPC_DAMAGED_BIT            = %00000100 ; is this npc damaged
 
 .if FAMISTUDIO_CFG_PAL_SUPPORT
     NPC_SPEED                  = 1
@@ -296,9 +297,8 @@
     NPC_DURATION_WARNING       = 10
     NPC_BOSS_DURATION_WARNING  = 20
 
-    NPC_STATE_DAMAGED          = 3
     NPC_STATE_ATTACK           = 2
-    NPC_STATE_WARNING          = 4
+    NPC_STATE_WARNING          = 3
 
     NPC_TYPE_TIMID             = 0
     NPC_TYPE_PREDATOR          = 1
