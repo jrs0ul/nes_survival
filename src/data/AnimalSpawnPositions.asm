@@ -24,7 +24,7 @@ location_spawns_high:
     .byte >spawnpoints_loc_9
     .byte 0
     .byte 0
-    .byte <spawnpoints_loc_12
+    .byte >spawnpoints_loc_12
 
 
 spawnpoints_base_loc_1:
@@ -88,11 +88,11 @@ spawnpoints_loc_9:
 
 spawnpoints_loc_12:
     .byte 64, 180
-    .byte 232, 72
+    .byte 232, 115
     .byte 232, 176
     .byte 40, 56
 
-    .byte 120, 72
+    .byte 120, 115
     .byte 168, 184
     .byte 48, 128
     .byte 98, 160

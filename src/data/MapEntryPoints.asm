@@ -133,7 +133,7 @@ MapSpawnPoint:
     .byte 0, 0, 0, 3, 0, 0, 3
     ;entrance to cave location
     .byte 119, 218, 11, OUTDOORS_LOC12_SCREEN_COUNT, <House_items, >House_items, 5, 160, 0
-    .byte 0, 0, 0, 4, 0, 0, 0
+    .byte 0, 0, 0, 2, 0, 0, 0
     ;-----------------
     ;Exit point of third location
     .byte 120, 209, 0, OUTDOORS_LOC1_SCREEN_COUNT, <Outside1_items, >Outside1_items, 0, 103, 1
@@ -159,7 +159,7 @@ MapSpawnPoint:
     .byte 0, 0, 0, 0, 0, 0, 0
     ;cave exit to cave location
     .byte 144, 63, 11, OUTDOORS_LOC12_SCREEN_COUNT, <House_items, >House_items, 5, 0, 0
-    .byte 0, 0, 0, 4, 0, 0, 0
+    .byte 0, 0, 0, 2, 0, 0, 0
     ;dark cave entrance
     .byte 15, 50, 13, 2, <House_items, >House_items, 4, 0, 0
     .byte 0, 0, 0, 0, <dark_cave_npcs, >dark_cave_npcs, 0
