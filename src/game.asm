@@ -127,6 +127,7 @@ game_over_sprites:
 .include "data/maps/crashsite0.asm"
 .include "data/maps/crashsite.asm"
 .include "data/maps/location_with_cave.asm"
+.include "data/maps/location_with_cave2.asm"
 
 ;=============================================================
 .segment "ROM6"

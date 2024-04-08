@@ -74,7 +74,7 @@ MapEntryPoints:
     ;23.exit from cave location to bjorn's location
     .byte 11, 0, 0, 255, 0,255, 222, 255
     ;24.cave entrance from location 11
-    .byte 11, 0, 140, 151, 0, 255, 40, 50
+    .byte 11, 0, 119, 122, 22, 26, 40, 50
     ;25. Boss room entrance
     .byte 10, 1, 238, 255, 0, 255, 112, 128
     ;-------------------------------------
@@ -132,8 +132,8 @@ MapSpawnPoint:
     .byte 128, 32, 0, OUTDOORS_LOC1_SCREEN_COUNT, <Outside1_items, >Outside1_items, 0, 0, OUTDOORS_LOC1_SCREEN_COUNT - 1
     .byte 0, 0, 0, 3, 0, 0, 3
     ;entrance to cave location
-    .byte 138, 210, 11, 1, <House_items, >House_items, 5, 0, 0
-    .byte 0, 0, 0, 0, 0, 0, 0
+    .byte 119, 218, 11, OUTDOORS_LOC12_SCREEN_COUNT, <House_items, >House_items, 5, 160, 0
+    .byte 0, 0, 0, 4, 0, 0, 0
     ;-----------------
     ;Exit point of third location
     .byte 120, 209, 0, OUTDOORS_LOC1_SCREEN_COUNT, <Outside1_items, >Outside1_items, 0, 103, 1
@@ -158,8 +158,8 @@ MapSpawnPoint:
     .byte 57, 210, 7, 2, <Crashsite_items, >Crashsite_items, 5, 0, 0
     .byte 0, 0, 0, 0, 0, 0, 0
     ;cave exit to cave location
-    .byte 144, 63, 11, 1, <House_items, >House_items, 5, 0, 0
-    .byte 0, 0, 0, 0, 0, 0, 0
+    .byte 144, 63, 11, OUTDOORS_LOC12_SCREEN_COUNT, <House_items, >House_items, 5, 0, 0
+    .byte 0, 0, 0, 4, 0, 0, 0
     ;dark cave entrance
     .byte 15, 50, 13, 2, <House_items, >House_items, 4, 0, 0
     .byte 0, 0, 0, 0, <dark_cave_npcs, >dark_cave_npcs, 0
@@ -235,7 +235,7 @@ LocationScreenCountList:
     .byte OUTDOORS_LOC9_SCREEN_COUNT ; 8 granny location
     .byte 1                          ; 9 granny's hut
     .byte 2                          ; 10 alien base
-    .byte 1                          ; 11 location where cave is
+    .byte OUTDOORS_LOC12_SCREEN_COUNT; 11 location where cave is
     .byte 1                          ; 12 boss room
     .byte 2                          ; 13 dark cave
     .byte 1                          ; 14 secret cave
