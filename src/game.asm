@@ -66,7 +66,8 @@ house_sprites_chr: .incbin "house_sprites.chr"
 ;============================================================
 .segment "ROM4" ; other location
 
-main_tiles_chr2: .incbin "alien.chr"
+alien_tiles_chr: .incbin "alien_bg_tiles.chr"
+alien_sprites_chr: .incbin "alien_sprites.chr"
 
 .include "data/maps/alien_base1.asm"
 .include "data/maps/alien_base2.asm"
@@ -1856,7 +1857,42 @@ CopyCHRTiles:
     dex
     bne @loop  ; repeat until we've copied enough pages
     rts
+;--------------------------------------------
+;pointer -  sits at zero page, points to the chr data
+;TempRowIndex - row count for the chunk
 
+CopyCHRChunk:
+
+    ldy #0
+    lda TempRowIndex ; total rows
+    sta TempRegX
+
+@tileLoop:
+    lda #96 ;6 * 16, one tile is 16 bytes
+    sta TempY ; data row size
+    lda TempRowIndex
+    sec
+    sbc TempRegX             ; row index
+    sta $2006                ; high address byte
+    lda #$A0                 ;
+    sta $2006                ; low address byte
+@loop:
+    lda (pointer),y  ; copy one byte
+    sta $2007
+    iny
+    bne @cont
+    inc pointer + 1
+@cont:
+    dec TempY
+    bne @loop
+
+    bcc @loop
+
+    dec TempRegX
+    bne @tileLoop
+
+
+    rts
 ;--------------------------------------------
 LoadBackgroundsIfNeeded:
 

@@ -21,6 +21,35 @@ LoadOutsideMap:
     ldy MapTilesetBankNo;bank where the outdoor tiles are
     jsr bankswitch_y
 
+    cpy #4
+    bne @main_bank
+
+    lda #<alien_tiles_chr
+    sta pointer
+    lda #>alien_tiles_chr
+    sta pointer + 1
+
+    lda #$10
+    sta chr_dest_high
+    lda #00
+    sta chr_dest_low
+    lda #16
+    sta chr_pages_to_copy
+    jsr CopyCHRTiles
+
+    lda #<alien_sprites_chr
+    sta pointer
+    lda #>alien_sprites_chr
+    sta pointer + 1
+
+    lda #15
+    sta TempRowIndex
+    jsr CopyCHRChunk
+
+
+    jmp @done_copying
+
+@main_bank:
     lda #<main_tiles_chr
     sta pointer
     lda #>main_tiles_chr
@@ -33,6 +62,7 @@ LoadOutsideMap:
     sta chr_pages_to_copy
     jsr CopyCHRTiles
 
+@done_copying:
     ldy LocationIndex
     lda LocationBanks, y
     tay

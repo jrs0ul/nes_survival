@@ -385,37 +385,15 @@ LoadIndoorMapData:
     sta chr_pages_to_copy
     jsr CopyCHRTiles
 
+;----6x8 tile chunk for indoor npcs
     lda #<house_sprites_chr
     sta pointer
     lda #>house_sprites_chr
     sta pointer + 1
 
-    ldy #0
-    lda #8
-    sta TempRegX
-@tileLoop:
-    lda #96
-    sta TempY ; data row size
-    lda #$08
-    sec
-    sbc TempRegX
-    sta $2006                ; high address byte
-    lda #$A0
-    sta $2006                ; low  address byte
-@loop:
-    lda (pointer),y  ; copy one byte
-    sta $2007
-    iny
-    bne @cont
-    inc pointer + 1
-@cont:
-    dec TempY
-    bne @loop
-
-    bcc @loop
-
-    dec TempRegX
-    bne @tileLoop
+    lda #8 ; total rows
+    sta TempRowIndex
+    jsr CopyCHRChunk
 
     lda MustRestartIndoorsMusic
     beq @loadHouseStuff
