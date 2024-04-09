@@ -107,9 +107,9 @@ LoadPalette:
 LoadNametable:
     lda $2002             ; read PPU status to reset the high/low latch
     lda NametableAddress
-    sta $2006             ; write the high byte of $2000 address
+    sta $2006             ; write the high byte of the name table address
     lda #$00
-    sta $2006             ; write the low byte of $2000 address
+    sta $2006             ; write the low byte of the name table address
 
     ldx #$00
     ldy #$00

@@ -1829,7 +1829,7 @@ CopyCHRTiles:
 
     ldy #0     ; starting index into the first page
     sty $2001  ; turn off rendering just in case
-    sty $2006  ; load the destination address into the PPU
+    sty $2006  ; load the destination address(0000) into the PPU
     sty $2006
     ldx #32      ; number of 256-byte pages to copy
 @loop:
