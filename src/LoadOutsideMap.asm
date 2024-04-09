@@ -26,6 +26,11 @@ LoadOutsideMap:
     lda #>main_tiles_chr
     sta pointer + 1
 
+    lda #0
+    sta chr_dest_high
+    sta chr_dest_low
+    lda #32
+    sta chr_pages_to_copy
     jsr CopyCHRTiles
 
     ldy LocationIndex

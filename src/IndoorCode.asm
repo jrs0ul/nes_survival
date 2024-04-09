@@ -377,9 +377,46 @@ LoadIndoorMapData:
     sta pointer
     lda #>house_tiles_chr
     sta pointer + 1
+    lda #$10
+    sta chr_dest_high
+    lda #$00
+    sta chr_dest_low
+    lda #16
+    sta chr_pages_to_copy
     jsr CopyCHRTiles
 
-    
+    lda #<house_sprites_chr
+    sta pointer
+    lda #>house_sprites_chr
+    sta pointer + 1
+
+    ldy #0
+    lda #8
+    sta TempRegX
+@tileLoop:
+    lda #96
+    sta TempY ; data row size
+    lda #$08
+    sec
+    sbc TempRegX
+    sta $2006                ; high address byte
+    lda #$A0
+    sta $2006                ; low  address byte
+@loop:
+    lda (pointer),y  ; copy one byte
+    sta $2007
+    iny
+    bne @cont
+    inc pointer + 1
+@cont:
+    dec TempY
+    bne @loop
+
+    bcc @loop
+
+    dec TempRegX
+    bne @tileLoop
+
     lda MustRestartIndoorsMusic
     beq @loadHouseStuff
     lda #1

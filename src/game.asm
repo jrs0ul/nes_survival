@@ -55,7 +55,8 @@ intro_tiles_chr: .incbin "intro.chr"
 ;============================================================
 .segment "ROM3" ; indoors
 
-house_tiles_chr: .incbin "house.chr"
+house_tiles_chr: .incbin "house_bg_tiles.chr"
+house_sprites_chr: .incbin "house_sprites.chr"
 .include "data/maps/house.asm"
 .include "data/maps/villager_hut.asm"
 .include "data/maps/villager2_hut.asm"
@@ -542,8 +543,15 @@ KnockBackDelay:
 OldDirectionX:
     .res 1
 
+chr_dest_high:
+    .res 1
+chr_dest_low:
+    .res 1
+chr_pages_to_copy:
+    .res 1
+
 ZPBuffer:
-    .res 51  ; I want to be aware of the free memory
+    .res 48  ; I want to be aware of the free memory
 
 ;--------------
 .segment "BSS" ; variables in ram
@@ -1332,6 +1340,11 @@ vblankwait2:      ; Second wait for vblank, PPU is ready after this
     sta pointer
     lda #>title_tiles_chr
     sta pointer + 1
+    lda #0
+    sta chr_dest_high
+    sta chr_dest_low
+    lda #32
+    sta chr_pages_to_copy
     jsr CopyCHRTiles
 
     ldy #5
@@ -1827,11 +1840,13 @@ doTitle:
 ;pointer -  sits at zero page, points to the chr data
 CopyCHRTiles:
 
-    ldy #0     ; starting index into the first page
-    sty $2001  ; turn off rendering just in case
-    sty $2006  ; load the destination address(0000) into the PPU
-    sty $2006
-    ldx #32      ; number of 256-byte pages to copy
+    ldy #0                   ; starting index into the first page
+    sty $2001                ; turn off rendering just in case
+    lda chr_dest_high
+    sta $2006                ; high address byte
+    lda chr_dest_low
+    sta $2006                ; low  address byte
+    ldx chr_pages_to_copy    ; number of 256-byte pages to copy, 32 max
 @loop:
     lda (pointer),y  ; copy one byte
     sta $2007
@@ -4956,6 +4971,11 @@ LoadTitle:
     sta pointer
     lda #>title_tiles_chr
     sta pointer + 1
+    lda #0
+    sta chr_dest_high
+    sta chr_dest_low
+    lda #32
+    sta chr_pages_to_copy
     jsr CopyCHRTiles
 
     lda #0
@@ -5004,6 +5024,11 @@ LoadGameOver:
     sta pointer
     lda #>title_tiles_chr
     sta pointer + 1
+    lda #0
+    sta chr_dest_high
+    sta chr_dest_low
+    lda #32
+    sta chr_pages_to_copy
     jsr CopyCHRTiles
 
 
@@ -5520,6 +5545,11 @@ LoadIntro:
     sta pointer
     lda #>intro_tiles_chr
     sta pointer + 1
+    lda #0
+    sta chr_dest_high
+    sta chr_dest_low
+    lda #32
+    sta chr_pages_to_copy
     jsr CopyCHRTiles
 
 @loadScene:
@@ -5555,6 +5585,11 @@ LoadOutro:
     sta pointer
     lda #>intro_tiles_chr
     sta pointer + 1
+    lda #0
+    sta chr_dest_high
+    sta chr_dest_low
+    lda #32
+    sta chr_pages_to_copy
     jsr CopyCHRTiles
 
 @loadScene:
