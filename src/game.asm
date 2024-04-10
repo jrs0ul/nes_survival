@@ -1254,6 +1254,8 @@ TempLocationPos:
 
 TempNpcDamaged:
     .res 1
+TempNpcAgitated:
+    .res 1
 
 DialogTextContainer:
     .res 96
@@ -1261,7 +1263,7 @@ DialogTextContainer:
 SaveData: ; inventory         HP | Food | Fuel | Warmth | Time | Equipment
     .res INVENTORY_MAX_SIZE + 3  +   3 +   3   +   3    +   5  +    4
 Buffer:
-    .res 17  ;must see how much is still available
+    .res 16  ;must see how much is still available
 
 ;====================================================================================
 

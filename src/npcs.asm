@@ -1647,6 +1647,16 @@ FetchNpcVars:
     lda #0
 @cont:
     sta TempNpcDamaged
+    lda Npcs, x
+    and #NPC_AGITATION_BIT
+    beq @not_agitated
+    lda #1
+    jmp @agicont
+@not_agitated:
+    lda #0
+@agicont:
+    sta TempNpcAgitated
+
     lda Npcs, x ;type & status
     lsr
     lsr
@@ -1729,9 +1739,18 @@ SingleNpcAI:
     cmp #NPC_TYPE_VILLAGER
     beq @changeDir
     cmp #NPC_TYPE_PASSIVE
-    bne @moveNpc
+    beq @rip
+    lda TempNpcIndex
+    cmp #NPC_IDX_BOSS
+    beq @onBoss
 
+    jmp @moveNpc
+@rip:
     rts
+@onBoss:
+    lda TempNpcAgitated
+    beq @rip
+    jmp @moveNpc
 
 @changeDir:
     jsr ChangeNpcDirection

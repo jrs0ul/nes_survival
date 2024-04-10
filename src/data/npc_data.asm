@@ -18,6 +18,6 @@ npc_data:
     .byte 2, 2, 2,  2, 255, 0, <npc_GRANNY_frames,  >npc_GRANNY_frames      ;5 villager-granny
     .byte 2, 3, 17, 3, 255, 0, <npc_DEADMAN_frames, >npc_DEADMAN_frames     ;6 dead-villager
     .byte 2, 2, 4,  4, 16,  8, <npc_BOAR_frames,    >npc_BOAR_frames        ;7 wild-boar
-    .byte 4, 5, 32, 1, 6,   9, <npc_BOSS_frames,    >npc_BOSS_frames        ;8 Boss
+    .byte 4, 5, 32, 4, 6,   9, <npc_BOSS_frames,    >npc_BOSS_frames        ;8 Boss
 
 
