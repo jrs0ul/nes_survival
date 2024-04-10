@@ -200,7 +200,7 @@ MapSpawnPoint:
     .byte 0, 0, 0, 0, <cave_npcs, >cave_npcs, 0
     ;boss room entrance
     .byte 20, 120, 12, 1, <House_items, >House_items, 6, 0, 0
-    .byte 0, <alien_bossroom, >alien_bossroom, 0, 0, 0, 0
+    .byte 1, <alien_bossroom, >alien_bossroom, 0, 0, 0, 0
     ;---------------
     ;boss room exit
     .byte 223, 120, 10, 2, <House_items, >House_items, 4, 0, 1
@@ -274,7 +274,7 @@ LocationBanks:
     .byte 0  ;9
     .byte 4  ;10
     .byte 5  ;11
-    .byte 6  ;12
+    .byte 0  ;12
     .byte 4  ;13
     .byte 6  ;14
 

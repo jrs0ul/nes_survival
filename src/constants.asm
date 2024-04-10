@@ -325,7 +325,7 @@
     FADE_DELAY_GAME_OVER       = 3
     FADE_DELAY_GENERIC         = 2
     FADE_DELAY_SLEEP           = 10
-    MAX_VILLAGERS              = 3
+    MAX_VILLAGERS              = 4
 
     MAX_LOCATIONS              = 15
 

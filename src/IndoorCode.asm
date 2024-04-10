@@ -373,6 +373,9 @@ LoadIndoorMapData:
     sta $2000
     sta $2001
 
+    lda MustCopyMainChr
+    beq @skipLoadingCHR
+
     lda #<house_tiles_chr
     sta pointer
     lda #>house_tiles_chr
@@ -385,7 +388,7 @@ LoadIndoorMapData:
     sta chr_pages_to_copy
     jsr CopyCHRTiles
 
-;----6x8 tile chunk for indoor npcs
+    ;6x8 tile chunk for indoor npcs
     lda #<house_sprites_chr
     sta pointer
     lda #>house_sprites_chr
@@ -394,6 +397,15 @@ LoadIndoorMapData:
     lda #8 ; total rows
     sta TempRowIndex
     jsr CopyCHRChunk
+
+    lda #<house_palette
+    sta PalettePtr
+    lda #>house_palette
+    sta PalettePtr + 1
+
+
+@skipLoadingCHR:
+
 
     lda MustRestartIndoorsMusic
     beq @loadHouseStuff
@@ -414,11 +426,7 @@ LoadIndoorMapData:
     jsr LoadNametable
     jsr LoadStatusBar
 
-    lda #<house_palette
-    sta PalettePtr
-    lda #>house_palette
-    sta PalettePtr + 1
-
+    
 
     lda #0
     sta MustLoadHouseInterior

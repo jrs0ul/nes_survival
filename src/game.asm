@@ -61,6 +61,7 @@ house_sprites_chr: .incbin "house_sprites.chr"
 .include "data/maps/villager_hut.asm"
 .include "data/maps/villager2_hut.asm"
 .include "data/maps/grannys_hut.asm"
+.include "data/maps/alien_bossroom.asm"
 
 
 ;============================================================
@@ -151,7 +152,6 @@ zerosprite:
     .byte $70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$2e,$7d,$7d,$7d,$7d,$24
 
 
-.include "data/maps/alien_bossroom.asm"
 .include "data/maps/secret_cave0.asm"
 .include "data/AnimalSpawnPositions.asm"
 ;=============================================================
@@ -1261,7 +1261,7 @@ DialogTextContainer:
 SaveData: ; inventory         HP | Food | Fuel | Warmth | Time | Equipment
     .res INVENTORY_MAX_SIZE + 3  +   3 +   3   +   3    +   5  +    4
 Buffer:
-    .res 21  ;must see how much is still available
+    .res 17  ;must see how much is still available
 
 ;====================================================================================
 
@@ -3374,9 +3374,9 @@ RoutinesAfterFadeOut:
     bne @next25
 
     lda #<alien_palette
-    sta CurrentMapPalettePtr
+    sta PalettePtr
     lda #>alien_palette
-    sta CurrentMapPalettePtr + 1
+    sta PalettePtr + 1
 
     lda BossDefeated
     bne @next25
@@ -3385,6 +3385,11 @@ RoutinesAfterFadeOut:
     lda #>boss_npcs
     sta pointer + 1
     jsr LoadNpcs
+
+    lda #1
+    sta InVillagerHut
+    lda #3
+    sta VillagerIndex
 
     lda #6
     sta SongName
@@ -3472,6 +3477,7 @@ RoutinesAfterFadeOut:
 
 
 @next30:
+
     lda DetectedMapType
     bne @itsAnIndoorMap
     lda #1
@@ -3480,13 +3486,31 @@ RoutinesAfterFadeOut:
     beq @finish
     lda #0              ;so we're leaving the villager house
     sta InVillagerHut
+
+    lda ActiveMapEntryIndex
+    cmp #26
+    beq @notcopy
     lda #1
+    jmp @saveCopyFlag
+@notcopy:
+    lda #0
+@saveCopyFlag:
     sta MustCopyMainChr
 
     jmp @finish
 @itsAnIndoorMap:
     lda #1
     sta MustLoadHouseInterior
+
+    lda ActiveMapEntryIndex
+    cmp #25
+    beq @BossRoom
+    lda #1
+    jmp @saveCHRloading
+@BossRoom:
+    lda #0
+@saveCHRloading:
+    sta MustCopyMainChr
 
 @finish:
     lda #1
@@ -5676,10 +5700,13 @@ LoadCheckPoint:
 
     lda #<alien_palette
     sta CurrentMapPalettePtr
+    sta PalettePtr
     lda #>alien_palette
     sta CurrentMapPalettePtr + 1
+    sta PalettePtr + 1
 
     lda #0
+    sta InVillagerHut
     sta SongName
     lda #1
     sta MustPlayNewSong
