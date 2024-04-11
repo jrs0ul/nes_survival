@@ -668,6 +668,7 @@ npc_DEADMAN_frames:
     .byte <npc_DEADMAN_frame_RIGHT, >npc_DEADMAN_frame_RIGHT
 
 npc_DEADMAN_frame_RIGHT:
+    .byte                        0, 0
     .byte <npc_DEADMAN_frame_RIGHT_0, >npc_DEADMAN_frame_RIGHT_0
 
 npc_DEADMAN_frame_RIGHT_0:

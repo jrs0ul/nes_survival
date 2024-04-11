@@ -212,7 +212,6 @@ FireplaceUpdate:
 @exit:
 
     rts
-
 ;---------------------------------
 SetupVillagerText:
 
@@ -440,6 +439,9 @@ LoadIndoorMapData:
     sta FadeIdx
     lda #FADE_DELAY_GENERIC
     sta PaletteAnimDelay
+
+    lda BossAgitated
+    bne @nope
 
     jsr SetupVillagerText
 

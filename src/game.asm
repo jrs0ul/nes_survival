@@ -1229,6 +1229,9 @@ EquipNextResetCount:
 BossDefeated:
     .res 1
 
+BossAgitated:
+    .res 1
+
 TempNpcTilesInARow:
     .res 1
 TempNpcWidth:
@@ -1263,7 +1266,7 @@ DialogTextContainer:
 SaveData: ; inventory         HP | Food | Fuel | Warmth | Time | Equipment
     .res INVENTORY_MAX_SIZE + 3  +   3 +   3   +   3    +   5  +    4
 Buffer:
-    .res 16  ;must see how much is still available
+    .res 15  ;must see how much is still available
 
 ;====================================================================================
 
@@ -3412,6 +3415,7 @@ RoutinesAfterFadeOut:
     jsr FlipStartingNametable ; for the locked door, so the second screen would always be in adress $24**
 
     lda #0
+    sta BossAgitated
     sta SongName
     lda #1
     sta MustPlayNewSong
@@ -5382,6 +5386,7 @@ ResetVariables:
     sta StaminaDelay
 
     lda #0
+    sta BossAgitated
     sta hadKnockBack
     sta CheckpointSaved
     sta BossDefeated
@@ -5709,6 +5714,7 @@ LoadCheckPoint:
 
     lda #0
     sta InVillagerHut
+    sta BossAgitated
     sta SongName
     lda #1
     sta MustPlayNewSong

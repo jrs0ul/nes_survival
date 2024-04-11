@@ -30,9 +30,10 @@ LoadNpcs:
     lda #1
     sta Npcs, x ; dir
     inx
-    lda #0
+    lda #32
     sta Npcs, x ;frame
     inx
+    lda #0
     sta Npcs, x ;timer
     inx
     ;hp
@@ -928,6 +929,19 @@ OnCollisionWithAttackRect:
 
     sta Npcs, y
 
+    lda TempNpcAgitated
+    bne @dontTouchText
+
+    lda TempNpcIndex
+    cmp #NPC_IDX_BOSS
+    bne @dontTouchText
+
+    lda #1
+    sta BossAgitated
+
+    jsr ClearTextBaloon
+
+@dontTouchText:
     tya
     clc
     adc #10; go to damage timer
@@ -955,6 +969,25 @@ OnCollisionWithAttackRect:
 @exit:
 
     rts
+;---------------------------------
+ClearTextBaloon:
+
+    ldx #95
+@loop:
+    lda #0
+    sta DialogTextContainer, x
+    dex
+    bne @loop
+
+    lda #1
+    sta MustUpdateTextBaloon
+    lda #DIALOG_TEXT_LENGTH
+    sta TextLength
+    lda #0
+    sta TextBaloonIndex
+
+    rts
+
 ;------------------------------------
 OnBossDefeat:
     lda #1
@@ -1749,7 +1782,7 @@ SingleNpcAI:
     rts
 @onBoss:
     lda TempNpcAgitated
-    beq @rip
+    beq @changeDir  ;  Face the player if not agitated
     jmp @moveNpc
 
 @changeDir:
