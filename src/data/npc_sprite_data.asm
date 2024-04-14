@@ -523,6 +523,7 @@ npc_BJORN_frames:
 
 
 npc_BJORN_frame_LEFT:
+    .byte 0, 0
     .byte <npc_BJORN_frame_LEFT_0,   >npc_BJORN_frame_LEFT_0
 
 npc_BJORN_frame_LEFT_0:
@@ -534,6 +535,7 @@ npc_BJORN_frame_LEFT_0:
     .byte 16, $7B, %00000000, 8
 
 npc_BJORN_frame_RIGHT:
+    .byte 0, 0
     .byte <npc_BJORN_frame_RIGHT_0,   >npc_BJORN_frame_RIGHT_0
 
 npc_BJORN_frame_RIGHT_0:
@@ -545,6 +547,7 @@ npc_BJORN_frame_RIGHT_0:
     .byte 16, $7A, %01000000, 8
 
 npc_BJORN_frame_UP:
+    .byte 0, 0
     .byte <npc_BJORN_frame_UP_0,   >npc_BJORN_frame_UP_0
 
 npc_BJORN_frame_UP_0:
@@ -556,6 +559,7 @@ npc_BJORN_frame_UP_0:
     .byte 16, $7D, %00000000, 8
 
 npc_BJORN_frame_DOWN:
+    .byte 0, 0
     .byte <npc_BJORN_frame_DOWN_0,   >npc_BJORN_frame_DOWN_0
 
 npc_BJORN_frame_DOWN_0:
@@ -575,6 +579,7 @@ npc_ERIKA_frames:
     .byte <npc_ERIKA_frame_DOWN,  >npc_ERIKA_frame_DOWN
 
 npc_ERIKA_frame_LEFT:
+    .byte 0, 0
     .byte <npc_ERIKA_frame_LEFT_0,   >npc_ERIKA_frame_LEFT_0
 
 npc_ERIKA_frame_LEFT_0:
@@ -586,6 +591,7 @@ npc_ERIKA_frame_LEFT_0:
     .byte 16, $2B, %00000000, 8
 
 npc_ERIKA_frame_RIGHT:
+    .byte 0, 0
     .byte <npc_ERIKA_frame_RIGHT_0,   >npc_ERIKA_frame_RIGHT_0
 
 npc_ERIKA_frame_RIGHT_0:
@@ -597,6 +603,7 @@ npc_ERIKA_frame_RIGHT_0:
     .byte 16, $2A, %01000000, 8
 
 npc_ERIKA_frame_UP:
+    .byte 0, 0
     .byte <npc_ERIKA_frame_UP_0,   >npc_ERIKA_frame_UP_0
 
 npc_ERIKA_frame_UP_0:
@@ -608,6 +615,7 @@ npc_ERIKA_frame_UP_0:
     .byte 16, $2D, %00000000, 8
 
 npc_ERIKA_frame_DOWN:
+    .byte 0, 0
     .byte <npc_ERIKA_frame_DOWN_0,   >npc_ERIKA_frame_DOWN_0
 
 npc_ERIKA_frame_DOWN_0:
@@ -627,6 +635,7 @@ npc_GRANNY_frames:
     .byte <npc_GRANNY_frame_DOWN,  >npc_GRANNY_frame_DOWN
 
 npc_GRANNY_frame_LEFT:
+    .byte 0, 0
     .byte <npc_GRANNY_frame_LEFT_0, >npc_GRANNY_frame_LEFT_0
 
 npc_GRANNY_frame_LEFT_0:
@@ -636,6 +645,7 @@ npc_GRANNY_frame_LEFT_0:
     .byte 8, $4B, %00000000, 8
 
 npc_GRANNY_frame_RIGHT:
+    .byte 0, 0
     .byte <npc_GRANNY_frame_RIGHT_0, >npc_GRANNY_frame_RIGHT_0
 
 npc_GRANNY_frame_RIGHT_0:
@@ -645,6 +655,7 @@ npc_GRANNY_frame_RIGHT_0:
     .byte 8, $4A, %01000000, 8
 
 npc_GRANNY_frame_UP:
+    .byte 0, 0
     .byte <npc_GRANNY_frame_UP_0, >npc_GRANNY_frame_UP_0
 
 npc_GRANNY_frame_UP_0:
@@ -654,6 +665,7 @@ npc_GRANNY_frame_UP_0:
     .byte 8, $4D, %00000000, 8
 
 npc_GRANNY_frame_DOWN:
+    .byte 0, 0
     .byte <npc_GRANNY_frame_DOWN_0, >npc_GRANNY_frame_DOWN_0
 
 npc_GRANNY_frame_DOWN_0:
