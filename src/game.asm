@@ -196,6 +196,24 @@ stamina_segment_values:
     .byte 96
     .byte 128
 
+.if FAMISTUDIO_CFG_PAL_SUPPORT
+;PAL values
+knockBackValuesInteger:
+    .byte 3
+    .byte 2
+    .byte 0
+    .byte 0
+    .byte 0
+
+knockBackValuesFractions:
+    .byte 86
+    .byte 95
+    .byte 216
+    .byte 12
+    .byte 12
+
+.else
+;NTSC values
 knockBackValuesInteger:
     .byte 2
     .byte 1
@@ -210,6 +228,7 @@ knockBackValuesFractions:
     .byte 10
     .byte 10
 
+.endif
 
 
 .include "data/house_palette.asm"
