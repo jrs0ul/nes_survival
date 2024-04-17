@@ -74,7 +74,7 @@ MapEntryPoints:
     ;23.exit from cave location to bjorn's location
     .byte 11, 0, 0, 255, 0,255, 222, 255
     ;24.cave entrance from location 11
-    .byte 11, 0, 119, 122, 22, 26, 40, 50
+    .byte 11, 0, 117, 122, 22, 28, 40, 50
     ;25. Boss room entrance
     .byte 10, 1, 238, 255, 0, 255, 112, 128
     ;-------------------------------------
@@ -158,7 +158,7 @@ MapSpawnPoint:
     .byte 57, 210, 7, 2, <Crashsite_items, >Crashsite_items, 5, 0, 0
     .byte 0, 0, 0, 0, 0, 0, 0
     ;cave exit to cave location
-    .byte 144, 63, 11, OUTDOORS_LOC12_SCREEN_COUNT, <House_items, >House_items, 5, 0, 0
+    .byte 119, 63, 11, OUTDOORS_LOC12_SCREEN_COUNT, <House_items, >House_items, 5, 24, 0
     .byte 0, 0, 0, 2, 0, 0, 0
     ;dark cave entrance
     .byte 15, 50, 13, 2, <House_items, >House_items, 4, 0, 0

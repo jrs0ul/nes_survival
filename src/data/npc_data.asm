@@ -10,7 +10,7 @@
 
 ;types: 1-predator, 0-timid, 2 - villager, 3 - inactive, 4 - agressive when attacked
 npc_data:
-    .byte 2, 3, 17, 1, 6,   9, <npc_DOGMAN_frames,  >npc_DOGMAN_frames      ;0 dogman
+    .byte 2, 3, 17, 1, 5,   9, <npc_DOGMAN_frames,  >npc_DOGMAN_frames      ;0 dogman
     .byte 2, 2, 9,  0, 2,   0, <npc_BUNNY_frames,   >npc_BUNNY_frames       ;1 bunny
     .byte 2, 3, 17, 2, 255, 0, <npc_BJORN_frames,   >npc_BJORN_frames       ;2 villager-Bjorn
     .byte 2, 2, 9,  1, 4,   3, <npc_HOUND_frames,   >npc_HOUND_frames       ;3 canid
