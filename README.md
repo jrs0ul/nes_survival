@@ -2,7 +2,7 @@
 A survival game for the NES and Famicom. The game uses the UNROM mapper.
 
 
-To build the game you will need cc65 and make, also python, if you're going to use FCEUX for debuging.
+To build the game you will need cc65 and make, also python(for debugging in FCEUX).
 
 How to get the needed packages on a debian based **Linux** distro: 
 
@@ -16,9 +16,9 @@ Make for windows:
 
 http://gnuwin32.sourceforge.net/packages/make.htm
 
-And optionaly install Python:
+Don't forget to add both cc65 and make bin folders to your environment variable *PATH*
 
-https://www.python.org/downloads/
+Install Python from Microsoft store by typing *Python* inside the windows power shell. 
 
 
 After everything is installed, clone the repository, enter its directory ant run:
