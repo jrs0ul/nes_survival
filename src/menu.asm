@@ -3912,18 +3912,31 @@ ExitMenuState:
 
 @cont:
     lda InHouse
-    beq @loadOther ;InHouse = 0
-    lda #1
-    sta MustLoadHouseInterior
-    sta MustLoadSomething
-    jmp @exit
-@loadOther:
+    beq @checkVillager ;InHouse = 0
+    jmp @indoorLoading
+@checkVillager:
     lda InVillagerHut
     beq @loadOutside
-
+@indoorLoading:
     lda #1
     sta MustLoadHouseInterior
     sta MustLoadSomething
+
+    lda LocationIndex
+    cmp #LOCATION_BOSS_ROOM
+    beq @bossroom
+    lda #1
+    sta MustCopyMainChr
+    jmp @exit
+@bossroom:
+    lda #0
+    sta MustCopyMainChr
+    lda #<alien_palette
+    sta PalettePtr
+    lda #>alien_palette
+    sta PalettePtr + 1
+
+
     jmp @exit
 
 @loadOutside:

@@ -97,6 +97,15 @@ granny_quest_3:
     .byte $00,$00,$4d,$41,$3e,$00,$47,$48,$4b,$4d,$41,$00,$3f,$4b,$48,$46
     .byte $00,$41,$3e,$4b,$3e,$5A,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
 
+;--------------------
+boss_quest_0:
+    .byte $00,$00,$00,$00,$42,$5a,$5a,$5a,$00,$50,$3a,$42,$4d,$3e,$3d,$5a
+    .byte $5a,$5a,$00,$45,$48,$47,$40,$5a,$5a,$5a,$00,$00,$00,$00,$00,$00
+    .byte $00,$00,$00,$00,$00,$00,$00,$00,$52,$48,$4e,$5a,$5a,$5a,$00,$4c
+    .byte $4d,$4b,$48,$47,$40,$5a,$5a,$5a,$00,$00,$00,$00,$00,$00,$00,$00
+    .byte $00,$00,$00,$3f,$42,$40,$41,$4d,$5a,$5a,$5a,$00,$46,$3e,$5a,$5a
+    .byte $5a,$00,$52,$48,$4e,$5a,$5a,$5a,$00,$50,$42,$45,$45,$00,$00,$00
+
 ;=====================
 villager_bear_thanks_0: ;after cooked meat
     .byte $00,$52,$48,$4e,$00,$46,$4e,$4c,$4d,$00,$4d,$4b,$3a,$4f,$3e,$4b
@@ -228,7 +237,7 @@ granny_thanks_special:
 
 .segment "ROM1"
 QuestSpritesCount:
-    .byte 0, 4, 4, 0,  0, 4, 0, 2,  2, 2, 0, 0
+    .byte 0, 4, 4, 0,  0, 4, 0, 2,  2, 2, 0, 0, 0, 0, 0, 0
 
 QuestSprites:
     .byte 0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
@@ -253,6 +262,7 @@ quest_items:
     .byte 0, 0, 0, 0
     .byte 0, 0, ITEM_PIE, 0
     .byte 0, 0, 0, ITEM_JAM
+    .byte 0, 0, 0, 0
 
 
 .segment "ROM3"
@@ -274,6 +284,11 @@ quest_list_low:
     .byte <granny_quest_2
     .byte <granny_quest_3
 
+    .byte <boss_quest_0
+    .byte <boss_quest_0
+    .byte <boss_quest_0
+    .byte <boss_quest_0
+
 quest_list_high:
     .byte >villager_bear_quest_0
     .byte >villager_bear_quest_1
@@ -290,6 +305,11 @@ quest_list_high:
     .byte >granny_quest_2
     .byte >granny_quest_3
 
+    .byte >boss_quest_0
+    .byte >boss_quest_0
+    .byte >boss_quest_0
+    .byte >boss_quest_0
+
 thanks_list_low:
     .byte <villager_bear_thanks_0
     .byte <villager_bear_thanks_1
@@ -304,6 +324,11 @@ thanks_list_low:
     .byte <granny_thanks_0
     .byte <granny_thanks_1
     .byte <granny_thanks_2
+    .byte <granny_thanks_3
+
+    .byte <granny_thanks_3
+    .byte <granny_thanks_3
+    .byte <granny_thanks_3
     .byte <granny_thanks_3
 
 thanks_list_high:
@@ -322,28 +347,36 @@ thanks_list_high:
     .byte >granny_thanks_2
     .byte >granny_thanks_3
 
+    .byte >granny_thanks_3
+    .byte >granny_thanks_3
+    .byte >granny_thanks_3
+    .byte >granny_thanks_3
+
 
 special_thanks_list_low:
     .byte <bjorn_thanks_special
     .byte <erika_thanks_special
     .byte <granny_thanks_special
+    .byte 0
 
 special_thanks_list_high:
     .byte >bjorn_thanks_special
     .byte >erika_thanks_special
     .byte >granny_thanks_special
+    .byte 0
 
 
 specialQuestReminders_low:
     .byte <bjorn_specialQuestReminder
     .byte <erika_specialQuestReminder
     .byte <granny_specialQuestReminder
+    .byte 0
 
 specialQuestReminders_high:
     .byte >bjorn_specialQuestReminder
     .byte >erika_specialQuestReminder
     .byte >granny_specialQuestReminder
-
+    .byte 0
 
 bjorn_specialQuestReminder:
     .byte $00,$00,$00,$00,$00,$42,$00,$50,$48,$47,$3d,$3e,$4b,$00,$50,$41
@@ -385,11 +418,13 @@ special_goal_items:
     .byte ITEM_JAM          ;Bjorn
     .byte ITEM_LETTER       ;Erika
     .byte ITEM_PIE          ;Grandma
+    .byte 0
 
 special_reward_items:
     .byte ITEM_SLINGSHOT
     .byte 0
     .byte ITEM_COOKED_JUMBO_MEAT
+    .byte 0
 
 
 
@@ -397,12 +432,14 @@ goal_items_list:
     .byte ITEM_COOKED_MEAT, ITEM_SPEAR, ITEM_JAM, ITEM_COAT
     .byte ITEM_RAW_MEAT, ITEM_KNIFE, 255, ITEM_HIDE
     .byte ITEM_STICK, ITEM_STICK, ITEM_COOKED_FISH, 255
+    .byte 255, 255, 255, 255
 
 .segment "RODATA"
 reward_items_list:
     .byte 0, ITEM_HIDE, ITEM_FISHING_ROD, ITEM_LAMP
     .byte 0, ITEM_ROWAN_BERRIES, ITEM_PIE, ITEM_COAT
     .byte 0, ITEM_JAM, 0, ITEM_PIE
+    .byte 0, 0, 0, 0
 
 
 ;Villager Id, quest Id
@@ -410,9 +447,11 @@ special_quests:
     .byte 2, 3
     .byte 1, 3
     .byte 1, 2
+    .byte 255, 255
 
 special_receivers:
     .byte 255
     .byte 2
     .byte 0
+    .byte 255
 

@@ -212,7 +212,6 @@ FireplaceUpdate:
 @exit:
 
     rts
-
 ;---------------------------------
 SetupVillagerText:
 
@@ -373,13 +372,40 @@ LoadIndoorMapData:
     sta $2000
     sta $2001
 
+    lda MustCopyMainChr
+    beq @skipLoadingCHR
+
     lda #<house_tiles_chr
     sta pointer
     lda #>house_tiles_chr
     sta pointer + 1
+    lda #$10
+    sta chr_dest_high
+    lda #$00
+    sta chr_dest_low
+    lda #16
+    sta chr_pages_to_copy
     jsr CopyCHRTiles
 
-    
+    ;6x8 tile chunk for indoor npcs
+    lda #<house_sprites_chr
+    sta pointer
+    lda #>house_sprites_chr
+    sta pointer + 1
+
+    lda #8 ; total rows
+    sta TempRowIndex
+    jsr CopyCHRChunk
+
+    lda #<house_palette
+    sta PalettePtr
+    lda #>house_palette
+    sta PalettePtr + 1
+
+
+@skipLoadingCHR:
+
+
     lda MustRestartIndoorsMusic
     beq @loadHouseStuff
     lda #1
@@ -399,11 +425,7 @@ LoadIndoorMapData:
     jsr LoadNametable
     jsr LoadStatusBar
 
-    lda #<house_palette
-    sta PalettePtr
-    lda #>house_palette
-    sta PalettePtr + 1
-
+    
 
     lda #0
     sta MustLoadHouseInterior
@@ -417,6 +439,9 @@ LoadIndoorMapData:
     sta FadeIdx
     lda #FADE_DELAY_GENERIC
     sta PaletteAnimDelay
+
+    lda BossAgitated
+    bne @nope
 
     jsr SetupVillagerText
 

@@ -26,9 +26,13 @@
     BUTTON_B_MASK              = %01000000
     BUTTON_A_MASK              = %10000000
 
-    NPC_MAX_COUNT              = 16
 
     PROJECTILE_MAX_COUNT       = 10
+
+    NPC_MAX_COUNT              = 16
+
+    NPC_AGITATION_BIT          = %00001000 ; is this npc agitated
+    NPC_DAMAGED_BIT            = %00000100 ; is this npc damaged
 
 .if FAMISTUDIO_CFG_PAL_SUPPORT
     NPC_SPEED                  = 1
@@ -164,6 +168,7 @@
     OUTDOORS_LOC3_SCREEN_COUNT = 2
     OUTDOORS_LOC7_SCREEN_COUNT = 2 ; cave
     OUTDOORS_LOC9_SCREEN_COUNT = 3 ; granny's
+    OUTDOORS_LOC12_SCREEN_COUNT = 2 ; locations with the northern cave
 
     PLAYER_START_X             = $50
     PLAYER_START_Y             = 200
@@ -181,6 +186,8 @@
 
     SCREEN_ROW_COUNT           = 30
     SCREEN_COLUMN_COUNT        = 32
+
+    SCREEN_MIDDLE              = 120
 
     CHARACTER_ZERO             = $30
 
@@ -281,13 +288,18 @@
 
     NPC_STEPS_BEFORE_REDIRECT  = 16
 
-    NPC_DELAY_ATTACK           = 64
+    NPC_DURATION_ATTACK        = 64
     NPC_DELAY_DAMAGED          = 32
 
-    NPC_ATTACK_FRAME           = 128
+    NPC_IDLE_FRAME             = 32
+    NPC_WARNING_FRAME          = 128
+    NPC_ATTACK_FRAME           = 160
+    NPC_DEATH_FRAME            = 6 * 32
+    NPC_DURATION_WARNING       = 10
+    NPC_BOSS_DURATION_WARNING  = 30
 
-    NPC_STATE_DAMAGED          = 3
     NPC_STATE_ATTACK           = 2
+    NPC_STATE_WARNING          = 3
 
     NPC_TYPE_TIMID             = 0
     NPC_TYPE_PREDATOR          = 1
@@ -313,7 +325,7 @@
     FADE_DELAY_GAME_OVER       = 3
     FADE_DELAY_GENERIC         = 2
     FADE_DELAY_SLEEP           = 10
-    MAX_VILLAGERS              = 3
+    MAX_VILLAGERS              = 4
 
     MAX_LOCATIONS              = 15
 

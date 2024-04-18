@@ -55,17 +55,20 @@ intro_tiles_chr: .incbin "intro.chr"
 ;============================================================
 .segment "ROM3" ; indoors
 
-house_tiles_chr: .incbin "house.chr"
+house_tiles_chr: .incbin "house_bg_tiles.chr"
+house_sprites_chr: .incbin "house_sprites.chr"
 .include "data/maps/house.asm"
 .include "data/maps/villager_hut.asm"
 .include "data/maps/villager2_hut.asm"
 .include "data/maps/grannys_hut.asm"
+.include "data/maps/alien_bossroom.asm"
 
 
 ;============================================================
 .segment "ROM4" ; other location
 
-main_tiles_chr2: .incbin "alien.chr"
+alien_tiles_chr: .incbin "alien_bg_tiles.chr"
+alien_sprites_chr: .incbin "alien_sprites.chr"
 
 .include "data/maps/alien_base1.asm"
 .include "data/maps/alien_base2.asm"
@@ -127,6 +130,7 @@ game_over_sprites:
 .include "data/maps/crashsite0.asm"
 .include "data/maps/crashsite.asm"
 .include "data/maps/location_with_cave.asm"
+.include "data/maps/location_with_cave2.asm"
 
 ;=============================================================
 .segment "ROM6"
@@ -148,7 +152,6 @@ zerosprite:
     .byte $70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$2e,$7d,$7d,$7d,$7d,$24
 
 
-.include "data/maps/alien_bossroom.asm"
 .include "data/maps/secret_cave0.asm"
 .include "data/AnimalSpawnPositions.asm"
 ;=============================================================
@@ -192,6 +195,20 @@ stamina_segment_values:
     .byte 64
     .byte 96
     .byte 128
+
+knockBackValuesInteger:
+    .byte 2
+    .byte 1
+    .byte 0
+    .byte 0
+    .byte 0
+
+knockBackValuesFractions:
+    .byte 200
+    .byte 250
+    .byte 180
+    .byte 10
+    .byte 10
 
 
 .include "data/house_palette.asm"
@@ -302,21 +319,21 @@ sun_moon_tiles_for_periods:
 
 npcs_ram_lookup: ;npc position in ram by index, max 16 npcs
     .byte 0
-    .byte 10
-    .byte 20
-    .byte 30
-    .byte 40
-    .byte 50
-    .byte 60
-    .byte 70
-    .byte 80
-    .byte 90
-    .byte 100
+    .byte 11
+    .byte 22
+    .byte 33
+    .byte 44
+    .byte 55
+    .byte 66
+    .byte 77
+    .byte 88
+    .byte 99
     .byte 110
-    .byte 120
-    .byte 130
-    .byte 140
-    .byte 150
+    .byte 121
+    .byte 132
+    .byte 143
+    .byte 154
+    .byte 165
 
 projectiles_ram_lookup: ; max 10 projectiles
     .byte 0
@@ -513,8 +530,28 @@ MapColumnAttributes:
 CheckpointSaved:
     .res 1
 
+hadKnockBack:
+    .res 1
+KnockBackDirectionX:
+    .res 1
+KnockBackDirectionY:
+    .res 1
+KnockBackIndex:
+    .res 1
+KnockBackDelay:
+    .res 1
+OldDirectionX:
+    .res 1
+
+chr_dest_high:
+    .res 1
+chr_dest_low:
+    .res 1
+chr_pages_to_copy:
+    .res 1
+
 ZPBuffer:
-    .res 57  ; I want to be aware of the free memory
+    .res 48  ; I want to be aware of the free memory
 
 ;--------------
 .segment "BSS" ; variables in ram
@@ -1098,8 +1135,13 @@ Item_Location14_Collection_times:
     .res ITEM_COUNT_LOC14
 
 Npcs:   ;animals and stuff
-    .res 160 ; max 16 npcs * 10 bytes:
-            ;   (npc type(5 bits) + agitatded?(1bit) + state(2 bit, 0 - dead, 1 - alive/idle, 2 - attacks, 3 - damaged),
+    .res 176 ; max 16 npcs * 11 bytes:
+            ;   (npc type(4 bits) + agitatded?(1bit) + damaged?(1bit) + state(2 bit,
+            ;                                                           0 - dead,
+            ;                                                           1 - alive/idle,
+            ;                                                           2 - attacks,
+            ;                                                           3 - warning
+            ;       ),
             ;   x (2 bytes),
             ;   y (2 bytes),
             ;   screen_index
@@ -1107,6 +1149,7 @@ Npcs:   ;animals and stuff
             ;   frame
             ;   timer
             ;   hp
+            ;   dammage timer (for how long a npc should stay red)
 NpcCount:
     .res 1
 
@@ -1185,6 +1228,9 @@ EquipNextResetCount:
 BossDefeated:
     .res 1
 
+BossAgitated:
+    .res 1
+
 TempNpcTilesInARow:
     .res 1
 TempNpcWidth:
@@ -1208,13 +1254,18 @@ TempNpcMovesDiagonaly:
 TempLocationPos:
     .res 1
 
+TempNpcDamaged:
+    .res 1
+TempNpcAgitated:
+    .res 1
+
 DialogTextContainer:
     .res 96
 
 SaveData: ; inventory         HP | Food | Fuel | Warmth | Time | Equipment
     .res INVENTORY_MAX_SIZE + 3  +   3 +   3   +   3    +   5  +    4
 Buffer:
-    .res 38  ;must see how much is still available
+    .res 15  ;must see how much is still available
 
 ;====================================================================================
 
@@ -1294,6 +1345,11 @@ vblankwait2:      ; Second wait for vblank, PPU is ready after this
     sta pointer
     lda #>title_tiles_chr
     sta pointer + 1
+    lda #0
+    sta chr_dest_high
+    sta chr_dest_low
+    lda #32
+    sta chr_pages_to_copy
     jsr CopyCHRTiles
 
     ldy #5
@@ -1789,11 +1845,13 @@ doTitle:
 ;pointer -  sits at zero page, points to the chr data
 CopyCHRTiles:
 
-    ldy #0     ; starting index into the first page
-    sty $2001  ; turn off rendering just in case
-    sty $2006  ; load the destination address into the PPU
-    sty $2006
-    ldx #32      ; number of 256-byte pages to copy
+    ldy #0                   ; starting index into the first page
+    sty $2001                ; turn off rendering just in case
+    lda chr_dest_high
+    sta $2006                ; high address byte
+    lda chr_dest_low
+    sta $2006                ; low  address byte
+    ldx chr_pages_to_copy    ; number of 256-byte pages to copy, 32 max
 @loop:
     lda (pointer),y  ; copy one byte
     sta $2007
@@ -1803,7 +1861,42 @@ CopyCHRTiles:
     dex
     bne @loop  ; repeat until we've copied enough pages
     rts
+;--------------------------------------------
+;pointer -  sits at zero page, points to the chr data
+;TempRowIndex - row count for the chunk
 
+CopyCHRChunk:
+
+    ldy #0
+    lda TempRowIndex ; total rows
+    sta TempRegX
+
+@tileLoop:
+    lda #96 ;6 * 16, one tile is 16 bytes
+    sta TempY ; data row size
+    lda TempRowIndex
+    sec
+    sbc TempRegX             ; row index
+    sta $2006                ; high address byte
+    lda #$A0                 ;
+    sta $2006                ; low address byte
+@loop:
+    lda (pointer),y  ; copy one byte
+    sta $2007
+    iny
+    bne @cont
+    inc pointer + 1
+@cont:
+    dec TempY
+    bne @loop
+
+    bcc @loop
+
+    dec TempRegX
+    bne @tileLoop
+
+
+    rts
 ;--------------------------------------------
 LoadBackgroundsIfNeeded:
 
@@ -3285,9 +3378,9 @@ RoutinesAfterFadeOut:
     bne @next25
 
     lda #<alien_palette
-    sta CurrentMapPalettePtr
+    sta PalettePtr
     lda #>alien_palette
-    sta CurrentMapPalettePtr + 1
+    sta PalettePtr + 1
 
     lda BossDefeated
     bne @next25
@@ -3296,6 +3389,11 @@ RoutinesAfterFadeOut:
     lda #>boss_npcs
     sta pointer + 1
     jsr LoadNpcs
+
+    lda #1
+    sta InVillagerHut
+    lda #3
+    sta VillagerIndex
 
     lda #6
     sta SongName
@@ -3316,6 +3414,7 @@ RoutinesAfterFadeOut:
     jsr FlipStartingNametable ; for the locked door, so the second screen would always be in adress $24**
 
     lda #0
+    sta BossAgitated
     sta SongName
     lda #1
     sta MustPlayNewSong
@@ -3383,6 +3482,7 @@ RoutinesAfterFadeOut:
 
 
 @next30:
+
     lda DetectedMapType
     bne @itsAnIndoorMap
     lda #1
@@ -3391,13 +3491,31 @@ RoutinesAfterFadeOut:
     beq @finish
     lda #0              ;so we're leaving the villager house
     sta InVillagerHut
+
+    lda ActiveMapEntryIndex
+    cmp #26
+    beq @notcopy
     lda #1
+    jmp @saveCopyFlag
+@notcopy:
+    lda #0
+@saveCopyFlag:
     sta MustCopyMainChr
 
     jmp @finish
 @itsAnIndoorMap:
     lda #1
     sta MustLoadHouseInterior
+
+    lda ActiveMapEntryIndex
+    cmp #25
+    beq @BossRoom
+    lda #1
+    jmp @saveCHRloading
+@BossRoom:
+    lda #0
+@saveCHRloading:
+    sta MustCopyMainChr
 
 @finish:
     lda #1
@@ -4232,7 +4350,6 @@ HandleInput:
     sta PlayerSpeed
     lda #PLAYER_SPEED_WALK_FRACTION
     sta PlayerSpeed + 1
-    jmp @finishInput ; no input at all
 
 @checkAttackTimer:
     lda AttackTimer
@@ -4242,6 +4359,9 @@ HandleInput:
     bne @finishInput
 
     jsr CheckB
+
+    lda hadKnockBack
+    bne @continueInput
 
     lda Buttons
     and #%00001111
@@ -4259,6 +4379,8 @@ HandleInput:
 
     ;gamepad button processing, the player could be moved here
     jsr ProcessButtons
+
+    jsr addKnockBack
 
     jsr IsPlayerCollidingWithNpcs
     bne @resetStuff
@@ -4914,6 +5036,11 @@ LoadTitle:
     sta pointer
     lda #>title_tiles_chr
     sta pointer + 1
+    lda #0
+    sta chr_dest_high
+    sta chr_dest_low
+    lda #32
+    sta chr_pages_to_copy
     jsr CopyCHRTiles
 
     lda #0
@@ -4962,6 +5089,11 @@ LoadGameOver:
     sta pointer
     lda #>title_tiles_chr
     sta pointer + 1
+    lda #0
+    sta chr_dest_high
+    sta chr_dest_low
+    lda #32
+    sta chr_pages_to_copy
     jsr CopyCHRTiles
 
 
@@ -5028,7 +5160,7 @@ LoadGame:
     ldx #0
 @WarmthLoop:
     lda SaveData, y
-    sta Fuel, x
+    sta Warmth, x
     iny
     inx
     cpx #3
@@ -5253,6 +5385,8 @@ ResetVariables:
     sta StaminaDelay
 
     lda #0
+    sta BossAgitated
+    sta hadKnockBack
     sta CheckpointSaved
     sta BossDefeated
     sta menuTileTransferRowIdx
@@ -5477,6 +5611,11 @@ LoadIntro:
     sta pointer
     lda #>intro_tiles_chr
     sta pointer + 1
+    lda #0
+    sta chr_dest_high
+    sta chr_dest_low
+    lda #32
+    sta chr_pages_to_copy
     jsr CopyCHRTiles
 
 @loadScene:
@@ -5512,6 +5651,11 @@ LoadOutro:
     sta pointer
     lda #>intro_tiles_chr
     sta pointer + 1
+    lda #0
+    sta chr_dest_high
+    sta chr_dest_low
+    lda #32
+    sta chr_pages_to_copy
     jsr CopyCHRTiles
 
 @loadScene:
@@ -5544,6 +5688,7 @@ LoadCheckPoint:
     lda #4
     sta LocationBankNo
     lda #0
+    sta hadKnockBack
     sta ScrollX
     lda #$77
     sta PlayerX
@@ -5561,10 +5706,14 @@ LoadCheckPoint:
 
     lda #<alien_palette
     sta CurrentMapPalettePtr
+    sta PalettePtr
     lda #>alien_palette
     sta CurrentMapPalettePtr + 1
+    sta PalettePtr + 1
 
     lda #0
+    sta InVillagerHut
+    sta BossAgitated
     sta SongName
     lda #1
     sta MustPlayNewSong
@@ -5865,13 +6014,239 @@ CheckDiagonal:
 
 @exit:
     rts
-;--------------------------------------
+;-------------------------------------
+;TODO: too similar to CheckLeft, should be merged
+KnockedBackLeft:
 
+    lda #1
+    sta ScrollDirection
+
+    lda OldDirectionX
+    sta DirectionX
+
+    lda PlayerX
+    cmp #SCREEN_MIDDLE
+    bcs @moveLeft
+
+    lda CurrentMapSegmentIndex ; is first screen
+    bne @scrollLeft                  ; nope
+    lda ScrollX
+    beq @moveLeft
+@scrollLeft:
+
+    ldy KnockBackIndex
+
+    lda ScrollX + 1
+    sec
+    sbc knockBackValuesFractions, y
+    sta ScrollX + 1
+
+    lda ScrollX
+    sbc knockBackValuesInteger, y
+    sta ScrollX
+
+    bcs @end
+
+    lda CurrentMapSegmentIndex
+    beq @firstScreen
+    dec CurrentMapSegmentIndex
+    lda #1
+    sta CurrentScreenWasDecremented
+    jmp @end
+@firstScreen:
+    lda #0
+    sta ScrollX
+
+    jmp @end
+
+
+@moveLeft:
+
+    ldy KnockBackIndex
+    lda PlayerX + 1
+    sec
+    sbc knockBackValuesFractions, y
+    sta PlayerX + 1
+
+    lda PlayerX
+    beq @end
+    sbc knockBackValuesInteger, y
+    sta PlayerX
+@end:
+    rts
+;--------------------------------------
+;TODO: same here as above
+KnockedBackRight:
+
+    lda #2
+    sta ScrollDirection
+
+    lda OldDirectionX
+    sta DirectionX
+
+
+    lda PlayerX
+    cmp #SCREEN_MIDDLE
+    bcc @moveRight
+
+    lda CurrentMapSegmentIndex ; CurrentMapSegment + 1 == ScreenCount -> do not scroll
+    clc
+    adc #1
+    cmp ScreenCount
+    beq @moveRight
+
+    ldy KnockBackIndex
+
+    lda ScrollX + 1
+    clc
+    adc knockBackValuesFractions, y
+    sta ScrollX + 1
+
+    lda ScrollX
+    adc knockBackValuesInteger, y
+    sta ScrollX
+
+    bcc @end
+
+    inc CurrentMapSegmentIndex
+    lda #1
+    sta CurrentScreenWasIncremented
+
+    lda CurrentMapSegmentIndex
+    clc
+    adc #1
+    cmp ScreenCount
+    beq @preLastScreen
+
+    jmp @end
+
+@preLastScreen:
+    lda #0          ;finshed to the last screen, set scroll to zero
+    sta ScrollX
+
+    jmp @end
+
+
+
+@moveRight:
+    ldy KnockBackIndex
+    lda PlayerX + 1
+    clc
+    adc knockBackValuesFractions, y
+    sta PlayerX + 1
+
+    lda PlayerX
+    adc knockBackValuesInteger, y
+    sta PlayerX
+    adc #PLAYER_WIDTH
+    bcc @end
+
+    lda #$FF
+    sec
+    sbc #PLAYER_WIDTH
+    sta PlayerX
+
+
+@end:
+
+    rts
+
+;--------------------------------------
+addKnockBack:
+
+    lda hadKnockBack
+    bne @continue
+
+    rts
+
+@continue:
+    lda FishingRodActive
+    beq @cont
+
+    rts
+
+@cont:
+
+    lda KnockBackDirectionY
+    cmp #1
+    bne @knockBackDown
+    ;knockBackUp
+
+    ldy KnockBackIndex
+
+    lda PlayerY + 1
+    sec
+    sbc knockBackValuesFractions, y
+    sta PlayerY + 1
+
+    lda PlayerY
+    sbc knockBackValuesInteger, y
+    sta PlayerY
+    jmp @end
+
+@knockBackDown:
+    cmp #2
+    bne @horizontal
+    ldy KnockBackIndex
+
+    lda PlayerY + 1
+    clc
+    adc knockBackValuesFractions, y
+    sta PlayerY + 1
+
+    lda PlayerY
+    adc knockBackValuesInteger, y
+    sta PlayerY
+    jmp @end
+;------
+@horizontal:
+    lda KnockBackDirectionX
+    beq @end ; no direction
+    cmp #1 ; left
+    bne @knockedRight
+
+    jsr KnockedBackLeft
+
+    jmp @end
+
+@knockedRight:
+
+   jsr KnockedBackRight
+
+@end:
+    inc KnockBackDelay
+    lda KnockBackDelay
+    cmp #2
+    bcc @exit
+
+    lda #0
+    sta KnockBackDelay
+    inc KnockBackIndex
+    lda KnockBackIndex
+    cmp #5
+    bcs @reset
+
+    jmp @exit
+
+@reset:
+    lda #0
+    sta hadKnockBack
+
+
+@exit:
+    rts
+
+
+;--------------------------------------
 ProcessButtons:
 
     lda FishingRodActive
     bne @exit
+    lda hadKnockBack
+    bne @exit
 
+    lda DirectionX
+    sta OldDirectionX
     lda #0
     sta DirectionX
     sta DirectionY
@@ -6699,7 +7074,7 @@ CheckLeft:
     jsr SetupCheckLeft
 
     lda PlayerX
-    cmp #120    ;check if player is in the left side of the screen
+    cmp #SCREEN_MIDDLE    ;check if player is in the left side of the screen
     bcs @moveLeft
 
     lda CurrentMapSegmentIndex ; is first screen
@@ -6769,7 +7144,7 @@ CheckRight:
     jsr SetupCheckRight
 
     lda PlayerX
-    cmp #120
+    cmp #SCREEN_MIDDLE
     bcc @moveRight  ;not gonna scroll until playerx + 8 >= 128
 
     lda CurrentMapSegmentIndex ; CurrentMapSegment + 1 == ScreenCount -> do not scroll
@@ -6788,7 +7163,7 @@ CheckRight:
     sta ScrollX
 
     bcc @exit ; no overflow
-@clamp:
+
     inc CurrentMapSegmentIndex
     lda #1
     sta CurrentScreenWasIncremented
