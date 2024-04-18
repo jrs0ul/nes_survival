@@ -1,7 +1,8 @@
 # nes_survival aka Cold and Starving
-A survival game for the NES and Famicom. The game is using the UNROM mapper.
+A survival game for the NES and Famicom. The game uses the UNROM mapper.
 
-To build this you will need cc65 and make, also python you're going to use FCEUX for debuging.
+
+To build the game you will need cc65 and make, also python, if you're going to use FCEUX for debuging.
 
 How to get the needed packages on a debian based **Linux** distro: 
 
