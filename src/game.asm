@@ -5689,6 +5689,8 @@ LoadCheckPoint:
     sta LocationBankNo
     lda #0
     sta hadKnockBack
+    sta ProjectileCount ; reset projectiles
+    sta SpearData       ; reset spear
     sta ScrollX
     lda #$77
     sta PlayerX
