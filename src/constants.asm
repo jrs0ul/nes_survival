@@ -202,6 +202,8 @@
 
     COOKING_FUEL_COST          = 5
 
+    SFX_INVENTORY_FULL         = 4
+
 
     INVENTORY_SPRITE_X         = 32
     INVENTORY_SPRITE_MIN_Y     = 68

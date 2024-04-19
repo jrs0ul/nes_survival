@@ -1814,7 +1814,7 @@ UnequipItem:
     inx
     inx
     cpx #INVENTORY_MAX_SIZE
-    bcs @exit ; no place for an unequiped item
+    bcs @PlaySfx ; no place for an unequiped item
     lda Inventory, x
     bne @loop
 
@@ -1831,6 +1831,12 @@ UnequipItem:
     sta (pointer), y
     iny
     sta (pointer), y
+    jmp @exit
+@PlaySfx:
+    lda #SFX_INVENTORY_FULL
+    sta SfxName
+    lda #1
+    sta MustPlaySfx
 @exit:
     rts
 
@@ -3032,7 +3038,10 @@ TakeItemFromStash:
     lda #0
     jmp @exit
 @fail:
+    lda #SFX_INVENTORY_FULL
+    sta SfxName
     lda #1
+    sta MustPlaySfx
 @exit:
     rts
 
