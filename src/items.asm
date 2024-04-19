@@ -280,21 +280,15 @@ AddAndDeactivateItems:
     iny
     cpy #INVENTORY_MAX_SIZE
     bcc @inventoryLoop
-    jmp @exit ; no place in the inventory?
+    jmp @playInventoryFull ; no place in the inventory?
 
 @addItem:
     sty Temp  ; store empty inventory slot
 
-    ldy current_bank
-    sty oldbank
-    ldy #6
-    jsr bankswitch_y
     lda #0
-    ldx #FAMISTUDIO_SFX_CH1
-    jsr famistudio_sfx_play
-    ldy oldbank
-    jsr bankswitch_y
-
+    sta SfxName
+    lda #1
+    sta MustPlaySfx
 
     ;let's store the time when the item was picked up
     ldy LocationIndex
@@ -342,6 +336,32 @@ AddAndDeactivateItems:
 
     ldy VillagerIndex
     sta TakenQuestItems, y
+
+    jmp @exit
+
+@playInventoryFull:
+    lda ScrollX
+    cmp FullInventoryScrollX
+    bne @play
+    lda PlayerX
+    cmp FullInventoryPlayerX
+    bne @play
+    lda PlayerY
+    cmp FullInventoryPlayerY
+    beq @exit
+@play:
+    lda ScrollX
+    sta FullInventoryScrollX
+    lda PlayerX
+    sta FullInventoryPlayerX
+    lda PlayerY
+    sta FullInventoryPlayerY
+
+    lda #4
+    sta SfxName
+    lda #1
+    sta MustPlaySfx
+
 
 @exit:
     ldy TempY

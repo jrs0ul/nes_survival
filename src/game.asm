@@ -459,14 +459,14 @@ MustLoadOutside:
     .res 1
 MustPlayNewSong:
     .res 1
-MustPlaySample:
+MustPlaySfx:
     .res 1
 
 
 
-SampleTimer:
-    .res 1
 SongName:
+    .res 1
+SfxName:
     .res 1
 IsLocationRoutine:
     .res 1
@@ -1264,8 +1264,16 @@ DialogTextContainer:
 
 SaveData: ; inventory         HP | Food | Fuel | Warmth | Time | Equipment
     .res INVENTORY_MAX_SIZE + 3  +   3 +   3   +   3    +   5  +    4
+
+FullInventoryScrollX:
+    .res 1
+FullInventoryPlayerX:
+    .res 1
+FullInventoryPlayerY:
+    .res 1
+
 Buffer:
-    .res 15  ;must see how much is still available
+    .res 12  ;must see how much is still available
 
 ;====================================================================================
 
@@ -1728,15 +1736,14 @@ famistudioupdate:
     ldy #6
     jsr bankswitch_y
 
-@checkNewSample:
-    lda MustPlaySample
+@checkNewSfx:
+    lda MustPlaySfx
     beq @checkNewSong
-    lda #3
-    jsr famistudio_music_play
+    lda SfxName
+    ldx #FAMISTUDIO_SFX_CH1
+    jsr famistudio_sfx_play
     lda #0
-    sta MustPlaySample
-    lda #255
-    sta SampleTimer
+    sta MustPlaySfx
 
     jmp @doSoundUpdate
 
@@ -5072,9 +5079,6 @@ LoadGameOver:
     beq @exit
 
 
-    lda #1
-    sta MustPlaySample
-
     ldy #2
     jsr bankswitch_y
 
@@ -5391,7 +5395,7 @@ ResetVariables:
     sta BossDefeated
     sta menuTileTransferRowIdx
     sta MapTilesetBankNo
-    sta MustPlaySample
+    sta MustPlaySfx
     sta InventoryItemIndex
     sta CurrentMapSegmentIndex
     sta ScrollDirection
