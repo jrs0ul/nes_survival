@@ -832,6 +832,8 @@ MustDrawStashToolMenu:
     .res 1
 MustDrawSleepMenu:
     .res 1
+MustDrawSleepMessage:
+    .res 1
 MustDrawDocument:
     .res 1
 MustClearSubMenu:
@@ -869,7 +871,8 @@ SubMenuIndex:
     .res 1
 SubMenuActivated:
     .res 1
-
+SleepMessageActivated:
+    .res 1
 DocumentActivated:
     .res 1
 ActiveDocument:
@@ -1272,8 +1275,11 @@ FullInventoryPlayerX:
 FullInventoryPlayerY:
     .res 1
 
+RepeatSameRowInTransfer: ; use same data row in tile transfer
+    .res 1
+
 Buffer:
-    .res 12  ;must see how much is still available
+    .res 9  ;must see how much is still available
 
 ;====================================================================================
 

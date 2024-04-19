@@ -1,4 +1,4 @@
-.segment "ROM3"
+    .segment "ROM3"
 
 
 DoSleep:

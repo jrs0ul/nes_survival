@@ -115,6 +115,7 @@ UpdateMenuGfx:
     jsr DrawStashItemMenu
     jsr DrawStashDocumentMenu
     jsr DrawDocument
+    jsr DrawSleepMessage
     jsr ClearSubMenu
 
     lda menuTileTransferRowIdx
@@ -375,6 +376,43 @@ DrawEquipmentGrid:
 
 @exit:
     rts
+;----------------------------------
+DrawSleepMessage:
+
+    lda MustDrawSleepMessage
+    beq @exit
+
+    lda FirstNametableAddr
+    clc
+    adc #1
+    sta Temp
+
+    lda #$23
+    sta TempX
+
+    lda #12
+    sta TempPointX
+
+    lda #5
+    sta TempPointY
+
+    lda #<sleep_msg_too_hungry
+    sta pointer
+    lda #>sleep_msg_too_hungry
+    sta pointer + 1
+
+
+    jsr TransferTiles
+    beq @exit; not done
+
+    lda #0
+    sta MustDrawSleepMessage
+    sta menuTileTransferRowIdx
+
+
+@exit:
+    rts
+
 ;----------------------------------
 DrawDocument:
     lda MustDrawDocument
@@ -1086,12 +1124,18 @@ ClearSubMenu:
     lda #12
     sta TempPointY
 
+    lda #1
+    sta RepeatSameRowInTransfer
+
     lda #<PopUpMenuClear
     sta pointer
     lda #>PopUpMenuClear
     sta pointer + 1
     jsr TransferTiles
     beq @exit
+
+    lda #0
+    sta RepeatSameRowInTransfer
 
 
     lda #0
@@ -1103,7 +1147,7 @@ ClearSubMenu:
 
     lda #1
     sta DocumentJustClosed
-    
+
     lda $2002
     lda FirstNametableAddr
     clc
@@ -1143,8 +1187,6 @@ ClearSubMenu:
     sta $2006
     lda #$51
     sta $2007
-
-
     
 @exit:
     rts
@@ -1319,6 +1361,9 @@ MenuInput:
     lda DocumentActivated
     bne @DocumentStuff
 
+    lda SleepMessageActivated
+    bne @SleepMessageStuff
+
     lda SubMenuIndex
     cmp #SUBMENU_FOOD
     beq @DoFoodMenuInput
@@ -1354,6 +1399,10 @@ MenuInput:
     beq @DoSleepInput
 
     jmp @skipSubmenuStuff
+
+@SleepMessageStuff:
+    jsr SleepMessageInput
+    jmp @exit
 
 @DocumentStuff:
     jsr ActivatedDocumentInput
@@ -1429,6 +1478,29 @@ ActivatedDocumentInput:
 
 @exit:
     rts
+;-------------------------------------
+SleepMessageInput:
+
+@CheckA:
+    lda Buttons
+    and #BUTTON_A_MASK
+    beq @exit
+
+    lda #0
+    sta SubMenuActivated
+    sta SubMenuIndex
+    sta SleepMessageActivated
+    jsr UpdateMenuStats
+    lda #1
+    sta MustLoadSomething
+    sta MustResetMenu
+
+
+@exit:
+
+
+    rts
+
 ;--------------------------------------
 SleepMenuInput:
 
@@ -1458,6 +1530,7 @@ SleepMenuInput:
     cmp #1 ; yes
     bne @hidemenu
     jsr StartSleep
+
 @CheckA: 
     lda Buttons
     and #BUTTON_A_MASK
@@ -3311,12 +3384,28 @@ OpenUpStash:
 ;--------------------------------------
 StartSleep:
 
+
+    lda Food
+    clc
+    adc Food + 1
+    adc Food + 2
+    cmp #0
+    bne @sleep
+
+
     lda #1
+    sta MustLoadSomething
+    sta SleepMessageActivated
+    sta MustDrawSleepMessage
+    jmp @exit
+
+@sleep:
+    lda #1
+    sta MustSleepAfterFadeOut
     sta MustExitMenuState
     sta PaletteFadeAnimationState ; set fade-out
     lda #FADE_DELAY_SLEEP
     sta PaletteAnimDelay
-    sta MustSleepAfterFadeOut
 
     lda #<house_palette
     sta PalettePtr
@@ -3327,7 +3416,7 @@ StartSleep:
     sta PaletteFadeTimer
     sta FadeIdx
 
-
+@exit:
     rts
 ;--------------------------------------
 CookMeat:
@@ -3642,6 +3731,11 @@ UpdateInventorySprites:
     cmp #0
     beq @ThePointer
 
+
+    lda SleepMessageActivated
+    bne @hideSprites
+
+
     ;if sleep submenu is active
     lda SubMenuActivated
     beq @itemLoop
@@ -3706,6 +3800,35 @@ UpdateInventorySprites:
 
 @ThePointer:
 
+    jsr UpdateArrowSprites
+
+@hideSprites:
+    lda TaintedSprites
+
+    cmp TempSpriteCount
+    bcc @done
+    beq @done
+    sec
+    sbc TempSpriteCount
+    asl
+    asl
+
+    tay
+    lda #$FE
+@hideSpritesLoop:
+    sta FIRST_SPRITE, x
+    inx
+
+    dey
+    bne @hideSpritesLoop
+@done:
+
+    lda TempSpriteCount
+    sta TaintedSprites
+
+    rts
+;---------------------------------
+UpdateArrowSprites:
     lda SubMenuActivated
     beq @singlePointer
     lda SubMenuIndex
@@ -3738,7 +3861,7 @@ UpdateInventorySprites:
 @singlePointer:
 
     lda DocumentActivated ; don't draw pointer if document is opened
-    bne @hideSprites
+    bne @exit
 
     ldx TempSpriteIdx
     lda InventoryPointerY
@@ -3764,9 +3887,9 @@ UpdateInventorySprites:
     inx
 
     lda CraftingActivated
-    beq @hideSprites
+    beq @exit
     lda CurrentCraftingComponent
-    beq @hideSprites
+    beq @exit
 
     ldx #0
     lda CraftingIndexes, x
@@ -3792,34 +3915,9 @@ UpdateInventorySprites:
     inc TempSpriteCount
     inc TempSpriteIdx
     inx
-
-
-@hideSprites:
-    lda TaintedSprites
-
-    cmp TempSpriteCount
-    bcc @done
-    beq @done
-    sec
-    sbc TempSpriteCount
-    asl
-    asl
-
-    tay
-    lda #$FE
-@hideSpritesLoop:
-    sta FIRST_SPRITE, x
-    inx
-
-    dey
-    bne @hideSpritesLoop
-@done:
-
-    lda TempSpriteCount
-    sta TaintedSprites
+@exit:
 
     rts
-
 ;----------------------------------
 TwoTileLoop:
     ldy #0
@@ -3873,6 +3971,7 @@ ExitMenuState:
     lda #0
     sta SubMenuActivated
     sta DocumentActivated
+    sta SleepMessageActivated
     sta SubMenuIndex
     sta MustLoadMenu
     sta menuTileTransferRowIdx
@@ -3892,6 +3991,7 @@ ExitMenuState:
     sta MustDrawInventoryGrid
     sta MustDrawMenuTitle
     sta MustDrawSleepMenu
+    sta MustDrawSleepMessage
     sta MustResetMenu
 
 

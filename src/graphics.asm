@@ -32,6 +32,12 @@ TransferTiles:
 
 @cont:
 
+    lda RepeatSameRowInTransfer ; repeat same data row
+    beq @cont2
+    lda #0
+    sta menuTileTransferDataIdx
+@cont2:
+
     lda $2002
     lda menuTileTransferAddressHigh
     sta $2006
