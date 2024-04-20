@@ -235,7 +235,7 @@ granny_thanks_special:
 
 ;==============================
 
-.segment "ROM1"
+.segment "ROM6"
 QuestSpritesCount:
     .byte 0, 4, 4, 0,  0, 4, 0, 2,  2, 2, 0, 0, 0, 0, 0, 0
 

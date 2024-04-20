@@ -405,7 +405,7 @@ ResetTimesWhenItemsWerePicked:
 
 
 ;===================================================
-.SEGMENT "ROM1"
+.SEGMENT "ROM6"
 ;update sprites from ItemCount-1 to 0
 UpdateItemSpritesInWorldZtoA:
 

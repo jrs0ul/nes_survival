@@ -13,7 +13,11 @@ sleep_msg_hungry:
     .byte $41,$4e,$47,$40,$4b,$52
 
 sleep_msg_cold:
-    .byte $3C,$48,$45,$3D
+    .byte $3C,$48,$45,$3D,$00,$00
+
+sleep_msg_ptr:
+    .byte <sleep_msg_hungry, >sleep_msg_hungry
+    .byte <sleep_msg_cold,   >sleep_msg_cold
 
 storage_title:
     .byte $00,$4C,$4D,$48,$4B,$3A,$40,$3E

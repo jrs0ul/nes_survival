@@ -485,9 +485,14 @@ DrawSleepMessage:
 
 @secondPart:
 
-    lda #<sleep_msg_hungry
+    lda SubMenuIndex
+    asl ; x2
+    tay
+
+    lda sleep_msg_ptr, y
     sta pointer
-    lda #>sleep_msg_hungry
+    iny
+    lda sleep_msg_ptr, y
     sta pointer + 1
 
     lda #6
@@ -3489,7 +3494,23 @@ OpenUpStash:
 ;--------------------------------------
 StartSleep:
 
+    lda Warmth
+    clc
+    adc Warmth + 1
+    adc Warmth + 2
+    cmp #0
+    bne @checkFood
 
+    lda #1
+    sta MustLoadSomething
+    sta SleepMessageActivated
+    sta MustDrawSleepMessage
+    lda #1
+    sta SubMenuIndex
+    jmp @exit
+
+
+@checkFood:
     lda Food
     clc
     adc Food + 1
@@ -3502,6 +3523,8 @@ StartSleep:
     sta MustLoadSomething
     sta SleepMessageActivated
     sta MustDrawSleepMessage
+    lda #0
+    sta SubMenuIndex
     jmp @exit
 
 @sleep:

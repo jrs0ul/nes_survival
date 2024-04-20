@@ -39,8 +39,6 @@ main_tiles_chr: .incbin "main.chr"
 ;===========================================================
 .segment "ROM1"
 
-.include "data/player_sprite_data.asm"
-.include "data/npc_sprite_data.asm"
 .include "data/menu_data.asm"
 .include "data/recipes.asm"
 .include "data/menu_screen_comp.asm"
@@ -154,6 +152,9 @@ zerosprite:
 
 .include "data/maps/secret_cave0.asm"
 .include "data/AnimalSpawnPositions.asm"
+
+.include "data/player_sprite_data.asm"
+.include "data/npc_sprite_data.asm"
 ;=============================================================
 
 .segment "RODATA" ; ROM7
@@ -1778,11 +1779,11 @@ famistudioupdate:
 RunSpriteUpdate:
     ldy current_bank
     sty oldbank
-    ldy #1
+    ldy #6
     jsr bankswitch_y
 
 
-    jsr UpdateSprites ; bank 1
+    jsr UpdateSprites ; bank 6
 
 
     ldy oldbank

@@ -1,6 +1,6 @@
 ;Sprite update routine during the GAME state
 
-.segment "ROM1"
+.segment "ROM6"
 
 UpdateSprites:
 

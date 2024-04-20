@@ -1299,7 +1299,7 @@ BuildSpearAttackSquare:
     rts
 
 ;-------------------------------------
-.SEGMENT "ROM1"
+.SEGMENT "ROM6"
 UpdateNpcSpritesInWorldZtoA:
 
     ldy NpcCount
