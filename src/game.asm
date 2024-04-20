@@ -494,6 +494,9 @@ menuTileTransferAddressLow:
 menuTileTransferDataIdx:
     .res 1
 
+TransferingSecondMenuPart:
+    .res 1
+
 character_sprite_data_ptr:
     .res 2
 
@@ -551,7 +554,7 @@ chr_pages_to_copy:
     .res 1
 
 ZPBuffer:
-    .res 48  ; I want to be aware of the free memory
+    .res 47  ; I want to be aware of the free memory
 
 ;--------------
 .segment "BSS" ; variables in ram

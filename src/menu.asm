@@ -146,8 +146,11 @@ UpdateMenuGfx:
 ResetMenu:
 
     lda MustResetMenu
-    beq @exit
+    bne @cont
 
+    rts
+
+@cont:
 
     lda menuTileTransferRowIdx
     bne @continueTileTransfer
@@ -157,6 +160,9 @@ ResetMenu:
 
 
 @continueTileTransfer:
+
+    lda TransferingSecondMenuPart
+    bne @secondPart
 
     lda FirstNametableAddr
     clc
@@ -168,9 +174,8 @@ ResetMenu:
 
     lda #13
     sta TempPointX
-    lda #16
+    lda #9
     sta TempPointY
-
 
 
     lda #<MainMenu
@@ -181,8 +186,39 @@ ResetMenu:
     beq @exit
 
     lda #0
+    sta menuTileTransferRowIdx
+    lda #1
+    sta TransferingSecondMenuPart
+
+@secondPart:
+    lda #1
+    sta RepeatSameRowInTransfer
+    lda #7
+    sta TempPointY
+    lda #13
+    sta TempPointX
+
+    lda FirstNametableAddr
+    clc
+    adc #2
+    sta Temp
+
+    lda #$23
+    sta TempX
+
+
+    lda #<MainMenuEmpty
+    sta pointer
+    lda #>MainMenuEmpty
+    sta pointer + 1
+    jsr TransferTiles
+    beq @exit
+
+    lda #0
     sta MustResetMenu
     sta menuTileTransferRowIdx
+    sta RepeatSameRowInTransfer
+    sta TransferingSecondMenuPart
     lda #1
     sta MustDrawMenuTitle
 
@@ -348,7 +384,8 @@ DrawEquipmentGrid:
     jsr ColorMainMenuAttributes
 
 @cont:
-
+    lda TransferingSecondMenuPart
+    bne @secondPart
 
     lda FirstNametableAddr
     clc
@@ -360,7 +397,7 @@ DrawEquipmentGrid:
 
     lda #10
     sta TempPointX
-    lda #16
+    lda #7
     sta TempPointY
 
     lda #<equipment_grid
@@ -370,7 +407,40 @@ DrawEquipmentGrid:
     jsr TransferTiles
     beq @exit ; not done yet
 
+    lda #1
+    sta TransferingSecondMenuPart
+    sta RepeatSameRowInTransfer
     lda #0
+    sta menuTileTransferRowIdx
+
+@secondPart:
+
+    lda FirstNametableAddr
+    clc
+    adc #1
+    sta Temp
+
+    lda #$E3
+    sta TempX
+
+
+    lda #13
+    sta TempPointX
+    lda #11 ; 11 empty rows
+    sta TempPointY
+
+    lda #<MainMenuEmpty
+    sta pointer
+    lda #>MainMenuEmpty
+    sta pointer + 1
+    jsr TransferTiles
+    beq @exit ; not done yet
+
+
+
+    lda #0
+    sta TransferingSecondMenuPart
+    sta RepeatSameRowInTransfer
     sta MustDrawEquipmentGrid
     sta menuTileTransferRowIdx
 
@@ -381,6 +451,9 @@ DrawSleepMessage:
 
     lda MustDrawSleepMessage
     beq @exit
+
+    lda TransferingSecondMenuPart
+    bne @secondPart
 
     lda FirstNametableAddr
     clc
@@ -396,9 +469,9 @@ DrawSleepMessage:
     lda #5
     sta TempPointY
 
-    lda #<sleep_msg_too_hungry
+    lda #<sleep_msg_background
     sta pointer
-    lda #>sleep_msg_too_hungry
+    lda #>sleep_msg_background
     sta pointer + 1
 
 
@@ -406,6 +479,38 @@ DrawSleepMessage:
     beq @exit; not done
 
     lda #0
+    sta menuTileTransferRowIdx
+    lda #1
+    sta TransferingSecondMenuPart
+
+@secondPart:
+
+    lda #<sleep_msg_hungry
+    sta pointer
+    lda #>sleep_msg_hungry
+    sta pointer + 1
+
+    lda #6
+    sta TempPointX
+
+    lda #1
+    sta TempPointY
+
+    lda FirstNametableAddr
+    clc
+    adc #1
+    sta Temp
+
+    lda #$48
+    sta TempX
+
+
+    jsr TransferTiles
+    beq @exit
+
+
+    lda #0
+    sta TransferingSecondMenuPart
     sta MustDrawSleepMessage
     sta menuTileTransferRowIdx
 
