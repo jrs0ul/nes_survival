@@ -910,6 +910,7 @@ OnCollisionWithAttackRect:
     cmp #NPC_IDX_BOSS
     bne @dropStuff
     jsr OnBossDefeat
+    jmp @wearWeapon ; boss not dropping anything
 
 @dropStuff:
     jsr DropItemAfterDeath
@@ -1003,56 +1004,64 @@ OnBossDefeat:
 ;-------------------------------------
 DropItemAfterDeath:
 
-    lda TempNpcType
-    cmp #NPC_TYPE_PREDATOR
-    bne @continueDrop
-
-    lda TempNpcIndex
-    beq @exit
-
-@continueDrop:
-    ;drop item
-
-
-    lda TempNpcType
-    cmp #NPC_TYPE_PREDATOR
-    beq @spawnHide
-    cmp #NPC_TYPE_AGRESSIVE
-    beq @jumbo
-
-
     lda NpcsHitByPlayer
     cmp #2
     bcs @specialRewardItem
 
-    lda #ITEM_RAW_MEAT
-    asl
-    ora #1
 
-    jmp @storeItem
-@specialRewardItem:
-    jsr UpdateRandomNumber
-    and #3
-    cmp #2
-    bcs @spawnHide
-@jumbo:
-    lda #ITEM_RAW_JUMBO_MEAT
-    asl
-    ora #1
-    jmp @storeItem
-@spawnHide:
     lda TempNpcIndex
     cmp #NPC_IDX_HOUND
-    bne @exit ; hide will be spawned only after killing hounds
+    bne @test_Boar
     jsr UpdateRandomNumber
     and #3
     cmp #2
     bcc @exit
-    lda #ITEM_HIDE
+    jmp @hide
+
+@test_Boar:
+    cmp #NPC_IDX_BOAR
+    beq @jumbo
+    cmp #NPC_IDX_DOGMAN
+    beq @exit
+
+    lda #ITEM_RAW_MEAT
     asl
     ora #1
+    jmp @storeItem
+
+@specialRewardItem:
+    ;the dogmen should drop berries/rocks
+    lda TempNpcIndex
+    cmp #NPC_IDX_DOGMAN
+    bne @continueSpecial
+
+    jsr UpdateRandomNumber
+    and #3
+    cmp #2
+    bcs @berries
+    jmp @rock
+
+@continueSpecial:
+    jsr UpdateRandomNumber
+    and #3
+    cmp #2
+    bcs @hide
+@jumbo:
+    lda #ITEM_RAW_JUMBO_MEAT
+    jmp @storeItem
+@berries:
+    lda #ITEM_ROWAN_BERRIES
+    jmp @storeItem
+@rock:
+    lda #ITEM_ROCK
+    jmp @storeItem
+@hide:
+    lda TempNpcIndex
+    lda #ITEM_HIDE
 @storeItem:
 
+    asl
+    ora #1
     sta TempItemIndex
 
     jsr ItemSpawnPrep

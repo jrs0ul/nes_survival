@@ -309,7 +309,10 @@
     NPC_TYPE_PASSIVE           = 3
     NPC_TYPE_AGRESSIVE         = 4
 
+    NPC_IDX_DOGMAN             = 0
+    NPC_IDX_BUNNY              = 1
     NPC_IDX_HOUND              = 3
+    NPC_IDX_BOAR               = 7
     NPC_IDX_BOSS               = 8
 
     DIALOG_TEXT_LENGTH         = 96
