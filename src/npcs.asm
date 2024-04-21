@@ -536,6 +536,7 @@ PlayerNpcsHitDectect:
     rts
 
 ;-------------------------------------
+;Check if the player is hitting one of the npcs
 CheckSingleNpcAgainstPlayerHit:
     lda npcs_ram_lookup, y
     tay
@@ -554,6 +555,7 @@ CheckSingleNpcAgainstPlayerHit:
     lsr
     lsr ;eliminate 3 state bits
 
+    sta TempNpcIndex ; state the npc kind for item dropping
     sty TempNpcPosInRam
     asl
     asl
@@ -617,8 +619,8 @@ CheckSingleNpcAgainstPlayerHit:
     bcs @ignoreTimer
     lda AttackTimer
     beq @exit
-    lda NpcsHitByPlayer
-    bne @exit
+    ;lda NpcsHitByPlayer
+    ;bne @exit
 @ignoreTimer:
     jsr AttackBoxNpcsCollision
 
@@ -857,7 +859,7 @@ OnCollisionWithAttackRect:
 
 @continue:
 
-    inc NpcsHitByPlayer
+    ;inc NpcsHitByPlayer
 
     jsr CalcPlayerDmg
 
@@ -905,6 +907,8 @@ OnCollisionWithAttackRect:
     lda Npcs, y
     and #%11110000; drop 4 last bits that stand for status
     sta Npcs, y
+
+    inc NpcsHitByPlayer
 
     lda TempNpcIndex
     cmp #NPC_IDX_BOSS
@@ -1024,9 +1028,8 @@ DropItemAfterDeath:
     cmp #NPC_IDX_DOGMAN
     beq @exit
 
+    ;everything else
     lda #ITEM_RAW_MEAT
-    asl
-    ora #1
     jmp @storeItem
 
 @specialRewardItem:
@@ -1056,7 +1059,6 @@ DropItemAfterDeath:
     lda #ITEM_ROCK
     jmp @storeItem
 @hide:
-    lda TempNpcIndex
     lda #ITEM_HIDE
 @storeItem:
 
