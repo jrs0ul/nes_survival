@@ -619,8 +619,8 @@ CheckSingleNpcAgainstPlayerHit:
     bcs @ignoreTimer
     lda AttackTimer
     beq @exit
-    ;lda NpcsHitByPlayer
-    ;bne @exit
+    lda NpcsHitByPlayer
+    bne @exit ; only one hit per attack
 @ignoreTimer:
     jsr AttackBoxNpcsCollision
 
@@ -859,7 +859,7 @@ OnCollisionWithAttackRect:
 
 @continue:
 
-    ;inc NpcsHitByPlayer
+    inc NpcsHitByPlayer
 
     jsr CalcPlayerDmg
 
@@ -908,7 +908,7 @@ OnCollisionWithAttackRect:
     and #%11110000; drop 4 last bits that stand for status
     sta Npcs, y
 
-    inc NpcsHitByPlayer
+    inc NpcsKilledByPlayer
 
     lda TempNpcIndex
     cmp #NPC_IDX_BOSS
@@ -1008,7 +1008,7 @@ OnBossDefeat:
 ;-------------------------------------
 DropItemAfterDeath:
 
-    lda NpcsHitByPlayer
+    lda NpcsKilledByPlayer
     cmp #2
     bcs @specialRewardItem
 
@@ -2396,6 +2396,7 @@ NpcMovement:
     lda Npcs, x ; load x fraction
     sec
     sbc TempNpcSpeed + 1
+    sta NewNpcX + 1
     dex
     lda Npcs, x ; load x
     sbc TempNpcSpeed

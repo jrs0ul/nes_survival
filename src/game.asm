@@ -628,7 +628,7 @@ WalkTimer:
     .res 1
 AttackTimer:
     .res 1
-NpcsHitByPlayer:
+NpcsKilledByPlayer: ; kills by a single strike
     .res 1
 PlayerFrame:
     .res 1
@@ -1282,8 +1282,11 @@ FullInventoryPlayerY:
 RepeatSameRowInTransfer: ; use same data row in tile transfer
     .res 1
 
+NpcsHitByPlayer: ;npc hits in one strike
+    .res 1
+
 Buffer:
-    .res 9  ;must see how much is still available
+    .res 8  ;must see how much is still available
 
 ;====================================================================================
 
@@ -6435,6 +6438,7 @@ CheckB:
     lda #PLAYER_ATTACK_DELAY
     sta AttackTimer
     lda #0
+    sta NpcsKilledByPlayer
     sta NpcsHitByPlayer
 
     jsr PlayAttackSfx
