@@ -422,10 +422,13 @@ LoadIndoorMapData:
     lda #$20    ; $20000
     sta NametableAddress
 
+    lda #128
+    sta NametableOffsetInBytes
     jsr LoadNametable
+    lda #0
+    sta NametableOffsetInBytes
     jsr LoadStatusBar
 
-    
 
     lda #0
     sta MustLoadHouseInterior

@@ -55,11 +55,11 @@ intro_tiles_chr: .incbin "intro.chr"
 
 house_tiles_chr: .incbin "house_bg_tiles.chr"
 house_sprites_chr: .incbin "house_sprites.chr"
-.include "data/maps/house.asm"
-.include "data/maps/villager_hut.asm"
-.include "data/maps/villager2_hut.asm"
-.include "data/maps/grannys_hut.asm"
-.include "data/maps/alien_bossroom.asm"
+.include "data/maps/house_crop.asm"
+.include "data/maps/villager_hut_crop.asm"
+.include "data/maps/villager2_hut_crop.asm"
+.include "data/maps/grannys_hut_crop.asm"
+.include "data/maps/alien_bossroom_crop.asm"
 
 
 ;============================================================
@@ -1285,8 +1285,10 @@ RepeatSameRowInTransfer: ; use same data row in tile transfer
 NpcsHitByPlayer: ;npc hits in one strike
     .res 1
 
+NametableOffsetInBytes: ; how many bytes to fill with zeroes at the beginning of a nametable
+    .res 1
 Buffer:
-    .res 8  ;must see how much is still available
+    .res 7  ;must see how much is still available
 
 ;====================================================================================
 
@@ -5406,6 +5408,7 @@ ResetVariables:
     sta StaminaDelay
 
     lda #0
+    sta NametableOffsetInBytes
     sta BossAgitated
     sta hadKnockBack
     sta CheckpointSaved

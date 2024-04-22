@@ -109,6 +109,7 @@ LoadPalette:
 ; Feeds stuff that the pointer points to, to PPU
 ; pointer points to the nametable data
 ; NametableAddress stores the ppu adress
+; NametableOffsetInBytes - memory at the beginning that will be filled in 00
 
 LoadNametable:
     lda $2002             ; read PPU status to reset the high/low latch
@@ -123,12 +124,24 @@ LoadNametable:
 
 @InsideLoop:
 
+    lda NametableOffsetInBytes
+    beq @OffsetIsEmpty
+
+    ;put some zeroes
+    lda #$00
+    sta $2007
+    dec NametableOffsetInBytes
+    jmp @InsideLoop
+
+    ;actual data
+@OffsetIsEmpty:
     lda (pointer),y       ;
     sta $2007             ; write to PPU
     iny
     cpy #0
     bne @InsideLoop
 
+@incUpperAddress:
     inc pointer + 1
     inx
     cpx #4

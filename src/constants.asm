@@ -66,7 +66,7 @@
 
     NUM_OF_BUNNIES_BEFORE_DOG  = 3
 
-    ROW_TABLE_SIZE             = 240
+    ROW_TABLE_SIZE             = 240 ;4 screens * 32 rows * 2
 
 
     DESTRUCTIBLE_COUNT         = 4
