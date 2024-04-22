@@ -5091,6 +5091,10 @@ LoadGameOver:
     lda MustLoadGameOver
     beq @exit
 
+    lda #1
+    sta MustPlayNewSong
+    lda #3
+    sta SongName
 
     ldy #2
     jsr bankswitch_y
