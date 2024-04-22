@@ -26,8 +26,8 @@
 
 main_tiles_chr: .incbin "main.chr"
 
-.include "data/maps/field_bg.asm"
-.include "data/maps/field_bg1.asm"
+.include "data/maps/field_bg_crop.asm"
+.include "data/maps/field_bg1_crop.asm"
 .include "data/maps/field_bg2.asm"
 .include "data/maps/field_bg4.asm"
 .include "data/maps/LOC3_bg1.asm"

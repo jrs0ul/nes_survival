@@ -186,6 +186,9 @@ TestPointAgainstCollisionMap:
     cmp #30
     bcs @collides
 
+    sec
+    sbc #4 ; drop the 4 top rows, where the hud is
+
     asl  ;row * 2
 
     clc

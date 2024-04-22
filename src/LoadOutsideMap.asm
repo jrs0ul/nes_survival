@@ -82,7 +82,11 @@ LoadOutsideMap:
     lda FirstNametableAddr
     sta NametableAddress
 
+    lda #128
+    sta NametableOffsetInBytes
     jsr LoadNametable
+    lda #0
+    sta NametableOffsetInBytes
 
     ;Load Nametable 2
 
@@ -103,7 +107,11 @@ LoadOutsideMap:
     lda SecondNametableAddr
     sta NametableAddress
 
+    lda #128
+    sta NametableOffsetInBytes
     jsr LoadNametable
+    lda #0
+    sta NametableOffsetInBytes
 
     lda ScreenCount
     cmp #3
