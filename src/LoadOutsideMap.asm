@@ -280,7 +280,7 @@ ReloadLowerColumnRange_movingLeft:
     lda BgColumnIdxToUpload
     sta TempPreRowLoopValue
 
-    ;x is SCREEN_ROW_COUNT (30)
+    ;x is SCREEN_ROW_COUNT - 4 (26)
 
     jsr CopyTilesToScreen
     lda CurrentMapSegmentIndex
@@ -315,7 +315,7 @@ ReloadUpperColumnRange_movingLeft:
     lda BgColumnIdxToUpload
     sta TempPreRowLoopValue
 
-    ;x is 30
+    ;x is 26
 
     jsr CopyTilesToScreen
     lda CurrentMapSegmentIndex
@@ -421,7 +421,7 @@ CopyAttributes:
 
     lda map_list_low, y
     clc
-    adc #$C0
+    adc #$40 ; $C0 - $80(four tile rows * 32 bytes)
     sta pointer
     lda map_list_high, y
     adc #$3
@@ -517,9 +517,9 @@ PrepareDestAndSource:
 
     lda DestScreenAddr
     sta Temp ;upper address
-    lda #0
+    lda #128 ; skip HUD rows
     sta TempY ;lower address
 
-    ldx #SCREEN_ROW_COUNT
+    ldx #SCREEN_ROW_COUNT - 4
 
     rts

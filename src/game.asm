@@ -4662,7 +4662,8 @@ CalcMapColumnToUpdate:
     sta pointer + 1
 
     ldx #0
-    ldy #128  ;  skip four rows
+    ldy #0
+    ;ldy #128  ;  skip four rows
 @loop:
     lda (pointer), y
     sta MapColumnData, x
@@ -4708,7 +4709,7 @@ CalcMapColumnToUpdate:
 
     lda map_list_low, y
     clc
-    adc #$C0
+    adc #$40 ; C0 - 80(4 lines at the top)
     sta pointer
     lda map_list_high, y
     adc #$3
@@ -4721,7 +4722,7 @@ CalcMapColumnToUpdate:
     sta pointer
 
     ldx #0 ;
-    lda #$C0
+    lda #$40
     clc
     adc AttribColumnIdxToUpdate
     sta tmpAttribAddress
