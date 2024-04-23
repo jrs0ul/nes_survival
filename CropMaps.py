@@ -39,14 +39,12 @@ def crop_maps():
     lines = []
 
     for fileName in map_files:
-        print("Cropping " + fileName)
-
 
         try:
             fileIN = open(map_path + fileName)
             lines = fileIN.readlines()
         except IOError:
-            print("oops!")
+            print("********* a FAILURE while reading [" + map_path + fileName + "] ! ************")
             return
 
         dataOut = ""
@@ -56,8 +54,6 @@ def crop_maps():
                 dataOut += lines[i]
 
         nameArray = fileName.split('.')
-        print(nameArray)
-
         fileOut = open(map_path + nameArray[0] + "_crop.asm", "wt").write(dataOut)
 
 
