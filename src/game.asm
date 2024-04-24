@@ -4659,11 +4659,11 @@ CalcMapColumnToUpdate:
     adc BgColumnIdxToUpload
     sta pointer
     lda map_list_high, y
+    adc #0
     sta pointer + 1
 
     ldx #0
     ldy #0
-    ;ldy #128  ;  skip four rows
 @loop:
     lda (pointer), y
     sta MapColumnData, x
