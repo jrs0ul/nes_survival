@@ -101,6 +101,9 @@
     STAMINA_DELAY              = 2
     NPC_ELIMINATION_DELAY      = 200
 
+    HUD_TILE_COUNT             = 128
+    HUD_TILE_ROW_COUNT         = 4
+
 
     PLAYER_COLLISION_LINE_X1   = 3
     PLAYER_COLLISION_LINE_X2   = 13 ;16 - 3

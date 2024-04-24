@@ -82,7 +82,7 @@ LoadOutsideMap:
     lda FirstNametableAddr
     sta NametableAddress
 
-    lda #128
+    lda #HUD_TILE_COUNT
     sta NametableOffsetInBytes
     jsr LoadNametable
     lda #0
@@ -107,7 +107,7 @@ LoadOutsideMap:
     lda SecondNametableAddr
     sta NametableAddress
 
-    lda #128
+    lda #HUD_TILE_COUNT
     sta NametableOffsetInBytes
     jsr LoadNametable
     lda #0
@@ -280,7 +280,7 @@ ReloadLowerColumnRange_movingLeft:
     lda BgColumnIdxToUpload
     sta TempPreRowLoopValue
 
-    ;x is SCREEN_ROW_COUNT - 4 (26)
+    ;x is SCREEN_ROW_COUNT - HUD_TILE_ROW_COUNT (26)
 
     jsr CopyTilesToScreen
     lda CurrentMapSegmentIndex
@@ -517,9 +517,9 @@ PrepareDestAndSource:
 
     lda DestScreenAddr
     sta Temp ;upper address
-    lda #128 ; skip HUD rows
+    lda #HUD_TILE_COUNT ; skip HUD rows
     sta TempY ;lower address
 
-    ldx #SCREEN_ROW_COUNT - 4
+    ldx #SCREEN_ROW_COUNT - HUD_TILE_ROW_COUNT
 
     rts

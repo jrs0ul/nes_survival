@@ -422,7 +422,7 @@ LoadIndoorMapData:
     lda #$20    ; $20000
     sta NametableAddress
 
-    lda #128
+    lda #HUD_TILE_COUNT
     sta NametableOffsetInBytes
     jsr LoadNametable
     lda #0
