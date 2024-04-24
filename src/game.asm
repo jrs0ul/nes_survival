@@ -1287,8 +1287,11 @@ NpcsHitByPlayer: ;npc hits in one strike
 
 NametableOffsetInBytes: ; how many bytes to fill with zeroes at the beginning of a nametable
     .res 1
+SkipLastTileRowsInIndoorMaps:
+    .res 1
+
 Buffer:
-    .res 7  ;must see how much is still available
+    .res 6  ;must see how much is still available
 
 ;====================================================================================
 
@@ -5409,6 +5412,7 @@ ResetVariables:
     sta StaminaDelay
 
     lda #0
+    sta SkipLastTileRowsInIndoorMaps
     sta NametableOffsetInBytes
     sta BossAgitated
     sta hadKnockBack

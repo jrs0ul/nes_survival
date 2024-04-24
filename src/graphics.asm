@@ -135,8 +135,50 @@ LoadNametable:
 
     ;actual data
 @OffsetIsEmpty:
+
+    lda SkipLastTileRowsInIndoorMaps
+    beq @contLoad
+;============skipping a tile block for indoor maps
+    cpx #2
+    beq @contcheck
+    bcc @contLoad
+    jmp @uppercheck
+@contcheck:
+    cpy #$60
+    bcc @contLoad
+@uppercheck:
+    cpx #3
+    bne @zero
+    cpy #$40
+    bcs @paletteLoad ; we reached $0340, time to load palette
+@zero:
+    lda #0
+    sta $2007
+    jmp @nextcell
+@paletteLoad:
+    sty TempY
+    lda pointer + 1
+    sta TempX
+    tya
+    sec
+    sbc #224 ; 7 tile rows from the bottom
+    tay
+    lda pointer + 1
+    sbc #0   ; subtract carry flag from upper address
+    sta pointer + 1
+    lda (pointer), y
+    sta $2007
+    lda TempX
+    sta pointer + 1
+    ldy TempY
+
+    jmp @nextcell
+;=============end of block skip
+
+@contLoad:
     lda (pointer),y       ;
     sta $2007             ; write to PPU
+@nextcell:
     iny
     cpy #0
     bne @InsideLoop

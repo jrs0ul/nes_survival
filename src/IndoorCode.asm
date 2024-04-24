@@ -424,9 +424,12 @@ LoadIndoorMapData:
 
     lda #HUD_TILE_COUNT
     sta NametableOffsetInBytes
+    lda #1
+    sta SkipLastTileRowsInIndoorMaps
     jsr LoadNametable
     lda #0
     sta NametableOffsetInBytes
+    sta SkipLastTileRowsInIndoorMaps
     jsr LoadStatusBar
 
 

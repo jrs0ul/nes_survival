@@ -34,6 +34,14 @@ map_files = [
 
 map_path = "src/data/maps/"
 
+indoor_maps = [
+              "house.asm",
+              "villager_hut.asm",
+              "villager2_hut.asm",
+              "grannys_hut.asm",
+              "alien_bossroom.asm"
+              ]
+
 def crop_maps():
 
     lines = []
@@ -49,9 +57,16 @@ def crop_maps():
 
         dataOut = ""
 
+        isIndoorMap = fileName in indoor_maps
+
         for i in range(len(lines)):
-            if i < 1 or i > 8 :
-                dataOut += lines[i]
+            if isIndoorMap :
+                if (i < 1 or i > 8) and (i < 45 or i > 58) :
+                    dataOut += lines[i]
+            else:
+                if (i < 1 or i > 8) :
+                    dataOut += lines[i]
+
 
         nameArray = fileName.split('.')
         fileOut = open(map_path + nameArray[0] + "_crop.asm", "wt").write(dataOut)
