@@ -112,6 +112,9 @@
     PLAYER_HEIGHT              = 16
     PLAYER_STAMINA_SIZE        = 128
 
+    PLAYER_DAMAGED_DELAY       = 25 ; how long player remains red when damaged
+    PLAYER_OUTLINE_COLOR_POS   = 29 ; black outline postion in sprite palette
+
 .if FAMISTUDIO_CFG_PAL_SUPPORT
     PLAYER_SPEED_WALK_BASE     = 0
     PLAYER_SPEED_WALK_FRACTION = 239
@@ -185,6 +188,8 @@
 
 
     DAMAGE_RED_BLINK_DURATION  = 5
+
+    COLOR_DARK_RED             = $06
     COLOR_RED                  = $16
 
     SCREEN_ROW_COUNT           = 30

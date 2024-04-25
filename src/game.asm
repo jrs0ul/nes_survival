@@ -2946,8 +2946,11 @@ DoPaletteFades:
     lda PaletteFadeAnimationState
     bne @continue
 
-    dec PlayerDamagedCounter
     lda PlayerDamagedCounter
+    beq @checkRed
+    sec
+    sbc #1
+    sta PlayerDamagedCounter
     bne @checkRed
 
     ldy #29
@@ -2960,8 +2963,11 @@ DoPaletteFades:
 
 
 @checkRed:
-    dec RedCounter
     lda RedCounter
+    beq @continue
+    sec
+    sbc #1
+    sta RedCounter
     beq @resetRed
 
     rts

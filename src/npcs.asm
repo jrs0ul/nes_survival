@@ -3242,11 +3242,12 @@ DamagePlayer:
     lda #1
     sta HpUpdated
     sta MustUpdatePalette
-    ldy #29
-    lda #07
+    ldy #PLAYER_OUTLINE_COLOR_POS
+    lda #COLOR_DARK_RED
     sta RamPalette, y
+    lda #PLAYER_DAMAGED_DELAY
     sta PlayerDamagedCounter
-    lda #32
+    lda #PALETTE_SIZE_MAX
     sta PaletteUpdateSize
 
 @exit:
