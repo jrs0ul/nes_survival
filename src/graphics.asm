@@ -120,17 +120,19 @@ LoadNametable:
 
     ldx #$00
     ldy #$00
+    
+    lda #$04
+    sta TempPointX
+    lda #$00
+    sta TempPointY
+
 @OutsideLoop:
 
 @InsideLoop:
 
     lda NametableOffsetInBytes
     beq @OffsetIsEmpty
-
-    ;put some zeroes
-    lda #$00
-    sta $2007
-    dec NametableOffsetInBytes
+    jsr PutEmptyTiles
     jmp @InsideLoop
 
     ;actual data
@@ -156,6 +158,44 @@ LoadNametable:
     sta $2007
     jmp @nextcell
 @paletteLoad:
+    jsr LoadIndoorAttributes
+    jmp @nextcell
+;=============end of block skip
+
+@contLoad:
+    lda (pointer),y       ;
+    sta $2007             ; write to PPU
+@nextcell:
+
+    lda TempPointY
+    sec
+    sbc #1
+    sta TempPointY
+    lda TempPointX
+    sbc #0
+    sta TempPointX
+    cmp #0
+    bne @incptr
+    lda TempPointY
+    cmp #0
+    beq @done
+
+@incptr:
+    iny
+    cpy #0
+    bne @InsideLoop
+
+@incUpperAddress:
+    inc pointer + 1
+    inx
+
+    cpx #4
+    bne @OutsideLoop
+@done:
+    rts
+
+;---------------------
+LoadIndoorAttributes:
     sty TempY
     lda pointer + 1
     sta TempX
@@ -172,21 +212,21 @@ LoadNametable:
     sta pointer + 1
     ldy TempY
 
-    jmp @nextcell
-;=============end of block skip
+    rts
 
-@contLoad:
-    lda (pointer),y       ;
-    sta $2007             ; write to PPU
-@nextcell:
-    iny
-    cpy #0
-    bne @InsideLoop
 
-@incUpperAddress:
-    inc pointer + 1
-    inx
-    cpx #4
-    bne @OutsideLoop
+;---------------------
+PutEmptyTiles:
+    lda #$00
+    sta $2007
+    dec NametableOffsetInBytes
+
+    lda TempPointY
+    sec
+    sbc #1
+    sta TempPointY
+    lda TempPointX
+    sbc #0
+    sta TempPointX
 
     rts
