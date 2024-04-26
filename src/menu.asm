@@ -3039,6 +3039,13 @@ GiveItem:
 @reward:
     jsr SpawnRewardItem
 
+    lda VillagerIndex
+    cmp #3
+    bne @cont
+
+    jsr OnBossDefeat
+
+@cont:
     lda #1
     jmp @done
 

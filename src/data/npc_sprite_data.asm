@@ -525,6 +525,11 @@ npc_BJORN_frames:
 npc_BJORN_frame_LEFT:
     .byte 0, 0
     .byte <npc_BJORN_frame_LEFT_0,   >npc_BJORN_frame_LEFT_0
+    .byte 0, 0
+    .byte 0, 0
+    .byte 0, 0
+    .byte 0, 0
+    .byte <npc_DOGMAN_frame_DTH, >npc_DOGMAN_frame_DTH
 
 npc_BJORN_frame_LEFT_0:
     .byte 0,  $5A, %00000000, 0
@@ -537,6 +542,11 @@ npc_BJORN_frame_LEFT_0:
 npc_BJORN_frame_RIGHT:
     .byte 0, 0
     .byte <npc_BJORN_frame_RIGHT_0,   >npc_BJORN_frame_RIGHT_0
+    .byte 0, 0
+    .byte 0, 0
+    .byte 0, 0
+    .byte 0, 0
+    .byte <npc_DOGMAN_frame_DTH, >npc_DOGMAN_frame_DTH
 
 npc_BJORN_frame_RIGHT_0:
     .byte 0,  $5B, %01000000, 0
@@ -549,6 +559,11 @@ npc_BJORN_frame_RIGHT_0:
 npc_BJORN_frame_UP:
     .byte 0, 0
     .byte <npc_BJORN_frame_UP_0,   >npc_BJORN_frame_UP_0
+    .byte 0, 0
+    .byte 0, 0
+    .byte 0, 0
+    .byte 0, 0
+    .byte <npc_DOGMAN_frame_DTH, >npc_DOGMAN_frame_DTH
 
 npc_BJORN_frame_UP_0:
     .byte 0,  $5C, %00000000, 0
@@ -561,6 +576,11 @@ npc_BJORN_frame_UP_0:
 npc_BJORN_frame_DOWN:
     .byte 0, 0
     .byte <npc_BJORN_frame_DOWN_0,   >npc_BJORN_frame_DOWN_0
+    .byte 0, 0
+    .byte 0, 0
+    .byte 0, 0
+    .byte 0, 0
+    .byte <npc_DOGMAN_frame_DTH, >npc_DOGMAN_frame_DTH
 
 npc_BJORN_frame_DOWN_0:
     .byte 0,  $5E, %00000000, 0
@@ -581,6 +601,11 @@ npc_ERIKA_frames:
 npc_ERIKA_frame_LEFT:
     .byte 0, 0
     .byte <npc_ERIKA_frame_LEFT_0,   >npc_ERIKA_frame_LEFT_0
+    .byte 0, 0
+    .byte 0, 0
+    .byte 0, 0
+    .byte 0, 0
+    .byte <npc_DOGMAN_frame_DTH, >npc_DOGMAN_frame_DTH
 
 npc_ERIKA_frame_LEFT_0:
     .byte 0,  $0A, %00000000, 0
@@ -593,6 +618,11 @@ npc_ERIKA_frame_LEFT_0:
 npc_ERIKA_frame_RIGHT:
     .byte 0, 0
     .byte <npc_ERIKA_frame_RIGHT_0,   >npc_ERIKA_frame_RIGHT_0
+    .byte 0, 0
+    .byte 0, 0
+    .byte 0, 0
+    .byte 0, 0
+    .byte <npc_DOGMAN_frame_DTH, >npc_DOGMAN_frame_DTH
 
 npc_ERIKA_frame_RIGHT_0:
     .byte 0,  $0B, %01000000, 0
@@ -605,6 +635,11 @@ npc_ERIKA_frame_RIGHT_0:
 npc_ERIKA_frame_UP:
     .byte 0, 0
     .byte <npc_ERIKA_frame_UP_0,   >npc_ERIKA_frame_UP_0
+    .byte 0, 0
+    .byte 0, 0
+    .byte 0, 0
+    .byte 0, 0
+    .byte <npc_DOGMAN_frame_DTH, >npc_DOGMAN_frame_DTH
 
 npc_ERIKA_frame_UP_0:
     .byte 0,  $0C, %00000000, 0
@@ -617,6 +652,11 @@ npc_ERIKA_frame_UP_0:
 npc_ERIKA_frame_DOWN:
     .byte 0, 0
     .byte <npc_ERIKA_frame_DOWN_0,   >npc_ERIKA_frame_DOWN_0
+    .byte 0, 0
+    .byte 0, 0
+    .byte 0, 0
+    .byte 0, 0
+    .byte <npc_DOGMAN_frame_DTH, >npc_DOGMAN_frame_DTH
 
 npc_ERIKA_frame_DOWN_0:
     .byte 0,  $0E, %00000000, 0
@@ -637,6 +677,11 @@ npc_GRANNY_frames:
 npc_GRANNY_frame_LEFT:
     .byte 0, 0
     .byte <npc_GRANNY_frame_LEFT_0, >npc_GRANNY_frame_LEFT_0
+    .byte 0, 0
+    .byte 0, 0
+    .byte 0, 0
+    .byte 0, 0
+    .byte <npc_DOGMAN_frame_DTH, >npc_DOGMAN_frame_DTH
 
 npc_GRANNY_frame_LEFT_0:
     .byte 0, $3A, %00000000, 0
@@ -647,6 +692,11 @@ npc_GRANNY_frame_LEFT_0:
 npc_GRANNY_frame_RIGHT:
     .byte 0, 0
     .byte <npc_GRANNY_frame_RIGHT_0, >npc_GRANNY_frame_RIGHT_0
+    .byte 0, 0
+    .byte 0, 0
+    .byte 0, 0
+    .byte 0, 0
+    .byte <npc_DOGMAN_frame_DTH, >npc_DOGMAN_frame_DTH
 
 npc_GRANNY_frame_RIGHT_0:
     .byte 0, $3B, %01000000, 0
@@ -657,6 +707,11 @@ npc_GRANNY_frame_RIGHT_0:
 npc_GRANNY_frame_UP:
     .byte 0, 0
     .byte <npc_GRANNY_frame_UP_0, >npc_GRANNY_frame_UP_0
+    .byte 0, 0
+    .byte 0, 0
+    .byte 0, 0
+    .byte 0, 0
+    .byte <npc_DOGMAN_frame_DTH, >npc_DOGMAN_frame_DTH
 
 npc_GRANNY_frame_UP_0:
     .byte 0, $3C, %00000000, 0
@@ -667,6 +722,11 @@ npc_GRANNY_frame_UP_0:
 npc_GRANNY_frame_DOWN:
     .byte 0, 0
     .byte <npc_GRANNY_frame_DOWN_0, >npc_GRANNY_frame_DOWN_0
+    .byte 0, 0
+    .byte 0, 0
+    .byte 0, 0
+    .byte 0, 0
+    .byte <npc_DOGMAN_frame_DTH, >npc_DOGMAN_frame_DTH
 
 npc_GRANNY_frame_DOWN_0:
     .byte 0, $3E, %00000000, 0

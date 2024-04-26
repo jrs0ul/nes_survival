@@ -5307,7 +5307,7 @@ SaveGame:
 
     ldx #0
 @WarmthLoop:
-    lda Fuel, x
+    lda Warmth, x
     sta SaveData, y
     iny
     inx

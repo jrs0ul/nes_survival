@@ -513,6 +513,19 @@ PlayerHitsNpcs:
     jsr bankswitch_y
 
     rts
+;------------------------------------
+OnBossDefeat:
+    ldy #3
+    lda #1
+    sta VillagerKilled, y
+    sta Destructibles + 2
+    sta Destructibles + 3
+    lda DestroyedTilesCount
+    clc
+    adc #2
+    sta DestroyedTilesCount
+    rts
+
 ;-------------------------------------
 .segment "ROM6"
 ;Player's attack box collides with all the npcs
@@ -1000,15 +1013,7 @@ ClearTextBaloon:
 
     rts
 
-;------------------------------------
-OnBossDefeat:
-    sta Destructibles + 2
-    sta Destructibles + 3
-    lda DestroyedTilesCount
-    clc
-    adc #2
-    sta DestroyedTilesCount
-    rts
+
 
 ;-------------------------------------
 DropItemAfterDeath:

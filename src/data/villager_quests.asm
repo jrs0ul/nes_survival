@@ -207,6 +207,15 @@ granny_thanks_3:
     .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
 
 
+boss_thanks_0:
+    .byte $00,$00,$00,$00,$00,$00,$00,$41,$3e,$4b,$3e,$62,$00,$41,$3a,$4f
+    .byte $3e,$00,$4d,$41,$42,$4c,$00,$49,$42,$3e,$00,$00,$00,$00,$00,$00
+    .byte $00,$00,$00,$00,$00,$00,$3f,$48,$4b,$00,$52,$48,$4e,$4b,$00,$4d
+    .byte $4b,$48,$4e,$3b,$45,$3e,$4c,$62,$00,$00,$00,$00,$00,$00,$00,$00
+    .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
+    .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
+
+
 
 bjorn_thanks_special:
     .byte $00,$00,$00,$00,$00,$00,$00,$52,$4e,$46,$62,$00,$42,$00,$45,$48
@@ -326,10 +335,10 @@ thanks_list_low:
     .byte <granny_thanks_2
     .byte <granny_thanks_3
 
-    .byte <granny_thanks_3
-    .byte <granny_thanks_3
-    .byte <granny_thanks_3
-    .byte <granny_thanks_3
+    .byte <boss_thanks_0
+    .byte 0
+    .byte 0
+    .byte 0
 
 thanks_list_high:
     .byte >villager_bear_thanks_0
@@ -347,10 +356,10 @@ thanks_list_high:
     .byte >granny_thanks_2
     .byte >granny_thanks_3
 
-    .byte >granny_thanks_3
-    .byte >granny_thanks_3
-    .byte >granny_thanks_3
-    .byte >granny_thanks_3
+    .byte >boss_thanks_0
+    .byte 0
+    .byte 0
+    .byte 0
 
 
 special_thanks_list_low:
@@ -432,7 +441,7 @@ goal_items_list:
     .byte ITEM_COOKED_MEAT, ITEM_SPEAR, ITEM_JAM, ITEM_COAT
     .byte ITEM_RAW_MEAT, ITEM_KNIFE, 255, ITEM_HIDE
     .byte ITEM_STICK, ITEM_STICK, ITEM_COOKED_FISH, 255
-    .byte 255, 255, 255, 255
+    .byte ITEM_GRANNYS_HEAD, 255, 255, 255
 
 .segment "RODATA"
 reward_items_list:
