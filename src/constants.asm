@@ -258,6 +258,7 @@
     ITEM_PIE                   = 23
     ITEM_LETTER                = 24
     ITEM_LAMP                  = 26
+    ITEM_GRANNYS_HEAD          = 27
 
 
 .if FAMISTUDIO_CFG_PAL_SUPPORT
@@ -319,7 +320,10 @@
 
     NPC_IDX_DOGMAN             = 0
     NPC_IDX_BUNNY              = 1
+    NPC_IDX_BJORN              = 2
     NPC_IDX_HOUND              = 3
+    NPC_IDX_ERIKA              = 4
+    NPC_IDX_GRANNY             = 5
     NPC_IDX_BOAR               = 7
     NPC_IDX_BOSS               = 8
 

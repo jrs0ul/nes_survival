@@ -1232,8 +1232,8 @@ PreviouslyEquipedItemIdx:
 EquipNextResetCount:
     .res 1
 
-BossDefeated:
-    .res 1
+VillagerKilled:
+    .res MAX_VILLAGERS
 
 BossAgitated:
     .res 1
@@ -1291,7 +1291,7 @@ SkipLastTileRowsInIndoorMaps:
     .res 1
 
 Buffer:
-    .res 6  ;must see how much is still available
+    .res 3  ;must see how much is still available
 
 ;====================================================================================
 
@@ -3149,7 +3149,7 @@ RoutinesAfterFadeOut:
     ;--some general location code----
     jsr CommonLocationRoutine
     ;-----------------------------
-    ;4.Bear's house entrance
+    ;4.Bjorn's house entrance
 @next1:
     lda ActiveMapEntryIndex
     cmp #4
@@ -3161,6 +3161,15 @@ RoutinesAfterFadeOut:
     sta InVillagerHut
     sta MustRestartIndoorsMusic
 
+    ldy #0
+    lda VillagerKilled, y
+    beq @cont_bjorn
+
+    lda #0
+    sta NpcCount
+    jmp @next2
+
+@cont_bjorn:
     jsr GetPaletteFadeValueForHour
     cmp #DAYTIME_NIGHT
     bne @skip_night
@@ -3224,7 +3233,7 @@ RoutinesAfterFadeOut:
     lda #2
     sta ScrollDirection
     ;------------------------------------------
-    ;8.Second villager's house
+    ;8.Erika's house entrance
 @next9:
 
     lda ActiveMapEntryIndex
@@ -3235,6 +3244,14 @@ RoutinesAfterFadeOut:
     sta MustRestartIndoorsMusic
     sta InVillagerHut
     sta VillagerIndex
+
+    tay
+    lda VillagerKilled, y
+    beq @cont_erika
+    lda #0
+    sta NpcCount
+    jmp @next10
+@cont_erika:
     jsr SpawnQuestItems
     jsr SpawnSpecialItemOwnerReward
 
@@ -3328,6 +3345,16 @@ RoutinesAfterFadeOut:
     sta InVillagerHut
     lda #2
     sta VillagerIndex
+
+    tay
+    lda VillagerKilled, y
+    beq @cont_granny
+
+    lda #0
+    sta NpcCount
+    jmp @next18
+
+@cont_granny:
     jsr SpawnQuestItems
     jsr SpawnSpecialItemOwnerReward
 
@@ -3413,7 +3440,8 @@ RoutinesAfterFadeOut:
     lda #>alien_palette
     sta PalettePtr + 1
 
-    lda BossDefeated
+    ldy #3
+    lda VillagerKilled, y
     bne @next25
     lda #<boss_npcs
     sta pointer
@@ -3474,7 +3502,8 @@ RoutinesAfterFadeOut:
     sta CurrentMapPalettePtr + 1
     jmp @next28
 @saveTheGame:
-    lda BossDefeated
+    ldy #3
+    lda VillagerKilled, y
     bne @next28
     lda CheckpointSaved
     bne @next28
@@ -5423,7 +5452,6 @@ ResetVariables:
     sta BossAgitated
     sta hadKnockBack
     sta CheckpointSaved
-    sta BossDefeated
     sta menuTileTransferRowIdx
     sta MapTilesetBankNo
     sta MustPlaySfx
@@ -5435,12 +5463,13 @@ ResetVariables:
     sta PlayerWins
     sta FoodToStamina
     sta ItemIGave
-    sta SpecialItemsDelivered
-    sta SpecialItemsDelivered + 1
-    sta SpecialItemsDelivered + 2
-    sta CompletedSpecialQuests
-    sta CompletedSpecialQuests + 1
-    sta CompletedSpecialQuests + 2
+    ldx #MAX_VILLAGERS - 1
+@villagerLoop:
+    sta SpecialItemsDelivered, x
+    sta CompletedSpecialQuests, x
+    sta VillagerKilled
+    dex
+    bpl @villagerLoop
 
     sta PaletteFadeAnimationState
     sta FadeIdx

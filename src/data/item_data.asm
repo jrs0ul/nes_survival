@@ -37,6 +37,7 @@ item_data: ;          ---||---
     .byte 72 , 2, 7, 0          ; 24 letter
     .byte 72 , 0, 7, 0          ; 25 first letter from Jon
     .byte 88 , 2, 4, 0          ; 26 lamp
+    .byte 104, 2, 4, 0          ; 27 granny's head
 
 ;item id, width, address low, address high
 document_item_data:
@@ -71,3 +72,4 @@ item_wear:
     .byte 0   ;letter
     .byte 0   ;letter1
     .byte 0   ;lamp
+    .byte 0   ;granny's head

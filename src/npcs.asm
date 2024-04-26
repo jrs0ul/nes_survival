@@ -850,8 +850,6 @@ OnCollisionWithAttackRect:
     tay
 
     lda TempNpcType
-    cmp #NPC_TYPE_VILLAGER
-    beq @doneDoingDmg
     cmp #NPC_TYPE_PASSIVE
     bne @continue
 
@@ -888,6 +886,15 @@ OnCollisionWithAttackRect:
 
 @instaKill:
 
+    lda TempNpcType
+    cmp #NPC_TYPE_VILLAGER
+    bne @playsfx
+
+    ldy VillagerIndex
+    lda #1
+    sta VillagerKilled, y
+
+@playsfx:
     jsr PlayDamageSfx
 
     lda #0
@@ -995,8 +1002,6 @@ ClearTextBaloon:
 
 ;------------------------------------
 OnBossDefeat:
-    lda #1
-    sta BossDefeated
     sta Destructibles + 2
     sta Destructibles + 3
     lda DestroyedTilesCount
@@ -1019,17 +1024,35 @@ DropItemAfterDeath:
     jsr UpdateRandomNumber
     and #3
     cmp #2
-    bcc @exit
-    jmp @hide
+    bcs @hide
+
+    rts
 
 @test_Boar:
     cmp #NPC_IDX_BOAR
     beq @jumbo
     cmp #NPC_IDX_DOGMAN
-    beq @exit
+    bne @nextKind
+    rts
+@nextKind:
+    cmp #NPC_IDX_BJORN
+    beq @lamp
+    cmp #NPC_IDX_GRANNY
+    beq @grannysHead
+    cmp #NPC_IDX_ERIKA
+    beq @superHammer
 
     ;everything else
     lda #ITEM_RAW_MEAT
+    jmp @storeItem
+@lamp:
+    lda #ITEM_LAMP
+    jmp @storeItem
+@grannysHead:
+    lda #ITEM_GRANNYS_HEAD
+    jmp @storeItem
+@superHammer:
+    lda #ITEM_HAMMER
     jmp @storeItem
 
 @specialRewardItem:
