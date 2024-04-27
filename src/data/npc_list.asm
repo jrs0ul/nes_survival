@@ -5,15 +5,15 @@ House_npcs:
 
 Hut_npcs:
     .byte 1
-    .byte %00100001, 104, 94, 0, 20
+    .byte %00100001, 104, 94, 0, 15
 
 villager2_npcs:
     .byte 1
-    .byte %01000001, 104, 94, 0, 20
+    .byte %01000001, 104, 94, 0, 15
 
 villager3_npcs:
     .byte 1
-    .byte %01010001, 104, 94, 0, 20
+    .byte %01010001, 104, 94, 0, 15
 
 boss_npcs:
     .byte 1
@@ -43,4 +43,4 @@ alien_base_npcs:
 
 Hut_npcs_night:
     .byte 1
-    .byte %00100001, 152, 77, 0, 100
+    .byte %00100001, 152, 77, 0, 15

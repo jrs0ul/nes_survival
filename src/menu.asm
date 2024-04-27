@@ -2979,11 +2979,16 @@ GiveItem:
     bne @continue
 
     lda VillagerIndex
-    beq @exit  ; no giving at night to bear
+    bne @continue  ; no giving at night to bear
+
+    rts
 
 @continue:
-
     ldy VillagerIndex
+
+    lda VillagerKilled, y
+    bne @exit
+
     lda ActiveVillagerQuests, y
     cmp #MAX_QUEST - 1
     bcc @con
@@ -4104,6 +4109,8 @@ ExitMenuState:
     sta GameState
 
     lda #0
+    sta RepeatSameRowInTransfer
+    sta TransferingSecondMenuPart
     sta SubMenuActivated
     sta DocumentActivated
     sta SleepMessageActivated

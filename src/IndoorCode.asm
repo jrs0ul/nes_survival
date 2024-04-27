@@ -219,7 +219,7 @@ SetupVillagerText:
     beq @checkPlayersHouse
 
     lda VillagerIndex
-    bne @skipNightCheck
+    bne @skipNightCheck ;everyone except Bjorn
 
     lda EnteredBeforeNightfall
     bne @skipNightCheck
@@ -227,10 +227,21 @@ SetupVillagerText:
     jsr GetPaletteFadeValueForHour
     cmp #DAYTIME_NIGHT
     bne @skipNightCheck
-    
+
     rts
 
 @skipNightCheck:
+
+    ldy VillagerIndex
+    cmp #3 ; boss ?
+    beq @cont ; I wan to see text when the boss is defeated
+
+    lda VillagerKilled, y
+    beq @cont
+
+    rts ; exit if villager is killed
+
+@cont:
     lda #1
     sta MustUpdateTextBaloon
     lda #0
@@ -239,7 +250,6 @@ SetupVillagerText:
     lda ItemIGave
     bne @thanks
 
-   
 
     ldy VillagerIndex
     lda SpecialItemsDelivered, y ;did this villager receive the special item
@@ -281,17 +291,7 @@ SetupVillagerText:
 
 @specialthanks:
 
-    ldx VillagerIndex
-
-    lda special_thanks_list_low, x
-    sta TextPtr
-    lda special_thanks_list_high, x
-    sta TextPtr + 1
-    lda #DIALOG_TEXT_LENGTH
-    sta TextLength
-    jsr CopyTextToRam
-
-    lda VillagerIndex
+    jsr SetupSpecialVillagerThanks
     jmp @exit
 
 @checkPlayersHouse:
@@ -315,6 +315,22 @@ SetupVillagerText:
 
 @exit:
     rts
+;----------------------
+SetupSpecialVillagerThanks:
+    ldx VillagerIndex
+
+    lda special_thanks_list_low, x
+    sta TextPtr
+    lda special_thanks_list_high, x
+    sta TextPtr + 1
+    lda #DIALOG_TEXT_LENGTH
+    sta TextLength
+    jsr CopyTextToRam
+
+    lda VillagerIndex
+
+    rts
+
 ;------------------------------
 ;Text length must be in A
 CopyTextToRam:

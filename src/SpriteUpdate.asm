@@ -364,8 +364,11 @@ UpdateVillagerDialogSprites:
 
     lda ItemIGave
     bne @exit ;works for the quest dialogs so far
-    
+
     ldy VillagerIndex
+    lda VillagerKilled, y
+    bne @exit
+
     lda SpecialItemsDelivered, y
     bne @exit
 
