@@ -6887,6 +6887,10 @@ CalcTileAddressInFrontOfPlayer:
     lsr
     lsr
     lsr
+
+    sec
+    sbc #4 ; remove supposed HUD rows
+
     sta TempY
 
     asl
