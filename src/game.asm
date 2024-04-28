@@ -2240,6 +2240,7 @@ ActivateYouWin:
     sta PaletteFadeAnimationState
     sta MustShowOutroAfterFadeout
     lda #0
+    sta CheckpointSaved
     sta PaletteFadeTimer
     sta FadeIdx
     lda #FADE_DELAY_GENERIC
@@ -5463,6 +5464,7 @@ ResetVariables:
     sta PlayerWins
     sta FoodToStamina
     sta ItemIGave
+
     ldx #MAX_VILLAGERS - 1
 @villagerLoop:
     sta SpecialItemsDelivered, x
