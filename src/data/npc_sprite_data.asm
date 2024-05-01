@@ -1,11 +1,3 @@
-npc_anim_2_3_row_sequence: ; 3 rows * ( 4 * 2 )
-    .byte 0
-    .byte 24
-    .byte 48
-    .byte 72
-    .byte 96
-    .byte 120
-
 
 ;lookup table for framelist indexes in npc_data
 frame_list_index_lookup:

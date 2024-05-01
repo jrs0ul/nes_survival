@@ -903,9 +903,11 @@ OnCollisionWithAttackRect:
     cmp #NPC_TYPE_VILLAGER
     bne @playsfx
 
+    sty TempY
     ldy VillagerIndex
     lda #1
     sta VillagerKilled, y
+    ldy TempY
 
 @playsfx:
     jsr PlayDamageSfx
