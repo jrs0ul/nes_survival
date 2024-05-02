@@ -1456,6 +1456,13 @@ ColorMainMenuAttributes:
 
 ;-------------------------------------
 MenuInput:
+
+    lda MustLoadSomething ; don't check input while the menu is still being drawn
+    beq @cont
+
+    rts
+
+@cont:
     lda Buttons
     cmp MenuButtons
     bne @continue
