@@ -3509,9 +3509,15 @@ RoutinesAfterFadeOut:
     lda CheckpointSaved
     bne @next28
 
-    jsr SaveGame
+    lda current_bank
+    sta oldbank
+    ldy #0
+    jsr bankswitch_y ; switch to bank 0
+    jsr SaveGame     ; call from bank 0
     lda #1
     sta CheckpointSaved
+    ldy oldbank
+    jsr bankswitch_y
 
     ;19 secret cave entrance
 @next28:
@@ -5175,91 +5181,8 @@ LoadGameOver:
 
 @exit:
     rts
-;------------------------------------
-LoadGame:
 
-;inventory
-    lda #INVENTORY_MAX_SIZE
-    tax
-    tay
-    dex
-    dey
-@InventoryLoop:
-    lda SaveData, y
-    sta Inventory, x
-    dey
-    dex
-    bpl @InventoryLoop
-
-    ldy #INVENTORY_MAX_SIZE
-
-    ldx #0
-@HPLoop:
-    lda SaveData, y
-    sta HP, x
-    iny
-    inx
-    cpx #3
-    bcc @HPLoop
-
-    ldx #0
-@FoodLoop:
-    lda SaveData, y
-    sta Food, x
-    iny
-    inx
-    cpx #3
-    bcc @FoodLoop
-
-    ldx #0
-@FuelLoop:
-    lda SaveData, y
-    sta Fuel, x
-    iny
-    inx
-    cpx #3
-    bcc @FuelLoop
-
-    ldx #0
-@WarmthLoop:
-    lda SaveData, y
-    sta Warmth, x
-    iny
-    inx
-    cpx #3
-    bcc @WarmthLoop
-;Time
-    ldx #0
-@DaysLoop:
-    lda SaveData, y
-    sta Days, x
-    iny
-    inx
-    cpx #3
-    bcc @DaysLoop
-
-    lda SaveData, y
-    sta Hours
-    iny
-    lda SaveData, y
-    sta Minutes
-    iny
-;Equipment
-    lda SaveData, y
-    sta EquipedItem
-    iny
-    lda SaveData, y
-    sta EquipedItem + 1
-    iny
-    lda SaveData, y
-    sta EquipedClothing
-    iny
-    lda SaveData, y
-    sta EquipedClothing + 1
-
-    rts
-
-
+.segment "ROM0"
 ;-------------------------------------
 SaveGame:
 
@@ -5344,6 +5267,90 @@ SaveGame:
     sta SaveData, y
 
     rts
+;-------------------------------
+LoadGame:
+
+;inventory
+    lda #INVENTORY_MAX_SIZE
+    tax
+    tay
+    dex
+    dey
+@InventoryLoop:
+    lda SaveData, y
+    sta Inventory, x
+    dey
+    dex
+    bpl @InventoryLoop
+
+    ldy #INVENTORY_MAX_SIZE
+
+    ldx #0
+@HPLoop:
+    lda SaveData, y
+    sta HP, x
+    iny
+    inx
+    cpx #3
+    bcc @HPLoop
+
+    ldx #0
+@FoodLoop:
+    lda SaveData, y
+    sta Food, x
+    iny
+    inx
+    cpx #3
+    bcc @FoodLoop
+
+    ldx #0
+@FuelLoop:
+    lda SaveData, y
+    sta Fuel, x
+    iny
+    inx
+    cpx #3
+    bcc @FuelLoop
+
+    ldx #0
+@WarmthLoop:
+    lda SaveData, y
+    sta Warmth, x
+    iny
+    inx
+    cpx #3
+    bcc @WarmthLoop
+;Time
+    ldx #0
+@DaysLoop:
+    lda SaveData, y
+    sta Days, x
+    iny
+    inx
+    cpx #3
+    bcc @DaysLoop
+
+    lda SaveData, y
+    sta Hours
+    iny
+    lda SaveData, y
+    sta Minutes
+    iny
+;Equipment
+    lda SaveData, y
+    sta EquipedItem
+    iny
+    lda SaveData, y
+    sta EquipedItem + 1
+    iny
+    lda SaveData, y
+    sta EquipedClothing
+    iny
+    lda SaveData, y
+    sta EquipedClothing + 1
+
+    rts
+
 
 
 ;-------------------------------------
@@ -5526,7 +5533,7 @@ ResetVariables:
 
     rts
 
-
+.segment "CODE"
 ;-------------------------------------
 ;Decrement digits from 100 to 000
 ;DigitChangeSize is the decrement
@@ -5735,7 +5742,9 @@ LoadOutro:
 ;-------------------------------------
 LoadCheckPoint:
 
-    jsr LoadGame
+    ldy #0
+    jsr bankswitch_y ; switch to bank 0
+    jsr LoadGame     ; call from bank 0
 
     ldx #0
     jsr initZeroSprite
