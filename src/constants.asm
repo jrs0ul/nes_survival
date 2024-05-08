@@ -179,6 +179,8 @@
     PLAYER_START_X             = $50
     PLAYER_START_Y             = 200
 
+    LOCATION_MAIN_CAVE         = 6
+    LOCATION_CRASHSITE         = 7
     LOCATION_ALIEN_BASE        = 10
     LOCATION_BOSS_ROOM         = 12
     LOCATION_DARK_CAVE         = 13

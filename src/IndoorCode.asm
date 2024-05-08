@@ -409,8 +409,14 @@ LoadIndoorMapData:
     lda #>house_sprites_chr
     sta pointer + 1
 
+    lda #96 ; 6 * 16
+    sta TempX
     lda #8 ; total rows
     sta TempRowIndex
+    lda #0
+    sta pointer2
+    lda #$A0
+    sta pointer2 + 1
     jsr CopyCHRChunk
 
     lda #<house_palette

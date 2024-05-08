@@ -79,6 +79,7 @@ alien_sprites_chr: .incbin "alien_sprites.chr"
 ;=============================================================
 .segment "ROM5" ;title and intro data (?)
 
+crashed_plane_tiles_chr: .incbin "crashed_plane_tiles_9x5.chr" ;9x5 tile block that should be put in 5x9 (xy starts at 0)
 title_palette:
     .byte $0F,$00,$11,$20, $0F,$01,$11,$07, $0F,$30,$11,$38, $0F,$07,$11,$35    ;background
     .byte $0F,$0f,$17,$20, $0F,$06,$26,$39, $0F,$17,$21,$31, $0F,$0f,$37,$26    ;OAM sprites
@@ -479,8 +480,6 @@ FlickerFrame: ;variable for alternating sprite update routines to achieve flicke
 
 LocationBankNo:
     .res 1
-MapTilesetBankNo: ; in which bank is located the tileset for map tiles and sprites
-    .res 1
 
 TempScreen:
     .res 1
@@ -555,7 +554,7 @@ chr_pages_to_copy:
     .res 1
 
 ZPBuffer:
-    .res 47  ; I want to be aware of the free memory
+    .res 48  ; I want to be aware of the free memory
 
 ;--------------
 .segment "BSS" ; variables in ram
@@ -1889,6 +1888,8 @@ CopyCHRTiles:
 ;--------------------------------------------
 ;pointer -  sits at zero page, points to the chr data
 ;TempRowIndex - row count for the chunk
+;pointer2 - ram destination address
+;TempX - size of a source data row, one tile is 16 bytes
 
 CopyCHRChunk:
 
@@ -1897,13 +1898,15 @@ CopyCHRChunk:
     sta TempRegX
 
 @tileLoop:
-    lda #96 ;6 * 16, one tile is 16 bytes
+    lda TempX ;
     sta TempY ; data row size
     lda TempRowIndex
     sec
     sbc TempRegX             ; row index
+    clc
+    adc pointer2
     sta $2006                ; high address byte
-    lda #$A0                 ;
+    lda pointer2 + 1
     sta $2006                ; low address byte
 @loop:
     lda (pointer),y  ; copy one byte
@@ -1913,10 +1916,10 @@ CopyCHRChunk:
     inc pointer + 1
 @cont:
     dec TempY
-    bne @loop
+    beq @decrement
+    jmp @loop
 
-    bcc @loop
-
+@decrement:
     dec TempRegX
     bne @tileLoop
 
@@ -3281,8 +3284,6 @@ RoutinesAfterFadeOut:
     lda #2
     sta ScrollDirection
 
-    lda #4
-    sta MapTilesetBankNo
     lda #1
     sta MustCopyMainChr
     ;---------------------
@@ -3294,8 +3295,6 @@ RoutinesAfterFadeOut:
     bne @next13
 
 
-    lda #0
-    sta MapTilesetBankNo
     lda #1
     sta MustCopyMainChr
 
@@ -3314,8 +3313,6 @@ RoutinesAfterFadeOut:
     lda #2
     sta ScrollDirection
 
-    lda #4
-    sta MapTilesetBankNo
     lda #1
     sta MustCopyMainChr
 
@@ -3525,8 +3522,6 @@ RoutinesAfterFadeOut:
     cmp #19
     bne @next29
 
-    lda #4
-    sta MapTilesetBankNo
     lda #1
     sta MustCopyMainChr
 
@@ -3732,7 +3727,6 @@ CommonLocationRoutine:
 
     lda #0
     sta ScrollDirection
-    sta MapTilesetBankNo ; let's say the main tileset is in the bank 0
 
     lda #<main_palette
     sta CurrentMapPalettePtr
@@ -5461,7 +5455,6 @@ ResetVariables:
     sta hadKnockBack
     sta CheckpointSaved
     sta menuTileTransferRowIdx
-    sta MapTilesetBankNo
     sta MustPlaySfx
     sta InventoryItemIndex
     sta CurrentMapSegmentIndex

@@ -1,3 +1,56 @@
+LoadAlienGfx:
+    ldy #4
+    jsr bankswitch_y
+    lda #<alien_tiles_chr
+    sta pointer
+    lda #>alien_tiles_chr
+    sta pointer + 1
+
+    lda #$10
+    sta chr_dest_high
+    lda #00
+    sta chr_dest_low
+    lda #16
+    sta chr_pages_to_copy
+    jsr CopyCHRTiles
+
+    lda #<alien_sprites_chr
+    sta pointer
+    lda #>alien_sprites_chr
+    sta pointer + 1
+
+    lda #96 ; 6 * 16
+    sta TempX
+    lda #15
+    sta TempRowIndex
+    lda #0
+    sta pointer2
+    lda #$A0
+    sta pointer2 + 1
+    jsr CopyCHRChunk
+
+
+    rts
+;----------------------------
+LoadMainTileset:
+    ldy #0
+    jsr bankswitch_y
+    lda #<main_tiles_chr
+    sta pointer
+    lda #>main_tiles_chr
+    sta pointer + 1
+
+    lda #0
+    sta chr_dest_high
+    sta chr_dest_low
+    lda #32
+    sta chr_pages_to_copy
+    jsr CopyCHRTiles
+
+    rts
+;----------------------------
+
+
 LoadOutsideMap:
 
     lda #0
@@ -18,49 +71,47 @@ LoadOutsideMap:
     lda MustCopyMainChr
     beq @continueLoad ;nope we don't need to load CHR
 
-    ldy MapTilesetBankNo;bank where the outdoor tiles are
+
+    lda LocationIndex
+    cmp #LOCATION_MAIN_CAVE
+    beq @load_alien
+    cmp #LOCATION_SECRET_CAVE
+    beq @load_alien
+    cmp #LOCATION_CRASHSITE
+    beq @load_crashsite
+    jmp @main_bank
+
+@load_alien:
+    jsr LoadAlienGfx
+    jmp @done_copying
+
+@load_crashsite:
+
+    jsr LoadMainTileset
+
+    ldy #5
     jsr bankswitch_y
 
-    cpy #4
-    bne @main_bank
-
-    lda #<alien_tiles_chr
+    lda #<crashed_plane_tiles_chr
     sta pointer
-    lda #>alien_tiles_chr
+    lda #>crashed_plane_tiles_chr
     sta pointer + 1
 
-    lda #$10
-    sta chr_dest_high
-    lda #00
-    sta chr_dest_low
-    lda #16
-    sta chr_pages_to_copy
-    jsr CopyCHRTiles
-
-    lda #<alien_sprites_chr
-    sta pointer
-    lda #>alien_sprites_chr
-    sta pointer + 1
-
-    lda #15
+    lda #144
+    sta TempX
+    lda #5 ; 5 rows
     sta TempRowIndex
+    lda #25
+    sta pointer2
+    lda #80
+    sta pointer2 + 1
     jsr CopyCHRChunk
 
 
     jmp @done_copying
 
 @main_bank:
-    lda #<main_tiles_chr
-    sta pointer
-    lda #>main_tiles_chr
-    sta pointer + 1
-
-    lda #0
-    sta chr_dest_high
-    sta chr_dest_low
-    lda #32
-    sta chr_pages_to_copy
-    jsr CopyCHRTiles
+    jsr LoadMainTileset
 
 @done_copying:
     ldy LocationIndex
