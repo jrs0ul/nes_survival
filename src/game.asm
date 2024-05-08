@@ -1290,7 +1290,7 @@ SkipLastTileRowsInIndoorMaps:
     .res 1
 
 Buffer:
-    .res 3  ;must see how much is still available
+    .res 2  ;must see how much is still available
 
 ;====================================================================================
 

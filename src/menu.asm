@@ -540,7 +540,7 @@ DrawDocument:
     lda #MENU_SUBMENU_ADDRESS_LOW
     sta TempX
 
-    lda #1
+    lda #MAX_LETTER_OBJECT_COUNT
     sta TempNpcSpeed
 @loop:
     lda TempNpcSpeed

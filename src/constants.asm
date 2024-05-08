@@ -262,6 +262,8 @@
     ITEM_LAMP                  = 26
     ITEM_GRANNYS_HEAD          = 27
 
+    MAX_LETTER_OBJECT_COUNT    = 2
+
 
 .if FAMISTUDIO_CFG_PAL_SUPPORT
     PROJECTILE_SPEED_INT       = 2
@@ -273,7 +275,7 @@
 
     ITEM_COUNT_MAX             = 25
 
-    ITEM_COUNT_LOC1            = 7
+    ITEM_COUNT_LOC1            = 8
     ITEM_COUNT_LOC2            = 6
     ITEM_COUNT_LOC3            = 4
     ITEM_COUNT_LOC7            = 3

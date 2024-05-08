@@ -38,11 +38,13 @@ item_data: ;          ---||---
     .byte 72 , 0, 7, 0          ; 25 first letter from Jon
     .byte 88 , 2, 4, 0          ; 26 lamp
     .byte 104, 2, 4, 0          ; 27 granny's head
+    .byte 72,  1, 7, 0          ; 28 letter about the rock
 
 ;item id, width, address low, address high
 document_item_data:
     .byte 24, 15, <LetterFromTheCave, >LetterFromTheCave
     .byte 25, 15, <FirstLetterFromJon, >FirstLetterFromJon
+    .byte 28, 15, <LetterAboutTheRock, >LetterAboutTheRock
 
 item_wear:
     .byte 0   ;empty
@@ -73,3 +75,4 @@ item_wear:
     .byte 0   ;letter1
     .byte 0   ;lamp
     .byte 0   ;granny's head
+    .byte 0   ;letter2
