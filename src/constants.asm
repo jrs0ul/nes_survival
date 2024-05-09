@@ -69,7 +69,7 @@
     ROW_TABLE_SIZE             = 240 ;4 screens * 32 rows * 2
 
 
-    DESTRUCTIBLE_COUNT         = 4
+    DESTRUCTIBLE_COUNT         = 6
 
     DESTRUCTIBLE_TILE_VALUE    = $F7
 
@@ -179,6 +179,7 @@
     PLAYER_START_X             = $50
     PLAYER_START_Y             = 200
 
+    LOCATION_FIRST             = 0
     LOCATION_MAIN_CAVE         = 6
     LOCATION_CRASHSITE         = 7
     LOCATION_ALIEN_BASE        = 10

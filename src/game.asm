@@ -255,11 +255,13 @@ fist_collision_pos:
 ;   tile column
 ;   tile value after destruction
 ;   screen
-destructible_tiles_list:
-    .byte 6, $24, $E7, 7,  7,  $14, 1, 0
-    .byte 6, $24, $E8, 7,  8,  $14, 1, 0
-    .byte 10,$25, $0D, 8,  13, $D8, 1, 0
-    .byte 10,$25, $2D, 9,  13, $2A, 1, 0
+destructible_tiles_list:                ;y   x
+    .byte LOCATION_FIRST,     $23, $70, 27, 16, $14, 3, 0
+    .byte LOCATION_FIRST,     $23, $71, 27, 17, $14, 3, 0
+    .byte LOCATION_FIRST,     $23, $90, 28, 16, $14, 3, 0
+    .byte LOCATION_FIRST,     $23, $91, 28, 17, $14, 3, 0
+    .byte LOCATION_ALIEN_BASE,$25, $0D, 8,  13, $D8, 1, 0
+    .byte LOCATION_ALIEN_BASE,$25, $2D, 9,  13, $2A, 1, 0
 
 spearSprites:
           ;+Y,frame,attributes,+X
@@ -1174,7 +1176,7 @@ ProjectileIdx:
     .res 1
 
 Destructibles:
-    .res 4  ;four destructibles so far, 1 means destroyed
+    .res 6  ;four destructibles so far, 1 means destroyed
 
 AttribHighAddress:
     .res 1
@@ -1288,9 +1290,6 @@ NametableOffsetInBytes: ; how many bytes to fill with zeroes at the beginning of
     .res 1
 SkipLastTileRowsInIndoorMaps:
     .res 1
-
-Buffer:
-    .res 2  ;must see how much is still available
 
 ;====================================================================================
 
@@ -6546,6 +6545,30 @@ WearWeapon:
 @exit:
     rts
 ;----------------------------------
+;stores 1 in register A if you can destroy
+CanTileBeDestroyed:
+
+    cmp #$F7
+    beq @can
+    cmp #$CC
+    beq @can
+    cmp #$CD
+    beq @can
+    cmp #$DC
+    beq @can
+    cmp #$DD
+    beq @can
+
+    jmp @cannot
+@can:
+    lda #1
+    jmp @exit
+@cannot:
+    lda #0
+
+@exit:
+    rts
+;----------------------------------
 useHammerOnEnvironment:
 
     lda InHouse
@@ -6567,16 +6590,21 @@ useHammerOnEnvironment:
 @cont:
     jsr CalcTileAddressInFrontOfPlayer
 
+    lda TempY
+    clc
+    adc #4
+    sta TempY
+
     lda (pointer), y
 
-    cmp #DESTRUCTIBLE_TILE_VALUE
-    bne @check_other_tiles
+    jsr CanTileBeDestroyed
+    beq @check_other_tiles
 
     lda EquipedItem
     cmp #ITEM_WOOD_HAMMER
     beq @check_other_tiles
 
-    ldy #2
+    ldy #DESTRUCTIBLE_COUNT
 @destructable_loop:
     dey
     bmi @exit
