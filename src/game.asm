@@ -255,13 +255,31 @@ fist_collision_pos:
 ;   tile column
 ;   tile value after destruction
 ;   screen
-destructible_tiles_list:                ;y   x
-    .byte LOCATION_FIRST,     $23, $70, 27, 16, $14, 3, 0
-    .byte LOCATION_FIRST,     $23, $71, 27, 17, $14, 3, 0
-    .byte LOCATION_FIRST,     $23, $90, 28, 16, $14, 3, 0
-    .byte LOCATION_FIRST,     $23, $91, 28, 17, $14, 3, 0
-    .byte LOCATION_ALIEN_BASE,$25, $0D, 8,  13, $D8, 1, 0
-    .byte LOCATION_ALIEN_BASE,$25, $2D, 9,  13, $2A, 1, 0
+destructible_tiles_list:                  ;y   x
+    .byte LOCATION_FIRST,       $23, $70, 27, 16, $14, 3, 0
+    .byte LOCATION_FIRST,       $23, $71, 27, 17, $14, 3, 0
+    .byte LOCATION_FIRST,       $23, $90, 28, 16, $14, 3, 0
+    .byte LOCATION_FIRST,       $23, $91, 28, 17, $14, 3, 0
+    .byte LOCATION_SECRET_CAVE, $21, $88, 12, 8,  $5F, 0, 0
+    .byte LOCATION_SECRET_CAVE, $21, $89, 12, 9,  $5F, 0, 0
+    .byte LOCATION_SECRET_CAVE, $21, $A8, 13, 8,  $5F, 0, 0
+    .byte LOCATION_SECRET_CAVE, $21, $A9, 13, 9,  $5F, 0, 0
+    .byte LOCATION_ALIEN_BASE,  $25, $0D, 8,  13, $D8, 1, 0
+    .byte LOCATION_ALIEN_BASE,  $25, $2D, 9,  13, $2A, 1, 0
+
+;Destructible index assigned to a tile
+linked_destructible_tiles:
+    .byte 0
+    .byte 0
+    .byte 0
+    .byte 0
+    .byte 1
+    .byte 1
+    .byte 1
+    .byte 1
+    .byte 2
+    .byte 3
+
 
 spearSprites:
           ;+Y,frame,attributes,+X
@@ -1987,7 +2005,9 @@ UpdateDestructableTiles:
 @loop:
     dey
     bmi @exit
-    lda Destructibles, y
+    lda linked_destructible_tiles, y ; find the destructable index that's linked to a tile
+    tax
+    lda Destructibles, x
     beq @loop
 
     tya
@@ -6558,6 +6578,14 @@ CanTileBeDestroyed:
     beq @can
     cmp #$DD
     beq @can
+    cmp #$F5
+    beq @can
+    cmp #$F6
+    beq @can
+    cmp #$F8
+    beq @can
+    cmp #$F9
+    beq @can
 
     jmp @cannot
 @can:
@@ -6629,6 +6657,8 @@ useHammerOnEnvironment:
     bne @destructable_loop
 
 
+    lda linked_destructible_tiles, y
+    tay
     lda #1
     sta Destructibles, y
     inc DestroyedTilesCount

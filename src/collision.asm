@@ -221,7 +221,7 @@ TestPointAgainstCollisionMap:
     stx destructibleIdx
     bmi @cont
 
-    lda Destructibles, x
+    jsr IsDestroyed
     beq @destructiblesLoop
 
     txa
@@ -276,6 +276,17 @@ TestPointAgainstCollisionMap:
 
 @exit_collision_check:
     rts
+;---------------------------
+IsDestroyed:
+
+    sty TempY
+    lda linked_destructible_tiles, x
+    tay
+    lda Destructibles, y
+    ldy TempY
+
+    rts
+
 ;-----------------------------
 ;Fill ram table with map row addresses
 BuildRowTable:

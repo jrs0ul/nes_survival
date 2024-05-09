@@ -69,7 +69,7 @@
     ROW_TABLE_SIZE             = 240 ;4 screens * 32 rows * 2
 
 
-    DESTRUCTIBLE_COUNT         = 6
+    DESTRUCTIBLE_COUNT         = 10
 
     DESTRUCTIBLE_TILE_VALUE    = $F7
 
