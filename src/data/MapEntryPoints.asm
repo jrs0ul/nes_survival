@@ -331,3 +331,19 @@ LocationsWithRespawnableItems:
     .byte 0 ; 13  dark cave
     .byte 0 ; 14
 
+LocationItems:
+    .byte  <Outside1_items,        >Outside1_items              ; 0
+    .byte  <Outside2_items,        >Outside2_items              ; 1
+    .byte  <Outside3_items,        >Outside3_items              ; 2
+    .byte  <House_items,           >House_items                 ; 3 Bjorn's house
+    .byte  <House_items,           >House_items                 ; 4 Player's house
+    .byte  <House_items,           >House_items                 ; 5 Erika
+    .byte  <Cave_items,            >Cave_items                  ; 6 cave
+    .byte  <Crashsite_items,       >Crashsite_items             ; 7 crashsite
+    .byte  <granny_location_items, >granny_location_items       ; 8 granny location
+    .byte  <House_items,           >House_items                 ; 9 granny's hut
+    .byte  <House_items,           >House_items                 ; 10 alien base
+    .byte  <House_items,           >House_items                 ; 11 location where cave is
+    .byte  <House_items,           >House_items                 ; 12 boss room
+    .byte  <House_items,           >House_items                 ; 13 dark cave
+    .byte  <secret_cave_items,     >secret_cave_items           ; 14 secret cave

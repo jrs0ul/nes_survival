@@ -3916,6 +3916,8 @@ SkipTime:
     sbc #HOURS_MAX
     sta Hours
     jsr IncreaseDays
+    lda #0
+    sta TempPointX2
     jsr ResetTimesWhenItemsWerePicked
     jsr DoFoodSpoilage
 
@@ -4186,6 +4188,7 @@ RunTime:
     bcc @adaptPalette
     lda #0
     sta Hours
+    sta TempPointX2
     jsr ResetTimesWhenItemsWerePicked
     jsr DoFoodSpoilage
     jsr IncreaseDays
@@ -5541,6 +5544,7 @@ ResetVariables:
     lda #255
     sta CurrentPaletteDecrementValue
 
+    sta TempPointX2
     jsr ResetTimesWhenItemsWerePicked
 
     rts

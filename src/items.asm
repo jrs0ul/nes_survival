@@ -22,10 +22,10 @@ LoadItems:
     lda Item_Location1_Collection_times, x
     ldx TempItemLoadX
 @checkDay:
+    sta Temp
     cmp #ITEM_NEVER_BEEN_PICKED
     beq @loadIt
 
-    sta Temp
 
     lda LocationsWithRespawnableItems, y
     beq @deactivatedItem
@@ -44,12 +44,31 @@ LoadItems:
     iny
 
 
-    lda (pointer), y
+    lda (pointer), y ; id + status
     dey
     sta Items, y
+
+    lsr
+    asl
+    asl
+    sty TempPointY
+    tay
     iny
     iny
-    lda (pointer), y
+    lda item_data, y
+    cmp #ITEM_TYPE_DOCUMENT
+    bne @notDocument
+
+    lda Temp
+    cmp #ITEM_NEVER_BEEN_PICKED
+    bne @deactivatedItem
+
+@notDocument:
+   ldy TempPointY
+
+    iny
+    iny
+    lda (pointer), y ; screen
     dey
     sta Items, y
     iny
@@ -65,6 +84,17 @@ LoadItems:
     jmp @decrementItemIndex
 
 @deactivatedItem:
+   jsr DeactivatedItem
+
+@decrementItemIndex:
+    inx
+    cpx ItemCount
+    bcc @itemLoop
+@exit:
+
+    rts
+;--------------------------------------
+DeactivatedItem:
     txa
     asl
     asl
@@ -82,13 +112,9 @@ LoadItems:
     iny
     sta Items, y
 
-@decrementItemIndex:
-    inx
-    cpx ItemCount
-    bcc @itemLoop
-@exit:
-
     rts
+
+
 ;--------------------------------------
 ItemCollisionCheck:
     lda #ITEM_DELAY
@@ -368,15 +394,31 @@ AddAndDeactivateItems:
     rts
 .segment "CODE"
 ;-------------------------------------
+;TempPointX2 - 255 if times are set for the first time
 ResetTimesWhenItemsWerePicked:
 
     ldy #0
+    lda current_bank
+    sta oldbank
 @loop:
     lda LocationItemCounts, y
     beq @nextLocation
     tax
     dex
     stx TempItemLoadX
+
+    sty TempPointY
+    tya
+    asl
+    tay
+    lda LocationItems, y
+    sta pointer
+    iny
+    lda LocationItems, y
+    sta pointer + 1
+    lda LocationBanks, y
+    ldy TempPointY
+    jsr bankswitch_y
 
     lda InitiateCompleteItemRespawn
     bne @location_loop
@@ -385,14 +427,40 @@ ResetTimesWhenItemsWerePicked:
 
 @location_loop:
 
+    lda TempPointX2
+    cmp #255
+    beq @just_reset_it
+
+    sty TempPointY
+
+    lda TempItemLoadX ;item index * 4 + 1
+    asl
+    asl
+    clc
+    adc #1
+    tay
+    lda (pointer), y ; item id + status
+    lsr ; strip status
+    asl
+    asl
+    tay
+    iny
+    iny ; item type
+    lda item_data, y ; get the type
+    cmp #ITEM_TYPE_DOCUMENT
+    beq @next_item
+
+    ldy TempPointY
+@just_reset_it:
     lda LocationItemIndexes, y
     clc
     adc TempItemLoadX
     tax
-
     lda #ITEM_NEVER_BEEN_PICKED
     sta Item_Location1_Collection_times, x
 
+@next_item:
+    ldy TempPointY
     dec TempItemLoadX
     bpl @location_loop
 
@@ -400,6 +468,9 @@ ResetTimesWhenItemsWerePicked:
     iny
     cpy #MAX_LOCATIONS
     bcc @loop
+
+    ldy oldbank
+    jsr bankswitch_y
 
     rts
 
