@@ -32,7 +32,7 @@ villager_bear_quest_3: ;coat
     .byte $00,$00,$00,$00,$00,$00,$00,$49,$45,$3a,$47,$3e,$00,$3a,$4c,$00
     .byte $3a,$00,$4b,$3e,$50,$3a,$4b,$3d,$62,$00,$00,$00,$00,$00,$00,$00
     ;-----
-dialog_quest_0: ;who are you? hunt me a rabbit
+erika_quest_0: ;who are you? hunt me a rabbit
     .byte $00,$00,$00,$00,$41,$3a,$4f,$3e,$47,$59,$4d,$00,$4c,$3e,$3e,$47
     .byte $00,$52,$48,$4e,$00,$3b,$3e,$3f,$48,$4b,$3e,$5A,$5A,$5A,$00,$00
     .byte $00,$46,$52,$00,$47,$3e,$42,$40,$41,$3b,$48,$4b,$00,$42,$4c,$00
@@ -40,7 +40,7 @@ dialog_quest_0: ;who are you? hunt me a rabbit
     .byte $00,$00,$3c,$48,$4e,$45,$3d,$00,$58,$52,$48,$4e,$58,$00,$41,$4e
     .byte $47,$4d,$00,$46,$3e,$00,$3a,$00,$4b,$3a,$3b,$3b,$42,$4d,$82,$00
 
-dialog_quest_1: ;knife
+erika_quest_1: ;knife
     .byte $00,$00,$00,$00,$00,$00,$3c,$48,$4e,$45,$3d,$00,$52,$48,$4e,$00
     .byte $46,$3a,$44,$3e,$00,$46,$3e,$00,$00,$00,$00,$00,$00,$00,$00,$00
     .byte $00,$00,$00,$3a,$00,$44,$47,$42,$3f,$3e,$82,$00,$46,$42,$47,$3e
@@ -48,7 +48,7 @@ dialog_quest_1: ;knife
     .byte $00,$00,$00,$00,$43,$4e,$4c,$4d,$00,$3c,$48,$46,$3b,$42,$47,$3e
     .byte $00,$00,$00,$00,$5b,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
 
-dialog_quest_2:  ;pie for granny
+erika_quest_2:  ;pie for granny
     .byte $00,$00,$3c,$3a,$47,$00,$52,$48,$4e,$00,$3b,$4b,$42,$47,$40,$00
     .byte $4d,$41,$42,$4c,$00,$49,$42,$3e,$00,$4d,$48,$00,$46,$52,$00,$00
     .byte $00,$40,$4b,$3a,$47,$47,$52,$82,$00,$3f,$48,$45,$45,$48,$50,$00
@@ -56,8 +56,7 @@ dialog_quest_2:  ;pie for granny
     .byte $00,$00,$00,$00,$3e,$3a,$4c,$4d,$63,$00,$4d,$41,$3e,$47,$00,$4d
     .byte $4e,$4b,$47,$00,$4c,$48,$4e,$4d,$41,$5A,$00,$00,$00,$00,$00,$00
 
-
-dialog_quest_3: ;animal hide
+erika_quest_3: ;animal hide
     .byte $00,$00,$00,$00,$00,$00,$42,$59,$46,$00,$46,$3a,$44,$42,$47,$40
     .byte $00,$4c,$48,$46,$3e,$4d,$41,$42,$47,$40,$5A,$00,$00,$00,$00,$00
     .byte $00,$00,$00,$3c,$48,$4e,$45,$3d,$00,$52,$48,$4e,$00,$3b,$4b,$42
@@ -98,7 +97,7 @@ granny_quest_3:
     .byte $00,$41,$3e,$4b,$3e,$5A,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
 
 ;--------------------
-boss_quest_0:
+boss_quest_0: ;bring granny's head
     .byte $00,$00,$00,$00,$42,$5a,$5a,$5a,$00,$50,$3a,$42,$4d,$3e,$3d,$5a
     .byte $5a,$5a,$00,$52,$48,$4e,$5a,$5a,$5a,$00,$00,$00,$00,$00,$00,$00
     .byte $00,$00,$44,$42,$45,$45,$5a,$5a,$5a,$00,$3a,$45,$45,$5a,$5a,$5a
@@ -141,15 +140,7 @@ villager_bear_thanks_3: ;thanks for coat -->lamp
 
 ;---
 
-dialog_thanks_0: ;thanks for the meat, go to the northern neighbor
-    .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$4d,$41,$3a,$47,$44
-    .byte $00,$52,$48,$4e,$00,$57,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
-    .byte $00,$52,$48,$4e,$00,$4c,$41,$48,$4e,$45,$3d,$00,$4f,$42,$4c,$42
-    .byte $4d,$00,$46,$52,$00,$3b,$4b,$48,$4d,$41,$3e,$4b,$00,$00,$00,$00
-    .byte $00,$3b,$43,$48,$4b,$47,$5A,$00,$41,$3e,$00,$45,$42,$4f,$3e,$4c
-    .byte $00,$50,$3a,$52,$00,$4e,$49,$00,$47,$48,$4b,$4d,$41,$5A,$00,$00
-
-dialog_thanks_1: ;thanks for knife --> berries
+erika_thanks_0: ;thanks for the meat ---> berries
     .byte $00,$00,$00,$4d,$3a,$44,$3e,$00,$4c,$48,$46,$3e,$00,$4b,$48,$50
     .byte $3a,$47,$00,$3b,$3e,$4b,$4b,$42,$3e,$4c,$62,$00,$00,$00,$00,$00
     .byte $00,$00,$00,$00,$4d,$41,$3e,$52,$00,$3c,$3a,$47,$00,$4b,$3e,$4c
@@ -157,7 +148,15 @@ dialog_thanks_1: ;thanks for knife --> berries
     .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$41,$3e,$3a,$45,$4d
     .byte $41,$00,$57,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
 
-dialog_thanks_2: ;thanks for bringing the pie, here's another for you
+erika_thanks_1: ;thanks for knife --> hammer
+    .byte $00,$00,$00,$00,$4d,$41,$3a,$47,$44,$4c,$62,$00,$40,$4b,$3a,$3b
+    .byte $00,$4d,$41,$42,$4c,$00,$41,$3a,$46,$46,$3e,$4b,$62,$00,$00,$00
+    .byte $00,$00,$00,$42,$4d,$00,$50,$42,$45,$45,$00,$4c,$46,$3a,$4c,$41
+    .byte $00,$3b,$48,$4e,$45,$3d,$3e,$4b,$4c,$00,$4d,$41,$3a,$4d,$00,$00
+    .byte $00,$00,$00,$00,$00,$00,$00,$00,$3b,$45,$48,$3c,$44,$00,$52,$48
+    .byte $4e,$4b,$00,$50,$3a,$52,$62,$00,$00,$00,$00,$00,$00,$00,$00,$00
+
+erika_thanks_2: ;thanks for bringing the pie, here's another for you
     .byte $00,$00,$00,$4d,$41,$3a,$47,$44,$4c,$00,$3f,$48,$4b,$00,$4d,$41
     .byte $3e,$00,$3d,$3e,$45,$42,$4f,$3e,$4b,$52,$00,$62,$00,$00,$00,$00
     .byte $00,$00,$00,$00,$00,$41,$3e,$4b,$3e,$59,$4c,$00,$48,$47,$3e,$00
@@ -165,7 +164,7 @@ dialog_thanks_2: ;thanks for bringing the pie, here's another for you
     .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
     .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
 
-dialog_thanks_3: ;hide_thanks - > coat
+erika_thanks_3: ;hide_thanks - > coat
     .byte $00,$00,$00,$00,$00,$00,$00,$00,$41,$3e,$4b,$3e,$62,$42,$59,$46
     .byte $00,$3d,$48,$47,$3e,$62,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
     .byte $00,$00,$00,$4d,$41,$42,$4c,$00,$4c,$41,$48,$4e,$45,$3d,$00,$49
@@ -283,10 +282,10 @@ quest_list_low:
     .byte <villager_bear_quest_2
     .byte <villager_bear_quest_3
 
-    .byte <dialog_quest_0
-    .byte <dialog_quest_1
-    .byte <dialog_quest_2
-    .byte <dialog_quest_3
+    .byte <erika_quest_0
+    .byte <erika_quest_1
+    .byte <erika_quest_2
+    .byte <erika_quest_3
 
     .byte <granny_quest_0
     .byte <granny_quest_1
@@ -304,10 +303,10 @@ quest_list_high:
     .byte >villager_bear_quest_2
     .byte >villager_bear_quest_3
 
-    .byte >dialog_quest_0
-    .byte >dialog_quest_1
-    .byte >dialog_quest_2
-    .byte >dialog_quest_3
+    .byte >erika_quest_0
+    .byte >erika_quest_1
+    .byte >erika_quest_2
+    .byte >erika_quest_3
 
     .byte >granny_quest_0
     .byte >granny_quest_1
@@ -325,10 +324,10 @@ thanks_list_low:
     .byte <villager_bear_thanks_2
     .byte <villager_bear_thanks_3
 
-    .byte <dialog_thanks_0
-    .byte <dialog_thanks_1
-    .byte <dialog_thanks_2
-    .byte <dialog_thanks_3
+    .byte <erika_thanks_0
+    .byte <erika_thanks_1
+    .byte <erika_thanks_2
+    .byte <erika_thanks_3
 
     .byte <granny_thanks_0
     .byte <granny_thanks_1
@@ -346,10 +345,10 @@ thanks_list_high:
     .byte >villager_bear_thanks_2
     .byte >villager_bear_thanks_3
 
-    .byte >dialog_thanks_0
-    .byte >dialog_thanks_1
-    .byte >dialog_thanks_2
-    .byte >dialog_thanks_3
+    .byte >erika_thanks_0
+    .byte >erika_thanks_1
+    .byte >erika_thanks_2
+    .byte >erika_thanks_3
 
     .byte >granny_thanks_0
     .byte >granny_thanks_1
@@ -446,7 +445,7 @@ goal_items_list:
 .segment "RODATA"
 reward_items_list:
     .byte 0, ITEM_HIDE, ITEM_FISHING_ROD, ITEM_LAMP
-    .byte 0, ITEM_ROWAN_BERRIES, ITEM_PIE, ITEM_COAT
+    .byte ITEM_ROWAN_BERRIES, ITEM_HAMMER, ITEM_PIE, ITEM_COAT
     .byte 0, ITEM_JAM, 0, ITEM_PIE
     .byte 0, 0, 0, 0
 
