@@ -362,8 +362,6 @@ UpdateSprites:
 
 UpdateVillagerDialogSprites:
 
-    lda ItemIGave
-    bne @exit ;works for the quest dialogs so far
 
     ldy VillagerIndex
     lda VillagerKilled, y
@@ -415,8 +413,18 @@ UpdateVillagerDialogSprites:
     clc
     adc ActiveVillagerQuests, y
     tay
+
+    lda ItemIGave
+    bne @checkRewardSpriteCount
+
     lda QuestSpritesCount, y
     beq @exit ;no sprites
+    jmp @storeSpriteCount
+@checkRewardSpriteCount:
+    lda RewardSpriteCount
+    beq @exit ;no sprites
+
+@storeSpriteCount:
     sta TempFrame ;store sprite count
 
     tya
@@ -428,6 +436,7 @@ UpdateVillagerDialogSprites:
 
 @spriteLoop:
 
+    jsr PickSpriteData
     jsr SingleDialogSpriteUpdate
 
     inc TempSpriteCount
@@ -439,21 +448,43 @@ UpdateVillagerDialogSprites:
 
     rts
 ;-----------------------------------
+PickSpriteData:
+    lda ItemIGave
+    bne @reward
+
+    lda #<QuestSprites
+    sta pointer
+    lda #>QuestSprites
+    sta pointer + 1
+
+    jmp @done
+@reward:
+
+    lda #<RewardSprites
+    sta pointer
+    lda #>RewardSprites
+    sta pointer + 1
+
+@done:
+    rts
+
+;-----------------------------------
+;pointer - RewardSprites or QuestSprites
 SingleDialogSpriteUpdate:
 
-    lda QuestSprites, y
+    lda (pointer), y
     sta FIRST_SPRITE, x
     inx
     iny
-    lda QuestSprites, y
+    lda (pointer), y
     sta FIRST_SPRITE, x
     inx
     iny
-    lda QuestSprites, y
+    lda (pointer), y
     sta FIRST_SPRITE, x
     inx
     iny
-    lda QuestSprites, y
+    lda (pointer), y
     sta FIRST_SPRITE, x
     inx
     iny
