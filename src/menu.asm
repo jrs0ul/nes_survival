@@ -540,10 +540,10 @@ DrawDocument:
     lda #MENU_SUBMENU_ADDRESS_LOW
     sta TempX
 
-    lda #MAX_LETTER_OBJECT_COUNT
+    lda #MAX_LETTER_OBJECT_COUNT ; letter count - 1
     sta TempNpcSpeed
 @loop:
-    lda TempNpcSpeed
+    lda TempNpcSpeed ; index * 4
     asl
     asl
     tay
@@ -552,9 +552,12 @@ DrawDocument:
     lda document_item_data, y
     cmp ActiveDocument
     beq @LoadMoreData
-    dec TempNpcSpeed
-    bne @exit ;not found
-    jmp @loop
+    lda TempNpcSpeed
+    sec
+    sbc #1
+    sta TempNpcSpeed
+    bpl @loop ;not found
+    jmp @exit
 
 @LoadMoreData:
     iny

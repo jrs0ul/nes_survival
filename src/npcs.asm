@@ -928,8 +928,9 @@ OnCollisionWithAttackRect:
 
     lda TempNpcType
     cmp #NPC_TYPE_PASSIVE ; skeleton doesn't spawn anything
-    jmp @exit
+    beq @exit
 
+    lda TempNpcIndex
     cmp #NPC_IDX_BOSS
     bne @dropStuff
     jsr OnBossDefeat
