@@ -732,8 +732,14 @@ npc_DEADMAN_frames:
     .byte <npc_DEADMAN_frame_RIGHT, >npc_DEADMAN_frame_RIGHT
 
 npc_DEADMAN_frame_RIGHT:
-    .byte                        0, 0
+    .byte 0, 0
     .byte <npc_DEADMAN_frame_RIGHT_0, >npc_DEADMAN_frame_RIGHT_0
+    .byte 0, 0
+    .byte 0, 0
+    .byte 0, 0
+    .byte 0, 0
+    .byte <npc_DOGMAN_frame_DTH, >npc_DOGMAN_frame_DTH
+
 
 npc_DEADMAN_frame_RIGHT_0:
     .byte 0,  $0A, %00000000, 0

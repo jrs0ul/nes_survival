@@ -862,12 +862,6 @@ OnCollisionWithAttackRect:
     adc #6 ; go to hp
     tay
 
-    lda TempNpcType
-    cmp #NPC_TYPE_PASSIVE
-    bne @continue
-
-    rts
-
 @continue:
 
     inc NpcsHitByPlayer
@@ -932,7 +926,10 @@ OnCollisionWithAttackRect:
 
     inc NpcsKilledByPlayer
 
-    lda TempNpcIndex
+    lda TempNpcType
+    cmp #NPC_TYPE_PASSIVE ; skeleton doesn't spawn anything
+    jmp @exit
+
     cmp #NPC_IDX_BOSS
     bne @dropStuff
     jsr OnBossDefeat
