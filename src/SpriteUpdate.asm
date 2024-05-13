@@ -362,17 +362,31 @@ UpdateSprites:
 
 UpdateVillagerDialogSprites:
 
-
+    lda MustUpdateTextBaloon
+    beq @cont
+    rts
+@cont:
     ldy VillagerIndex
     lda VillagerKilled, y
-    bne @exit
-
+    beq @notKilled
+    rts
+@notKilled:
     lda SpecialItemsDelivered, y
-    bne @exit
+    beq @notSpecialItemReceiver
+    rts
+@notSpecialItemReceiver:
+    lda special_receivers, y
+    cmp #MAX_VILLAGERS
+    bcc @ok
+    lda #0
+    jmp @no_special_reward
+@ok:
+    tay
+    lda SpecialItemsDelivered, y
+@no_special_reward:
+    sta TempDigit ; is special item delivered
 
-    lda MustUpdateTextBaloon
-    bne @exit
-
+    
     stx TempRegX
 
     lda EnteredBeforeNightfall
@@ -417,11 +431,14 @@ UpdateVillagerDialogSprites:
     lda ItemIGave
     bne @checkRewardSpriteCount
 
+    lda TempDigit
+    bne @checkRewardSpriteCount
+
     lda QuestSpritesCount, y
     beq @exit ;no sprites
     jmp @storeSpriteCount
 @checkRewardSpriteCount:
-    lda RewardSpriteCount
+    lda RewardSpriteCount, y
     beq @exit ;no sprites
 
 @storeSpriteCount:
@@ -441,16 +458,24 @@ UpdateVillagerDialogSprites:
 
     inc TempSpriteCount
 
-    dec TempFrame
+    lda TempFrame
+    sec
+    sbc #1
+    sta TempFrame
     bne @spriteLoop
 
 @exit:
 
     rts
 ;-----------------------------------
+;TemDigit is the special item delivered
 PickSpriteData:
     lda ItemIGave
     bne @reward
+
+    lda TempDigit
+    bne @reward
+
 
     lda #<QuestSprites
     sta pointer
