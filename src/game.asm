@@ -256,16 +256,16 @@ fist_collision_pos:
 ;   tile value after destruction
 ;   screen
 destructible_tiles_list:                  ;y   x
-    .byte LOCATION_FIRST,       $23, $70, 27, 16, $14, 3, 0
-    .byte LOCATION_FIRST,       $23, $71, 27, 17, $14, 3, 0
-    .byte LOCATION_FIRST,       $23, $90, 28, 16, $14, 3, 0
-    .byte LOCATION_FIRST,       $23, $91, 28, 17, $14, 3, 0
-    .byte LOCATION_SECRET_CAVE, $21, $88, 12, 8,  $5F, 0, 0
-    .byte LOCATION_SECRET_CAVE, $21, $89, 12, 9,  $5F, 0, 0
-    .byte LOCATION_SECRET_CAVE, $21, $A8, 13, 8,  $5F, 0, 0
-    .byte LOCATION_SECRET_CAVE, $21, $A9, 13, 9,  $5F, 0, 0
-    .byte LOCATION_ALIEN_BASE,  $25, $0D, 8,  13, $D8, 1, 0
-    .byte LOCATION_ALIEN_BASE,  $25, $2D, 9,  13, $2A, 1, 0
+    .byte LOCATION_FIRST,       $03, $70, 27, 16, $14, 3, 0
+    .byte LOCATION_FIRST,       $03, $71, 27, 17, $14, 3, 0
+    .byte LOCATION_FIRST,       $03, $90, 28, 16, $14, 3, 0
+    .byte LOCATION_FIRST,       $03, $91, 28, 17, $14, 3, 0
+    .byte LOCATION_SECRET_CAVE, $01, $88, 12, 8,  $5F, 0, 0
+    .byte LOCATION_SECRET_CAVE, $01, $89, 12, 9,  $5F, 0, 0
+    .byte LOCATION_SECRET_CAVE, $01, $A8, 13, 8,  $5F, 0, 0
+    .byte LOCATION_SECRET_CAVE, $01, $A9, 13, 9,  $5F, 0, 0
+    .byte LOCATION_ALIEN_BASE,  $05, $0D, 8,  13, $D8, 1, 0
+    .byte LOCATION_ALIEN_BASE,  $05, $2D, 9,  13, $2A, 1, 0
 
 ;Destructible index assigned to a tile
 linked_destructible_tiles:
@@ -2019,8 +2019,25 @@ UpdateDestructableTiles:
     cmp LocationIndex
     bne @loop
     inx
+    inx
+    inx
+    inx
+    inx
+    inx
+    lda CurrentMapSegmentIndex
+    cmp destructible_tiles_list, x
+    bne @loop
+    dex
+    dex
+    dex
+    dex
+    dex
+
+    ;inx
     lda $2002
-    lda destructible_tiles_list, x
+    lda FirstNametableAddr
+    clc
+    adc destructible_tiles_list, x
     sta $2006
     inx
     lda destructible_tiles_list, x
