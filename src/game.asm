@@ -267,6 +267,24 @@ destructible_tiles_list:                  ;y   x
     .byte LOCATION_ALIEN_BASE,  $05, $0D, 8,  13, $D8, 1, 0
     .byte LOCATION_ALIEN_BASE,  $05, $2D, 9,  13, $2A, 1, 0
 
+;255 means there are no tiles
+destructible_tile_location_lookup:
+    .byte 0 ;0
+    .byte 255 ;1
+    .byte 255 ;2
+    .byte 255 ;3
+    .byte 255 ;4
+    .byte 255 ;5
+    .byte 255 ;6
+    .byte 255 ;7
+    .byte 255 ;8
+    .byte 255 ;9
+    .byte 64 ;10
+    .byte 255 ;11
+    .byte 255 ;12
+    .byte 255 ;13
+    .byte 32 ;14
+
 ;Destructible index assigned to a tile
 linked_destructible_tiles:
     .byte 0
@@ -573,8 +591,13 @@ chr_dest_low:
 chr_pages_to_copy:
     .res 1
 
+TempMapColumnY:
+    .res 1
+TempDestructibleTileIdx:
+    .res 1
+
 ZPBuffer:
-    .res 48  ; I want to be aware of the free memory
+    .res 46  ; I want to be aware of the free memory
 
 ;--------------
 .segment "BSS" ; variables in ram
@@ -4755,6 +4778,8 @@ CalcMapColumnToUpdate:
     inc pointer + 1
 
 @cont:
+
+    jsr InjectDestructibleTilesIntoColumn
     inx
     cpx #SCREEN_ROW_COUNT - 4
     bcc @loop
@@ -4827,6 +4852,72 @@ CalcMapColumnToUpdate:
     sta MustUpdateMapAttributeColumn
 @exit:
     rts
+;--------------------------------
+InjectDestructibleTilesIntoColumn:
+    ;inject destructible tile here
+    ; x - y
+    ;SourceMapIdx - screen
+    ;bgcolumentIdxtoUpload - x
+
+    stx TempMapColumnY
+    
+    ldx LocationIndex
+    lda destructible_tile_location_lookup, x
+    tax
+    stx TempDestructibleTileIdx
+    cmp #255
+    beq @noDestructibleTiles
+
+@destructibleLoop:
+    txa
+    clc
+    adc #6 ; go to destructible tile screen
+    tax
+    lda destructible_tiles_list, x
+    cmp SourceMapIdx
+    bne @nextTile
+
+    txa
+    sec
+    sbc #3 ; move to tiles's y
+    tax
+    lda destructible_tiles_list, x
+    sec
+    sbc #4
+    cmp TempMapColumnY
+    bne @nextTile
+
+    inx
+    lda destructible_tiles_list, x ; x
+    cmp BgColumnIdxToUpload
+    bne @nextTile
+
+    inx ; tile
+    lda destructible_tiles_list, x
+
+    ldx TempMapColumnY
+    sta MapColumnData, x
+
+@nextTile:
+    lda TempDestructibleTileIdx
+    clc
+    adc #8
+    tax
+    stx TempDestructibleTileIdx
+    lda destructible_tiles_list, x
+    cmp LocationIndex
+    bne @noDestructibleTiles
+    cpx #DESTRUCTIBLE_COUNT * 8
+    bcs @noDestructibleTiles
+    jmp @destructibleLoop
+
+
+@noDestructibleTiles:
+    ldx TempMapColumnY
+
+    rts
+
+
 ;--------------------------------
 IntroNametableAnimations:
 
