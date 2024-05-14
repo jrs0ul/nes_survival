@@ -4870,6 +4870,17 @@ InjectDestructibleTilesIntoColumn:
 
 @destructibleLoop:
     txa
+    lsr
+    lsr
+    lsr
+    tax
+    lda linked_destructible_tiles, x
+    tax
+    lda Destructibles, x
+    beq @nextTile
+
+    lda TempDestructibleTileIdx
+
     clc
     adc #6 ; go to destructible tile screen
     tax
