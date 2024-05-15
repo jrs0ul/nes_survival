@@ -256,10 +256,10 @@ fist_collision_pos:
 ;   tile value after destruction
 ;   screen
 destructible_tiles_list:                  ;y   x
-    .byte LOCATION_FIRST,       $23, $70, 27, 16, $14, 3, 0
-    .byte LOCATION_FIRST,       $23, $71, 27, 17, $14, 3, 0
-    .byte LOCATION_FIRST,       $23, $90, 28, 16, $14, 3, 0
-    .byte LOCATION_FIRST,       $23, $91, 28, 17, $14, 3, 0
+    .byte LOCATION_FIRST,       $27, $70, 27, 16, $14, 3, 0
+    .byte LOCATION_FIRST,       $27, $71, 27, 17, $14, 3, 0
+    .byte LOCATION_FIRST,       $27, $90, 28, 16, $14, 3, 0
+    .byte LOCATION_FIRST,       $27, $91, 28, 17, $14, 3, 0
     .byte LOCATION_SECRET_CAVE, $21, $88, 12, 8,  $5F, 0, 0
     .byte LOCATION_SECRET_CAVE, $21, $89, 12, 9,  $5F, 0, 0
     .byte LOCATION_SECRET_CAVE, $21, $A8, 13, 8,  $5F, 0, 0
@@ -2050,26 +2050,9 @@ UpdateDestructableTiles:
     lda destructible_tiles_list, x
     cmp LocationIndex
     bne @loop
-    ;inx
-    ;inx
-    ;inx
-    ;inx
-    ;inx
-    ;inx
-    ;lda CurrentMapSegmentIndex
-    ;cmp destructible_tiles_list, x
-    ;bne @loop
-    ;dex
-    ;dex
-    ;dex
-    ;dex
-    ;dex
-
     inx
     lda $2002
-    lda #00;FirstNametableAddr
-    clc
-    adc destructible_tiles_list, x
+    lda destructible_tiles_list, x
     sta $2006
     inx
     lda destructible_tiles_list, x
@@ -3265,10 +3248,17 @@ RoutinesAfterFadeOut:
 @next2:
     lda ActiveMapEntryIndex
     cmp #9
-    bne @next5
+    bne @next4
 
     jsr OnExitVillagerHut
+    ;--------------------------
+    ;second location exit
+@next4:
+    lda ActiveMapEntryIndex
+    cmp #5
+    bne @next5
 
+    jsr FlipStartingNametable ; for the breakable rock
     ;-----------------------------------------
     ;entered player's house
 @next5:
@@ -3304,6 +3294,7 @@ RoutinesAfterFadeOut:
 
     lda #2
     sta ScrollDirection
+    jsr FlipStartingNametable ;for the rock
     ;------------------------------------------
     ;8.Erika's house entrance
 @next9:
@@ -3389,7 +3380,7 @@ RoutinesAfterFadeOut:
 @next14:
     lda ActiveMapEntryIndex
     cmp #13
-    bne @next17
+    bne @next16
 
     lda #2
     sta ScrollDirection
@@ -3399,6 +3390,14 @@ RoutinesAfterFadeOut:
     lda #0
     sta CheckpointSaved
 
+    ;17. exit from the grannys location
+@next16:
+    lda ActiveMapEntryIndex
+    cmp #17
+    bne @next17
+
+
+    jsr FlipStartingNametable ; for the breakable rock
     ;----------------------------
     ;18.granny's house
 @next17:
