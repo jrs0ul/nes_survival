@@ -256,16 +256,16 @@ fist_collision_pos:
 ;   tile value after destruction
 ;   screen
 destructible_tiles_list:                  ;y   x
-    .byte LOCATION_FIRST,       $03, $70, 27, 16, $14, 3, 0
-    .byte LOCATION_FIRST,       $03, $71, 27, 17, $14, 3, 0
-    .byte LOCATION_FIRST,       $03, $90, 28, 16, $14, 3, 0
-    .byte LOCATION_FIRST,       $03, $91, 28, 17, $14, 3, 0
-    .byte LOCATION_SECRET_CAVE, $01, $88, 12, 8,  $5F, 0, 0
-    .byte LOCATION_SECRET_CAVE, $01, $89, 12, 9,  $5F, 0, 0
-    .byte LOCATION_SECRET_CAVE, $01, $A8, 13, 8,  $5F, 0, 0
-    .byte LOCATION_SECRET_CAVE, $01, $A9, 13, 9,  $5F, 0, 0
-    .byte LOCATION_ALIEN_BASE,  $05, $0D, 8,  13, $D8, 1, 0
-    .byte LOCATION_ALIEN_BASE,  $05, $2D, 9,  13, $2A, 1, 0
+    .byte LOCATION_FIRST,       $23, $70, 27, 16, $14, 3, 0
+    .byte LOCATION_FIRST,       $23, $71, 27, 17, $14, 3, 0
+    .byte LOCATION_FIRST,       $23, $90, 28, 16, $14, 3, 0
+    .byte LOCATION_FIRST,       $23, $91, 28, 17, $14, 3, 0
+    .byte LOCATION_SECRET_CAVE, $21, $88, 12, 8,  $5F, 0, 0
+    .byte LOCATION_SECRET_CAVE, $21, $89, 12, 9,  $5F, 0, 0
+    .byte LOCATION_SECRET_CAVE, $21, $A8, 13, 8,  $5F, 0, 0
+    .byte LOCATION_SECRET_CAVE, $21, $A9, 13, 9,  $5F, 0, 0
+    .byte LOCATION_ALIEN_BASE,  $25, $0D, 8,  13, $D8, 1, 0
+    .byte LOCATION_ALIEN_BASE,  $25, $2D, 9,  13, $2A, 1, 0
 
 ;255 means there are no tiles
 destructible_tile_location_lookup:
@@ -596,8 +596,47 @@ TempMapColumnY:
 TempDestructibleTileIdx:
     .res 1
 
+OldPlayerX:
+    .res 2
+OldPlayerY:
+    .res 2
+
+PlayerX:
+    .res 2
+PlayerY:
+    .res 2
+
+PlayerSpeed:
+    .res 2
+
+OldScrollX:
+    .res 2
+ScrollX:
+    .res 2
+
+LocationIndex:
+    .res 1
+
+SourceMapIdx:
+    .res 1
+
+Temp:
+    .res 1
+TempX:
+    .res 1
+TempY:
+    .res 1
+TempZ:
+    .res 1
+TempPush:
+    .res 1
+TempPointX:
+    .res 1
+TempPointY:
+    .res 1
+
 ZPBuffer:
-    .res 46  ; I want to be aware of the free memory
+    .res 23  ; I want to be aware of the free memory
 
 ;--------------
 .segment "BSS" ; variables in ram
@@ -605,10 +644,6 @@ ZPBuffer:
 CurrentPaletteDecrementValue: ;a helper value to prevent doing too much of palette changing
     .res 1
 
-OldScrollX:
-    .res 2
-ScrollX:
-    .res 2
 
 ScrollY:
     .res 1
@@ -651,18 +686,6 @@ NametableAddress:
     .res 1
 
 
-OldPlayerX:
-    .res 2
-OldPlayerY:
-    .res 2
-
-PlayerX:
-    .res 2
-PlayerY:
-    .res 2
-
-PlayerSpeed:
-    .res 2
 
 PlayerAnimationRowIndex: ;which animation row to use for player sprites at the moment
     .res 1
@@ -981,26 +1004,11 @@ NextItemMapScreenIndex:
 ItemMapScreenIndex:
     .res 1
 
-LocationIndex:
-    .res 1
 
 DamagedPaletteMask:
     .res 1
 
-Temp:
-    .res 1
-TempX:
-    .res 1
-TempY:
-    .res 1
-TempZ:
-    .res 1
-TempPush:
-    .res 1
-TempPointX:
-    .res 1
-TempPointY:
-    .res 1
+
 TempIndex:
     .res 1
 TempRegX:
@@ -1221,8 +1229,6 @@ Destructibles:
 
 AttribHighAddress:
     .res 1
-SourceMapIdx:
-    .res 1
 
 MapRowAddressTable:
     .res ROW_TABLE_SIZE
@@ -1331,6 +1337,9 @@ NametableOffsetInBytes: ; how many bytes to fill with zeroes at the beginning of
     .res 1
 SkipLastTileRowsInIndoorMaps:
     .res 1
+
+BSSBuffer:
+    .res 23
 
 ;====================================================================================
 
@@ -2021,8 +2030,8 @@ UpdateFireplace:
 ;--------------------------------------------
 UpdateDestructableTiles:
 
-    ;lda MustUpdateDestructables
-    ;bne @exit
+    lda MustUpdateDestructibles
+    beq @exit
 
     ldy #DESTRUCTIBLE_COUNT
 @loop:
@@ -2041,24 +2050,24 @@ UpdateDestructableTiles:
     lda destructible_tiles_list, x
     cmp LocationIndex
     bne @loop
-    inx
-    inx
-    inx
-    inx
-    inx
-    inx
-    lda CurrentMapSegmentIndex
-    cmp destructible_tiles_list, x
-    bne @loop
-    dex
-    dex
-    dex
-    dex
-    dex
-
     ;inx
+    ;inx
+    ;inx
+    ;inx
+    ;inx
+    ;inx
+    ;lda CurrentMapSegmentIndex
+    ;cmp destructible_tiles_list, x
+    ;bne @loop
+    ;dex
+    ;dex
+    ;dex
+    ;dex
+    ;dex
+
+    inx
     lda $2002
-    lda FirstNametableAddr
+    lda #00;FirstNametableAddr
     clc
     adc destructible_tiles_list, x
     sta $2006
@@ -2074,10 +2083,10 @@ UpdateDestructableTiles:
 
     jmp @loop
 
-
-    ;lda #0
-    ;sta MustUpdateDestructables
 @exit:
+    lda #0
+    sta MustUpdateDestructibles
+
     rts
 
 ;--------------------------------------------
@@ -3608,6 +3617,7 @@ RoutinesAfterFadeOut:
     bne @itsAnIndoorMap
     lda #1
     sta MustLoadOutside
+    sta MustUpdateDestructibles
     lda InVillagerHut  ;let's check if we previously were inside a villager house
     beq @finish
     lda #0              ;so we're leaving the villager house
@@ -5944,6 +5954,7 @@ LoadCheckPoint:
     lda #1
     sta InCave
     sta MustLoadOutside
+    sta MustUpdateDestructibles
     sta MustLoadSomething
 
     rts
@@ -5994,6 +6005,7 @@ StartGame:
     lda #1
     sta FirstTime
     sta MustLoadOutside
+    sta MustUpdateDestructibles
     sta MustLoadSomething
     sta MustCopyMainChr
 
@@ -6787,7 +6799,6 @@ useHammerOnEnvironment:
     inc DestroyedTilesCount
 
 
-    ;TODO: update destructible tiles
     lda #1
     sta MustUpdateDestructibles
     jmp @exit

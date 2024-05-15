@@ -4203,6 +4203,7 @@ ExitMenuState:
 @loadOutside:
     lda #1
     sta MustLoadOutside
+    sta MustUpdateDestructibles
     sta MustLoadSomething
 @exit:
     ldx LocationIndex
