@@ -399,7 +399,7 @@ ResetTimesWhenItemsWerePicked:
 
     ldy #0
     lda current_bank
-    sta oldbank
+    sta bankBeforeItemReset
 @loop:
     lda LocationItemCounts, y
     beq @nextLocation
@@ -469,7 +469,7 @@ ResetTimesWhenItemsWerePicked:
     cpy #MAX_LOCATIONS
     bcc @loop
 
-    ldy oldbank
+    ldy bankBeforeItemReset
     jsr bankswitch_y
 
     rts

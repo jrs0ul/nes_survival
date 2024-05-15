@@ -620,6 +620,9 @@ LocationIndex:
 SourceMapIdx:
     .res 1
 
+bankBeforeItemReset:
+    .res 1
+
 Temp:
     .res 1
 TempX:
@@ -636,7 +639,7 @@ TempPointY:
     .res 1
 
 ZPBuffer:
-    .res 23  ; I want to be aware of the free memory
+    .res 22  ; I want to be aware of the free memory
 
 ;--------------
 .segment "BSS" ; variables in ram
