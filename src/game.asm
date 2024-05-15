@@ -623,6 +623,26 @@ SourceMapIdx:
 bankBeforeItemReset:
     .res 1
 
+CurrentMapSegmentIndex: ;starting screen
+    .res 1
+OldCurrentMapSegmentIndex:
+    .res 1
+
+CurrentScreenWasIncremented:
+    .res 1
+CurrentScreenWasDecremented:
+    .res 1
+
+ScreenCount:
+    .res 1
+
+BgColumnIdxToUpload: ; index of a column to be uploaded
+    .res 1
+
+AttribColumnIdxToUpdate:
+    .res 1
+
+
 Temp:
     .res 1
 TempX:
@@ -639,7 +659,7 @@ TempPointY:
     .res 1
 
 ZPBuffer:
-    .res 22  ; I want to be aware of the free memory
+    .res 15  ; I want to be aware of the free memory
 
 ;--------------
 .segment "BSS" ; variables in ram
@@ -650,25 +670,6 @@ CurrentPaletteDecrementValue: ;a helper value to prevent doing too much of palet
 
 ScrollY:
     .res 1
-
-CurrentMapSegmentIndex: ;starting screen
-    .res 1
-OldCurrentMapSegmentIndex:
-    .res 1
-CurrentScreenWasIncremented:
-    .res 1
-CurrentScreenWasDecremented:
-    .res 1
-
-ScreenCount:
-    .res 1
-
-BgColumnIdxToUpload: ; index of a column to be uploaded
-    .res 1
-
-AttribColumnIdxToUpdate:
-    .res 1
-
 
 DestScreenAddr: ; higher byte of destination screen to upload columns
     .res 1
@@ -1342,7 +1343,7 @@ SkipLastTileRowsInIndoorMaps:
     .res 1
 
 BSSBuffer:
-    .res 23
+    .res 30
 
 ;====================================================================================
 
@@ -5622,7 +5623,7 @@ ResetVariables:
 @villagerLoop:
     sta SpecialItemsDelivered, x
     sta CompletedSpecialQuests, x
-    sta VillagerKilled
+    sta VillagerKilled, x
     dex
     bpl @villagerLoop
 
