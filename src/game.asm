@@ -3662,6 +3662,7 @@ RoutinesAfterFadeOut:
     sta OldBgColumnIdxToUpload
     sta OldSourceMapIdx
     sta OldAttribColumnIdxToUpdate
+    sta TaintedSprites
     jsr CalcMapColumnToUpdate
 
 
