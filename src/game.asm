@@ -633,6 +633,28 @@ CurrentScreenWasIncremented:
 CurrentScreenWasDecremented:
     .res 1
 
+WarmthDelay:
+    .res 1
+FoodDelay:
+    .res 1
+FuelDelay:
+    .res 1
+
+
+PlayerAlive:
+    .res 1
+PlayerWins:
+    .res 1
+
+InHouse:    ;is the player inside his hut?
+    .res 1
+
+InCave:
+    .res 1
+
+InVillagerHut:
+    .res 1
+
 ScreenCount:
     .res 1
 
@@ -640,6 +662,9 @@ BgColumnIdxToUpload: ; index of a column to be uploaded
     .res 1
 
 AttribColumnIdxToUpdate:
+    .res 1
+
+RandomNumber:
     .res 1
 
 
@@ -659,7 +684,7 @@ TempPointY:
     .res 1
 
 ZPBuffer:
-    .res 15  ; I want to be aware of the free memory
+    .res 6  ; I want to be aware of the free memory
 
 ;--------------
 .segment "BSS" ; variables in ram
@@ -722,8 +747,6 @@ DirectionY:
 
 
 
-RandomNumber:
-    .res 1
 
 FishingRodActive:
     .res 1
@@ -801,27 +824,7 @@ InventoryItemIndex:
 BaseMenuIndex: ; INVENTORY OR SLEEP ?
     .res 1
 
-WarmthDelay:
-    .res 1
-FoodDelay:
-    .res 1
-FuelDelay:
-    .res 1
 
-
-PlayerAlive:
-    .res 1
-PlayerWins:
-    .res 1
-
-InHouse:    ;is the player inside his hut?
-    .res 1
-
-InCave:
-    .res 1
-
-InVillagerHut:
-    .res 1
 
 VillagerIndex:
     .res 1
@@ -1343,7 +1346,7 @@ SkipLastTileRowsInIndoorMaps:
     .res 1
 
 BSSBuffer:
-    .res 30
+    .res 39
 
 ;====================================================================================
 
