@@ -13,7 +13,7 @@ TitleLogics:
 
     lda #0
     sta TempSpriteCount
-    jsr HideIntroSprites
+    jsr HideCutsceneSprites
 
 
     inc SnowDelay
@@ -215,7 +215,9 @@ IntroLogics:
 @go:
     lda CutsceneSceneIdx
     cmp #INTRO_SCENE_MAX
-    bcs @exit
+    bcc @gogo
+    rts
+@gogo:
     tax
 
     jsr DoScrolling
@@ -238,7 +240,19 @@ IntroLogics:
     inx
 
 @cont:
-    jsr MoveIntroSprites
+    txa
+    tay
+    lda #<intro_sprite_dir_x
+    sta pointer
+    lda #<intro_sprite_dir_y
+    sta pointer2
+    lda #>intro_sprite_dir_x
+    sta pointer + 1
+    lda #>intro_sprite_dir_y
+    sta pointer2 + 1
+    jsr MoveCutsceneSprites
+    tya
+    tax
     jsr DoPaletteAnim
 
     dec CutsceneTimer
@@ -294,7 +308,9 @@ OutroLogics:
 @go:
     lda CutsceneSceneIdx
     cmp #OUTRO_SCENE_MAX
-    bcs @exit
+    bcc @gogo
+    rts
+@gogo:
     tax
 
     ;do some scrolling
@@ -326,7 +342,19 @@ OutroLogics:
     inx
 
 @cont:
-    jsr MoveOutroSprites
+    txa
+    tay
+    lda #<outro_sprite_dir_x
+    sta pointer
+    lda #<outro_sprite_dir_y
+    sta pointer2
+    lda #>outro_sprite_dir_x
+    sta pointer + 1
+    lda #>outro_sprite_dir_y
+    sta pointer2 + 1
+    jsr MoveCutsceneSprites
+    tya
+    tax
 
     dec CutsceneTimer
     beq @increaseScene
@@ -366,53 +394,30 @@ OutroLogics:
     rts
 
 ;------------------------------
-MoveIntroSprites:
+;pointer - points to  x drection array
+;pointer2 - points to y direction array
+MoveCutsceneSprites:
     lda CutsceneSprite1X
     clc
-    adc intro_sprite_dir_x, x
+    adc (pointer), y
     sta CutsceneSprite1X
 
     lda CutsceneSprite1Y
     clc
-    adc intro_sprite_dir_y, x
+    adc (pointer2), y
     sta CutsceneSprite1Y
 
-    inx
+    iny
 
     lda CutsceneSprite2X
     clc
-    adc intro_sprite_dir_x, x
+    adc (pointer), y
     sta CutsceneSprite2X
 
     lda CutsceneSprite2Y
     clc
-    adc intro_sprite_dir_y, x
+    adc (pointer2), y
     sta CutsceneSprite2Y
-    rts
-;--------------------------------
-MoveOutroSprites:
-    lda CutsceneSprite1X
-    clc
-    adc outro_sprite_dir_x, x
-    sta CutsceneSprite1X
-
-    lda CutsceneSprite1Y
-    clc
-    adc outro_sprite_dir_y, x
-    sta CutsceneSprite1Y
-
-    inx
-
-    lda CutsceneSprite2X
-    clc
-    adc outro_sprite_dir_x, x
-    sta CutsceneSprite2X
-
-    lda CutsceneSprite2Y
-    clc
-    adc outro_sprite_dir_y, x
-    sta CutsceneSprite2Y
-
     rts
 ;--------------------------------
 UpdateOutroSprites:
@@ -474,7 +479,7 @@ UpdateOutroSprites:
 
 @updateLoop:
 
-    jsr DoIntroSpriteUpdate
+    jsr DoCutsceneSpriteUpdate
 
     cpy CutsceneSpriteCount
     bcc @updateLoop
@@ -501,7 +506,7 @@ UpdateOutroSprites:
 
     ldy TempPointY2
 @hide:
-    jsr HideIntroSprites
+    jsr HideCutsceneSprites
 
 @done:
     rts
@@ -566,7 +571,7 @@ UpdateIntroSprites:
 
 @updateLoop:
 
-    jsr DoIntroSpriteUpdate
+    jsr DoCutsceneSpriteUpdate
 
     cpy CutsceneSpriteCount
     bcc @updateLoop
@@ -593,12 +598,12 @@ UpdateIntroSprites:
 
     ldy TempPointY2
 @hide:
-    jsr HideIntroSprites
+    jsr HideCutsceneSprites
 
 @done:
     rts
 ;---------------------------------
-DoIntroSpriteUpdate:
+DoCutsceneSpriteUpdate:
 
     ldy #1
     lda (IntroSpriteCoordPtr), y ; y coord
@@ -607,7 +612,7 @@ DoIntroSpriteUpdate:
     adc (IntroSpritePtr), y
 
     ldy TempPointY2
-    sta FIRST_SPRITE, y ; store Y
+    sta ZERO_SPRITE, y ; store Y
     ;---
     inc TempPointY2
     inc TempPointY
@@ -616,7 +621,7 @@ DoIntroSpriteUpdate:
     lda (IntroSpritePtr), y
 
     ldy TempPointY2
-    sta FIRST_SPRITE, y ; store frame
+    sta ZERO_SPRITE, y ; store frame
     ;---
     inc TempPointY2
     inc TempPointY
@@ -625,7 +630,7 @@ DoIntroSpriteUpdate:
     lda (IntroSpritePtr), y
 
     ldy TempPointY2
-    sta FIRST_SPRITE, y ; store attribs
+    sta ZERO_SPRITE, y ; store attribs
     ;--
     inc TempPointY2
     inc TempPointY
@@ -636,7 +641,7 @@ DoIntroSpriteUpdate:
     adc (IntroSpritePtr), y
 
     ldy TempPointY2
-    sta FIRST_SPRITE, y ; store X
+    sta ZERO_SPRITE, y ; store X
     ;--
     inc TempPointY2
     inc TempPointY
@@ -645,8 +650,7 @@ DoIntroSpriteUpdate:
     rts
 
 ;---------------------------------
-;TODO might be a duplicate
-HideIntroSprites:
+HideCutsceneSprites:
 
     lda TaintedSprites
     cmp TempSpriteCount
@@ -660,7 +664,7 @@ HideIntroSprites:
     tax
     lda #$FE
 @hideSpritesLoop:
-    sta FIRST_SPRITE, y
+    sta ZERO_SPRITE, y
     iny
 
     dex
@@ -919,16 +923,16 @@ UpdateGameOverSprites:
     lda game_over_sprites, y
     clc
     adc SnowDelay
-    sta FIRST_SPRITE, y
+    sta ZERO_SPRITE, y
     iny
     lda game_over_sprites, y
-    sta FIRST_SPRITE, y
+    sta ZERO_SPRITE, y
     iny
     lda game_over_sprites, y
-    sta FIRST_SPRITE, y
+    sta ZERO_SPRITE, y
     iny
     lda game_over_sprites, y
-    sta FIRST_SPRITE, y
+    sta ZERO_SPRITE, y
     iny
 
     dex
@@ -961,16 +965,16 @@ UpdateGameOverSprites:
 
 @spriteLoop2:
     lda game_over_sprites, y
-    sta FIRST_SPRITE, y
+    sta ZERO_SPRITE, y
     iny
     lda game_over_sprites, y
-    sta FIRST_SPRITE, y
+    sta ZERO_SPRITE, y
     iny
     lda game_over_sprites, y
-    sta FIRST_SPRITE, y
+    sta ZERO_SPRITE, y
     iny
     lda game_over_sprites, y
-    sta FIRST_SPRITE, y
+    sta ZERO_SPRITE, y
     iny
 
     inc TempSpriteCount
@@ -983,7 +987,7 @@ UpdateGameOverSprites:
 @daysLoop:
 
     lda #200
-    sta FIRST_SPRITE, y
+    sta ZERO_SPRITE, y
     iny
 
     lda #CHARACTER_ZERO
@@ -998,11 +1002,11 @@ UpdateGameOverSprites:
     bne @was_zero
 @write_sprite:
     inc TempSpriteCount
-    sta FIRST_SPRITE, y
+    sta ZERO_SPRITE, y
     iny
 
     lda #1
-    sta FIRST_SPRITE, y ;attrib
+    sta ZERO_SPRITE, y ;attrib
     iny
     txa ; index * 8
     asl
@@ -1010,7 +1014,7 @@ UpdateGameOverSprites:
     asl
     clc
     adc #96
-    sta FIRST_SPRITE, y ; number x coordinate
+    sta ZERO_SPRITE, y ; number x coordinate
     iny
     jmp @next
 @was_zero:
@@ -1023,7 +1027,7 @@ UpdateGameOverSprites:
 
 
 @hide:
-    jsr HideIntroSprites
+    jsr HideCutsceneSprites
 
     rts
 

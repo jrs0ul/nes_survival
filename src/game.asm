@@ -5329,6 +5329,8 @@ LoadGameOver:
     lda #0
     sta MustLoadGameOver
     sta MustLoadSomething
+    lda #255
+    sta TaintedSprites
 
 
 @exit:
