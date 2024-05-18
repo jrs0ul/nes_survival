@@ -4190,6 +4190,16 @@ AdaptBackgroundPaletteByTime:
 
 @calc:
     jsr GetPaletteFadeValueForHour
+    cmp #DAYTIME_NIGHT
+    bne @cont
+    lda SongName
+    cmp #7
+    beq @cont
+    lda #1
+    sta MustPlayNewSong
+    lda #7
+    sta SongName
+
 @cont:
     cmp CurrentPaletteDecrementValue
     beq @exit
