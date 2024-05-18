@@ -119,12 +119,6 @@ LoadOutsideMap:
     tay
     jsr bankswitch_y
 
-    lda #0
-    sta MustCopyMainChr
-    sta SongName; let's play song 0
-    lda #1
-    sta MustPlayNewSong
-
 @continueLoad:
     ldy CurrentMapSegmentIndex
     sty TempY

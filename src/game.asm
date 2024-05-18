@@ -3346,6 +3346,9 @@ RoutinesAfterFadeOut:
 
     lda #1
     sta InCave
+    sta MustPlayNewSong
+    lda #7
+    sta SongName
 
     lda #2
     sta ScrollDirection
@@ -3375,6 +3378,9 @@ RoutinesAfterFadeOut:
 
     lda #1
     sta InCave
+    sta MustPlayNewSong
+    lda #7
+    sta SongName
 
     lda #2
     sta ScrollDirection
@@ -3544,7 +3550,7 @@ RoutinesAfterFadeOut:
     sta CurrentMapPalettePtr + 1
     jsr FlipStartingNametable ; for the locked door, so the second screen would always be in adress $24**
 
-    lda #0
+    lda #7
     sta BossAgitated
     sta SongName
     lda #1
@@ -4191,13 +4197,22 @@ AdaptBackgroundPaletteByTime:
 @calc:
     jsr GetPaletteFadeValueForHour
     cmp #DAYTIME_NIGHT
-    bne @cont
+    bne @not_night
     lda SongName
     cmp #7
     beq @cont
     lda #1
     sta MustPlayNewSong
     lda #7
+    sta SongName
+    jmp @cont
+@not_night:
+    lda SongName
+    cmp #0
+    beq @cont
+    lda #1
+    sta MustPlayNewSong
+    lda #0
     sta SongName
 
 @cont:
@@ -5952,7 +5967,7 @@ LoadCheckPoint:
     sta CurrentMapPalettePtr + 1
     sta PalettePtr + 1
 
-    lda #0
+    lda #7
     sta InVillagerHut
     sta BossAgitated
     sta SongName
@@ -6027,10 +6042,12 @@ StartGame:
     sta MustUpdateDestructibles
     sta MustLoadSomething
     sta MustCopyMainChr
+    sta MustPlayNewSong
 
     jsr BuildRowTable
 
     lda #0
+    sta SongName
     sta InitiateCompleteItemRespawn
 
 
