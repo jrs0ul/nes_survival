@@ -180,6 +180,7 @@ TestPointAgainstCollisionMap:
     lsr
     lsr
     lsr ; y / 8
+    sta PointCellY
 
     cmp #4
     bcc @collides
@@ -209,9 +210,14 @@ TestPointAgainstCollisionMap:
     tay ;put X/8 to register y
 
     lda DestroyedTilesCount
-    beq @cont
+    beq @cont ; no tiles that have been destroyed
 
 ;--- ok, this -is- UGLY------------
+    ldx LocationIndex
+    lda destructible_tile_location_lookup, x
+    cmp #255
+    beq @cont
+
     lda #DESTRUCTIBLE_COUNT
     tax
     stx destructibleIdx
@@ -222,32 +228,25 @@ TestPointAgainstCollisionMap:
     bmi @cont
 
     jsr IsDestroyed
+    cmp #0
     beq @destructiblesLoop
 
-    txa
+    txa ; destructible tile index * 8
     asl
     asl
     asl
     tax
 
-    inx
-    inx
-    inx
+    inx ; address hi
+    inx ; address low
+    inx ; y
 
-    lda TempPointY
-    clc
-    adc #8
-    lsr
-    lsr
-    lsr
+    lda PointCellY
     cmp destructible_tiles_list, x ; compare with y
     bne @destructiblesLoop
 
     inx ; move to x
-    lda TempPointX
-    lsr
-    lsr
-    lsr
+    tya ; x divided by 8 is in y-register
     cmp destructible_tiles_list, x
     bne @destructiblesLoop
 
@@ -261,7 +260,6 @@ TestPointAgainstCollisionMap:
     lda destructible_tiles_list, x
     jmp @compare
 
-;----------------------------
 @cont:
     lda (pointer), y
 @compare:

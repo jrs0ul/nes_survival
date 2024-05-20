@@ -682,9 +682,11 @@ TempPointX:
     .res 1
 TempPointY:
     .res 1
+PointCellY: ; for collision
+    .res 1
 
 ZPBuffer:
-    .res 6  ; I want to be aware of the free memory
+    .res 5  ; I want to be aware of the free memory
 
 ;--------------
 .segment "BSS" ; variables in ram
@@ -4902,7 +4904,7 @@ InjectDestructibleTilesIntoColumn:
     ;bgcolumentIdxtoUpload - x
 
     stx TempMapColumnY
-    
+
     ldx LocationIndex
     lda destructible_tile_location_lookup, x
     tax
