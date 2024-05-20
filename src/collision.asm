@@ -182,13 +182,12 @@ TestPointAgainstCollisionMap:
     lsr ; y / 8
     sta PointCellY
 
-    cmp #4
-    bcc @collides
-    cmp #30
-    bcs @collides
-
     sec
     sbc #4 ; drop the 4 top rows, where the hud is
+    bcc @collides
+
+    cmp #26
+    bcs @collides
 
     asl  ;row * 2
 
@@ -213,21 +212,20 @@ TestPointAgainstCollisionMap:
     beq @cont ; no tiles that have been destroyed
 
 ;--- ok, this -is- UGLY------------
-    ldx LocationIndex
-    lda destructible_tile_location_lookup, x
-    cmp #255
-    beq @cont
-
-    lda #DESTRUCTIBLE_COUNT
-    tax
+    ldx #DESTRUCTIBLE_COUNT
     stx destructibleIdx
+
 @destructiblesLoop:
     ldx destructibleIdx
     dex
     stx destructibleIdx
     bmi @cont
 
-    jsr IsDestroyed
+    lda linked_destructible_tiles, x
+    tax
+    lda Destructibles, x
+    ldx destructibleIdx
+
     cmp #0
     beq @destructiblesLoop
 
@@ -235,18 +233,15 @@ TestPointAgainstCollisionMap:
     asl
     asl
     asl
+    clc
+    adc #3 ; move to screen
     tax
-
-    inx ; address hi
-    inx ; address low
-    inx ; screen
 
     lda destructible_tiles_list, x
     cmp TempScreen
     bne @destructiblesLoop
 
     inx ; y
-
     lda PointCellY
     cmp destructible_tiles_list, x ; compare with y
     bne @destructiblesLoop
@@ -257,7 +252,6 @@ TestPointAgainstCollisionMap:
     bne @destructiblesLoop
 
     inx ;tile
-
     lda destructible_tiles_list, x
     jmp @compare
 
@@ -274,16 +268,6 @@ TestPointAgainstCollisionMap:
     lda #0
 
 @exit_collision_check:
-    rts
-;---------------------------
-IsDestroyed:
-
-    sty TempY
-    lda linked_destructible_tiles, x
-    tay
-    lda Destructibles, y
-    ldy TempY
-
     rts
 
 ;-----------------------------
