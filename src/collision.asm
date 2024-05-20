@@ -239,6 +239,12 @@ TestPointAgainstCollisionMap:
 
     inx ; address hi
     inx ; address low
+    inx ; screen
+
+    lda destructible_tiles_list, x
+    cmp TempScreen
+    bne @destructiblesLoop
+
     inx ; y
 
     lda PointCellY
@@ -250,13 +256,8 @@ TestPointAgainstCollisionMap:
     cmp destructible_tiles_list, x
     bne @destructiblesLoop
 
-    inx
-    inx ;screen
-    lda destructible_tiles_list, x
-    cmp TempScreen
-    bne @destructiblesLoop
+    inx ;tile
 
-    dex ; tile after destruction
     lda destructible_tiles_list, x
     jmp @compare
 

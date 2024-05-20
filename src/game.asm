@@ -251,21 +251,21 @@ fist_collision_pos:
 ;   location,
 ;   tile address high, (in video memory)
 ;   tile address low,
+;   screen
 ;   tile row
 ;   tile column
 ;   tile value after destruction
-;   screen
-destructible_tiles_list:                  ;y   x
-    .byte LOCATION_FIRST,       $27, $70, 27, 16, $14, 3, 0
-    .byte LOCATION_FIRST,       $27, $71, 27, 17, $14, 3, 0
-    .byte LOCATION_FIRST,       $27, $90, 28, 16, $14, 3, 0
-    .byte LOCATION_FIRST,       $27, $91, 28, 17, $14, 3, 0
-    .byte LOCATION_SECRET_CAVE, $21, $88, 12, 8,  $5F, 0, 0
-    .byte LOCATION_SECRET_CAVE, $21, $89, 12, 9,  $5F, 0, 0
-    .byte LOCATION_SECRET_CAVE, $21, $A8, 13, 8,  $5F, 0, 0
-    .byte LOCATION_SECRET_CAVE, $21, $A9, 13, 9,  $5F, 0, 0
-    .byte LOCATION_ALIEN_BASE,  $25, $0D, 8,  13, $D8, 1, 0
-    .byte LOCATION_ALIEN_BASE,  $25, $2D, 9,  13, $2A, 1, 0
+destructible_tiles_list:                 ;sc  y   x
+    .byte LOCATION_FIRST,       $27, $70, 3, 27, 16, $14, 0
+    .byte LOCATION_FIRST,       $27, $71, 3, 27, 17, $14, 0
+    .byte LOCATION_FIRST,       $27, $90, 3, 28, 16, $14, 0
+    .byte LOCATION_FIRST,       $27, $91, 3, 28, 17, $14, 0
+    .byte LOCATION_SECRET_CAVE, $21, $88, 0, 12, 8,  $5F, 0
+    .byte LOCATION_SECRET_CAVE, $21, $89, 0, 12, 9,  $5F, 0
+    .byte LOCATION_SECRET_CAVE, $21, $A8, 0, 13, 8,  $5F, 0
+    .byte LOCATION_SECRET_CAVE, $21, $A9, 0, 13, 9,  $5F, 0
+    .byte LOCATION_ALIEN_BASE,  $25, $0D, 1, 8,  13, $D8, 0
+    .byte LOCATION_ALIEN_BASE,  $25, $2D, 1, 9,  13, $2A, 0
 
 ;255 means there are no tiles
 destructible_tile_location_lookup:
@@ -2059,16 +2059,28 @@ UpdateDestructableTiles:
     lda destructible_tiles_list, x
     cmp LocationIndex
     bne @loop
+
     inx
+    inx
+    inx ; screen
+    lda CurrentMapSegmentIndex
+    clc
+    adc #1
+    cmp destructible_tiles_list, x
+    bcc @loop
+    dex ; lo
+    dex ; hi
+
     lda $2002
     lda destructible_tiles_list, x
     sta $2006
-    inx
+    inx ;address lo
     lda destructible_tiles_list, x
     sta $2006
-    inx
-    inx
-    inx
+    inx ;screen
+    inx ; y
+    inx ; x
+    inx ; tile
     lda destructible_tiles_list, x
     sta $2007
 
@@ -4913,7 +4925,7 @@ InjectDestructibleTilesIntoColumn:
     beq @noDestructibleTiles
 
 @destructibleLoop:
-    txa
+    txa ;div 8
     lsr
     lsr
     lsr
@@ -4924,18 +4936,15 @@ InjectDestructibleTilesIntoColumn:
     beq @nextTile
 
     lda TempDestructibleTileIdx
-
-    clc
-    adc #6 ; go to destructible tile screen
     tax
+    inx ;addr hi
+    inx ;addr lo
+    inx ; screen
     lda destructible_tiles_list, x
     cmp SourceMapIdx
     bne @nextTile
 
-    txa
-    sec
-    sbc #3 ; move to tiles's y
-    tax
+    inx
     lda destructible_tiles_list, x
     sec
     sbc #4
@@ -6818,13 +6827,14 @@ useHammerOnEnvironment:
     lda destructible_tiles_list, x
     cmp LocationIndex
     bne @destructable_loop
-    inx
-    inx
-    inx
+    inx ;addr hi
+    inx ;addr lo
+    inx ;scr
+    inx ; y
     lda destructible_tiles_list, x
     cmp TempY
     bne @destructable_loop
-    inx
+    inx ; x
     lda destructible_tiles_list, x
     cmp TempX
     bne @destructable_loop
