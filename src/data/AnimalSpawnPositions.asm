@@ -7,10 +7,13 @@ location_spawns_low:
     .byte 0
     .byte 0
     .byte 0
-    .byte <spawnpoints_loc_9 ; granny's house is here
+    .byte <spawnpoints_loc_9 ; 8 granny's house is here
+    .byte 0                  ; 9
+    .byte 0                  ; 10
+    .byte <spawnpoints_loc_12; 11 cave loc
     .byte 0
     .byte 0
-    .byte <spawnpoints_loc_12
+    .byte 0
 
 location_spawns_high:
     .byte >spawnpoints_base_loc_1
@@ -25,6 +28,9 @@ location_spawns_high:
     .byte 0
     .byte 0
     .byte >spawnpoints_loc_12
+    .byte 0
+    .byte 0
+    .byte 0
 
 
 spawnpoints_base_loc_1:
@@ -71,7 +77,7 @@ spawnpoints_loc_3:
     .byte 98, 160
 
 spawnpoints_loc_9:
-    .byte 64, 180
+    .byte 64, 150
     .byte 232, 72
     .byte 232, 176
     .byte 40, 56

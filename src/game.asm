@@ -279,11 +279,11 @@ destructible_tile_location_lookup:
     .byte 255 ;7
     .byte 255 ;8
     .byte 255 ;9
-    .byte 64 ;10
+    .byte 8 ;10
     .byte 255 ;11
     .byte 255 ;12
     .byte 255 ;13
-    .byte 32 ;14
+    .byte 4 ;14
 
 ;Destructible index assigned to a tile
 linked_destructible_tiles:
@@ -4919,10 +4919,13 @@ InjectDestructibleTilesIntoColumn:
 
     ldx LocationIndex
     lda destructible_tile_location_lookup, x
-    tax
-    stx TempDestructibleTileIdx
     cmp #255
     beq @noDestructibleTiles
+    asl
+    asl
+    asl ;idx * 8
+    tax
+    stx TempDestructibleTileIdx
 
 @destructibleLoop:
     txa ;div 8

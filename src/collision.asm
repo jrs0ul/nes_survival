@@ -23,7 +23,7 @@ CanPlayerGo:
     adc #PLAYER_COLLISION_LINE_Y1
     sta TempPointY
 
-    jsr TestPointAgainstCollisionMap
+    jsr TestPointAgainstCollisionMapHero
     bne @collides
 ;------------ 
     lda PlayerX
@@ -41,7 +41,7 @@ CanPlayerGo:
 @cont2:
     sta TempScreen
 
-    jsr TestPointAgainstCollisionMap
+    jsr TestPointAgainstCollisionMapHero
     bne @collides
 
     lda #0
@@ -76,7 +76,7 @@ CanPlayerGoWithOldY:
     adc #PLAYER_COLLISION_LINE_Y1
     sta TempPointY
 
-    jsr TestPointAgainstCollisionMap
+    jsr TestPointAgainstCollisionMapHero
     bne @collides
 ;----------- 
 
@@ -97,7 +97,7 @@ CanPlayerGoWithOldY:
 @cont2:
 
     sta TempScreen
-    jsr TestPointAgainstCollisionMap
+    jsr TestPointAgainstCollisionMapHero
     bne @collides
 
     lda #0
@@ -131,7 +131,7 @@ CanPlayerGoWithOldX:
     adc #PLAYER_COLLISION_LINE_Y1
     sta TempPointY
 
-    jsr TestPointAgainstCollisionMap
+    jsr TestPointAgainstCollisionMapHero
     bne @collides
 ;----
 
@@ -150,7 +150,7 @@ CanPlayerGoWithOldX:
 @cont2:
     sta TempScreen
 
-    jsr TestPointAgainstCollisionMap
+    jsr TestPointAgainstCollisionMapHero
     bne @collides
 
     lda #0
@@ -160,14 +160,9 @@ CanPlayerGoWithOldX:
     lda #1
 @end:
     rts
-
-
-;----------------------------------
-;Set TempPointX and TempPointY as point to be tested
-;Set TempScreen as screen of your entity
-;sets A=1 if point collides
-TestPointAgainstCollisionMap:
-
+;---------------------------------
+;register A is 1 if collides already
+CalculateXYCellsForCollision:
     ldy LocationIndex
     lda TempScreen
     cmp LocationScreenCountList, y
@@ -207,55 +202,49 @@ TestPointAgainstCollisionMap:
     lsr
     lsr
     tay ;put X/8 to register y
+    jmp @notyet
 
-    lda DestroyedTilesCount
-    beq @cont ; no tiles that have been destroyed
+@collides:
+    lda #1
+    jmp @end
+@notyet:
+    lda #0
+@end:
+    rts
 
-;--- ok, this -is- UGLY------------
-    ldx #DESTRUCTIBLE_COUNT
-    stx destructibleIdx
+;----------------------------------
+;Set TempPointX and TempPointY as point to be tested
+;Set TempScreen as screen of your entity
+;sets A=1 if point collides
+TestPointAgainstCollisionMap:
 
-@destructiblesLoop:
-    ldx destructibleIdx
-    dex
-    stx destructibleIdx
-    bmi @cont
+    jsr CalculateXYCellsForCollision
+    bne @collides ;already colliding
 
-    lda linked_destructible_tiles, x
-    tax
-    lda Destructibles, x
-    ldx destructibleIdx
+    lda (pointer), y
+@compare:
+    cmp #128
+    bcc @not_Colliding
+@collides:
+    lda #1
+    jmp @exit_collision_check
 
-    cmp #0
-    beq @destructiblesLoop
+@not_Colliding:
+    lda #0
 
-    txa ; destructible tile index * 8
-    asl
-    asl
-    asl
-    clc
-    adc #3 ; move to screen
-    tax
+@exit_collision_check:
+    rts
+;-----------------------------
+;same as above, but for hero
+TestPointAgainstCollisionMapHero:
 
-    lda destructible_tiles_list, x
-    cmp TempScreen
-    bne @destructiblesLoop
+    jsr CalculateXYCellsForCollision
+    bne @collides ;already colliding
 
-    inx ; y
-    lda PointCellY
-    cmp destructible_tiles_list, x ; compare with y
-    bne @destructiblesLoop
+    jsr IsCollidingWithADestructedTile
+    cpx #1
+    beq @compare
 
-    inx ; move to x
-    tya ; x divided by 8 is in y-register
-    cmp destructible_tiles_list, x
-    bne @destructiblesLoop
-
-    inx ;tile
-    lda destructible_tiles_list, x
-    jmp @compare
-
-@cont:
     lda (pointer), y
 @compare:
     cmp #128
@@ -270,6 +259,77 @@ TestPointAgainstCollisionMap:
 @exit_collision_check:
     rts
 
+
+
+;-----------------------------
+;puts 1 into register X if the cell intersects with destructed tile
+;tile value is in register A
+IsCollidingWithADestructedTile:
+
+    lda DestroyedTilesCount
+    beq @cont ; no tiles that have been destroyed
+
+    ldx LocationIndex
+    lda destructible_tile_location_lookup, x
+    cmp #255
+    beq @cont
+
+    sta destructibleIdx ; save tile index
+
+@destructiblesLoop:
+
+    lda linked_destructible_tiles, x
+    tax
+    lda Destructibles, x
+    ldx destructibleIdx
+
+    cmp #0
+    beq @nextTile
+
+    txa ; destructible tile index * 8
+    asl
+    asl
+    asl
+    tax
+    lda destructible_tiles_list, x
+    cmp LocationIndex
+    bne @cont
+    inx
+    inx
+    inx ; move to screen
+
+    lda destructible_tiles_list, x
+    cmp TempScreen
+    bne @nextTile
+
+    inx ; y
+    lda PointCellY
+    cmp destructible_tiles_list, x ; compare with y
+    bne @nextTile
+
+    inx ; move to x
+    tya ; x divided by 8 is in y-register
+    cmp destructible_tiles_list, x
+    bne @nextTile
+
+
+    inx ;tile
+    lda destructible_tiles_list, x
+
+    ldx #1 ;intersects with destructed tile
+    jmp @end
+
+@nextTile:
+    inc destructibleIdx
+    ldx destructibleIdx
+    cpx #DESTRUCTIBLE_COUNT - 1
+    bcs @cont
+    jmp @destructiblesLoop
+
+@cont:
+    ldx #0
+@end:
+    rts
 ;-----------------------------
 ;Fill ram table with map row addresses
 BuildRowTable:
