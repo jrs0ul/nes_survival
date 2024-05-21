@@ -5901,8 +5901,21 @@ LoadOutro:
     lda MustLoadIntroChr
     beq @loadScene
 
-    lda #2
+    lda VillagerKilled
+    clc
+    adc VillagerKilled + 1
+    adc VillagerKilled + 2
+    cmp #0
+    bne @evilEnding
+
+    lda #9
     sta SongName
+    jmp @activateNewSong
+@evilEnding:
+    lda #8
+    sta SongName
+
+@activateNewSong:
     lda #1
     sta MustPlayNewSong
 

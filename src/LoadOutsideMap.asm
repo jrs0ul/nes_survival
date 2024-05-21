@@ -114,6 +114,8 @@ LoadOutsideMap:
     jsr LoadMainTileset
 
 @done_copying:
+    lda #0
+    sta MustCopyMainChr
     ldy LocationIndex
     lda LocationBanks, y
     tay
