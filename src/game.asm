@@ -5973,6 +5973,7 @@ LoadCheckPoint:
     sta ProjectileCount ; reset projectiles
     sta SpearData       ; reset spear
     sta ScrollX
+    sta InVillagerHut   ; if you were killed in boss room
     lda #$77
     sta PlayerX
     lda #$70
@@ -6017,6 +6018,7 @@ LoadCheckPoint:
     sta MustLoadOutside
     sta MustUpdateDestructibles
     sta MustLoadSomething
+    sta MustCopyMainChr
 
     rts
 
