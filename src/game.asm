@@ -1974,10 +1974,8 @@ CopyCHRChunk:
     inc pointer + 1
 @cont:
     dec TempY
-    beq @decrement
-    jmp @loop
+    bne @loop
 
-@decrement:
     dec TempRegX
     bne @tileLoop
 

@@ -4186,12 +4186,8 @@ ExitMenuState:
     lda LocationIndex
     cmp #LOCATION_BOSS_ROOM
     beq @bossroom
-    lda #1
-    sta MustCopyMainChr
     jmp @exit
 @bossroom:
-    lda #0
-    sta MustCopyMainChr
     lda #<alien_palette
     sta PalettePtr
     lda #>alien_palette
