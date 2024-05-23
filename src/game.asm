@@ -4835,7 +4835,6 @@ CalcMapColumnToUpdate:
 
 @cont:
 
-    jsr InjectDestructibleTilesIntoColumn
     inx
     cpx #SCREEN_ROW_COUNT - 4
     bcc @loop
@@ -4844,6 +4843,7 @@ CalcMapColumnToUpdate:
 
     lda #1
     sta MustUpdateMapColumn
+    sta MustUpdateDestructibles
 
 @attr:
     lda BgColumnIdxToUpload
@@ -4908,82 +4908,6 @@ CalcMapColumnToUpdate:
     sta MustUpdateMapAttributeColumn
 @exit:
     rts
-;--------------------------------
-InjectDestructibleTilesIntoColumn:
-    ;inject destructible tile here
-    ; x - y
-    ;SourceMapIdx - screen
-    ;bgcolumentIdxtoUpload - x
-
-    stx TempMapColumnY
-
-    ldx LocationIndex
-    lda destructible_tile_location_lookup, x
-    cmp #255
-    beq @noDestructibleTiles
-    asl
-    asl
-    asl ;idx * 8
-    tax
-    stx TempDestructibleTileIdx
-
-@destructibleLoop:
-    txa ;div 8
-    lsr
-    lsr
-    lsr
-    tax
-    lda linked_destructible_tiles, x
-    tax
-    lda Destructibles, x
-    beq @nextTile
-
-    lda TempDestructibleTileIdx
-    tax
-    inx ;addr hi
-    inx ;addr lo
-    inx ; screen
-    lda destructible_tiles_list, x
-    cmp SourceMapIdx
-    bne @nextTile
-
-    inx
-    lda destructible_tiles_list, x
-    sec
-    sbc #4
-    cmp TempMapColumnY
-    bne @nextTile
-
-    inx
-    lda destructible_tiles_list, x ; x
-    cmp BgColumnIdxToUpload
-    bne @nextTile
-
-    inx ; tile
-    lda destructible_tiles_list, x
-
-    ldx TempMapColumnY
-    sta MapColumnData, x
-
-@nextTile:
-    lda TempDestructibleTileIdx
-    clc
-    adc #8
-    tax
-    stx TempDestructibleTileIdx
-    lda destructible_tiles_list, x
-    cmp LocationIndex
-    bne @noDestructibleTiles
-    cpx #DESTRUCTIBLE_COUNT * 8
-    bcs @noDestructibleTiles
-    jmp @destructibleLoop
-
-
-@noDestructibleTiles:
-    ldx TempMapColumnY
-
-    rts
-
 
 ;--------------------------------
 IntroNametableAnimations:
