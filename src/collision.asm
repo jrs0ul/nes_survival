@@ -275,6 +275,7 @@ IsCollidingWithADestructedTile:
     beq @cont
 
     sta destructibleIdx ; save tile index
+    ldx destructibleIdx
 
 @destructiblesLoop:
 
@@ -322,7 +323,7 @@ IsCollidingWithADestructedTile:
 @nextTile:
     inc destructibleIdx
     ldx destructibleIdx
-    cpx #DESTRUCTIBLE_COUNT - 1
+    cpx #DESTRUCTIBLE_COUNT
     bcs @cont
     jmp @destructiblesLoop
 

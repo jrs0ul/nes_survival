@@ -423,12 +423,14 @@ LoadIndoorMapData:
     lda #0
     sta MustCopyMainChr
 
-@skipLoadingCHR:
 
     lda #<house_palette
     sta PalettePtr
     lda #>house_palette
     sta PalettePtr + 1
+
+@skipLoadingCHR:
+
 
 
     lda MustRestartIndoorsMusic
