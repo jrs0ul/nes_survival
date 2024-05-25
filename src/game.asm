@@ -5917,9 +5917,10 @@ LoadCheckPoint:
     sta CurrentMapPalettePtr + 1
     sta PalettePtr + 1
 
-    lda #7
+    lda #0
     sta InVillagerHut
     sta BossAgitated
+    lda #7
     sta SongName
     lda #1
     sta MustPlayNewSong
@@ -5931,8 +5932,6 @@ LoadCheckPoint:
     sta pointer + 1
 
     jsr LoadNpcs
-
-
     jsr BuildRowTable
 
     lda #1
