@@ -4186,6 +4186,10 @@ ExitMenuState:
     lda LocationIndex
     cmp #LOCATION_BOSS_ROOM
     beq @bossroom
+    lda #<house_palette
+    sta PalettePtr
+    lda #>house_palette
+    sta PalettePtr + 1
     jmp @exit
 @bossroom:
     lda #<alien_palette
