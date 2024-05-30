@@ -24,7 +24,9 @@
 
 .segment "ROM0"
 
-main_tiles_chr: .incbin "main.chr"
+main_tiles_chr: .incbin "main_sprites.chr"
+font:           .incbin "font.chr"
+main_bg_tiles:  .incbin "main_bg_tiles.chr"
 
 .include "data/maps/cropped/field_bg_crop.asm"
 .include "data/maps/cropped/field_bg1_crop.asm"
