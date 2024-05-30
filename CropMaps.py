@@ -69,7 +69,7 @@ def crop_maps():
 
 
         nameArray = fileName.split('.')
-        fileOut = open(map_path + nameArray[0] + "_crop.asm", "wt").write(dataOut)
+        fileOut = open(map_path + "/cropped/" + nameArray[0] + "_crop.asm", "wt").write(dataOut)
 
 
 if __name__ == "__main__":

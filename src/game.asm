@@ -26,12 +26,12 @@
 
 main_tiles_chr: .incbin "main.chr"
 
-.include "data/maps/field_bg_crop.asm"
-.include "data/maps/field_bg1_crop.asm"
-.include "data/maps/field_bg2_crop.asm"
-.include "data/maps/field_bg4_crop.asm"
-.include "data/maps/LOC3_bg1_crop.asm"
-.include "data/maps/LOC3_bg0_crop.asm"
+.include "data/maps/cropped/field_bg_crop.asm"
+.include "data/maps/cropped/field_bg1_crop.asm"
+.include "data/maps/cropped/field_bg2_crop.asm"
+.include "data/maps/cropped/field_bg4_crop.asm"
+.include "data/maps/cropped/LOC3_bg1_crop.asm"
+.include "data/maps/cropped/LOC3_bg0_crop.asm"
 .include "data/Outside1_items.asm"
 .include "data/Outside3_items.asm"
 
@@ -55,11 +55,11 @@ intro_tiles_chr: .incbin "intro.chr"
 
 house_tiles_chr: .incbin "house_bg_tiles.chr"
 house_sprites_chr: .incbin "house_sprites.chr"
-.include "data/maps/house_crop.asm"
-.include "data/maps/villager_hut_crop.asm"
-.include "data/maps/villager2_hut_crop.asm"
-.include "data/maps/grannys_hut_crop.asm"
-.include "data/maps/alien_bossroom_crop.asm"
+.include "data/maps/cropped/house_crop.asm"
+.include "data/maps/cropped/villager_hut_crop.asm"
+.include "data/maps/cropped/villager2_hut_crop.asm"
+.include "data/maps/cropped/grannys_hut_crop.asm"
+.include "data/maps/cropped/alien_bossroom_crop.asm"
 
 
 ;============================================================
@@ -68,12 +68,12 @@ house_sprites_chr: .incbin "house_sprites.chr"
 alien_tiles_chr: .incbin "alien_bg_tiles.chr"
 alien_sprites_chr: .incbin "alien_sprites.chr"
 
-.include "data/maps/alien_base1_crop.asm"
-.include "data/maps/alien_base2_crop.asm"
-.include "data/maps/cave0_crop.asm"
-.include "data/maps/cave1_crop.asm"
-.include "data/maps/dark_cave0_crop.asm"
-.include "data/maps/dark_cave1_crop.asm"
+.include "data/maps/cropped/alien_base1_crop.asm"
+.include "data/maps/cropped/alien_base2_crop.asm"
+.include "data/maps/cropped/cave0_crop.asm"
+.include "data/maps/cropped/cave1_crop.asm"
+.include "data/maps/cropped/dark_cave0_crop.asm"
+.include "data/maps/cropped/dark_cave1_crop.asm"
 
 
 ;=============================================================
@@ -121,15 +121,15 @@ game_over_sprites:
 .include "data/game_over_comp.asm"
 .include "data/CutsceneData.asm"
 ;--------- maps
-.include "data/maps/babloc1_crop.asm"
-.include "data/maps/babloc2_crop.asm"
-.include "data/maps/babloc3_crop.asm"
-.include "data/maps/field2_bg_crop.asm"
-.include "data/maps/field2_bg1_crop.asm"
-.include "data/maps/crashsite0_crop.asm"
-.include "data/maps/crashsite_crop.asm"
-.include "data/maps/location_with_cave_crop.asm"
-.include "data/maps/location_with_cave2_crop.asm"
+.include "data/maps/cropped/babloc1_crop.asm"
+.include "data/maps/cropped/babloc2_crop.asm"
+.include "data/maps/cropped/babloc3_crop.asm"
+.include "data/maps/cropped/field2_bg_crop.asm"
+.include "data/maps/cropped/field2_bg1_crop.asm"
+.include "data/maps/cropped/crashsite0_crop.asm"
+.include "data/maps/cropped/crashsite_crop.asm"
+.include "data/maps/cropped/location_with_cave_crop.asm"
+.include "data/maps/cropped/location_with_cave2_crop.asm"
 
 ;=============================================================
 .segment "ROM6"
@@ -151,7 +151,7 @@ zerosprite:
     .byte $70,$70,$70,$70,$70,$70,$70,$70,$70,$70,$2e,$7d,$7d,$7d,$7d,$24
 
 
-.include "data/maps/secret_cave0_crop.asm"
+.include "data/maps/cropped/secret_cave0_crop.asm"
 .include "data/AnimalSpawnPositions.asm"
 
 .include "data/player_sprite_data.asm"
