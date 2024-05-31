@@ -6,11 +6,11 @@ LoadAlienGfx:
     lda #>alien_tiles_chr
     sta pointer + 1
 
-    lda #$10
+    lda #$13
     sta chr_dest_high
     lda #00
     sta chr_dest_low
-    lda #16
+    lda #13
     sta chr_pages_to_copy
     jsr CopyCHRTiles
 
