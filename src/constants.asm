@@ -142,7 +142,7 @@
 
     STAMINA_END_SPRITE         = $FD
     STAMINA_SEGMENT_START      = $56 ; lower adress where first stamina segment should be placed
-    STAMINA_TILE               = $1A
+    STAMINA_TILE               = $4A
 
     MAX_TILE_SCROLL_LEFT       = 248; -8
     MAX_TILE_SCROLL_RIGHT      = 8
@@ -200,7 +200,7 @@
 
     SCREEN_MIDDLE              = 120
 
-    CHARACTER_ZERO             = $30
+    CHARACTER_ZERO             = $01
 
     MAX_WARMTH_DELAY_OUTSIDE   = 60 ; how fast you lose warmth
     MAX_WARMTH_DELAY_INDOORS   = 16 ; how fast you gain warmth
