@@ -197,7 +197,7 @@ FireplaceUpdate:
     lda FireFrame
     asl
     sta Temp
-    lda #$5C
+    lda #FIRE_TILE
     clc
     adc Temp
     sta $2007

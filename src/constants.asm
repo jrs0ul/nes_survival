@@ -71,6 +71,8 @@
 
     DESTRUCTIBLE_COUNT         = 10
 
+    FIRE_TILE                  = $80
+
     DESTRUCTIBLE_TILE_VALUE    = $F7
 
     ROCK_TILE_1                = $DE
