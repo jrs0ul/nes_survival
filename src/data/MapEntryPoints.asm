@@ -274,7 +274,7 @@ LocationBanks:
     .byte 0  ;9
     .byte 4  ;10
     .byte 5  ;11
-    .byte 0  ;12
+    .byte 3  ;12
     .byte 4  ;13
     .byte 6  ;14
 

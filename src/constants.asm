@@ -71,6 +71,8 @@
 
     DESTRUCTIBLE_COUNT         = 10
 
+    ICE_TILE_A                 = $3A
+    ICE_TILE_B                 = $4A
     FIRE_TILE                  = $80
 
     DESTRUCTIBLE_TILE_VALUE    = $F7

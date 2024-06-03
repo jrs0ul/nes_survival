@@ -3522,6 +3522,9 @@ RoutinesAfterFadeOut:
     lda #>alien_palette
     sta PalettePtr + 1
 
+    lda #1
+    sta InVillagerHut
+
     ldy #3
     lda VillagerKilled, y
     bne @next25
@@ -3531,8 +3534,7 @@ RoutinesAfterFadeOut:
     sta pointer + 1
     jsr LoadNpcs
 
-    lda #1
-    sta InVillagerHut
+   
     lda #3
     sta VillagerIndex
 
@@ -7106,9 +7108,9 @@ CanCastRodHere:
     jsr CalcTileAddressInFrontOfPlayer
 
     lda (pointer), y
-    cmp #$1A
+    cmp #ICE_TILE_B
     beq @throwThere
-    cmp #$0A
+    cmp #ICE_TILE_A
     bne @exit
 
 @throwThere:
