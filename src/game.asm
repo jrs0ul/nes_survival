@@ -5821,7 +5821,7 @@ LoadIntro:
     iny
     sta     (sp),y
     ldx     #$20
-    jmp     _vram_unlz4
+    jsr     _vram_unlz4
 
 @loadScene:
 
