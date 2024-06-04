@@ -49,7 +49,8 @@ main_bg_tiles:  .incbin "main_bg_tiles.chr"
 .segment "ROM2"
 
 title_tiles_chr: .incbin "title.chr"
-intro_tiles_chr: .incbin "intro.chr"
+;intro_tiles_chr: .incbin "intro.chr"
+intro_tiles_chr: .incbin "intro.lz4"
 
 
 ;============================================================
@@ -677,8 +678,16 @@ TempPointY:
 PointCellY: ; for collision
     .res 1
 
-ZPBuffer:
-    .res 5  ; I want to be aware of the free memory
+RLETag:
+    .res 1
+
+sp:
+    .res 2
+sreg:
+    .res 2
+
+;ZPBuffer:
+;    .res 4  ; I want to be aware of the free memory
 
 ;--------------
 .segment "BSS" ; variables in ram
@@ -1246,8 +1255,6 @@ DestroyedTilesCount:
 destructibleIdx:
     .res 1
 
-RLETag:
-    .res 1
 
 RedCounter:
     .res 1
@@ -1340,7 +1347,7 @@ SkipLastTileRowsInIndoorMaps:
     .res 1
 
 BSSBuffer:
-    .res 39
+    .res 40
 
 ;====================================================================================
 
@@ -1768,6 +1775,7 @@ noBankSwitch:
     rti        ; return from interrupt
 
 ;#############################| Subroutines |#############################################
+.include "lz4vram.s"
 .include "decompress_rle.asm"
 .include "graphics.asm"
 .include "collision.asm"
@@ -5789,16 +5797,31 @@ LoadIntro:
     jsr bankswitch_y
 
 
-    lda #<intro_tiles_chr
-    sta pointer
-    lda #>intro_tiles_chr
-    sta pointer + 1
-    lda #0
-    sta chr_dest_high
-    sta chr_dest_low
-    lda #32
-    sta chr_pages_to_copy
-    jsr CopyCHRTiles
+   ; lda #<intro_tiles_chr
+   ; sta pointer
+   ; lda #>intro_tiles_chr
+   ; sta pointer + 1
+   ; lda #0
+   ; sta chr_dest_high
+   ; sta chr_dest_low
+   ; lda #32
+   ; sta chr_pages_to_copy
+
+   ; jsr CopyCHRTiles
+
+    lda     #<intro_tiles_chr
+    ldy     #$02
+    sta     (sp),y
+    iny
+    lda     #>intro_tiles_chr
+    sta     (sp),y
+    lda     #$00
+    tay
+    sta     (sp),y
+    iny
+    sta     (sp),y
+    ldx     #$20
+    jmp     _vram_unlz4
 
 @loadScene:
 
