@@ -4,11 +4,8 @@
 ; An optimized LZ4 decompressor
 ;
 
-    ;.importzp   sp, sreg, regsave, regbank
-    ;.importzp   tmp1, tmp2, tmp3, tmp4, ptr1, ptr2, ptr3, ptr4
     .macpack    longbranch
-    ;.import     pushax,popax,_vram_write
-    ;.export     _vram_unlz4
+    .macpack        cpu
 
 regsave = MapColumnAttributes
 regbank = MapColumnData
@@ -31,17 +28,32 @@ TEMP = pointer2
 PPU_ADDR = $2006
 PPU_DATA = $2007
 
-.proc   popax
+popax:
 
         ldy     #1
         lda     (sp),y          ; get hi byte
         tax                     ; into x
+.if (.cpu .bitand ::CPU_ISET_65SC02)
+        lda     (sp)            ; get lo byte
+.else
         dey
         lda     (sp),y          ; get lo byte
+.endif
 
-.endproc
+incsp2:
 
-.proc   pushax
+        inc     sp              ; 5
+        beq     @L1             ; 2
+        inc     sp              ; 5
+        beq     @L2             ; 2
+        rts
+
+@L1:    inc     sp              ; 5
+@L2:    inc     sp+1            ; 5
+        rts
+;--------------------------
+
+pushax:
 
         pha                     ; (3)
         lda     sp              ; (6)
@@ -55,12 +67,14 @@ PPU_DATA = $2007
         sta     (sp),y          ; (27)
         pla                     ; (31)
         dey                     ; (33)
+.if (.cpu .bitand ::CPU_ISET_65SC02)
+        sta     (sp)            ; (37)
+.else
         sta     (sp),y          ; (38)
+.endif
         rts                     ; (44/43)
-
-.endproc
-
-_vram_write:
+;----------------------------
+vram_write:
 
     sta <TEMP
     stx <TEMP+1
@@ -98,7 +112,6 @@ _vram_write:
 ; void decompress_lz4 (const u8 *in, u8 * const out, const u16 outlen)
 ; ---------------------------------------------------------------
 
-.segment    "CODE"
 
 ; size in ptr3, src in ptr1, dest in ptr2
 ; don't touch size
@@ -116,7 +129,7 @@ memcpy_r2v:
     lda ptr3
     ldx ptr3+1
 
-    jmp _vram_write
+    jmp vram_write
 
 memcpy_v2v:
 
@@ -167,8 +180,9 @@ memcpy_v2v:
     bcc @loop
 
     rts
+;---------------------------
 
-.proc   _vram_unlz4: near
+UnLZ4toVram:
 
     sta _outlen
     stx _outlen+1
@@ -417,6 +431,4 @@ L0046:  sta     _written+1
     jcc     L0004
 
     rts
-
-.endproc
 

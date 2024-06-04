@@ -5797,18 +5797,6 @@ LoadIntro:
     jsr bankswitch_y
 
 
-   ; lda #<intro_tiles_chr
-   ; sta pointer
-   ; lda #>intro_tiles_chr
-   ; sta pointer + 1
-   ; lda #0
-   ; sta chr_dest_high
-   ; sta chr_dest_low
-   ; lda #32
-   ; sta chr_pages_to_copy
-
-   ; jsr CopyCHRTiles
-
     lda     #<intro_tiles_chr
     ldy     #$02
     sta     (sp),y
@@ -5821,7 +5809,7 @@ LoadIntro:
     iny
     sta     (sp),y
     ldx     #$20
-    jsr     _vram_unlz4
+    jsr     UnLZ4toVram
 
 @loadScene:
 
@@ -5865,16 +5853,19 @@ LoadOutro:
     jsr bankswitch_y
 
 
-    lda #<intro_tiles_chr
-    sta pointer
-    lda #>intro_tiles_chr
-    sta pointer + 1
-    lda #0
-    sta chr_dest_high
-    sta chr_dest_low
-    lda #32
-    sta chr_pages_to_copy
-    jsr CopyCHRTiles
+    lda     #<intro_tiles_chr
+    ldy     #$02
+    sta     (sp),y
+    iny
+    lda     #>intro_tiles_chr
+    sta     (sp),y
+    lda     #$00
+    tay
+    sta     (sp),y
+    iny
+    sta     (sp),y
+    ldx     #$20
+    jsr     UnLZ4toVram
 
 @loadScene:
     ldy #5
