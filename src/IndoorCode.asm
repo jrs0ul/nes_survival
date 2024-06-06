@@ -391,17 +391,28 @@ LoadIndoorMapData:
     lda MustCopyMainChr
     beq @skipLoadingCHR
 
+    lda #0
+    sta sp
+    lda #8
+    sta sp + 1
+
     lda #<house_tiles_chr
-    sta pointer
+    ldy #2
+    sta (sp),y
+    iny
     lda #>house_tiles_chr
-    sta pointer + 1
+    sta (sp),y
+
+    lda #0
+    ldy #0
+    sta (sp),y
     lda #$13
-    sta chr_dest_high
-    lda #$00
-    sta chr_dest_low
-    lda #13
-    sta chr_pages_to_copy
-    jsr CopyCHRTiles
+    ldy #1
+    sta (sp),y
+    lda #0
+    ldx #13
+    jsr UnLZ4toVram
+
 
     ;6x8 tile chunk for indoor npcs
     lda #<house_sprites_chr

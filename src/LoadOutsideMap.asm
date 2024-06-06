@@ -1,18 +1,30 @@
 LoadAlienGfx:
     ldy #4
     jsr bankswitch_y
-    lda #<alien_tiles_chr
-    sta pointer
-    lda #>alien_tiles_chr
-    sta pointer + 1
 
+    lda #0
+    sta sp
+    lda #8
+    sta sp + 1
+
+    lda #<alien_tiles_chr
+    ldy #2
+    sta (sp),y
+    iny
+    lda #>alien_tiles_chr
+    sta (sp),y
+
+    lda #0
+    ldy #0
+    sta (sp),y
     lda #$13
-    sta chr_dest_high
-    lda #00
-    sta chr_dest_low
-    lda #13
-    sta chr_pages_to_copy
-    jsr CopyCHRTiles
+    ldy #1
+    sta (sp),y
+    lda #0
+    ldx #13
+    jsr UnLZ4toVram
+
+
 
     lda #<alien_sprites_chr
     sta pointer

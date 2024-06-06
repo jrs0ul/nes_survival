@@ -685,8 +685,6 @@ sp:
 sreg:
     .res 2
 
-;ZPBuffer:
-;    .res 4  ; I want to be aware of the free memory
 
 ;--------------
 .segment "BSS" ; variables in ram
@@ -1345,6 +1343,7 @@ NametableOffsetInBytes: ; how many bytes to fill with zeroes at the beginning of
 SkipLastTileRowsInIndoorMaps:
     .res 1
 
+
 BSSBuffer:
     .res 40
 
@@ -1422,16 +1421,10 @@ vblankwait2:      ; Second wait for vblank, PPU is ready after this
     ldy #2
     jsr bankswitch_y ;switching to Title/Game Over bank
 
-    ;lda #<title_tiles_chr
-    ;sta pointer
-    ;lda #>title_tiles_chr
-    ;sta pointer + 1
-    ;lda #0
-    ;sta chr_dest_high
-    ;sta chr_dest_low
-    ;lda #32
-    ;sta chr_pages_to_copy
-    ;jsr CopyCHRTiles
+    lda #0
+    sta sp
+    lda #8
+    sta sp + 1
 
     lda     #<title_tiles_chr
     ldy     #$02
@@ -5229,16 +5222,10 @@ LoadTitle:
     sta $2000
     sta $2001
 
-    ;lda #<title_tiles_chr
-    ;sta pointer
-    ;lda #>title_tiles_chr
-    ;sta pointer + 1
-    ;lda #0
-    ;sta chr_dest_high
-    ;sta chr_dest_low
-    ;lda #32
-    ;sta chr_pages_to_copy
-    ;jsr CopyCHRTiles
+    lda #0
+    sta sp
+    lda #8
+    sta sp + 1
 
     lda     #<title_tiles_chr
     ldy     #$02
@@ -5297,16 +5284,10 @@ LoadGameOver:
     lda #%10000000
     sta PPUCTRL
 
-    ;lda #<title_tiles_chr
-    ;sta pointer
-    ;lda #>title_tiles_chr
-    ;sta pointer + 1
-    ;lda #0
-    ;sta chr_dest_high
-    ;sta chr_dest_low
-    ;lda #32
-    ;sta chr_pages_to_copy
-    ;jsr CopyCHRTiles
+    lda #0
+    sta sp
+    lda #8
+    sta sp + 1
 
     lda     #<title_tiles_chr
     ldy     #$02
@@ -5839,6 +5820,10 @@ LoadIntro:
     ldy #2
     jsr bankswitch_y
 
+    lda #0
+    sta sp
+    lda #8
+    sta sp + 1
 
     lda     #<intro_tiles_chr
     ldy     #$02
@@ -5895,6 +5880,10 @@ LoadOutro:
     ldy #2
     jsr bankswitch_y
 
+    lda #0
+    sta sp
+    lda #8
+    sta sp + 1
 
     lda     #<intro_tiles_chr
     ldy     #$02
