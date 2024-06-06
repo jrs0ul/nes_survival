@@ -391,9 +391,9 @@ LoadIndoorMapData:
     lda MustCopyMainChr
     beq @skipLoadingCHR
 
-    lda #0
+    lda #ARGUMENT_STACK_HI
     sta sp
-    lda #8
+    lda #ARGUMENT_STACK_LO
     sta sp + 1
 
     lda #<house_tiles_chr

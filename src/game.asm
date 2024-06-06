@@ -24,9 +24,9 @@
 
 .segment "ROM0"
 
-main_tiles_chr: .incbin "main_sprites.chr"
-font:           .incbin "font.chr"
-main_bg_tiles:  .incbin "main_bg_tiles.chr"
+main_sprites :  .incbin "main_sprites.lz4"
+font:           .incbin "font.lz4"
+main_bg_tiles:  .incbin "main_bg_tiles.lz4"
 
 .include "data/maps/cropped/field_bg_crop.asm"
 .include "data/maps/cropped/field_bg1_crop.asm"
@@ -1421,9 +1421,9 @@ vblankwait2:      ; Second wait for vblank, PPU is ready after this
     ldy #2
     jsr bankswitch_y ;switching to Title/Game Over bank
 
-    lda #0
+    lda #ARGUMENT_STACK_HI
     sta sp
-    lda #8
+    lda #ARGUMENT_STACK_LO
     sta sp + 1
 
     lda     #<title_tiles_chr
@@ -5222,9 +5222,9 @@ LoadTitle:
     sta $2000
     sta $2001
 
-    lda #0
+    lda #ARGUMENT_STACK_HI
     sta sp
-    lda #8
+    lda #ARGUMENT_STACK_LO
     sta sp + 1
 
     lda     #<title_tiles_chr
@@ -5284,9 +5284,9 @@ LoadGameOver:
     lda #%10000000
     sta PPUCTRL
 
-    lda #0
+    lda #ARGUMENT_STACK_HI
     sta sp
-    lda #8
+    lda #ARGUMENT_STACK_LO
     sta sp + 1
 
     lda     #<title_tiles_chr
@@ -5820,9 +5820,9 @@ LoadIntro:
     ldy #2
     jsr bankswitch_y
 
-    lda #0
+    lda #ARGUMENT_STACK_HI
     sta sp
-    lda #8
+    lda #ARGUMENT_STACK_LO
     sta sp + 1
 
     lda     #<intro_tiles_chr
@@ -5880,9 +5880,9 @@ LoadOutro:
     ldy #2
     jsr bankswitch_y
 
-    lda #0
+    lda #ARGUMENT_STACK_HI
     sta sp
-    lda #8
+    lda #ARGUMENT_STACK_LO
     sta sp + 1
 
     lda     #<intro_tiles_chr

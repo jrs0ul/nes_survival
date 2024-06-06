@@ -2,9 +2,9 @@ LoadAlienGfx:
     ldy #4
     jsr bankswitch_y
 
-    lda #0
+    lda #ARGUMENT_STACK_HI
     sta sp
-    lda #8
+    lda #ARGUMENT_STACK_LO
     sta sp + 1
 
     lda #<alien_tiles_chr
@@ -47,17 +47,57 @@ LoadAlienGfx:
 LoadMainTileset:
     ldy #0
     jsr bankswitch_y
-    lda #<main_tiles_chr
-    sta pointer
-    lda #>main_tiles_chr
-    sta pointer + 1
 
+    lda #ARGUMENT_STACK_HI
+    sta sp
+    lda #ARGUMENT_STACK_LO
+    sta sp + 1
+
+    lda #<main_sprites
+    ldy #2
+    sta (sp), y
+    iny
+    lda #>main_sprites
+    sta (sp), y
     lda #0
-    sta chr_dest_high
-    sta chr_dest_low
-    lda #32
-    sta chr_pages_to_copy
-    jsr CopyCHRTiles
+    tay
+    sta (sp), y
+    iny
+    sta (sp), y
+    ldx #$10
+    jsr UnLZ4toVram
+
+    lda #<font
+    ldy #2
+    sta (sp), y
+    iny
+    lda #>font
+    sta (sp), y
+    lda #0
+    ldy #0
+    sta (sp), y
+    iny
+    lda #16
+    sta (sp), y
+    ldx #$03
+    jsr UnLZ4toVram
+
+
+    lda #<main_bg_tiles
+    ldy #2
+    sta (sp), y
+    iny
+    lda #>main_bg_tiles
+    sta (sp), y
+    lda #0
+    ldy #0
+    sta (sp), y
+    iny
+    lda #19
+    sta (sp), y
+    ldx #13
+    jsr UnLZ4toVram
+
 
     rts
 ;----------------------------
