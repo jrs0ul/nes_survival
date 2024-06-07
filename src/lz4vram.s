@@ -7,12 +7,10 @@
     .macpack    longbranch
     .macpack        cpu
 
-regsave = MapColumnAttributes
-regbank = MapColumnData
 ptr3 = DigitPtr
 ptr4 = ProjectilePtr
-_out = regsave
-_written = regsave + 2
+_out = IntroSpritePtr
+_written = IntroSpriteCoordPtr
 _tmp = Temp
 _token = TempX
 tmp3 = TempY
