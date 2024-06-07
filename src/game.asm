@@ -48,8 +48,9 @@ main_bg_tiles:  .incbin "main_bg_tiles.lz4"
 ;============================================================
 .segment "ROM2"
 
-title_tiles_chr: .incbin "title.lz4"
-intro_tiles_chr: .incbin "intro.lz4"
+title_tiles_chr   :  .incbin "title_tiles.lz4"
+gameover_tiles_chr:  .incbin "gameover_tiles.lz4"
+intro_tiles_chr   :  .incbin "intro.lz4"
 
 
 ;============================================================
@@ -91,33 +92,33 @@ intro_palette:
     .byte $0C,$06,$16,$30, $0C,$0c,$35,$21, $0C,$0c,$16,$36, $0C,$01,$07,$21 ; sprites
 
 push_start:
-    .byte $48,$4d,$4b,$40,$00,$4b,$4c,$39,$4a,$4c
+    .byte $1a,$1f,$1d,$12,$00,$1d,$1e,$0b,$1c,$1e
 
 
 game_over_sprites:
-    .byte 152, $40, 0, 88   ; G
-    .byte 152, $3A, 0, 96   ; A
-    .byte 152, $46, 0, 104  ; M
-    .byte 152, $3E, 0, 112  ; E
+    .byte 152, $11, 0, 88   ; G
+    .byte 152, $0b, 0, 96   ; A
+    .byte 152, $17, 0, 104  ; M
+    .byte 152, $0f, 0, 112  ; E
 
-    .byte 152, $48, 0, 136  ; O
-    .byte 152, $4F, 0, 144  ; V
-    .byte 152, $3E, 0, 152  ; E
-    .byte 152, $4B, 0, 160  ; R
+    .byte 152, $19, 0, 136  ; O
+    .byte 152, $20, 0, 144  ; V
+    .byte 152, $0f, 0, 152  ; E
+    .byte 152, $1c, 0, 160  ; R
 
-    .byte 184, $4C, 1, 96   ; S
-    .byte 184, $4E, 1, 104  ; U
-    .byte 184, $4B, 1, 112  ; R
-    .byte 184, $4F, 1, 120  ; V
-    .byte 184, $42, 1, 128  ; I
-    .byte 184, $4F, 1, 136  ; V
-    .byte 184, $3E, 1, 144  ; E
-    .byte 184, $3D, 1, 152  ; D
+    .byte 184, $1d, 1, 96   ; S
+    .byte 184, $1f, 1, 104  ; U
+    .byte 184, $1c, 1, 112  ; R
+    .byte 184, $20, 1, 120  ; V
+    .byte 184, $13, 1, 128  ; I
+    .byte 184, $20, 1, 136  ; V
+    .byte 184, $0f, 1, 144  ; E
+    .byte 184, $0e, 1, 152  ; D
 
-    .byte 200, $3D, 1, 128  ; D
-    .byte 200, $3A, 1, 136  ; A
-    .byte 200, $52, 1, 144  ; Y
-    .byte 200, $4C, 1, 152  ; S
+    .byte 200, $0e, 1, 128  ; D
+    .byte 200, $0b, 1, 136  ; A
+    .byte 200, $23, 1, 144  ; Y
+    .byte 200, $1d, 1, 152  ; S
 
 .include "data/title_comp.asm"
 .include "data/game_over_comp.asm"
@@ -1417,29 +1418,7 @@ vblankwait2:      ; Second wait for vblank, PPU is ready after this
     bit $2002
     bpl vblankwait2
 
-;---
-    ldy #2
-    jsr bankswitch_y ;switching to Title/Game Over bank
-
-    lda #ARGUMENT_STACK_HI
-    sta sp
-    lda #ARGUMENT_STACK_LO
-    sta sp + 1
-
-    lda     #<title_tiles_chr
-    ldy     #$02
-    sta     (sp),y
-    iny
-    lda     #>title_tiles_chr
-    sta     (sp),y
-    lda     #$00
-    tay
-    sta     (sp),y
-    iny
-    sta     (sp),y
-    ldx     #$20
-    jsr     UnLZ4toVram
-
+    jsr LoadTitleGfx
 
     ldy #5
     jsr bankswitch_y
@@ -5199,6 +5178,52 @@ HideSprites:
 
     rts
 ;--------------------------------------------
+LoadTitleGfx:
+    ldy #0
+    jsr bankswitch_y ;switching to Title/Game Over bank
+
+    lda #ARGUMENT_STACK_HI
+    sta sp
+    lda #ARGUMENT_STACK_LO
+    sta sp + 1
+
+    lda #<font
+    ldy #2
+    sta (sp), y
+    iny
+    lda #>font
+    sta (sp), y
+    lda #0
+    ldy #0
+    sta (sp), y
+    iny
+    lda #16
+    sta (sp), y
+    ldx #$03
+    jsr UnLZ4toVram
+
+    ldy #2
+    jsr bankswitch_y ;switching to Title/Game Over bank
+
+    lda #<title_tiles_chr
+    ldy #$02
+    sta (sp),y
+    iny
+    lda #>title_tiles_chr
+    sta (sp),y
+    lda #$00
+    tay
+    sta (sp),y
+    iny
+    lda #19
+    sta (sp),y
+    ldx #13
+    jsr UnLZ4toVram
+
+
+    rts
+
+;--------------------------------------------
 LoadTitle:
 
     lda MustLoadTitle
@@ -5215,31 +5240,11 @@ LoadTitle:
     beq @loadJustData
 
 
-    ldy #2
-    jsr bankswitch_y
-
     lda #0
     sta $2000
     sta $2001
 
-    lda #ARGUMENT_STACK_HI
-    sta sp
-    lda #ARGUMENT_STACK_LO
-    sta sp + 1
-
-    lda     #<title_tiles_chr
-    ldy     #$02
-    sta     (sp),y
-    iny
-    lda     #>title_tiles_chr
-    sta     (sp),y
-    lda     #$00
-    tay
-    sta     (sp),y
-    iny
-    sta     (sp),y
-    ldx     #$20
-    jsr     UnLZ4toVram
+    jsr LoadTitleGfx
 
     lda #0
     sta MustLoadTitleCHR
@@ -5274,9 +5279,6 @@ LoadGameOver:
     lda #3
     sta SongName
 
-    ldy #2
-    jsr bankswitch_y
-
     lda #0
     sta $2000
     sta $2001
@@ -5284,25 +5286,48 @@ LoadGameOver:
     lda #%10000000
     sta PPUCTRL
 
+    ldy #0
+    jsr bankswitch_y ;switching to Title/Game Over bank
+
     lda #ARGUMENT_STACK_HI
     sta sp
     lda #ARGUMENT_STACK_LO
     sta sp + 1
 
-    lda     #<title_tiles_chr
-    ldy     #$02
-    sta     (sp),y
+    lda #<font
+    ldy #2
+    sta (sp), y
     iny
-    lda     #>title_tiles_chr
-    sta     (sp),y
-    lda     #$00
-    tay
-    sta     (sp),y
+    lda #>font
+    sta (sp), y
+    lda #0
+    ldy #0
+    sta (sp), y
     iny
-    sta     (sp),y
-    ldx     #$20
-    jsr     UnLZ4toVram
+    lda #0
+    sta (sp), y
+    ldx #$03
+    jsr UnLZ4toVram
 
+    ldy #2
+    jsr bankswitch_y ;switching to Title/Game Over bank
+
+    lda #<gameover_tiles_chr
+    ldy #$02
+    sta (sp),y
+    iny
+    lda #>gameover_tiles_chr
+    sta (sp),y
+    lda #$00
+    tay
+    sta (sp),y
+    iny
+    lda #03
+    sta (sp),y
+    ldx #13
+    jsr UnLZ4toVram
+
+    jsr LoadTitleGfx
 
 
     lda #STATE_GAME_OVER
