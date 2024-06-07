@@ -24,9 +24,9 @@
 
 .segment "ROM0"
 
-main_tiles_chr: .incbin "main_sprites.chr"
-font:           .incbin "font.chr"
-main_bg_tiles:  .incbin "main_bg_tiles.chr"
+main_sprites :  .incbin "main_sprites.lz4"
+font:           .incbin "font.lz4"
+main_bg_tiles:  .incbin "main_bg_tiles.lz4"
 
 .include "data/maps/cropped/field_bg_crop.asm"
 .include "data/maps/cropped/field_bg1_crop.asm"
@@ -48,14 +48,14 @@ main_bg_tiles:  .incbin "main_bg_tiles.chr"
 ;============================================================
 .segment "ROM2"
 
-title_tiles_chr: .incbin "title.chr"
-intro_tiles_chr: .incbin "intro.chr"
+title_tiles_chr: .incbin "title.lz4"
+intro_tiles_chr: .incbin "intro.lz4"
 
 
 ;============================================================
 .segment "ROM3" ; indoors
 
-house_tiles_chr: .incbin "house_bg_tiles.chr"
+house_tiles_chr: .incbin "house_bg_tiles.lz4"
 house_sprites_chr: .incbin "house_sprites.chr"
 .include "data/maps/cropped/house_crop.asm"
 .include "data/maps/cropped/villager_hut_crop.asm"
@@ -67,7 +67,7 @@ house_sprites_chr: .incbin "house_sprites.chr"
 ;============================================================
 .segment "ROM4" ; other location
 
-alien_tiles_chr: .incbin "alien_bg_tiles.chr"
+alien_tiles_chr: .incbin "alien_bg_tiles.lz4"
 alien_sprites_chr: .incbin "alien_sprites.chr"
 
 .include "data/maps/cropped/alien_base1_crop.asm"
@@ -677,8 +677,14 @@ TempPointY:
 PointCellY: ; for collision
     .res 1
 
-ZPBuffer:
-    .res 5  ; I want to be aware of the free memory
+RLETag:
+    .res 1
+
+sp:
+    .res 2
+sreg:
+    .res 2
+
 
 ;--------------
 .segment "BSS" ; variables in ram
@@ -1246,8 +1252,6 @@ DestroyedTilesCount:
 destructibleIdx:
     .res 1
 
-RLETag:
-    .res 1
 
 RedCounter:
     .res 1
@@ -1339,8 +1343,9 @@ NametableOffsetInBytes: ; how many bytes to fill with zeroes at the beginning of
 SkipLastTileRowsInIndoorMaps:
     .res 1
 
+
 BSSBuffer:
-    .res 39
+    .res 40
 
 ;====================================================================================
 
@@ -1416,16 +1421,25 @@ vblankwait2:      ; Second wait for vblank, PPU is ready after this
     ldy #2
     jsr bankswitch_y ;switching to Title/Game Over bank
 
-    lda #<title_tiles_chr
-    sta pointer
-    lda #>title_tiles_chr
-    sta pointer + 1
-    lda #0
-    sta chr_dest_high
-    sta chr_dest_low
-    lda #32
-    sta chr_pages_to_copy
-    jsr CopyCHRTiles
+    lda #ARGUMENT_STACK_HI
+    sta sp
+    lda #ARGUMENT_STACK_LO
+    sta sp + 1
+
+    lda     #<title_tiles_chr
+    ldy     #$02
+    sta     (sp),y
+    iny
+    lda     #>title_tiles_chr
+    sta     (sp),y
+    lda     #$00
+    tay
+    sta     (sp),y
+    iny
+    sta     (sp),y
+    ldx     #$20
+    jsr     UnLZ4toVram
+
 
     ldy #5
     jsr bankswitch_y
@@ -1768,6 +1782,7 @@ noBankSwitch:
     rti        ; return from interrupt
 
 ;#############################| Subroutines |#############################################
+.include "lz4vram.s"
 .include "decompress_rle.asm"
 .include "graphics.asm"
 .include "collision.asm"
@@ -5207,16 +5222,24 @@ LoadTitle:
     sta $2000
     sta $2001
 
-    lda #<title_tiles_chr
-    sta pointer
-    lda #>title_tiles_chr
-    sta pointer + 1
-    lda #0
-    sta chr_dest_high
-    sta chr_dest_low
-    lda #32
-    sta chr_pages_to_copy
-    jsr CopyCHRTiles
+    lda #ARGUMENT_STACK_HI
+    sta sp
+    lda #ARGUMENT_STACK_LO
+    sta sp + 1
+
+    lda     #<title_tiles_chr
+    ldy     #$02
+    sta     (sp),y
+    iny
+    lda     #>title_tiles_chr
+    sta     (sp),y
+    lda     #$00
+    tay
+    sta     (sp),y
+    iny
+    sta     (sp),y
+    ldx     #$20
+    jsr     UnLZ4toVram
 
     lda #0
     sta MustLoadTitleCHR
@@ -5261,16 +5284,25 @@ LoadGameOver:
     lda #%10000000
     sta PPUCTRL
 
-    lda #<title_tiles_chr
-    sta pointer
-    lda #>title_tiles_chr
-    sta pointer + 1
-    lda #0
-    sta chr_dest_high
-    sta chr_dest_low
-    lda #32
-    sta chr_pages_to_copy
-    jsr CopyCHRTiles
+    lda #ARGUMENT_STACK_HI
+    sta sp
+    lda #ARGUMENT_STACK_LO
+    sta sp + 1
+
+    lda     #<title_tiles_chr
+    ldy     #$02
+    sta     (sp),y
+    iny
+    lda     #>title_tiles_chr
+    sta     (sp),y
+    lda     #$00
+    tay
+    sta     (sp),y
+    iny
+    sta     (sp),y
+    ldx     #$20
+    jsr     UnLZ4toVram
+
 
 
     lda #STATE_GAME_OVER
@@ -5788,17 +5820,24 @@ LoadIntro:
     ldy #2
     jsr bankswitch_y
 
+    lda #ARGUMENT_STACK_HI
+    sta sp
+    lda #ARGUMENT_STACK_LO
+    sta sp + 1
 
-    lda #<intro_tiles_chr
-    sta pointer
-    lda #>intro_tiles_chr
-    sta pointer + 1
-    lda #0
-    sta chr_dest_high
-    sta chr_dest_low
-    lda #32
-    sta chr_pages_to_copy
-    jsr CopyCHRTiles
+    lda     #<intro_tiles_chr
+    ldy     #$02
+    sta     (sp),y
+    iny
+    lda     #>intro_tiles_chr
+    sta     (sp),y
+    lda     #$00
+    tay
+    sta     (sp),y
+    iny
+    sta     (sp),y
+    ldx     #$20
+    jsr     UnLZ4toVram
 
 @loadScene:
 
@@ -5841,17 +5880,24 @@ LoadOutro:
     ldy #2
     jsr bankswitch_y
 
+    lda #ARGUMENT_STACK_HI
+    sta sp
+    lda #ARGUMENT_STACK_LO
+    sta sp + 1
 
-    lda #<intro_tiles_chr
-    sta pointer
-    lda #>intro_tiles_chr
-    sta pointer + 1
-    lda #0
-    sta chr_dest_high
-    sta chr_dest_low
-    lda #32
-    sta chr_pages_to_copy
-    jsr CopyCHRTiles
+    lda     #<intro_tiles_chr
+    ldy     #$02
+    sta     (sp),y
+    iny
+    lda     #>intro_tiles_chr
+    sta     (sp),y
+    lda     #$00
+    tay
+    sta     (sp),y
+    iny
+    sta     (sp),y
+    ldx     #$20
+    jsr     UnLZ4toVram
 
 @loadScene:
     ldy #5

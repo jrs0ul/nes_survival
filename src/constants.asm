@@ -27,6 +27,10 @@
     BUTTON_A_MASK              = %10000000
 
 
+    ARGUMENT_STACK_HI          = $fd
+    ARGUMENT_STACK_LO          = $07
+
+
     PROJECTILE_MAX_COUNT       = 10
 
     NPC_MAX_COUNT              = 16
