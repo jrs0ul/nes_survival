@@ -44,7 +44,6 @@ main_bg_tiles:  .incbin "main_bg_tiles.lz4"
 menu_screen: .incbin "data/menu_screen_nam.lz4"
 .include "data/menu_data.asm"
 .include "data/recipes.asm"
-;.include "data/menu_screen_comp.asm"
 
 ;============================================================
 .segment "ROM2"
@@ -5196,6 +5195,7 @@ LoadTitleGfx:
     lda #16
     sta (sp), y
     ldx #$03
+    lda #0
     jsr UnLZ4toVram
 
     ldy #2
@@ -5214,6 +5214,7 @@ LoadTitleGfx:
     lda #19
     sta (sp),y
     ldx #13
+    lda #0
     jsr UnLZ4toVram
 
 
@@ -5321,6 +5322,7 @@ LoadGameOver:
     lda #03
     sta (sp),y
     ldx #13
+    lda #0
     jsr UnLZ4toVram
 
     jsr LoadTitleGfx
@@ -5906,19 +5908,19 @@ LoadOutro:
     lda #ARGUMENT_STACK_LO
     sta sp + 1
 
-    lda     #<intro_tiles_chr
-    ldy     #$02
-    sta     (sp),y
+    lda #<intro_tiles_chr
+    ldy #$02
+    sta (sp),y
     iny
-    lda     #>intro_tiles_chr
-    sta     (sp),y
-    lda     #$00
+    lda #>intro_tiles_chr
+    sta (sp),y
+    lda #$00
     tay
-    sta     (sp),y
+    sta (sp),y
     iny
-    sta     (sp),y
-    ldx     #$20
-    jsr     UnLZ4toVram
+    sta (sp),y
+    ldx #$20
+    jsr UnLZ4toVram
 
 @loadScene:
     ldy #5

@@ -699,10 +699,16 @@ LoadIntroScene:
     tay
     sta (sp),y
     iny
-    lda #$24
+    lda #$20
     sta (sp),y
     ldx #4
+    lda #0
     jsr UnLZ4toVram
+
+    lda #ARGUMENT_STACK_HI
+    sta sp
+    lda #ARGUMENT_STACK_LO
+    sta sp + 1
 
     ldy CutsceneSceneIdx
     lda intro_scenes_low, y
@@ -720,10 +726,12 @@ LoadIntroScene:
     tay
     sta (sp),y
     iny
-    lda #$20
+    lda #$24
     sta (sp),y
     ldx #4
+    lda #0
     jsr UnLZ4toVram
+
 
     jsr ClearPalette
 
@@ -775,6 +783,7 @@ LoadOutroScene:
     lda #$24
     sta (sp),y
     ldx #4
+    lda #0
     jsr UnLZ4toVram
 
     ldy CutsceneSceneIdx
@@ -796,6 +805,7 @@ LoadOutroScene:
     lda #$20
     sta (sp),y
     ldx #4
+    lda #0
     jsr UnLZ4toVram
 
     jsr ClearPalette

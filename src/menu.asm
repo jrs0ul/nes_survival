@@ -37,6 +37,7 @@ LoadMenu:
     lda FirstNametableAddr
     sta (sp),y
     ldx #4
+    lda #0
     jsr UnLZ4toVram
 
 
