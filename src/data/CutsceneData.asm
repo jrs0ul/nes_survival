@@ -1,8 +1,8 @@
-.include "data/intro_bg_mowdens_comp.asm"
-.include "data/intro_bg_cockpit_comp.asm"
-.include "data/intro_bg_boom_comp.asm"
-.include "data/intro_bg_mowdens_base_comp.asm"
-.include "data/intro_bg_mowdens_top_comp.asm"
+intro_bg_mowdens:         .incbin "data/intro_bg_mowdens_nam.lz4"
+intro_bg_cockpit:         .incbin "data/intro_bg_cockpit_nam.lz4"
+intro_bg_boom:            .incbin "data/intro_bg_boom_nam.lz4"
+intro_bg_mowdens_base:    .incbin "data/intro_bg_mowdens_base_nam.lz4"
+intro_bg_mowdens_top:     .incbin "data/intro_bg_mowdens_top_nam.lz4"
 
 .include "data/outro_bg_sos_comp.asm"
 .include "data/outro_bg_that_same_day_comp.asm"
@@ -11,22 +11,22 @@
 
 
 intro_scenes_low:
-    .byte <intro_bg_mowdens_comp
-    .byte <intro_bg_cockpit_comp
-    .byte <intro_bg_mowdens_comp
-    .byte <intro_bg_boom_comp
-    .byte <intro_bg_mowdens_comp
-    .byte <intro_bg_mowdens_base_comp
-    .byte <intro_bg_mowdens_top_comp
+    .byte <intro_bg_mowdens
+    .byte <intro_bg_cockpit
+    .byte <intro_bg_mowdens
+    .byte <intro_bg_boom
+    .byte <intro_bg_mowdens
+    .byte <intro_bg_mowdens_base
+    .byte <intro_bg_mowdens_top
 
 intro_scenes_high:
-    .byte >intro_bg_mowdens_comp
-    .byte >intro_bg_cockpit_comp
-    .byte >intro_bg_mowdens_comp
-    .byte >intro_bg_boom_comp
-    .byte >intro_bg_mowdens_comp
-    .byte >intro_bg_mowdens_base_comp
-    .byte >intro_bg_mowdens_top_comp
+    .byte >intro_bg_mowdens
+    .byte >intro_bg_cockpit
+    .byte >intro_bg_mowdens
+    .byte >intro_bg_boom
+    .byte >intro_bg_mowdens
+    .byte >intro_bg_mowdens_base
+    .byte >intro_bg_mowdens_top
 
 outro_scenes_low:
     .byte <outro_bg_sos_comp

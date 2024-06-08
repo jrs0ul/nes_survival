@@ -18,15 +18,27 @@ LoadMenu:
     sta $2000
     sta $2001
 
-    lda #<menu_screen_comp
-    sta pointer
-    lda #>menu_screen_comp
-    sta pointer + 1
+    lda #ARGUMENT_STACK_HI
+    sta sp
+    lda #ARGUMENT_STACK_LO
+    sta sp + 1
 
+    lda #<menu_screen
+    ldy #$02
+    sta (sp),y
+    iny
+
+    lda #>menu_screen
+    sta (sp),y
+    lda #$00
+    tay
+    sta (sp),y
+    iny
     lda FirstNametableAddr
-    sta NametableAddress
+    sta (sp),y
+    ldx #4
+    jsr UnLZ4toVram
 
-    jsr DecompressRLE
 
     lda #<menu_palette
     sta pointer

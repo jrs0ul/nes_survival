@@ -41,9 +41,10 @@ main_bg_tiles:  .incbin "main_bg_tiles.lz4"
 ;===========================================================
 .segment "ROM1"
 
+menu_screen: .incbin "data/menu_screen_nam.lz4"
 .include "data/menu_data.asm"
 .include "data/recipes.asm"
-.include "data/menu_screen_comp.asm"
+;.include "data/menu_screen_comp.asm"
 
 ;============================================================
 .segment "ROM2"
@@ -77,11 +78,14 @@ alien_sprites_chr: .incbin "alien_sprites.chr"
 .include "data/maps/cropped/cave1_crop.asm"
 .include "data/maps/cropped/dark_cave0_crop.asm"
 .include "data/maps/cropped/dark_cave1_crop.asm"
+.include "data/maps/cropped/secret_cave0_crop.asm"
 
 
 ;=============================================================
 .segment "ROM5" ;title and intro data (?)
 
+game_over_screen: .incbin "data/game_over_nam.lz4"
+title_screen: .incbin "data/title_nam.lz4"
 crashed_plane_tiles_chr: .incbin "crashed_plane_tiles_9x5.chr" ;9x5 tile block that should be put in 5x9 (xy starts at 0)
 title_palette:
     .byte $0F,$00,$11,$20, $0F,$01,$11,$07, $0F,$30,$11,$38, $0F,$07,$11,$35    ;background
@@ -120,8 +124,6 @@ game_over_sprites:
     .byte 200, $23, 1, 144  ; Y
     .byte 200, $1d, 1, 152  ; S
 
-.include "data/title_comp.asm"
-.include "data/game_over_comp.asm"
 .include "data/CutsceneData.asm"
 ;--------- maps
 .include "data/maps/cropped/babloc1_crop.asm"
@@ -136,15 +138,13 @@ game_over_sprites:
 
 ;=============================================================
 .segment "ROM6"
-
-FAMISTUDIO_DPCM_OFF = $F920
+FAMISTUDIO_DPCM_OFF = $FBBA
 FAMISTUDIO_CFG_C_BINDINGS = 0
 .include "data/music.s"
 .include "data/sfx.s"
-.include "famistudio_ca65.asm"
+.include "famistudio_ca65.s"
 
 .include "data/StatusBar.asm"
-.include "data/maps/cropped/secret_cave0_crop.asm"
 .include "data/AnimalSpawnPositions.asm"
 
 .include "data/player_sprite_data.asm"
@@ -676,9 +676,6 @@ TempPointX:
 TempPointY:
     .res 1
 PointCellY: ; for collision
-    .res 1
-
-RLETag:
     .res 1
 
 sp:
@@ -1762,7 +1759,6 @@ noBankSwitch:
 
 ;#############################| Subroutines |#############################################
 .include "lz4vram.s"
-.include "decompress_rle.asm"
 .include "graphics.asm"
 .include "collision.asm"
 .include "items.asm"
@@ -5850,19 +5846,19 @@ LoadIntro:
     lda #ARGUMENT_STACK_LO
     sta sp + 1
 
-    lda     #<intro_tiles_chr
-    ldy     #$02
-    sta     (sp),y
+    lda #<intro_tiles_chr
+    ldy #$02
+    sta (sp),y
     iny
-    lda     #>intro_tiles_chr
-    sta     (sp),y
-    lda     #$00
+    lda #>intro_tiles_chr
+    sta (sp),y
+    lda #$00
     tay
-    sta     (sp),y
+    sta (sp),y
     iny
-    sta     (sp),y
-    ldx     #$20
-    jsr     UnLZ4toVram
+    sta (sp),y
+    ldx #$20
+    jsr UnLZ4toVram
 
 @loadScene:
 

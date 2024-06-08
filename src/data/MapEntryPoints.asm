@@ -178,7 +178,7 @@ MapSpawnPoint:
     .byte 123, 148, 9, 1, <House_items, >House_items, 0, 0, 0
     .byte 1, <grannys_hut, >grannys_hut, 0, <villager3_npcs, >villager3_npcs, 0
     ;secret cave
-    .byte 127, 209, 14, 1, <secret_cave_items, >secret_cave_items, 6, 0, 0
+    .byte 127, 209, 14, 1, <secret_cave_items, >secret_cave_items, 4, 0, 0
     .byte 0, 0, 0, 0, 0, 0, 0
     ;--------------------
     ;granny's house exit to the location 8
@@ -276,7 +276,7 @@ LocationBanks:
     .byte 5  ;11
     .byte 3  ;12
     .byte 4  ;13
-    .byte 6  ;14
+    .byte 4  ;14
 
 
 ;indexes in Item_Location1_Collection_times
