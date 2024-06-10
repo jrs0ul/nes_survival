@@ -24,22 +24,27 @@ LoadAlienGfx:
     ldx #13
     jsr UnLZ4toVram
 
-
+    lda #ARGUMENT_STACK_HI
+    sta sp
+    lda #ARGUMENT_STACK_LO
+    sta sp + 1
 
     lda #<alien_sprites_chr
-    sta pointer
+    ldy #2
+    sta (sp),y
+    iny
     lda #>alien_sprites_chr
-    sta pointer + 1
+    sta (sp),y
 
-    lda #96 ; 6 * 16
-    sta TempX
-    lda #15
-    sta TempRowIndex
     lda #0
-    sta pointer2
-    lda #$A0
-    sta pointer2 + 1
-    jsr CopyCHRChunk
+    ldy #0
+    sta (sp),y
+    lda #$0A
+    ldy #1
+    sta (sp),y
+    lda #0
+    ldx #6
+    jsr UnLZ4toVram
 
 
     rts
@@ -164,6 +169,8 @@ LoadOutsideMap:
 
 @main_bank:
     jsr LoadMainTileset
+    lda #1
+    sta MustPlayNewSong
 
 @done_copying:
     lda #0

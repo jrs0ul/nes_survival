@@ -414,21 +414,23 @@ LoadIndoorMapData:
     jsr UnLZ4toVram
 
 
-    ;6x8 tile chunk for indoor npcs
     lda #<house_sprites_chr
-    sta pointer
+    ldy #2
+    sta (sp),y
+    iny
     lda #>house_sprites_chr
-    sta pointer + 1
+    sta (sp),y
 
-    lda #96 ; 6 * 16
-    sta TempX
-    lda #8 ; total rows
-    sta TempRowIndex
     lda #0
-    sta pointer2
-    lda #$A0
-    sta pointer2 + 1
-    jsr CopyCHRChunk
+    ldy #0
+    sta (sp),y
+    lda #$0A
+    ldy #1
+    sta (sp),y
+    lda #0
+    ldx #3
+    jsr UnLZ4toVram
+
 
 
     lda #0

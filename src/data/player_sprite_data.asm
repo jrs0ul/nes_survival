@@ -22,7 +22,7 @@ hammerSprites:
 player_sprites:
     ;LEFT
     ;head
-    .byte 0, 0,  %00000011, 0 ;1st sprite
+    .byte 0, $FF,  %00000011, 0 ;1st sprite
     .byte 0, 1,  %00000011, 8 ;2nd
     ;body
     ;frame 0
@@ -45,7 +45,7 @@ player_sprites:
     ;RIGHT
     ;head
     .byte 0, 1,  %01000011, 0 ;1st
-    .byte 0, 0,  %01000011, 8 ;2nd
+    .byte 0, $FF,  %01000011, 8 ;2nd
     ;body
     ;frame 0
     .byte 8, 17, %01000011, 0 ;3rd
@@ -109,7 +109,7 @@ player_sprites:
 player_sprites_coat:
     ;LEFT
     ;head
-    .byte 0, 0,  %00000011, 0 ;1st sprite
+    .byte 0, $FF,  %00000011, 0 ;1st sprite
     .byte 0, 1,  %00000011, 8 ;2nd
     ;body
     ;frame 0
@@ -132,7 +132,7 @@ player_sprites_coat:
     ;RIGHT
     ;head
     .byte 0, 1,  %01000011, 0 ;1st
-    .byte 0, 0,  %01000011, 8 ;2nd
+    .byte 0, $FF,  %01000011, 8 ;2nd
     ;body
     ;frame 0
     .byte 8, $05, %01000011, 0 ;3rd

@@ -17,6 +17,8 @@ pal:
 	lz4 -9 -f -B4 --no-frame-crc src/house_bg_tiles.chr src/house_bg_tiles.lz4
 	lz4 -9 -f -B4 --no-frame-crc src/font.chr src/font.lz4
 	lz4 -9 -f -B4 --no-frame-crc src/main_sprites.chr src/main_sprites.lz4
+	lz4 -9 -f -B4 --no-frame-crc src/alien_sprites.chr src/alien_sprites.lz4
+	lz4 -9 -f -B4 --no-frame-crc src/house_sprites.chr src/house_sprites.lz4
 	lz4 -9 -f -B4 --no-frame-crc src/main_bg_tiles.chr src/main_bg_tiles.lz4
 	lz4 -9 -f -B4 --no-frame-crc src/title_tiles.chr src/title_tiles.lz4
 	lz4 -9 -f -B4 --no-frame-crc src/gameover_tiles.chr src/gameover_tiles.lz4
@@ -46,6 +48,8 @@ ntsc:
 	lz4 -9 -f -B4 --no-frame-crc src/house_bg_tiles.chr src/house_bg_tiles.lz4
 	lz4 -9 -f -B4 --no-frame-crc src/font.chr src/font.lz4
 	lz4 -9 -f -B4 --no-frame-crc src/main_sprites.chr src/main_sprites.lz4
+	lz4 -9 -f -B4 --no-frame-crc src/alien_sprites.chr src/alien_sprites.lz4
+	lz4 -9 -f -B4 --no-frame-crc src/house_sprites.chr src/house_sprites.lz4
 	lz4 -9 -f -B4 --no-frame-crc src/main_bg_tiles.chr src/main_bg_tiles.lz4
 	lz4 -9 -f -B4 --no-frame-crc src/title_tiles.chr src/title_tiles.lz4
 	lz4 -9 -f -B4 --no-frame-crc src/gameover_tiles.chr src/gameover_tiles.lz4

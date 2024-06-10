@@ -57,7 +57,7 @@ intro_tiles_chr   :  .incbin "intro.lz4"
 .segment "ROM3" ; indoors
 
 house_tiles_chr: .incbin "house_bg_tiles.lz4"
-house_sprites_chr: .incbin "house_sprites.chr"
+house_sprites_chr: .incbin "house_sprites.lz4"
 .include "data/maps/cropped/house_crop.asm"
 .include "data/maps/cropped/villager_hut_crop.asm"
 .include "data/maps/cropped/villager2_hut_crop.asm"
@@ -69,7 +69,7 @@ house_sprites_chr: .incbin "house_sprites.chr"
 .segment "ROM4" ; other location
 
 alien_tiles_chr: .incbin "alien_bg_tiles.lz4"
-alien_sprites_chr: .incbin "alien_sprites.chr"
+alien_sprites_chr: .incbin "alien_sprites.lz4"
 
 .include "data/maps/cropped/alien_base1_crop.asm"
 .include "data/maps/cropped/alien_base2_crop.asm"
@@ -216,7 +216,7 @@ game_over_palette:
 
 
 sprites:
-    .byte $1A, $FF, %00000011, $01  ; sprite 0 
+    .byte $1A, $00, %00000011, $01  ; sprite 0 
 
 
 ;position of knife sprite depending on the player frame
@@ -6055,7 +6055,6 @@ StartGame:
     sta MustUpdateDestructibles
     sta MustLoadSomething
     sta MustCopyMainChr
-    sta MustPlayNewSong
 
     jsr BuildRowTable
 
