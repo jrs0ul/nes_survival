@@ -4005,7 +4005,7 @@ UpdateArrowSprites:
     sbc #1                  ;subtract 1 because the gfx in the tile skips first pixel row
     sta FIRST_SPRITE, x
     inc TempSpriteIdx
-    lda #$FC
+    lda #ARROW_TILE
     ldx TempSpriteIdx
     sta FIRST_SPRITE, x
     inc TempSpriteIdx
@@ -4032,7 +4032,7 @@ UpdateArrowSprites:
     sbc #1                  ;subtract 1 because the gfx in the tile skips first pixel row
     sta FIRST_SPRITE, x
     inc TempSpriteIdx
-    lda #$FC
+    lda #ARROW_TILE
     ldx TempSpriteIdx
     sta FIRST_SPRITE, x
     inc TempSpriteIdx
@@ -4064,7 +4064,7 @@ UpdateArrowSprites:
     ldx TempSpriteIdx
     sta FIRST_SPRITE, x
     inc TempSpriteIdx
-    lda #$FC
+    lda #ARROW_TILE
     ldx TempSpriteIdx
     sta FIRST_SPRITE, x
     inc TempSpriteIdx

@@ -75,6 +75,8 @@
 
     DESTRUCTIBLE_COUNT         = 10
 
+    PROJECTILE_TILE            = $37
+
     ICE_TILE_A                 = $3A
     ICE_TILE_B                 = $4A
     FIRE_TILE                  = $80
@@ -148,12 +150,14 @@
 
 .endif
 
-    STAMINA_END_SPRITE         = $FD
+    STAMINA_END_SPRITE         = $39
     STAMINA_SEGMENT_START      = $56 ; lower adress where first stamina segment should be placed
     STAMINA_TILE               = $4A
 
     MAX_TILE_SCROLL_LEFT       = 248; -8
     MAX_TILE_SCROLL_RIGHT      = 8
+
+    ARROW_TILE                 = $38
 
 
     ENTRY_POINT_COUNT          = 30

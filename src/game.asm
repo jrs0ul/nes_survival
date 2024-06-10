@@ -218,13 +218,11 @@ game_over_palette:
 sprites:
     .byte $1A, $00, %00000011, $01  ; sprite 0 
 
-
-;position of knife sprite depending on the player frame
-knife_pos:
-    .byte 248,  8 ; left (248 = -8)
-    .byte  16,  8 ; right
-    .byte   8,  0 ; up
-    .byte   0, 16 ; down
+knife_sprite_data:
+    .byte 8,  $29, %00000000, 248 ; left (248 = -8)
+    .byte 8,  $29, %01000000, 16 ; right
+    .byte 0,  $2A, %00000000, 8  ; up
+    .byte 16, $2A, %10000000, 0 ; down
 
 knife_collision_pos:
     .byte 250, 9, 250, 15 ; left
@@ -293,10 +291,10 @@ linked_destructible_tiles:
 
 spearSprites:
           ;+Y,frame,attributes,+X
-    .byte 248, $E2, %00000000, 252, 0, $E3, %00000000, 252 ;up
-    .byte 248, $E3, %10000000, 252, 0, $E2, %10000000, 252 ;down
-    .byte 252, $E0, %00000000, 248, 252, $E1, %00000000, 0 ;left
-    .byte 252, $E1, %01000000, 248, 252, $E0, %01000000, 0 ;right
+    .byte 248, $2B, %00000000, 252, 0  , $2C, %00000000, 252 ;up
+    .byte 248, $2C, %10000000, 252, 0  , $2B, %10000000, 252 ;down
+    .byte 252, $3E, %00000000, 248, 252, $3F, %00000000, 0 ;left
+    .byte 252, $3F, %01000000, 248, 252, $3E, %01000000, 0 ;right
 
 
 npc_direction_list:

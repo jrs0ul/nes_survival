@@ -105,22 +105,50 @@ UpdateSprites:
     cmp #ITEM_KNIFE
     bne @noKnife
 
-    jsr PrepareKnifeSprite
 
 @updateKnife: ;update the actual sprite
-    inx
-    lda TempPointY
-    sta FIRST_SPRITE,x
-    inx
-    lda #240
+
+
+    lda PlayerFrame
+    bne @vert
+
+    lda DirectionX
+    cmp #2
+    bne @noFlip
+    lda PlayerFrame
     clc
-    adc PlayerFrame
+    adc #1
+    jmp @horizontal
+@noFlip:
+    lda PlayerFrame
+    jmp @horizontal
+
+@vert:
+    clc
+    adc #1
+@horizontal:
+    asl
+    asl
+    tay
+
+    inx
+    lda knife_sprite_data, y
+    clc
+    adc PlayerY
+    sta FIRST_SPRITE,x
+    iny
+    inx
+    lda knife_sprite_data, y
     sta FIRST_SPRITE,x
     inx
-    lda Temp
+    iny
+    lda knife_sprite_data, y
     sta FIRST_SPRITE,x
     inx
-    lda TempPointX
+    iny
+    lda knife_sprite_data, y
+    clc
+    adc PlayerX
     sta FIRST_SPRITE,x
     inc TempSpriteCount
 
@@ -174,7 +202,7 @@ UpdateSprites:
     beq @hammer
 
     lda PlayerFrame
-    beq @horizontal
+    beq @horiz
 
     cmp #1
     beq @down
@@ -184,7 +212,7 @@ UpdateSprites:
     ldy #24
     jmp @update
 
-@horizontal:
+@horiz:
     lda DirectionX
     cmp #2
     beq @flipIndex
@@ -677,7 +705,7 @@ UpdateProjectileSprites:
     lda Projectiles, y ; y
     sta FIRST_SPRITE, x ; y
     inx
-    lda #$FB
+    lda #PROJECTILE_TILE
     sta FIRST_SPRITE, x
     inx
     lda #%00000011
@@ -696,56 +724,6 @@ UpdateProjectileSprites:
 
     rts
 
-;----------------------------------
-PrepareKnifeSprite:
-
-    lda #%00000000
-    sta Temp ; knife is not flipped
-
-    lda #0
-    sta TempFrame
-
-    lda DirectionX
-    cmp #2
-    bne @notFlipped
-
-    lda #%01000000
-    sta Temp ; knife is flipped
-    lda #1
-    sta TempFrame
-
-
-@notFlipped:
-
-    lda PlayerFrame
-    bne @vertical
-
-    clc 
-    adc TempFrame
-    jmp @horizontal
-
-@vertical:
-    clc
-    adc #1
-@horizontal:
-    asl
-    tay
-    lda knife_pos, y
-    sta TempPointX
-    iny
-    lda knife_pos, y
-    sta TempPointY
-    lda PlayerY
-    clc
-    adc TempPointY
-    sta TempPointY
-
-    lda PlayerX
-    clc
-    adc TempPointX
-    sta TempPointX
-
-    rts
 ;----------------------------------
 UpdateHammerSprites:
 
