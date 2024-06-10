@@ -149,20 +149,28 @@ LoadOutsideMap:
     ldy #5
     jsr bankswitch_y
 
-    lda #<crashed_plane_tiles_chr
-    sta pointer
-    lda #>crashed_plane_tiles_chr
-    sta pointer + 1
+    lda #ARGUMENT_STACK_HI
+    sta sp
+    lda #ARGUMENT_STACK_LO
+    sta sp + 1
 
-    lda #144
-    sta TempX
-    lda #5 ; 5 rows
-    sta TempRowIndex
+
+    lda #<crashed_plane_tiles_chr
+    ldy #2
+    sta (sp),y
+    iny
+    lda #>crashed_plane_tiles_chr
+    sta (sp),y
+
+    lda #0
+    ldy #0
+    sta (sp),y
     lda #25
-    sta pointer2
-    lda #80
-    sta pointer2 + 1
-    jsr CopyCHRChunk
+    ldy #1
+    sta (sp),y
+    lda #0
+    ldx #3
+    jsr UnLZ4toVram
 
 
     jmp @done_copying

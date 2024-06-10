@@ -83,9 +83,9 @@ alien_sprites_chr: .incbin "alien_sprites.lz4"
 ;=============================================================
 .segment "ROM5" ;title and intro data (?)
 
-game_over_screen: .incbin "data/game_over_nam.lz4"
-title_screen: .incbin "data/title_nam.lz4"
-crashed_plane_tiles_chr: .incbin "crashed_plane_tiles_9x5.chr" ;9x5 tile block that should be put in 5x9 (xy starts at 0)
+game_over_screen       : .incbin "data/game_over_nam.lz4"
+title_screen           : .incbin "data/title_nam.lz4"
+crashed_plane_tiles_chr: .incbin "crashed_plane_tiles.lz4"
 title_palette:
     .byte $0F,$00,$11,$20, $0F,$01,$11,$07, $0F,$30,$11,$38, $0F,$07,$11,$35    ;background
     .byte $0F,$0f,$17,$20, $0F,$06,$26,$39, $0F,$17,$21,$31, $0F,$0f,$37,$26    ;OAM sprites
@@ -1903,65 +1903,7 @@ doTitle:
     bankswitch
 
     rts
-;--------------------------------------------
-;copy chr tiles from ROM bank to a CHR RAM
-;pointer -  sits at zero page, points to the chr data
-CopyCHRTiles:
 
-    ldy #0                   ; starting index into the first page
-    sty $2001                ; turn off rendering just in case
-    lda chr_dest_high
-    sta $2006                ; high address byte
-    lda chr_dest_low
-    sta $2006                ; low  address byte
-    ldx chr_pages_to_copy    ; number of 256-byte pages to copy, 32 max
-@loop:
-    lda (pointer),y  ; copy one byte
-    sta $2007
-    iny
-    bne @loop  ; repeat until we finish the page
-    inc pointer + 1  ; go to the next page
-    dex
-    bne @loop  ; repeat until we've copied enough pages
-    rts
-;--------------------------------------------
-;pointer -  sits at zero page, points to the chr data
-;TempRowIndex - row count for the chunk
-;pointer2 - ram destination address
-;TempX - size of a source data row, one tile is 16 bytes
-
-CopyCHRChunk:
-
-    ldy #0
-    lda TempRowIndex ; total rows
-    sta TempRegX
-
-@tileLoop:
-    lda TempX ;
-    sta TempY ; data row size
-    lda TempRowIndex
-    sec
-    sbc TempRegX             ; row index
-    clc
-    adc pointer2
-    sta $2006                ; high address byte
-    lda pointer2 + 1
-    sta $2006                ; low address byte
-@loop:
-    lda (pointer),y  ; copy one byte
-    sta $2007
-    iny
-    bne @cont
-    inc pointer + 1
-@cont:
-    dec TempY
-    bne @loop
-
-    dec TempRegX
-    bne @tileLoop
-
-
-    rts
 ;--------------------------------------------
 LoadBackgroundsIfNeeded:
 

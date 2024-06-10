@@ -20,6 +20,7 @@ pal:
 	lz4 -9 -f -B4 --no-frame-crc src/alien_sprites.chr src/alien_sprites.lz4
 	lz4 -9 -f -B4 --no-frame-crc src/house_sprites.chr src/house_sprites.lz4
 	lz4 -9 -f -B4 --no-frame-crc src/main_bg_tiles.chr src/main_bg_tiles.lz4
+	lz4 -9 -f -B4 --no-frame-crc src/crashed_plane_tiles.chr src/crashed_plane_tiles.lz4
 	lz4 -9 -f -B4 --no-frame-crc src/title_tiles.chr src/title_tiles.lz4
 	lz4 -9 -f -B4 --no-frame-crc src/gameover_tiles.chr src/gameover_tiles.lz4
 	lz4 -9 -f -B4 --no-frame-crc src/data/game_over.nam src/data/game_over_nam.lz4
@@ -51,6 +52,7 @@ ntsc:
 	lz4 -9 -f -B4 --no-frame-crc src/alien_sprites.chr src/alien_sprites.lz4
 	lz4 -9 -f -B4 --no-frame-crc src/house_sprites.chr src/house_sprites.lz4
 	lz4 -9 -f -B4 --no-frame-crc src/main_bg_tiles.chr src/main_bg_tiles.lz4
+	lz4 -9 -f -B4 --no-frame-crc src/crashed_plane_tiles.chr src/crashed_plane_tiles.lz4
 	lz4 -9 -f -B4 --no-frame-crc src/title_tiles.chr src/title_tiles.lz4
 	lz4 -9 -f -B4 --no-frame-crc src/gameover_tiles.chr src/gameover_tiles.lz4
 	lz4 -9 -f -B4 --no-frame-crc src/data/game_over.nam src/data/game_over_nam.lz4
