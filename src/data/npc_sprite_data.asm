@@ -495,12 +495,12 @@ npc_BJORN_frame_LEFT:
     .byte <npc_DOGMAN_frame_DTH, >npc_DOGMAN_frame_DTH
 
 npc_BJORN_frame_LEFT_0:
-    .byte 0,  $5A, %00000000, 0
-    .byte 0,  $5B, %00000000, 8
-    .byte 8,  $6A, %00000000, 0
-    .byte 8,  $6B, %00000000, 8
-    .byte 16, $7A, %00000000, 0
-    .byte 16, $7B, %00000000, 8
+    .byte 0,  $BE, %00000000, 0
+    .byte 0,  $BF, %00000000, 8
+    .byte 8,  $C4, %00000000, 0
+    .byte 8,  $C5, %00000000, 8
+    .byte 16, $CA, %00000000, 0
+    .byte 16, $CB, %00000000, 8
 
 npc_BJORN_frame_RIGHT:
     .byte 0, 0
@@ -512,12 +512,12 @@ npc_BJORN_frame_RIGHT:
     .byte <npc_DOGMAN_frame_DTH, >npc_DOGMAN_frame_DTH
 
 npc_BJORN_frame_RIGHT_0:
-    .byte 0,  $5B, %01000000, 0
-    .byte 0,  $5A, %01000000, 8
-    .byte 8,  $6B, %01000000, 0
-    .byte 8,  $6A, %01000000, 8
-    .byte 16, $7B, %01000000, 0
-    .byte 16, $7A, %01000000, 8
+    .byte 0,  $BF, %01000000, 0
+    .byte 0,  $BE, %01000000, 8
+    .byte 8,  $C5, %01000000, 0
+    .byte 8,  $C4, %01000000, 8
+    .byte 16, $CB, %01000000, 0
+    .byte 16, $CA, %01000000, 8
 
 npc_BJORN_frame_UP:
     .byte 0, 0
@@ -529,12 +529,12 @@ npc_BJORN_frame_UP:
     .byte <npc_DOGMAN_frame_DTH, >npc_DOGMAN_frame_DTH
 
 npc_BJORN_frame_UP_0:
-    .byte 0,  $5C, %00000000, 0
-    .byte 0,  $5D, %00000000, 8
-    .byte 8,  $6C, %00000000, 0
-    .byte 8,  $6D, %00000000, 8
-    .byte 16, $7C, %00000000, 0
-    .byte 16, $7D, %00000000, 8
+    .byte 0,  $C0, %00000000, 0
+    .byte 0,  $C1, %00000000, 8
+    .byte 8,  $C6, %00000000, 0
+    .byte 8,  $C7, %00000000, 8
+    .byte 16, $CC, %00000000, 0
+    .byte 16, $CD, %00000000, 8
 
 npc_BJORN_frame_DOWN:
     .byte 0, 0
@@ -546,12 +546,12 @@ npc_BJORN_frame_DOWN:
     .byte <npc_DOGMAN_frame_DTH, >npc_DOGMAN_frame_DTH
 
 npc_BJORN_frame_DOWN_0:
-    .byte 0,  $5E, %00000000, 0
-    .byte 0,  $5F, %00000000, 8
-    .byte 8,  $6E, %00000000, 0
-    .byte 8,  $6F, %00000000, 8
-    .byte 16, $7E, %00000000, 0
-    .byte 16, $7F, %00000000, 8
+    .byte 0,  $C2, %00000000, 0
+    .byte 0,  $C3, %00000000, 8
+    .byte 8,  $C8, %00000000, 0
+    .byte 8,  $C9, %00000000, 8
+    .byte 16, $CE, %00000000, 0
+    .byte 16, $CF, %00000000, 8
 ;================================================
 npc_ERIKA_sprite_data:
 
@@ -571,12 +571,12 @@ npc_ERIKA_frame_LEFT:
     .byte <npc_DOGMAN_frame_DTH, >npc_DOGMAN_frame_DTH
 
 npc_ERIKA_frame_LEFT_0:
-    .byte 0,  $0A, %00000000, 0
-    .byte 0,  $0B, %00000000, 8
-    .byte 8,  $1A, %00000000, 0
-    .byte 8,  $1B, %00000000, 8
-    .byte 16, $2A, %00000000, 0
-    .byte 16, $2B, %00000000, 8
+    .byte 0,  $A0, %00000000, 0
+    .byte 0,  $A1, %00000000, 8
+    .byte 8,  $A6, %00000000, 0
+    .byte 8,  $A7, %00000000, 8
+    .byte 16, $AC, %00000000, 0
+    .byte 16, $AD, %00000000, 8
 
 npc_ERIKA_frame_RIGHT:
     .byte 0, 0
@@ -588,12 +588,12 @@ npc_ERIKA_frame_RIGHT:
     .byte <npc_DOGMAN_frame_DTH, >npc_DOGMAN_frame_DTH
 
 npc_ERIKA_frame_RIGHT_0:
-    .byte 0,  $0B, %01000000, 0
-    .byte 0,  $0A, %01000000, 8
-    .byte 8,  $1B, %01000000, 0
-    .byte 8,  $1A, %01000000, 8
-    .byte 16, $2B, %01000000, 0
-    .byte 16, $2A, %01000000, 8
+    .byte 0,  $A1, %01000000, 0
+    .byte 0,  $A0, %01000000, 8
+    .byte 8,  $A7, %01000000, 0
+    .byte 8,  $A6, %01000000, 8
+    .byte 16, $AD, %01000000, 0
+    .byte 16, $AC, %01000000, 8
 
 npc_ERIKA_frame_UP:
     .byte 0, 0
@@ -605,12 +605,12 @@ npc_ERIKA_frame_UP:
     .byte <npc_DOGMAN_frame_DTH, >npc_DOGMAN_frame_DTH
 
 npc_ERIKA_frame_UP_0:
-    .byte 0,  $0C, %00000000, 0
-    .byte 0,  $0D, %00000000, 8
-    .byte 8,  $1C, %00000000, 0
-    .byte 8,  $1D, %00000000, 8
-    .byte 16, $2C, %00000000, 0
-    .byte 16, $2D, %00000000, 8
+    .byte 0,  $A2, %00000000, 0
+    .byte 0,  $A3, %00000000, 8
+    .byte 8,  $A8, %00000000, 0
+    .byte 8,  $A9, %00000000, 8
+    .byte 16, $AE, %00000000, 0
+    .byte 16, $AF, %00000000, 8
 
 npc_ERIKA_frame_DOWN:
     .byte 0, 0
@@ -622,12 +622,12 @@ npc_ERIKA_frame_DOWN:
     .byte <npc_DOGMAN_frame_DTH, >npc_DOGMAN_frame_DTH
 
 npc_ERIKA_frame_DOWN_0:
-    .byte 0,  $0E, %00000000, 0
-    .byte 0,  $0F, %00000000, 8
-    .byte 8,  $1E, %00000000, 0
-    .byte 8,  $1F, %00000000, 8
-    .byte 16, $2E, %00000000, 0
-    .byte 16, $2F, %00000000, 8
+    .byte 0,  $A4, %00000000, 0
+    .byte 0,  $A5, %00000000, 8
+    .byte 8,  $AA, %00000000, 0
+    .byte 8,  $AB, %00000000, 8
+    .byte 16, $B0, %00000000, 0
+    .byte 16, $B1, %00000000, 8
 ;========================================
 npc_GRANNY_sprite_data:
 
@@ -647,10 +647,10 @@ npc_GRANNY_frame_LEFT:
     .byte <npc_DOGMAN_frame_DTH, >npc_DOGMAN_frame_DTH
 
 npc_GRANNY_frame_LEFT_0:
-    .byte 0, $3A, %00000000, 0
-    .byte 0, $3B, %00000000, 8
-    .byte 8, $4A, %00000000, 0
-    .byte 8, $4B, %00000000, 8
+    .byte 0, $B2, %00000000, 0
+    .byte 0, $B3, %00000000, 8
+    .byte 8, $B8, %00000000, 0
+    .byte 8, $B9, %00000000, 8
 
 npc_GRANNY_frame_RIGHT:
     .byte 0, 0
@@ -662,10 +662,10 @@ npc_GRANNY_frame_RIGHT:
     .byte <npc_DOGMAN_frame_DTH, >npc_DOGMAN_frame_DTH
 
 npc_GRANNY_frame_RIGHT_0:
-    .byte 0, $3B, %01000000, 0
-    .byte 0, $3A, %01000000, 8
-    .byte 8, $4B, %01000000, 0
-    .byte 8, $4A, %01000000, 8
+    .byte 0, $B3, %01000000, 0
+    .byte 0, $B2, %01000000, 8
+    .byte 8, $B9, %01000000, 0
+    .byte 8, $B8, %01000000, 8
 
 npc_GRANNY_frame_UP:
     .byte 0, 0
@@ -677,10 +677,10 @@ npc_GRANNY_frame_UP:
     .byte <npc_DOGMAN_frame_DTH, >npc_DOGMAN_frame_DTH
 
 npc_GRANNY_frame_UP_0:
-    .byte 0, $3C, %00000000, 0
-    .byte 0, $3D, %00000000, 8
-    .byte 8, $4C, %00000000, 0
-    .byte 8, $4D, %00000000, 8
+    .byte 0, $B4, %00000000, 0
+    .byte 0, $B5, %00000000, 8
+    .byte 8, $BA, %00000000, 0
+    .byte 8, $BB, %00000000, 8
 
 npc_GRANNY_frame_DOWN:
     .byte 0, 0
@@ -692,10 +692,10 @@ npc_GRANNY_frame_DOWN:
     .byte <npc_DOGMAN_frame_DTH, >npc_DOGMAN_frame_DTH
 
 npc_GRANNY_frame_DOWN_0:
-    .byte 0, $3E, %00000000, 0
-    .byte 0, $3F, %00000000, 8
-    .byte 8, $4E, %00000000, 0
-    .byte 8, $4F, %00000000, 8
+    .byte 0, $B6, %00000000, 0
+    .byte 0, $B7, %00000000, 8
+    .byte 8, $BC, %00000000, 0
+    .byte 8, $BD, %00000000, 8
 ;====================================
 
 npc_DEADMAN_frames:
@@ -713,12 +713,12 @@ npc_DEADMAN_frame_RIGHT:
 
 
 npc_DEADMAN_frame_RIGHT_0:
-    .byte 0,  $0A, %00000000, 0
-    .byte 0,  $0B, %00000000, 8
-    .byte 8,  $1A, %00000000, 0
-    .byte 8,  $1B, %00000000, 8
-    .byte 16, $2A, %00000000, 0
-    .byte 16, $2B, %00000000, 8
+    .byte 0,  $A0, %00000000, 0
+    .byte 0,  $A1, %00000000, 8
+    .byte 8,  $A6, %00000000, 0
+    .byte 8,  $A7, %00000000, 8
+    .byte 16, $AC, %00000000, 0
+    .byte 16, $AD, %00000000, 8
 ;======================================
 
 npc_BOAR_frames:
