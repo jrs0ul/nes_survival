@@ -138,8 +138,8 @@ player_sprites_coat:
     .byte 8, $06, %01000011, 0 ;3rd
     .byte 8, $05, %01000011, 8 ;4th
     ;frame 1
-    .byte 8, $0b, %01000011, 0 ;3rd
-    .byte 8, $0c, %01000011, 8 ;4th
+    .byte 8, $0c, %01000011, 0 ;3rd
+    .byte 8, $0b, %01000011, 8 ;4th
     ;frame 2
     .byte 8, $12, %01000011, 0 ;3rd
     .byte 8, $11, %01000011, 8 ;4th

@@ -6691,23 +6691,22 @@ WearWeapon:
 ;stores 1 in register A if you can destroy
 CanTileBeDestroyed:
 
-    cmp #$F7
+    cmp #$9C
     beq @can
-    cmp #$CC
+    cmp #$9D
     beq @can
-    cmp #$CD
+    cmp #$AC
     beq @can
-    cmp #$DC
+    cmp #$AD
     beq @can
-    cmp #$DD
+
+    cmp #$F9
     beq @can
     cmp #$F5
     beq @can
     cmp #$F6
     beq @can
     cmp #$F8
-    beq @can
-    cmp #$F9
     beq @can
 
     jmp @cannot
@@ -6835,21 +6834,21 @@ useHammerOnEnvironment:
     rts
 ;---------------------------------
 IsTree:
-    cmp #$AE
+    cmp #$87
     beq @yes
-    cmp #$AF
+    cmp #$88
     beq @yes
-    cmp #$BE
+    cmp #$DC
     beq @yes
-    cmp #$BF
+    cmp #$DD
     beq @yes
     cmp #$CE
     beq @yes
     cmp #$CF
     beq @yes
-    cmp #$87
+    cmp #$CC
     beq @yes
-    cmp #$88
+    cmp #$CD
     beq @yes
     bne @nope
 @yes:
