@@ -41,7 +41,7 @@ main_bg_tiles:  .incbin "main_bg_tiles.lz4"
 ;===========================================================
 .segment "ROM1"
 
-menu_screen: .incbin "data/menu_screen_nam.lz4"
+.include "data/menu_screen_comp.asm"
 .include "data/menu_data.asm"
 .include "data/recipes.asm"
 
@@ -83,8 +83,8 @@ alien_sprites_chr: .incbin "alien_sprites.lz4"
 ;=============================================================
 .segment "ROM5" ;title and intro data (?)
 
-game_over_screen       : .incbin "data/game_over_nam.lz4"
-title_screen           : .incbin "data/title_nam.lz4"
+.include "data/game_over_comp.asm"
+.include "data/title_comp.asm"
 crashed_plane_tiles_chr: .incbin "crashed_plane_tiles.lz4"
 title_palette:
     .byte $0F,$00,$11,$20, $0F,$01,$11,$07, $0F,$30,$11,$38, $0F,$07,$11,$35    ;background
@@ -1756,6 +1756,7 @@ noBankSwitch:
 
 ;#############################| Subroutines |#############################################
 .include "lz4vram.s"
+.include "decompress_rle.asm"
 .include "graphics.asm"
 .include "collision.asm"
 .include "items.asm"

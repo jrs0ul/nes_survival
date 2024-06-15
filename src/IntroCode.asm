@@ -678,60 +678,27 @@ HideCutsceneSprites:
 ;---------------------
 LoadIntroScene:
 
-    lda #ARGUMENT_STACK_HI
-    sta sp
-    lda #ARGUMENT_STACK_LO
-    sta sp + 1
-
     ldy CutsceneSceneIdx
+
     lda intro_scenes_low, y
     sta pointer
     lda intro_scenes_high, y
-    sta pointer + 1
+    sta pointer+1
 
-    lda pointer
-    ldy #$02
-    sta (sp),y
-    iny
-    lda pointer + 1
-    sta (sp),y
-    lda #$00
-    tay
-    sta (sp),y
-    iny
-    lda #$20
-    sta (sp),y
-    ldx #4
-    lda #0
-    jsr UnLZ4toVram
-
-    lda #ARGUMENT_STACK_HI
-    sta sp
-    lda #ARGUMENT_STACK_LO
-    sta sp + 1
-
-    ldy CutsceneSceneIdx
-    lda intro_scenes_low, y
-    sta pointer
-    lda intro_scenes_high, y
-    sta pointer + 1
-
-    lda pointer
-    ldy #$02
-    sta (sp),y
-    iny
-    lda pointer + 1
-    sta (sp),y
-    lda #$00
-    tay
-    sta (sp),y
-    iny
     lda #$24
-    sta (sp),y
-    ldx #4
-    lda #0
-    jsr UnLZ4toVram
+    sta NametableAddress
 
+    jsr DecompressRLE
+
+    ldy CutsceneSceneIdx
+    lda intro_scenes_low, y
+    sta pointer
+    lda intro_scenes_high, y
+    sta pointer+1
+
+    lda #$20
+    sta NametableAddress
+    jsr DecompressRLE
 
     jsr ClearPalette
 
@@ -763,50 +730,18 @@ LoadOutroScene:
     sta pointer
     lda outro_scenes_high, y
     sta pointer+1
-
-    lda #ARGUMENT_STACK_HI
-    sta sp
-    lda #ARGUMENT_STACK_LO
-    sta sp + 1
-
-
-    lda pointer
-    ldy #$02
-    sta (sp),y
-    iny
-    lda pointer + 1
-    sta (sp),y
-    lda #$00
-    tay
-    sta (sp),y
-    iny
     lda #$24
-    sta (sp),y
-    ldx #4
-    lda #0
-    jsr UnLZ4toVram
-
+    sta NametableAddress
+    jsr DecompressRLE
     ldy CutsceneSceneIdx
     lda outro_scenes_low, y
     sta pointer
     lda outro_scenes_high, y
     sta pointer+1
 
-    lda pointer
-    ldy #$02
-    sta (sp),y
-    iny
-    lda pointer + 1
-    sta (sp),y
-    lda #$00
-    tay
-    sta (sp),y
-    iny
     lda #$20
-    sta (sp),y
-    ldx #4
-    lda #0
-    jsr UnLZ4toVram
+    sta NametableAddress
+    jsr DecompressRLE
 
     jsr ClearPalette
 
@@ -908,19 +843,12 @@ LoadTitleData:
 
 
     lda #<title_screen
-    ldy #$02
-    sta (sp),y
-    iny
+    sta pointer
     lda #>title_screen
-    sta (sp),y
-    lda #$00
-    tay
-    sta (sp),y
-    iny
+    sta pointer + 1
     lda #$20
-    sta (sp),y
-    ldx #4
-    jsr UnLZ4toVram
+    sta NametableAddress
+    jsr DecompressRLE
 
     lda #STATE_TITLE
     sta GameState
@@ -944,19 +872,12 @@ LoadGameOverData:
     sta sp + 1
 
     lda #<game_over_screen
-    ldy #$02
-    sta (sp),y
-    iny
+    sta pointer
     lda #>game_over_screen
-    sta (sp),y
-    lda #$00
-    tay
-    sta (sp),y
-    iny
+    sta pointer + 1
     lda #$20
-    sta (sp),y
-    ldx #4
-    jsr UnLZ4toVram
+    sta NametableAddress
+    jsr DecompressRLE
 
     lda #102
     sta SnowDelay

@@ -23,18 +23,6 @@ pal:
 	lz4 -9 -f -B4 --no-frame-crc src/crashed_plane_tiles.chr src/crashed_plane_tiles.lz4
 	lz4 -9 -f -B4 --no-frame-crc src/title_tiles.chr src/title_tiles.lz4
 	lz4 -9 -f -B4 --no-frame-crc src/gameover_tiles.chr src/gameover_tiles.lz4
-	lz4 -9 -f -B4 --no-frame-crc src/data/game_over.nam src/data/game_over_nam.lz4
-	lz4 -9 -f -B4 --no-frame-crc src/data/menu_screen.nam src/data/menu_screen_nam.lz4
-	lz4 -9 -f -B4 --no-frame-crc src/data/title.nam src/data/title_nam.lz4
-	lz4 -9 -f -B4 --no-frame-crc src/data/intro_bg_mowdens.nam src/data/intro_bg_mowdens_nam.lz4
-	lz4 -9 -f -B4 --no-frame-crc src/data/intro_bg_cockpit.nam src/data/intro_bg_cockpit_nam.lz4
-	lz4 -9 -f -B4 --no-frame-crc src/data/intro_bg_boom.nam src/data/intro_bg_boom_nam.lz4
-	lz4 -9 -f -B4 --no-frame-crc src/data/intro_bg_mowdens_base.nam src/data/intro_bg_mowdens_base_nam.lz4
-	lz4 -9 -f -B4 --no-frame-crc src/data/intro_bg_mowdens_top.nam src/data/intro_bg_mowdens_top_nam.lz4
-	lz4 -9 -f -B4 --no-frame-crc src/data/outro_bg_sos.nam src/data/outro_bg_sos_nam.lz4
-	lz4 -9 -f -B4 --no-frame-crc src/data/outro_bg_that_same_day.nam src/data/outro_bg_that_same_day_nam.lz4
-	lz4 -9 -f -B4 --no-frame-crc src/data/outro_bg_chopper_comes.nam src/data/outro_bg_chopper_comes_nam.lz4
-	lz4 -9 -f -B4 --no-frame-crc src/data/outro_bg_victory.nam src/data/outro_bg_victory_nam.lz4
 	python CropLZ4bytes.py
 	ca65 src/game.asm   -DFAMISTUDIO_CFG_PAL_SUPPORT=1  -g -o src/game.o
 	ld65 -o $(PalName).nes -m map.txt -C memory.cfg src/game.o --dbgfile $(PalName).dbg -Ln $(PalName).labels.txt
@@ -55,18 +43,6 @@ ntsc:
 	lz4 -9 -f -B4 --no-frame-crc src/crashed_plane_tiles.chr src/crashed_plane_tiles.lz4
 	lz4 -9 -f -B4 --no-frame-crc src/title_tiles.chr src/title_tiles.lz4
 	lz4 -9 -f -B4 --no-frame-crc src/gameover_tiles.chr src/gameover_tiles.lz4
-	lz4 -9 -f -B4 --no-frame-crc src/data/game_over.nam src/data/game_over_nam.lz4
-	lz4 -9 -f -B4 --no-frame-crc src/data/menu_screen.nam src/data/menu_screen_nam.lz4
-	lz4 -9 -f -B4 --no-frame-crc src/data/title.nam src/data/title_nam.lz4
-	lz4 -9 -f -B4 --no-frame-crc src/data/intro_bg_mowdens.nam src/data/intro_bg_mowdens_nam.lz4
-	lz4 -9 -f -B4 --no-frame-crc src/data/intro_bg_cockpit.nam src/data/intro_bg_cockpit_nam.lz4
-	lz4 -9 -f -B4 --no-frame-crc src/data/intro_bg_boom.nam src/data/intro_bg_boom_nam.lz4
-	lz4 -9 -f -B4 --no-frame-crc src/data/intro_bg_mowdens_base.nam src/data/intro_bg_mowdens_base_nam.lz4
-	lz4 -9 -f -B4 --no-frame-crc src/data/intro_bg_mowdens_top.nam src/data/intro_bg_mowdens_top_nam.lz4
-	lz4 -9 -f -B4 --no-frame-crc src/data/outro_bg_sos.nam src/data/outro_bg_sos_nam.lz4
-	lz4 -9 -f -B4 --no-frame-crc src/data/outro_bg_that_same_day.nam src/data/outro_bg_that_same_day_nam.lz4
-	lz4 -9 -f -B4 --no-frame-crc src/data/outro_bg_chopper_comes.nam src/data/outro_bg_chopper_comes_nam.lz4
-	lz4 -9 -f -B4 --no-frame-crc src/data/outro_bg_victory.nam src/data/outro_bg_victory_nam.lz4
 	python CropLZ4bytes.py
 	ca65 src/game.asm  -DFAMISTUDIO_CFG_NTSC_SUPPORT=1 -g -o src/game.o
 	ld65 -o $(NtscName).nes -m map.txt -C memory.cfg src/game.o --dbgfile $(NtscName).dbg -Ln $(NtscName).labels.txt
