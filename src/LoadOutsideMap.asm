@@ -58,18 +58,40 @@ LoadMainTileset:
     lda #ARGUMENT_STACK_LO
     sta sp + 1
 
-    lda #<main_sprites
+    lda MustLoadCoreSprites
+    beq @loadAnimals
+
+    lda #<main_core_sprites
     ldy #2
     sta (sp), y
     iny
-    lda #>main_sprites
+    lda #>main_core_sprites
     sta (sp), y
     lda #0
     tay
     sta (sp), y
     iny
     sta (sp), y
-    ldx #$10
+    ldx #$0A
+    jsr UnLZ4toVram
+
+    lda #0
+    sta MustLoadCoreSprites
+
+@loadAnimals:
+    lda #<main_animal_sprites
+    ldy #2
+    sta (sp), y
+    iny
+    lda #>main_animal_sprites
+    sta (sp), y
+    lda #0
+    tay
+    sta (sp), y
+    iny
+    lda #10
+    sta (sp), y
+    ldx #$06
     jsr UnLZ4toVram
 
     lda #<font

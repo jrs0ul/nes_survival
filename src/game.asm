@@ -24,9 +24,10 @@
 
 .segment "ROM0"
 
-main_sprites :  .incbin "main_sprites.lz4"
-font:           .incbin "font.lz4"
-main_bg_tiles:  .incbin "main_bg_tiles.lz4"
+main_core_sprites   : .incbin "main_core_sprites.lz4"
+main_animal_sprites : .incbin "main_animal_sprites.lz4"
+font                : .incbin "font.lz4"
+main_bg_tiles       : .incbin "main_bg_tiles.lz4"
 
 .include "data/maps/cropped/field_bg_crop.asm"
 .include "data/maps/cropped/field_bg1_crop.asm"
@@ -1337,10 +1338,12 @@ NametableOffsetInBytes: ; how many bytes to fill with zeroes at the beginning of
     .res 1
 SkipLastTileRowsInIndoorMaps:
     .res 1
+MustLoadCoreSprites:
+    .res 1
 
 
 BSSBuffer:
-    .res 40
+    .res 39
 
 ;====================================================================================
 
@@ -5996,6 +5999,7 @@ StartGame:
     sta MustUpdateDestructibles
     sta MustLoadSomething
     sta MustCopyMainChr
+    sta MustLoadCoreSprites
 
     jsr BuildRowTable
 
