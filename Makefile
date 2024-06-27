@@ -17,6 +17,7 @@ define prepare_content
 	$(Compress) src/alien_bg_tiles.chr src/alien_bg_tiles.lz4
 	$(Compress) src/house_bg_tiles.chr src/house_bg_tiles.lz4
 	$(Compress) src/font.chr src/font.lz4
+	$(Compress) src/UI.chr src/UI.lz4
 	$(Compress) src/main_core_sprites.chr src/main_core_sprites.lz4
 	$(Compress) src/main_animal_sprites.chr src/main_animal_sprites.lz4
 	$(Compress) src/alien_sprites.chr src/alien_sprites.lz4

@@ -12,6 +12,7 @@ lz4_files = [
             "alien_sprites.lz4",
             "house_sprites.lz4",
             "font.lz4",
+            "UI.lz4",
             "main_bg_tiles.lz4",
             "crashed_plane_tiles.lz4",
             "title_tiles.lz4",

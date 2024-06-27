@@ -109,6 +109,25 @@ LoadMainTileset:
     ldx #$03
     jsr UnLZ4toVram
 
+    lda #<UI_tiles
+    ldy #2
+    sta (sp), y
+    iny
+    lda #>UI_tiles
+    sta (sp), y
+    lda #0
+    ldy #0
+    sta (sp), y
+    iny
+    lda #19
+    sta (sp), y
+    ldx #$02
+    jsr UnLZ4toVram
+
+    lda #ARGUMENT_STACK_HI
+    sta sp
+    lda #ARGUMENT_STACK_LO
+    sta sp + 1
 
     lda #<main_bg_tiles
     ldy #2
@@ -120,9 +139,9 @@ LoadMainTileset:
     ldy #0
     sta (sp), y
     iny
-    lda #19
+    lda #21
     sta (sp), y
-    ldx #13
+    ldx #11
     jsr UnLZ4toVram
 
 

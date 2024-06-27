@@ -27,6 +27,7 @@
 main_core_sprites   : .incbin "main_core_sprites.lz4"
 main_animal_sprites : .incbin "main_animal_sprites.lz4"
 font                : .incbin "font.lz4"
+UI_tiles            : .incbin "UI.lz4"
 main_bg_tiles       : .incbin "main_bg_tiles.lz4"
 
 .include "data/maps/cropped/field_bg_crop.asm"
