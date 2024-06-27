@@ -152,7 +152,7 @@
 
     STAMINA_END_SPRITE         = $39
     STAMINA_SEGMENT_START      = $56 ; lower adress where first stamina segment should be placed
-    STAMINA_TILE               = $4A
+    STAMINA_TILE               = $69
 
     MAX_TILE_SCROLL_LEFT       = 248; -8
     MAX_TILE_SCROLL_RIGHT      = 8

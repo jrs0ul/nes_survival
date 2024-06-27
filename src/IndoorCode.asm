@@ -406,11 +406,11 @@ LoadIndoorMapData:
     lda #0
     ldy #0
     sta (sp),y
-    lda #$13
+    lda #$15
     ldy #1
     sta (sp),y
     lda #0
-    ldx #13
+    ldx #11
     jsr UnLZ4toVram
 
 
