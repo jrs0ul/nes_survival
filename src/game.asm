@@ -70,7 +70,9 @@ house_sprites_chr: .incbin "house_sprites.lz4"
 ;============================================================
 .segment "ROM4" ; other location
 
-alien_tiles_chr: .incbin "alien_bg_tiles.lz4"
+cave_tiles_chr   : .incbin "cave_bg_tiles.lz4"
+alien_tiles_chr  : .incbin "alien_bg_tiles.lz4"
+cave_sprites_chr : .incbin "cave_sprites.lz4"
 alien_sprites_chr: .incbin "alien_sprites.lz4"
 
 .include "data/maps/cropped/alien_base1_crop.asm"
@@ -3393,6 +3395,9 @@ RoutinesAfterFadeOut:
     cmp #28
     bne @next20
 
+    lda #1
+    sta MustCopyMainChr
+
     lda #0
     sta InCave
   ;TODO: perhaps it would be good to create a table for location - palette
@@ -3411,6 +3416,8 @@ RoutinesAfterFadeOut:
     lda #0
     sta InCave
 
+    lda #1
+    sta MustCopyMainChr
     lda #<alien_palette
     sta CurrentMapPalettePtr
     lda #>alien_palette
@@ -3426,6 +3433,7 @@ RoutinesAfterFadeOut:
     bne @next22
 
     lda #1
+    sta MustCopyMainChr
     sta InCave
     ;--------------------------
     ;22.alien base exit to the dark cave
@@ -3435,6 +3443,8 @@ RoutinesAfterFadeOut:
     cmp #22
     bne @next24
 
+    lda #1
+    sta MustCopyMainChr
     jsr IsLampInInventory
     bne @next24 ; it is
 

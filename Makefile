@@ -14,12 +14,14 @@ define prepare_content
 	python CropMaps.py
 	$(Compress) src/intro.chr src/intro.lz4
 	$(Compress) src/title.chr src/title.lz4
+	$(Compress) src/cave_bg_tiles.chr src/cave_bg_tiles.lz4
 	$(Compress) src/alien_bg_tiles.chr src/alien_bg_tiles.lz4
 	$(Compress) src/house_bg_tiles.chr src/house_bg_tiles.lz4
 	$(Compress) src/font.chr src/font.lz4
 	$(Compress) src/UI.chr src/UI.lz4
 	$(Compress) src/main_core_sprites.chr src/main_core_sprites.lz4
 	$(Compress) src/main_animal_sprites.chr src/main_animal_sprites.lz4
+	$(Compress) src/cave_sprites.chr src/cave_sprites.lz4
 	$(Compress) src/alien_sprites.chr src/alien_sprites.lz4
 	$(Compress) src/house_sprites.chr src/house_sprites.lz4
 	$(Compress) src/main_bg_tiles.chr src/main_bg_tiles.lz4

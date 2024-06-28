@@ -49,6 +49,57 @@ LoadAlienGfx:
 
     rts
 ;----------------------------
+LoadCaveGfx:
+
+    ldy #4
+    jsr bankswitch_y
+
+    lda #ARGUMENT_STACK_HI
+    sta sp
+    lda #ARGUMENT_STACK_LO
+    sta sp + 1
+
+    lda #<cave_tiles_chr
+    ldy #2
+    sta (sp),y
+    iny
+    lda #>cave_tiles_chr
+    sta (sp),y
+
+    lda #0
+    ldy #0
+    sta (sp),y
+    lda #$15
+    ldy #1
+    sta (sp),y
+    lda #0
+    ldx #11
+    jsr UnLZ4toVram
+
+    lda #ARGUMENT_STACK_HI
+    sta sp
+    lda #ARGUMENT_STACK_LO
+    sta sp + 1
+
+    lda #<cave_sprites_chr
+    ldy #2
+    sta (sp),y
+    iny
+    lda #>cave_sprites_chr
+    sta (sp),y
+
+    lda #0
+    ldy #0
+    sta (sp),y
+    lda #$0A
+    ldy #1
+    sta (sp),y
+    lda #0
+    ldx #6
+    jsr UnLZ4toVram
+
+    rts
+;----------------------------
 LoadMainTileset:
     ldy #0
     jsr bankswitch_y
@@ -172,15 +223,23 @@ LoadOutsideMap:
 
     lda LocationIndex
     cmp #LOCATION_MAIN_CAVE
-    beq @load_alien
+    beq @load_cave
     cmp #LOCATION_SECRET_CAVE
-    beq @load_alien
+    beq @load_cave
+    cmp #LOCATION_DARK_CAVE
+    beq @load_cave
     cmp #LOCATION_CRASHSITE
     beq @load_crashsite
+    cmp #LOCATION_ALIEN_BASE
+    beq @load_alien
     jmp @main_bank
 
 @load_alien:
     jsr LoadAlienGfx
+    jmp @done_copying
+
+@load_cave:
+    jsr LoadCaveGfx
     jmp @done_copying
 
 @load_crashsite:
