@@ -248,14 +248,14 @@ fist_collision_pos:
 ;   tile column
 ;   tile value after destruction
 destructible_tiles_list:                 ;sc  y   x
-    .byte LOCATION_FIRST,       $27, $70, 3, 27, 16, $44, 0
-    .byte LOCATION_FIRST,       $27, $71, 3, 27, 17, $44, 0
-    .byte LOCATION_FIRST,       $27, $90, 3, 28, 16, $44, 0
-    .byte LOCATION_FIRST,       $27, $91, 3, 28, 17, $44, 0
-    .byte LOCATION_SECRET_CAVE, $21, $88, 0, 12, 8,  $44, 0
-    .byte LOCATION_SECRET_CAVE, $21, $89, 0, 12, 9,  $44, 0
-    .byte LOCATION_SECRET_CAVE, $21, $A8, 0, 13, 8,  $44, 0
-    .byte LOCATION_SECRET_CAVE, $21, $A9, 0, 13, 9,  $44, 0
+    .byte LOCATION_FIRST,       $27, $70, 3, 27, 16, $7C, 0
+    .byte LOCATION_FIRST,       $27, $71, 3, 27, 17, $7C, 0
+    .byte LOCATION_FIRST,       $27, $90, 3, 28, 16, $7C, 0
+    .byte LOCATION_FIRST,       $27, $91, 3, 28, 17, $7C, 0
+    .byte LOCATION_SECRET_CAVE, $21, $88, 0, 12, 8,  $5E, 0
+    .byte LOCATION_SECRET_CAVE, $21, $89, 0, 12, 9,  $5E, 0
+    .byte LOCATION_SECRET_CAVE, $21, $A8, 0, 13, 8,  $5E, 0
+    .byte LOCATION_SECRET_CAVE, $21, $A9, 0, 13, 9,  $5E, 0
     .byte LOCATION_ALIEN_BASE,  $25, $0D, 1, 8,  13, $D8, 0
     .byte LOCATION_ALIEN_BASE,  $25, $2D, 1, 9,  13, $5A, 0
 
@@ -338,7 +338,7 @@ sun_moon_tiles_for_periods:
     .byte $00, $32, $33, $00 ;$40
     .byte $00, $00, $32, $33 ;$30
     .byte $31, $00, $32, $33 ;$20
-    .byte $30, $31, $00, $52 ;$10
+    .byte $30, $31, $00, $32 ;$10
     .byte $00, $30, $31, $00 ;$00
     .byte $00, $30, $31, $00 ;$00
     .byte $00, $30, $31, $00 ;$00

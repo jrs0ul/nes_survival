@@ -77,8 +77,8 @@
 
     PROJECTILE_TILE            = $37
 
-    ICE_TILE_A                 = $3A
-    ICE_TILE_B                 = $4A
+    ICE_TILE_A                 = $68
+    ICE_TILE_B                 = $69
     FIRE_TILE                  = $80
 
     DESTRUCTIBLE_TILE_VALUE    = $F7
