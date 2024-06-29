@@ -21,7 +21,7 @@ boss_npcs:
 
 cave_npcs:
     .byte 1
-    .byte %01100001, 45, 90, 1, 8
+    .byte %01100001, 45, 90, 2, 8
 
 dark_cave_npcs:
     .byte 6

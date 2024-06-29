@@ -45,13 +45,13 @@ MapEntryPoints:
     .byte 5, 0, 0, 255, 0, 255, 152, 255
     ;------------------------
     ;12.crashsite entrance from cave
-    .byte 6, 0, 0, 255, 0, 255, 0, 22
+    .byte 6, 0, 119, 125, 182, 204, 0, 22
     ;13.cave exit to cave location
-    .byte 6, 0, 0, 255, 0, 255, 222, 255
+    .byte 6, 0, 119, 125, 220, 230, 222, 255
     ;14.dark cave entrance bottom
-    .byte 6, 1, 232, 255, 0, 255, 160, 199
+    .byte 6, 2, 232, 255, 0, 255, 160, 199
     ;15.alien base entrance top
-    .byte 6, 1, 232, 255, 0, 255, 24, 55
+    .byte 6, 2, 232, 255, 0, 255, 24, 55
     ;--------------------------
     ;16.crashsite exit to cave
     .byte 7, 0, 0, 255, 0, 255, 222, 255
@@ -168,7 +168,7 @@ MapSpawnPoint:
     .byte 0, 0, 0, 0, <alien_base_npcs, >alien_base_npcs, 0
     ;---------------------
     ;crashsite exit to cave
-    .byte 56, 34, 6, OUTDOORS_LOC7_SCREEN_COUNT, <Cave_items, >Cave_items, 4, 0, 0
+    .byte 120, 34, 6, OUTDOORS_LOC7_SCREEN_COUNT, <Cave_items, >Cave_items, 4, 192, 0
     .byte 0, 0, 0, 0, <cave_npcs, >cave_npcs, 0
     ;---------------------
     ;exit from granny's location to main
@@ -186,7 +186,7 @@ MapSpawnPoint:
     .byte 0, 0, 0, 2, 0, 0, 0
     ;------------
     ;alien base exit top
-    .byte 230, 50, 6, OUTDOORS_LOC7_SCREEN_COUNT, <Cave_items, >Cave_items, 4, 0, 1
+    .byte 230, 50, 6, OUTDOORS_LOC7_SCREEN_COUNT, <Cave_items, >Cave_items, 4, 0, 2
     .byte 0, 0, 0, 0, <cave_npcs, >cave_npcs, 0
     ;alien base exit to dark cave
     .byte 230, 50, 13, 2, <House_items, >House_items, 4, 0, 1
@@ -196,7 +196,7 @@ MapSpawnPoint:
     .byte 135, 38, 1, OUTDOORS_LOC2_SCREEN_COUNT, <Outside2_items, >Outside2_items, 5, 0, 0
     .byte 0, 0, 0, 3, 0, 0, 0
     ;cave entrance
-    .byte 88, 207, 6, OUTDOORS_LOC7_SCREEN_COUNT, <Cave_items, >Cave_items, 4, 0, 0
+    .byte 120, 207, 6, OUTDOORS_LOC7_SCREEN_COUNT, <Cave_items, >Cave_items, 4, 222, 0
     .byte 0, 0, 0, 0, <cave_npcs, >cave_npcs, 0
     ;boss room entrance
     .byte 20, 120, 12, 1, <House_items, >House_items, 6, 0, 0
@@ -207,7 +207,7 @@ MapSpawnPoint:
     .byte 0, 0, 0, 0, <alien_base_npcs, >alien_base_npcs, 0
     ;----------------
     ;Dark cave exit to light cave
-    .byte 230, 180, 6, OUTDOORS_LOC7_SCREEN_COUNT, <Cave_items, >Cave_items, 4, 0, 1
+    .byte 230, 180, 6, OUTDOORS_LOC7_SCREEN_COUNT, <Cave_items, >Cave_items, 4, 0, 2
     .byte 0, 0, 0, 0, <cave_npcs, >cave_npcs, 0
 
     ;alien base entrance bottom

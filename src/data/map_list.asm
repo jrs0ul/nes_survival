@@ -8,14 +8,14 @@ location_map_pos: ;index where the pointer to the first screen of each location 
     .byte 9  ;4
     .byte 10 ;5
     .byte 11 ;6 cave
-    .byte 13 ;7
-    .byte 15 ;8
-    .byte 18 ;9
-    .byte 19 ;10 alien base
-    .byte 21 ;11
-    .byte 23 ;12 bossroom
-    .byte 24 ;13 dark cave
-    .byte 26 ;14
+    .byte 14 ;7
+    .byte 16 ;8
+    .byte 19 ;9
+    .byte 20 ;10 alien base
+    .byte 22 ;11
+    .byte 24 ;12 bossroom
+    .byte 25 ;13 dark cave
+    .byte 27 ;14
 
 map_list_low:
     .byte <field_bg
@@ -35,8 +35,9 @@ map_list_low:
 
     .byte <villager2_hut
 
-    .byte <cave0
-    .byte <cave1
+    .byte <mine_0
+    .byte <mine_1
+    .byte <mine_2
 
     .byte <crashsite0
     .byte <crashsite
@@ -80,8 +81,9 @@ map_list_high:
 
     .byte >villager2_hut
 
-    .byte >cave0
-    .byte >cave1
+    .byte >mine_0
+    .byte >mine_1
+    .byte >mine_2
 
     .byte >crashsite0
     .byte >crashsite
