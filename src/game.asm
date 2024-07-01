@@ -83,6 +83,8 @@ alien_sprites_chr: .incbin "alien_sprites.lz4"
 .include "data/maps/cropped/mine_2_crop.asm"
 .include "data/maps/cropped/dark_cave0_crop.asm"
 .include "data/maps/cropped/dark_cave1_crop.asm"
+.include "data/maps/cropped/dark_cave2_0_crop.asm"
+.include "data/maps/cropped/dark_cave2_1_crop.asm"
 .include "data/maps/cropped/secret_cave0_crop.asm"
 
 

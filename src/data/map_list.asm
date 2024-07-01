@@ -17,6 +17,7 @@ location_map_pos: ;index where the pointer to the first screen of each location 
     .byte 25 ;13 dark cave
     .byte 27 ;14 secret cave
     .byte 28 ;15 mine room
+    .byte 29 ;16 dark cave 2
 
 map_list_low:
     .byte <field_bg
@@ -63,6 +64,9 @@ map_list_low:
     .byte <secret_cave0
 
     .byte <mine_room
+
+    .byte <dark_cave2_0
+    .byte <dark_cave2_1
 
 
 
@@ -111,3 +115,6 @@ map_list_high:
     .byte >secret_cave0
 
     .byte >mine_room
+
+    .byte >dark_cave2_0
+    .byte >dark_cave2_1

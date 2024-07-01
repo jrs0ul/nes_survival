@@ -86,13 +86,18 @@ MapEntryPoints:
     ;28 Dark cave exit to light cave
     .byte 13, 0, 0, 5, 0, 255, 32, 55
     ;29 alien base entrance bottom
-    .byte 13, 1, 232, 255, 0, 255, 32, 55
+    .byte 13, 1, 200, 240, 0, 255, 200, 255
     ;-------------------------------------
     ;30 Secret cave exit
     .byte 14, 0, 0, 255, 0, 255, 222, 255
     ;-------------------------------------
     ;31 Mine room exit
     .byte 15, 0, 0  , 255, 0, 255, 160, 255
+    ;--------------------------------------
+    ;32. Dark cave2 exit to dark cave 1
+    .byte 16, 0, 10, 50, 0, 255, 0, 32
+    ;33 alien base entrance bottom
+    .byte 16, 1, 232, 255, 0, 255, 32, 55
 
 
 .segment "ROM0"
@@ -172,8 +177,8 @@ MapSpawnPoint:
     .byte 15, 90, 10, 2, <House_items, >House_items, 4, 0, 0
     .byte 0, 0, 0, 0, <alien_base_npcs, >alien_base_npcs, 0
     ;Mine room entrance
-    .byte 128, 152, 15, 1, <House_items, >House_items, 0, 0, 0
-    .byte 1, <house, >house, 0, <House_npcs, >House_npcs, 0
+    .byte 120, 152, 15, 1, <House_items, >House_items, 0, 0, 0
+    .byte 1, <mine_room, >mine_room, 0, <House_npcs, >House_npcs, 0
     ;---------------------
     ;crashsite exit to cave
     .byte 120, 34, 6, OUTDOORS_LOC7_SCREEN_COUNT, <Cave_items, >Cave_items, 4, 192, 0
@@ -229,6 +234,13 @@ MapSpawnPoint:
     ;exit of mine room
     .byte 120, 146, 6, OUTDOORS_LOC7_SCREEN_COUNT, <Cave_items, >Cave_items, 4, 24, 0
     .byte 0, 0, 0, 0, <cave_npcs, >cave_npcs, 0
+    ;-----------------------
+    ;exit to first dar cave
+    .byte 13, 200, 200, 2, <House_items, >House_items, 4, 0, 0
+    .byte 0, 0, 0, 0, <dark_cave_npcs, >dark_cave_npcs, 0
+    ;alien base entrance
+    .byte 15, 170, 10, 2, <House_items, >House_items, 4, 0, 0
+    .byte 0, 0, 0, 0, <alien_base_npcs, >alien_base_npcs, 0
 
 
 
@@ -253,6 +265,7 @@ LocationScreenCountList:
     .byte 2                          ; 13 dark cave
     .byte 1                          ; 14 secret cave
     .byte 1                          ; 15 mine room
+    .byte 2                          ; 16 dark cave extension
 
 ;what is index(0..N) for entry points for each location
 ;note: a loction can have multiple entry points
@@ -273,6 +286,7 @@ LocationEntryPointsPos:
     .byte 28  ;13
     .byte 30  ;14
     .byte 31  ;15
+    .byte 32  ;16
 
 
 ;which location in which bank
@@ -293,6 +307,7 @@ LocationBanks:
     .byte 4  ;13
     .byte 4  ;14
     .byte 3  ;15
+    .byte 4  ;16
 
 
 ;indexes in Item_Location1_Collection_times
@@ -313,6 +328,7 @@ LocationItemIndexes:
     .byte 0
     .byte ITEM_COUNT_LOC1 + ITEM_COUNT_LOC2 + ITEM_COUNT_LOC3 + ITEM_COUNT_LOC7 + ITEM_COUNT_LOC8 + ITEM_COUNT_LOC9
     .byte 0
+    .byte 0
 
 LocationItemCounts:
     .byte ITEM_COUNT_LOC1  ; 0
@@ -330,6 +346,7 @@ LocationItemCounts:
     .byte 0                ; 12
     .byte 0                ; 13
     .byte ITEM_COUNT_LOC14 ; 14 secret cave
+    .byte 0
     .byte 0
 
 LocationsWithRespawnableItems:
@@ -349,6 +366,7 @@ LocationsWithRespawnableItems:
     .byte 0 ; 13  dark cave
     .byte 0 ; 14
     .byte 0 ; 15
+    .byte 0 ; 16
 
 LocationItems:
     .byte  <Outside1_items,        >Outside1_items              ; 0
@@ -367,3 +385,4 @@ LocationItems:
     .byte  <House_items,           >House_items                 ; 13 dark cave
     .byte  <secret_cave_items,     >secret_cave_items           ; 14 secret cave
     .byte  <House_items,           >House_items                 ; 15 mine room
+    .byte  <House_items,           >House_items                 ; 16 dark cave extension

@@ -160,7 +160,7 @@
     ARROW_TILE                 = $38
 
 
-    ENTRY_POINT_COUNT          = 32
+    ENTRY_POINT_COUNT          = 34
 
     SLEEP_POS_X                = 100
     SLEEP_POS_Y                = 72
@@ -200,7 +200,7 @@
     LOCATION_SECRET_CAVE       = 14
     LOCATION_MINE_ROOM         = 15
 
-    MAX_LOCATIONS              = 16
+    MAX_LOCATIONS              = 17
 
     MIN_SCREEN_COUNT_TO_UPDATE = 3
 
