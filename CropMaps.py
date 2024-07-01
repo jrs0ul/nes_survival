@@ -30,12 +30,14 @@ map_files = [
             "crashsite.asm",
             "location_with_cave.asm",
             "location_with_cave2.asm",
-            "secret_cave0.asm"
+            "secret_cave0.asm",
+            "mine_room.asm"
             ]
 
 map_path = "src/data/maps/"
 
 indoor_maps = [
+              "mine_room.asm",
               "house.asm",
               "villager_hut.asm",
               "villager2_hut.asm",

@@ -160,7 +160,7 @@
     ARROW_TILE                 = $38
 
 
-    ENTRY_POINT_COUNT          = 30
+    ENTRY_POINT_COUNT          = 32
 
     SLEEP_POS_X                = 100
     SLEEP_POS_Y                = 72
@@ -198,6 +198,9 @@
     LOCATION_BOSS_ROOM         = 12
     LOCATION_DARK_CAVE         = 13
     LOCATION_SECRET_CAVE       = 14
+    LOCATION_MINE_ROOM         = 15
+
+    MAX_LOCATIONS              = 16
 
     MIN_SCREEN_COUNT_TO_UPDATE = 3
 
@@ -361,7 +364,6 @@
     FADE_DELAY_SLEEP           = 10
     MAX_VILLAGERS              = 4
 
-    MAX_LOCATIONS              = 15
 
     SUBMENU_FOOD               = 1
     SUBMENU_STASH_FOOD         = 2
