@@ -100,7 +100,7 @@ entry_points_loc13:
     ;28 Dark cave exit to light cave
     .byte 28, 0, 0, 5, 0, 255, 32, 55
     ;29 entrance to dark cave second segment
-    .byte 29, 1, 200, 240, 0, 255, 200, 255
+    .byte 29, 1, 189, 240, 0, 255, 222, 255
     ;-------------------------------------
 entry_points_loc14:
     ;30 Secret cave exit
@@ -112,7 +112,7 @@ entry_points_loc15:
     ;--------------------------------------
 entry_points_loc16:
     ;32. Dark cave2 exit to dark cave 1
-    .byte 32, 1, 202, 255, 0, 255, 0, 60
+    .byte 32, 1, 189, 255, 0, 255, 0, 32
     ;33 alien base entrance bottom
     .byte 33, 0, 8, 32, 0, 255, 180, 200
 
@@ -218,9 +218,9 @@ MapSpawnPoint:
     ;alien base exit top
     .byte 230, 50, 6, OUTDOORS_LOC7_SCREEN_COUNT, <Cave_items, >Cave_items, 4, 0, 2
     .byte 0, 0, 0, 0, <cave_npcs, >cave_npcs, 0
-    ;alien base exit to dark cave
-    .byte 230, 50, 13, 2, <House_items, >House_items, 4, 0, 1
-    .byte 0, 0, 0, 0, <dark_cave_npcs, >dark_cave_npcs, 0
+    ;alien base exit to dark cave 2
+    .byte 60, 200, 16, 2, <House_items, >House_items, 4, 0, 0
+    .byte 0, 0, 0, 0, 0, 0, 0
     ;--------------
     ;exit from cave location to bjorn's location
     .byte 135, 38, 1, OUTDOORS_LOC2_SCREEN_COUNT, <Outside2_items, >Outside2_items, 5, 0, 0
@@ -252,8 +252,8 @@ MapSpawnPoint:
     .byte 120, 146, 6, OUTDOORS_LOC7_SCREEN_COUNT, <Cave_items, >Cave_items, 4, 24, 0
     .byte 0, 0, 0, 0, <cave_npcs, >cave_npcs, 0
     ;-----------------------
-    ;exit to first dar cave
-    .byte 13, 200, 200, 2, <House_items, >House_items, 4, 0, 0
+    ;exit to first dark cave
+    .byte 200, 200, 13, 2, <House_items, >House_items, 4, 0, 1
     .byte 0, 0, 0, 0, <dark_cave_npcs, >dark_cave_npcs, 0
     ;alien base entrance
     .byte 15, 170, 10, 2, <House_items, >House_items, 4, 0, 0

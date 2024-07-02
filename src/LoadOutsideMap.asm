@@ -130,6 +130,11 @@ LoadMainTileset:
     sta MustLoadCoreSprites
 
 @loadAnimals:
+    lda #ARGUMENT_STACK_HI
+    sta sp
+    lda #ARGUMENT_STACK_LO
+    sta sp + 1
+
     lda #<main_animal_sprites
     ldy #2
     sta (sp), y
@@ -145,6 +150,11 @@ LoadMainTileset:
     ldx #$06
     jsr UnLZ4toVram
 
+    lda #ARGUMENT_STACK_HI
+    sta sp
+    lda #ARGUMENT_STACK_LO
+    sta sp + 1
+
     lda #<font
     ldy #2
     sta (sp), y
@@ -159,6 +169,11 @@ LoadMainTileset:
     sta (sp), y
     ldx #$03
     jsr UnLZ4toVram
+
+    lda #ARGUMENT_STACK_HI
+    sta sp
+    lda #ARGUMENT_STACK_LO
+    sta sp + 1
 
     lda #<UI_tiles
     ldy #2
@@ -227,6 +242,7 @@ LoadOutsideMap:
     cmp #LOCATION_SECRET_CAVE
     beq @load_cave
     cmp #LOCATION_DARK_CAVE
+    cmp #LOCATION_DARK_CAVE2
     beq @load_cave
     cmp #LOCATION_CRASHSITE
     beq @load_crashsite

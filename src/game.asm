@@ -1354,19 +1354,26 @@ BSSBuffer:
 
 ;====================================================================================
 
-.macro bankswitch
-    sty current_bank      ; save the current bank in RAM so the NMI handler can restore it
-    lda banktable, y      ; read a byte from the banktable
-    sta banktable, y      ; and write it back, switching banks
-.endmacro
+;.macro bankswitch
+;    sty current_bank      ; save the current bank in RAM so the NMI handler can restore it
+;    lda banktable, y      ; read a byte from the banktable
+;    sta banktable, y      ; and write it back, switching banks
+;.endmacro
 
 .segment "CODE"
 ;---------------------------
 bankswitch_y:
+;    cpy #8
+;    bcs basta
+
     sty current_bank      ; save the current bank in RAM so the NMI handler can restore it
 bankswitch_nosave:
     lda banktable, y      ; read a byte from the banktable
-    sta banktable, y      ; and write it back, switching banks 
+    sta banktable, y      ; and write it back, switching banks
+;    jmp end
+;basta:
+;    lda #1
+;end:
     rts
 ;----------------------------
 reset:
@@ -1751,7 +1758,8 @@ endOfNmi:
     beq noBankSwitch
 
     ldy bankBeforeNMI
-    bankswitch
+    ;bankswitch
+    jsr bankswitch_y
 
 noBankSwitch:
     lda #0
@@ -1852,12 +1860,14 @@ doGameOver:
     ldy current_bank
     sty oldbank
     ldy #5
-    bankswitch
+    ;bankswitch
+    jsr bankswitch_y
 
     jsr UpdateGameOverSprites ; bank 5
 
     ldy oldbank
-    bankswitch
+    ;bankswitch
+    jsr bankswitch_y
 
 
     rts
@@ -1871,13 +1881,15 @@ doIntro:
     ldy current_bank
     sty oldbank
     ldy #5
-    bankswitch
+    ;bankswitch
+    jsr bankswitch_y
 
     jsr IntroLogics
     jsr UpdateIntroSprites
 
     ldy oldbank
-    bankswitch
+    ;bankswitch
+    jsr bankswitch_y
     rts
 ;---------------------------------
 doOutro:
@@ -1889,13 +1901,15 @@ doOutro:
     ldy current_bank
     sty oldbank
     ldy #5
-    bankswitch
+    ;bankswitch
+    jsr bankswitch_y
 
     jsr OutroLogics
     jsr UpdateOutroSprites
 
     ldy oldbank
-    bankswitch
+    ;bankswitch
+    jsr bankswitch_y
 
     rts
 ;--------------------------------------
@@ -1904,12 +1918,14 @@ doTitle:
     ldy current_bank
     sty oldbank
     ldy #5
-    bankswitch
+    ;bankswitch
+    jsr bankswitch_y
 
     jsr TitleLogics
 
     ldy oldbank
-    bankswitch
+    ;bankswitch
+    jsr bankswitch_y
 
     rts
 
@@ -2346,7 +2362,8 @@ CheckEntryPoints:
     lda LocationIndex
     tax
     lda EntryPointCountForLocation, x
-    sta TempPointY
+    sta TempNpcCnt ; save entry point count
+
     lda LocationIndex
     asl
     tax
@@ -2356,8 +2373,13 @@ CheckEntryPoints:
     lda LocationEntryPointPtrs, x
     sta pointer2 + 1
     ldy #0
+    ldx #0
 @entryPointLoop:
-
+    txa
+    asl
+    asl
+    asl
+    tay
 
     lda (pointer2), y ; entry index
     sta ActiveMapEntryIndex
@@ -2408,7 +2430,7 @@ CheckEntryPoints:
 
 @nextEntry:
     inx
-    cpx TempPointY ; count for that location
+    cpx TempNpcCnt ; count for that location
     bcc @entryPointLoop
 
 @exit:
@@ -5182,6 +5204,12 @@ LoadTitleGfx:
     ldy #2
     jsr bankswitch_y ;switching to Title/Game Over bank
 
+    lda #ARGUMENT_STACK_HI
+    sta sp
+    lda #ARGUMENT_STACK_LO
+    sta sp + 1
+
+
     lda #<title_tiles_chr
     ldy #$02
     sta (sp),y
@@ -5250,8 +5278,11 @@ LoadTitle:
 ;-------------------------------------
 LoadGameOver:
     lda MustLoadGameOver
-    beq @exit
+    bne @cont
 
+    rts
+
+@cont:
     lda #1
     sta MustPlayNewSong
     lda #3
@@ -5289,6 +5320,11 @@ LoadGameOver:
 
     ldy #2
     jsr bankswitch_y ;switching to Title/Game Over bank
+
+    lda #ARGUMENT_STACK_HI
+    sta sp
+    lda #ARGUMENT_STACK_LO
+    sta sp + 1
 
     lda #<gameover_tiles_chr
     ldy #$02
@@ -5928,9 +5964,9 @@ LoadCheckPoint:
 
     lda #6
     sta LocationIndex
-    lda #2
+    lda #3
     sta ScreenCount
-    lda #1
+    lda #2
     sta CurrentMapSegmentIndex
     lda #4
     sta LocationBankNo

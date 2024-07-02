@@ -413,6 +413,10 @@ LoadIndoorMapData:
     ldx #11
     jsr UnLZ4toVram
 
+    lda #ARGUMENT_STACK_HI
+    sta sp
+    lda #ARGUMENT_STACK_LO
+    sta sp + 1
 
     lda #<house_sprites_chr
     ldy #2

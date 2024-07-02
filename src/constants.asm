@@ -197,6 +197,7 @@
     LOCATION_DARK_CAVE         = 13
     LOCATION_SECRET_CAVE       = 14
     LOCATION_MINE_ROOM         = 15
+    LOCATION_DARK_CAVE2        = 16
 
     MAX_LOCATIONS              = 17
 
