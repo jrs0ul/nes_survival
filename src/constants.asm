@@ -160,8 +160,6 @@
     ARROW_TILE                 = $38
 
 
-    ENTRY_POINT_COUNT          = 34
-
     SLEEP_POS_X                = 100
     SLEEP_POS_Y                = 72
 

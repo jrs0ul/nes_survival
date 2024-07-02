@@ -2343,45 +2343,48 @@ RestoreStamina:
 CheckEntryPoints:
 
 
-    ldx LocationIndex
-    lda LocationEntryPointsPos, x
+    lda LocationIndex
     tax
+    lda EntryPointCountForLocation, x
+    sta TempPointY
+    lda LocationIndex
+    asl
+    tax
+    lda LocationEntryPointPtrs, x
+    sta pointer2
+    inx
+    lda LocationEntryPointPtrs, x
+    sta pointer2 + 1
+    ldy #0
 @entryPointLoop:
 
-    txa
-    asl
-    asl
-    asl ; entry index * 8
-    tay
 
-    lda MapEntryPoints, y ; location index
-    cmp LocationIndex
-    bcc @exit ; location from list is less than current, we're done
-    bne @nextEntry ; not equal? next!
+    lda (pointer2), y ; entry index
+    sta ActiveMapEntryIndex
     iny
-    lda MapEntryPoints, y ; CurrentMapSegmentIndex
+    lda (pointer2), y ; CurrentMapSegmentIndex
     cmp CurrentMapSegmentIndex
     bne @nextEntry
     iny             ;minX
     lda PlayerX
-    cmp MapEntryPoints, y
+    cmp (pointer2), y
     bcc @nextEntry
     iny             ;maxX
-    cmp MapEntryPoints, y
+    cmp (pointer2), y
     bcs @nextEntry
     lda ScrollX
     iny
-    cmp MapEntryPoints, y
+    cmp (pointer2), y
     bcc @nextEntry
     iny
-    cmp MapEntryPoints, y
+    cmp (pointer2), y
     bcs @nextEntry
     lda PlayerY
     iny             ;minY
-    cmp MapEntryPoints, y
+    cmp (pointer2), y
     bcc @nextEntry
     iny
-    cmp MapEntryPoints, y
+    cmp (pointer2), y
     bcs @nextEntry
 
 
@@ -2390,9 +2393,6 @@ CheckEntryPoints:
 
 
     ldy #0
-
-    stx ActiveMapEntryIndex
-
     lda #1
     sta PaletteFadeAnimationState
     sta IsLocationRoutine
@@ -2408,7 +2408,7 @@ CheckEntryPoints:
 
 @nextEntry:
     inx
-    cpx #ENTRY_POINT_COUNT
+    cpx TempPointY ; count for that location
     bcc @entryPointLoop
 
 @exit:
@@ -3392,11 +3392,11 @@ RoutinesAfterFadeOut:
 
     jsr OnExitVillagerHut
     ;-----------------------------
-    ;29.alien base entrance bottom
+    ;33.alien base entrance bottom
 @next19:
 
     lda ActiveMapEntryIndex
-    cmp #29
+    cmp #33
     bne @next20
 
     lda #1
