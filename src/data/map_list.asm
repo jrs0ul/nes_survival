@@ -18,6 +18,7 @@ location_map_pos: ;index where the pointer to the first screen of each location 
     .byte 27 ;14 secret cave
     .byte 28 ;15 mine room
     .byte 29 ;16 dark cave 2
+    .byte 31 ;17 alien base lobby
 
 map_list_low:
     .byte <field_bg
@@ -67,6 +68,8 @@ map_list_low:
 
     .byte <dark_cave2_0
     .byte <dark_cave2_1
+
+    .byte <alien_base_lobby
 
 
 
@@ -118,3 +121,5 @@ map_list_high:
 
     .byte >dark_cave2_0
     .byte >dark_cave2_1
+
+    .byte >alien_base_lobby

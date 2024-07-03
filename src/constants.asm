@@ -198,8 +198,9 @@
     LOCATION_SECRET_CAVE       = 14
     LOCATION_MINE_ROOM         = 15
     LOCATION_DARK_CAVE2        = 16
+    LOCATION_ALIEN_BASE_LOBBY  = 17
 
-    MAX_LOCATIONS              = 17
+    MAX_LOCATIONS              = 18
 
     MIN_SCREEN_COUNT_TO_UPDATE = 3
 

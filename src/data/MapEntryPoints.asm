@@ -83,14 +83,14 @@ entry_points_loc10:
     .byte 22, 0, 0, 5, 0, 255, 88, 111
     ;23.alien base exit bottom
     .byte 23, 0, 0, 5, 0, 255, 160, 200
+    ;24. Boss room entrance
+    .byte 24, 1, 238, 255, 0, 255, 112, 128
     ;--------------------------
 entry_points_loc11:
-    ;24.exit from cave location to bjorn's location
-    .byte 24, 0, 0, 255, 0,255, 222, 255
-    ;25.cave entrance from location 11
-    .byte 25, 0, 117, 122, 22, 28, 40, 50
-    ;26. Boss room entrance
-    .byte 26, 1, 238, 255, 0, 255, 112, 128
+    ;25.exit from cave location to bjorn's location
+    .byte 25, 0, 0, 255, 0,255, 222, 255
+    ;26.cave entrance from location 11
+    .byte 26, 0, 117, 122, 22, 28, 40, 50
     ;-------------------------------------
 entry_points_loc12:
     ;27 Boss room exit
@@ -113,9 +113,14 @@ entry_points_loc15:
 entry_points_loc16:
     ;32. Dark cave2 exit to dark cave 1
     .byte 32, 1, 189, 255, 0, 255, 0, 32
-    ;33 alien base entrance bottom
+    ;33 alien base lobby entrance
     .byte 33, 0, 8, 32, 0, 255, 180, 200
-
+    ;--------------------------------------
+entry_points_loc17:
+    ;34 alien base entrance bottom
+    .byte 34, 0, 200, 255, 0, 255, 120, 130
+    ;35 exit to dark cave 2
+    .byte 35, 0, 32, 40, 0, 255, 119, 130
 
 .segment "ROM0"
 ;-----------------------------------------------------
@@ -216,11 +221,14 @@ MapSpawnPoint:
     .byte 0, 0, 0, 2, 0, 0, 0
     ;------------
     ;alien base exit top
-    .byte 230, 50, 6, OUTDOORS_LOC7_SCREEN_COUNT, <Cave_items, >Cave_items, 4, 0, 2
+    .byte 220, 50, 6, OUTDOORS_LOC7_SCREEN_COUNT, <Cave_items, >Cave_items, 4, 0, 2
     .byte 0, 0, 0, 0, <cave_npcs, >cave_npcs, 0
-    ;alien base exit to dark cave 2
-    .byte 60, 200, 16, 2, <House_items, >House_items, 4, 0, 0
+    ;alien base exit to lobby
+    .byte 60, 200, 17, 1, <House_items, >House_items, 4, 0, 0
     .byte 0, 0, 0, 0, 0, 0, 0
+    ;boss room entrance
+    .byte 20, 120, 12, 1, <House_items, >House_items, 6, 0, 0
+    .byte 1, <alien_bossroom, >alien_bossroom, 0, 0, 0, 0
     ;--------------
     ;exit from cave location to bjorn's location
     .byte 135, 38, 1, OUTDOORS_LOC2_SCREEN_COUNT, <Outside2_items, >Outside2_items, 5, 0, 0
@@ -228,9 +236,6 @@ MapSpawnPoint:
     ;cave entrance
     .byte 120, 207, 6, OUTDOORS_LOC7_SCREEN_COUNT, <Cave_items, >Cave_items, 4, 222, 0
     .byte 0, 0, 0, 0, <cave_npcs, >cave_npcs, 0
-    ;boss room entrance
-    .byte 20, 120, 12, 1, <House_items, >House_items, 6, 0, 0
-    .byte 1, <alien_bossroom, >alien_bossroom, 0, 0, 0, 0
     ;---------------
     ;boss room exit
     .byte 223, 120, 10, 2, <House_items, >House_items, 4, 0, 1
@@ -255,9 +260,18 @@ MapSpawnPoint:
     ;exit to first dark cave
     .byte 200, 200, 13, 2, <House_items, >House_items, 4, 0, 1
     .byte 0, 0, 0, 0, <dark_cave_npcs, >dark_cave_npcs, 0
-    ;alien base entrance
+    ;alien base lobby entrance
+    .byte 80, 170, 17, 1, <House_items, >House_items, 4, 0, 0
+    .byte 0, 0, 0, 0, 0, 0, 0
+    ;------------
+    ;alien base entrance bottom
     .byte 15, 170, 10, 2, <House_items, >House_items, 4, 0, 0
     .byte 0, 0, 0, 0, <alien_base_npcs, >alien_base_npcs, 0
+    ;------------
+    ;exit to dark cave 2
+    .byte 80, 170, 16, 2, <House_items, >House_items, 4, 0, 0
+    .byte 0, 0, 0, 0, 0, 0, 0
+
 
 
 
@@ -283,6 +297,7 @@ LocationScreenCountList:
     .byte 1                          ; 14 secret cave
     .byte 1                          ; 15 mine room
     .byte 2                          ; 16 dark cave extension
+    .byte 1                          ; 17 alien base lobby
 
 
 LocationEntryPointPtrs:
@@ -303,6 +318,7 @@ LocationEntryPointPtrs:
     .byte <entry_points_loc14, >entry_points_loc14
     .byte <entry_points_loc15, >entry_points_loc15
     .byte <entry_points_loc16, >entry_points_loc16
+    .byte <entry_points_loc17, >entry_points_loc17
 
 EntryPointCountForLocation:
     .byte 4 ;0
@@ -315,13 +331,14 @@ EntryPointCountForLocation:
     .byte 1 ;7
     .byte 3 ;8
     .byte 1 ;9
-    .byte 2 ;10
-    .byte 3 ;11
+    .byte 3 ;10 alien base
+    .byte 2 ;11 location with the mine
     .byte 1 ;12
     .byte 2 ;13
     .byte 1 ;14
     .byte 1 ;15
-    .byte 2 ;16
+    .byte 2 ;16 dark cave 2
+    .byte 2 ;17
 
 
 ;which location in which bank
@@ -343,6 +360,7 @@ LocationBanks:
     .byte 4  ;14
     .byte 3  ;15
     .byte 4  ;16
+    .byte 4  ;17
 
 
 ;indexes in Item_Location1_Collection_times
@@ -364,6 +382,7 @@ LocationItemIndexes:
     .byte ITEM_COUNT_LOC1 + ITEM_COUNT_LOC2 + ITEM_COUNT_LOC3 + ITEM_COUNT_LOC7 + ITEM_COUNT_LOC8 + ITEM_COUNT_LOC9
     .byte 0
     .byte 0
+    .byte 0
 
 LocationItemCounts:
     .byte ITEM_COUNT_LOC1  ; 0
@@ -381,8 +400,9 @@ LocationItemCounts:
     .byte 0                ; 12
     .byte 0                ; 13
     .byte ITEM_COUNT_LOC14 ; 14 secret cave
-    .byte 0
-    .byte 0
+    .byte 0                ; 15
+    .byte 0                ; 16
+    .byte 0                ; 17
 
 LocationsWithRespawnableItems:
     .byte 1 ; 0
@@ -402,6 +422,7 @@ LocationsWithRespawnableItems:
     .byte 0 ; 14
     .byte 0 ; 15
     .byte 0 ; 16
+    .byte 0 ; 17
 
 LocationItems:
     .byte  <Outside1_items,        >Outside1_items              ; 0
@@ -421,3 +442,4 @@ LocationItems:
     .byte  <secret_cave_items,     >secret_cave_items           ; 14 secret cave
     .byte  <House_items,           >House_items                 ; 15 mine room
     .byte  <House_items,           >House_items                 ; 16 dark cave extension
+    .byte  <House_items,           >House_items                 ; 17 alien base lobby

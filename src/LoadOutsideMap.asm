@@ -242,10 +242,13 @@ LoadOutsideMap:
     cmp #LOCATION_SECRET_CAVE
     beq @load_cave
     cmp #LOCATION_DARK_CAVE
+    beq @load_cave
     cmp #LOCATION_DARK_CAVE2
     beq @load_cave
     cmp #LOCATION_CRASHSITE
     beq @load_crashsite
+    cmp #LOCATION_ALIEN_BASE_LOBBY
+    beq @load_alien
     cmp #LOCATION_ALIEN_BASE
     beq @load_alien
     jmp @main_bank

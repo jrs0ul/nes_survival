@@ -33,7 +33,8 @@ map_files = [
             "location_with_cave.asm",
             "location_with_cave2.asm",
             "secret_cave0.asm",
-            "mine_room.asm"
+            "mine_room.asm",
+            "alien_base_lobby.asm"
             ]
 
 map_path = "src/data/maps/"

@@ -78,6 +78,7 @@ alien_sprites_chr: .incbin "alien_sprites.lz4"
 
 .include "data/maps/cropped/alien_base1_crop.asm"
 .include "data/maps/cropped/alien_base2_crop.asm"
+.include "data/maps/cropped/alien_base_lobby_crop.asm"
 .include "data/maps/cropped/mine_0_crop.asm"
 .include "data/maps/cropped/mine_1_crop.asm"
 .include "data/maps/cropped/mine_2_crop.asm"
@@ -3304,10 +3305,10 @@ RoutinesAfterFadeOut:
 
     jsr OnExitVillagerHut
     ;----------------------------
-    ;25.cave entrance from location 11
+    ;26.cave entrance from location 11
 @next11:
     lda ActiveMapEntryIndex
-    cmp #25
+    cmp #26
     bne @next12
 
     lda #1
@@ -3489,11 +3490,11 @@ RoutinesAfterFadeOut:
     sta CurrentMapPalettePtr + 1
 
     ;---------------------------
-    ;26. Boss room entrance
+    ;24. Boss room entrance
 @next24:
 
     lda ActiveMapEntryIndex
-    cmp #26
+    cmp #24
     bne @next25
 
     lda #<alien_palette
@@ -3634,7 +3635,7 @@ RoutinesAfterFadeOut:
     sta InVillagerHut
 
     lda ActiveMapEntryIndex
-    cmp #26
+    cmp #27     ; CRUTCH
     beq @notcopy
     lda #1
     jmp @saveCopyFlag
@@ -3649,7 +3650,7 @@ RoutinesAfterFadeOut:
     sta MustLoadHouseInterior
 
     lda ActiveMapEntryIndex
-    cmp #25
+    cmp #24   ;ANOTHER CRUTCH
     beq @BossRoom
     lda #1
     jmp @saveCHRloading
