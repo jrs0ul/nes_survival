@@ -12,13 +12,13 @@ location_map_pos: ;index where the pointer to the first screen of each location 
     .byte 16 ;8
     .byte 19 ;9
     .byte 20 ;10 alien base
-    .byte 22 ;11
-    .byte 24 ;12 bossroom
-    .byte 25 ;13 dark cave
-    .byte 27 ;14 secret cave
-    .byte 28 ;15 mine room
-    .byte 29 ;16 dark cave 2
-    .byte 31 ;17 alien base lobby
+    .byte 22 ;11 location with mine entrance
+    .byte 25 ;12 bossroom
+    .byte 26 ;13 dark cave
+    .byte 28 ;14 secret cave
+    .byte 29 ;15 mine room
+    .byte 30 ;16 dark cave 2
+    .byte 32 ;17 alien base lobby
 
 map_list_low:
     .byte <field_bg
@@ -43,7 +43,8 @@ map_list_low:
     .byte <mine_2
 
     .byte <crashsite0
-    .byte <crashsite
+    .byte <crashsite1
+    .byte <crashsite2
 
     .byte <babloc1
     .byte <babloc2
@@ -54,8 +55,10 @@ map_list_low:
     .byte <alien_base1
     .byte <alien_base2
 
-    .byte <location_with_cave
+    .byte <location_with_cave0
+    .byte <location_with_cave1
     .byte <location_with_cave2
+    .byte <location_with_cave3
 
     .byte <alien_bossroom
 
@@ -70,6 +73,8 @@ map_list_low:
     .byte <dark_cave2_1
 
     .byte <alien_base_lobby
+
+    .byte <path_to_crashsite
 
 
 
@@ -96,7 +101,8 @@ map_list_high:
     .byte >mine_2
 
     .byte >crashsite0
-    .byte >crashsite
+    .byte >crashsite1
+    .byte >crashsite2
 
     .byte >babloc1
     .byte >babloc2
@@ -107,8 +113,10 @@ map_list_high:
     .byte >alien_base1
     .byte >alien_base2
 
-    .byte >location_with_cave
+    .byte >location_with_cave0
+    .byte >location_with_cave1
     .byte >location_with_cave2
+    .byte >location_with_cave3
 
     .byte >alien_bossroom
 
@@ -123,3 +131,5 @@ map_list_high:
     .byte >dark_cave2_1
 
     .byte >alien_base_lobby
+
+    .byte >path_to_crashsite

@@ -29,12 +29,16 @@ map_files = [
             "field2_bg.asm",
             "field2_bg1.asm",
             "crashsite0.asm",
-            "crashsite.asm",
-            "location_with_cave.asm",
+            "crashsite1.asm",
+            "crashsite2.asm",
+            "location_with_cave0.asm",
+            "location_with_cave1.asm",
             "location_with_cave2.asm",
+            "location_with_cave3.asm",
             "secret_cave0.asm",
             "mine_room.asm",
-            "alien_base_lobby.asm"
+            "alien_base_lobby.asm",
+            "path_to_crashsite.asm"
             ]
 
 map_path = "src/data/maps/"

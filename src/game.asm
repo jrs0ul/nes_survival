@@ -36,6 +36,7 @@ main_bg_tiles       : .incbin "main_bg_tiles.lz4"
 .include "data/maps/cropped/field_bg4_crop.asm"
 .include "data/maps/cropped/LOC3_bg1_crop.asm"
 .include "data/maps/cropped/LOC3_bg0_crop.asm"
+.include "data/maps/cropped/path_to_crashsite_crop.asm"
 .include "data/Outside1_items.asm"
 .include "data/Outside3_items.asm"
 
@@ -87,6 +88,9 @@ alien_sprites_chr: .incbin "alien_sprites.lz4"
 .include "data/maps/cropped/dark_cave2_0_crop.asm"
 .include "data/maps/cropped/dark_cave2_1_crop.asm"
 .include "data/maps/cropped/secret_cave0_crop.asm"
+.include "data/maps/cropped/crashsite0_crop.asm"
+.include "data/maps/cropped/crashsite1_crop.asm"
+.include "data/maps/cropped/crashsite2_crop.asm"
 
 
 ;=============================================================
@@ -139,10 +143,10 @@ game_over_sprites:
 .include "data/maps/cropped/babloc3_crop.asm"
 .include "data/maps/cropped/field2_bg_crop.asm"
 .include "data/maps/cropped/field2_bg1_crop.asm"
-.include "data/maps/cropped/crashsite0_crop.asm"
-.include "data/maps/cropped/crashsite_crop.asm"
-.include "data/maps/cropped/location_with_cave_crop.asm"
+.include "data/maps/cropped/location_with_cave0_crop.asm"
+.include "data/maps/cropped/location_with_cave1_crop.asm"
 .include "data/maps/cropped/location_with_cave2_crop.asm"
+.include "data/maps/cropped/location_with_cave3_crop.asm"
 
 ;=============================================================
 .segment "ROM6"

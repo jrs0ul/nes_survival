@@ -29,7 +29,7 @@ entry_points_loc1:
     .byte 4, 0, 118, 136, 169, 192, $68, $6F
     ;5.Exit point of second location
     .byte 5, 0, 0, 255, 0, 255, 222, 255
-    ;6.entrance to cave location
+    ;6.entrance to mine location
     .byte 6, 0, 0, 255, 0, 255, 0, 20
     ;----------------------------------------
 entry_points_loc2:
@@ -163,8 +163,8 @@ MapSpawnPoint:
     ;Exit point of second location
     .byte 128, 32, 0, OUTDOORS_LOC1_SCREEN_COUNT, <Outside1_items, >Outside1_items, 0, 0, OUTDOORS_LOC1_SCREEN_COUNT - 1
     .byte 0, 0, 0, 3, 0, 0, 3
-    ;entrance to cave location
-    .byte 119, 218, 11, OUTDOORS_LOC12_SCREEN_COUNT, <House_items, >House_items, 5, 160, 0
+    ;entrance to mine location
+    .byte 119, 210, 11, OUTDOORS_LOC12_SCREEN_COUNT, <House_items, >House_items, 5, 160, 1
     .byte 0, 0, 0, 2, 0, 0, 0
     ;-----------------
     ;Exit point of third location

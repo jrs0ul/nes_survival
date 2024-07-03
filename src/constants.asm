@@ -184,7 +184,7 @@
     OUTDOORS_LOC3_SCREEN_COUNT  = 2
     OUTDOORS_LOC7_SCREEN_COUNT  = 3 ; cave
     OUTDOORS_LOC9_SCREEN_COUNT  = 3 ; granny's
-    OUTDOORS_LOC12_SCREEN_COUNT = 2 ; locations with the northern cave
+    OUTDOORS_LOC12_SCREEN_COUNT = 3 ; locations with the northern cave
 
     PLAYER_START_X             = $50
     PLAYER_START_Y             = 200
