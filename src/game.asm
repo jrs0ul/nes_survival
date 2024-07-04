@@ -3309,10 +3309,10 @@ RoutinesAfterFadeOut:
 
     jsr OnExitVillagerHut
     ;----------------------------
-    ;26.cave entrance from location 11
+    ;27.cave entrance from location 11
 @next11:
     lda ActiveMapEntryIndex
-    cmp #26
+    cmp #27
     bne @next12
 
     lda #1
@@ -3373,20 +3373,20 @@ RoutinesAfterFadeOut:
     sta MustCopyMainChr
     lda #0
     sta CheckpointSaved
-
-    ;18. exit from the grannys location
+    ;-------------------------
+    ;19. exit from the grannys location
 @next16:
     lda ActiveMapEntryIndex
-    cmp #18
+    cmp #19
     bne @next17
 
 
     jsr FlipStartingNametable ; for the breakable rock
     ;----------------------------
-    ;19.granny's house
+    ;20.granny's house
 @next17:
     lda ActiveMapEntryIndex
-    cmp #19
+    cmp #20
     bne @next18
 
     lda #1
@@ -3408,10 +3408,10 @@ RoutinesAfterFadeOut:
     jsr SpawnSpecialItemOwnerReward
 
     ;-------------------------------
-    ;21.exit from grannys house
+    ;22.exit from grannys house
 @next18:
     lda ActiveMapEntryIndex
-    cmp #21
+    cmp #22
     bne @next19
 
     lda #2
@@ -3419,11 +3419,11 @@ RoutinesAfterFadeOut:
 
     jsr OnExitVillagerHut
     ;-----------------------------
-    ;35.alien base entrance bottom
+    ;36.alien base entrance bottom
 @next19:
 
     lda ActiveMapEntryIndex
-    cmp #35
+    cmp #36
     bne @next20
 
     lda #1
@@ -3455,7 +3455,7 @@ RoutinesAfterFadeOut:
     sta CurrentMapPalettePtr + 1
     
     ;------------------------
-    ;mine room
+    ;16. mine room
 @next21:
     lda ActiveMapEntryIndex
     cmp #16
@@ -3465,22 +3465,22 @@ RoutinesAfterFadeOut:
     sta InHouse
 
     ;--------------------
-    ;22.alien base exit top
+    ;23.alien base exit top
 @next22:
 
     lda ActiveMapEntryIndex
-    cmp #22
+    cmp #23
     bne @next23
 
     lda #1
     sta MustCopyMainChr
     sta InCave
     ;--------------------------
-    ;23.alien base exit to the dark cave
+    ;24.alien base exit to the dark cave
 @next23:
 
     lda ActiveMapEntryIndex
-    cmp #23
+    cmp #24
     bne @next24
 
     lda #1
@@ -3494,11 +3494,11 @@ RoutinesAfterFadeOut:
     sta CurrentMapPalettePtr + 1
 
     ;---------------------------
-    ;24. Boss room entrance
+    ;25. Boss room entrance
 @next24:
 
     lda ActiveMapEntryIndex
-    cmp #24
+    cmp #25
     bne @next25
 
     lda #<alien_palette
@@ -3527,11 +3527,11 @@ RoutinesAfterFadeOut:
     lda #1
     sta MustPlayNewSong
     ;-------------------------
-    ;27 Boss room exit
+    ;28 Boss room exit
 @next25:
 
     lda ActiveMapEntryIndex
-    cmp #27
+    cmp #28
     bne @next26
 
     lda #<alien_palette
@@ -3546,10 +3546,10 @@ RoutinesAfterFadeOut:
     lda #1
     sta MustPlayNewSong
 
-    ;29 exit to light cave
+    ;30 exit to light cave
 @next26:
     lda ActiveMapEntryIndex
-    cmp #29
+    cmp #30
     bne @next27
 
     lda #1
@@ -3586,10 +3586,10 @@ RoutinesAfterFadeOut:
     ldy oldbank
     jsr bankswitch_y
     ;---------------------
-    ;20 secret cave entrance
+    ;21 secret cave entrance
 @next28:
     lda ActiveMapEntryIndex
-    cmp #20
+    cmp #21
     bne @next29
 
     lda #1
@@ -3603,20 +3603,20 @@ RoutinesAfterFadeOut:
     lda #>dark_cave_palette
     sta CurrentMapPalettePtr + 1
     ;------------------------
-    ;31 secret cave exit
+    ;32 secret cave exit
 @next29:
     lda ActiveMapEntryIndex
-    cmp #31
+    cmp #32
     bne @next30
 
     lda #1
     sta MustCopyMainChr
     ;-----------------------
-    ;32 mine room exit
+    ;33 mine room exit
 @next30:
     lda ActiveMapEntryIndex
-    cmp #32
-    bne @next32
+    cmp #33
+    bne @next31
 
     lda #1
     sta MustCopyMainChr
@@ -3624,9 +3624,28 @@ RoutinesAfterFadeOut:
     lda #0
     sta InHouse
 
-
     ;-----------------
+    ;38. entrance to crashsite from path
+@next31:
+    lda ActiveMapEntryIndex
+    cmp #38
+    bne @next32
+
+    lda #1
+    sta MustCopyMainChr
+
+    ;---------------------
+    ;39. entrance to crashsite from path
 @next32:
+    lda ActiveMapEntryIndex
+    cmp #39
+    bne @next33
+
+    lda #1
+    sta MustCopyMainChr
+
+
+@next33:
 
     lda DetectedMapType
     bne @itsAnIndoorMap
@@ -3639,7 +3658,7 @@ RoutinesAfterFadeOut:
     sta InVillagerHut
 
     lda ActiveMapEntryIndex
-    cmp #28     ; CRUTCH for bossroom exit
+    cmp #29     ; CRUTCH for bossroom exit
     beq @notcopy
     lda #1
     jmp @saveCopyFlag
@@ -3654,7 +3673,7 @@ RoutinesAfterFadeOut:
     sta MustLoadHouseInterior
 
     lda ActiveMapEntryIndex
-    cmp #24   ;ANOTHER CRUTCH for bossroom entrance
+    cmp #25   ;ANOTHER CRUTCH for bossroom entrance
     beq @BossRoom
     lda #1
     jmp @saveCHRloading
