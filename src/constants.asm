@@ -183,8 +183,9 @@
     OUTDOORS_LOC2_SCREEN_COUNT  = 2
     OUTDOORS_LOC3_SCREEN_COUNT  = 2
     OUTDOORS_LOC7_SCREEN_COUNT  = 3 ; cave
+    OUTDOORS_LOC8_SCREEN_COUNT  = 3 ; crashsite
     OUTDOORS_LOC9_SCREEN_COUNT  = 3 ; granny's
-    OUTDOORS_LOC12_SCREEN_COUNT = 3 ; locations with the northern cave
+    OUTDOORS_LOC12_SCREEN_COUNT = 4 ; locations with the mine
 
     PLAYER_START_X             = $50
     PLAYER_START_Y             = 200
@@ -199,8 +200,9 @@
     LOCATION_MINE_ROOM         = 15
     LOCATION_DARK_CAVE2        = 16
     LOCATION_ALIEN_BASE_LOBBY  = 17
+    LOCATION_PATH_TO_CRASHSITE = 18
 
-    MAX_LOCATIONS              = 18
+    MAX_LOCATIONS              = 19
 
     MIN_SCREEN_COUNT_TO_UPDATE = 3
 

@@ -3419,11 +3419,11 @@ RoutinesAfterFadeOut:
 
     jsr OnExitVillagerHut
     ;-----------------------------
-    ;33.alien base entrance bottom
+    ;35.alien base entrance bottom
 @next19:
 
     lda ActiveMapEntryIndex
-    cmp #33
+    cmp #35
     bne @next20
 
     lda #1
@@ -3546,10 +3546,10 @@ RoutinesAfterFadeOut:
     lda #1
     sta MustPlayNewSong
 
-    ;28 exit to light cave
+    ;29 exit to light cave
 @next26:
     lda ActiveMapEntryIndex
-    cmp #28
+    cmp #29
     bne @next27
 
     lda #1
@@ -3603,19 +3603,19 @@ RoutinesAfterFadeOut:
     lda #>dark_cave_palette
     sta CurrentMapPalettePtr + 1
     ;------------------------
-    ;30 secret cave exit
+    ;31 secret cave exit
 @next29:
     lda ActiveMapEntryIndex
-    cmp #30
+    cmp #31
     bne @next30
 
     lda #1
     sta MustCopyMainChr
     ;-----------------------
-    ;31 mine room exit
+    ;32 mine room exit
 @next30:
     lda ActiveMapEntryIndex
-    cmp #31
+    cmp #32
     bne @next32
 
     lda #1
@@ -3639,7 +3639,7 @@ RoutinesAfterFadeOut:
     sta InVillagerHut
 
     lda ActiveMapEntryIndex
-    cmp #27     ; CRUTCH
+    cmp #28     ; CRUTCH for bossroom exit
     beq @notcopy
     lda #1
     jmp @saveCopyFlag
@@ -3654,7 +3654,7 @@ RoutinesAfterFadeOut:
     sta MustLoadHouseInterior
 
     lda ActiveMapEntryIndex
-    cmp #24   ;ANOTHER CRUTCH
+    cmp #24   ;ANOTHER CRUTCH for bossroom entrance
     beq @BossRoom
     lda #1
     jmp @saveCHRloading

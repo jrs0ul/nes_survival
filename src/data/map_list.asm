@@ -1,24 +1,25 @@
 ;4 screens per location max
 
 location_map_pos: ;index where the pointer to the first screen of each location is
-    .byte 0  ;0
+    .byte 0  ;0 first location with house
     .byte 4  ;1
     .byte 6  ;2
     .byte 8  ;3
     .byte 9  ;4
     .byte 10 ;5
-    .byte 11 ;6 cave
-    .byte 14 ;7
-    .byte 16 ;8
-    .byte 19 ;9
-    .byte 20 ;10 alien base
-    .byte 22 ;11 location with mine entrance
-    .byte 25 ;12 bossroom
-    .byte 26 ;13 dark cave
-    .byte 28 ;14 secret cave
-    .byte 29 ;15 mine room
-    .byte 30 ;16 dark cave 2
-    .byte 32 ;17 alien base lobby
+    .byte 11 ;6 mine
+    .byte 14 ;7 crashsite
+    .byte 17 ;8 grannys location
+    .byte 20 ;9 granny's house
+    .byte 21 ;10 alien base
+    .byte 23 ;11 location with mine entrance
+    .byte 27 ;12 bossroom
+    .byte 28 ;13 dark cave
+    .byte 30 ;14 secret cave
+    .byte 31 ;15 mine room
+    .byte 33 ;16 dark cave 2
+    .byte 34 ;17 alien base lobby
+    .byte 35 ;18 path to crashsite
 
 map_list_low:
     .byte <field_bg
