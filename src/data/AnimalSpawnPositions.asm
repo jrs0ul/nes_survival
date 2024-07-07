@@ -1,19 +1,24 @@
 location_spawns_low:
-    .byte <spawnpoints_base_loc_1
-    .byte <spawnpoints_loc_2 ;Bjorn's hut is here
-    .byte <spawnpoints_loc_3 ; Erika's location
-    .byte 0
-    .byte 0
-    .byte 0
-    .byte 0
-    .byte 0
-    .byte <spawnpoints_loc_9 ; 8 granny's house is here
-    .byte 0                  ; 9
-    .byte 0                  ; 10
-    .byte <spawnpoints_loc_12; 11 cave loc
-    .byte 0
-    .byte 0
-    .byte 0
+    .byte <spawnpoints_base_loc_1   ; 0 starting location
+    .byte <spawnpoints_loc_2        ; 1 Bjorn's hut is here
+    .byte <spawnpoints_loc_3        ; 2 Erika's location
+    .byte 0                         ; 3
+    .byte 0                         ; 4
+    .byte 0                         ; 5
+    .byte 0                         ; 6
+    .byte 0                         ; 7
+    .byte <spawnpoints_loc_9        ; 8 granny's house is here
+    .byte 0                         ; 9
+    .byte 0                         ; 10
+    .byte <spawnpoints_loc_12       ; 11 mine entrance loc
+    .byte 0                         ; 11
+    .byte 0                         ; 12
+    .byte 0                         ; 13
+    .byte 0                         ; 14
+    .byte 0                         ; 15
+    .byte 0                         ; 16
+    .byte 0                         ; 17
+    .byte 0                         ; 18
 
 location_spawns_high:
     .byte >spawnpoints_base_loc_1
@@ -28,6 +33,10 @@ location_spawns_high:
     .byte 0
     .byte 0
     .byte >spawnpoints_loc_12
+    .byte 0
+    .byte 0
+    .byte 0
+    .byte 0
     .byte 0
     .byte 0
     .byte 0
@@ -97,6 +106,16 @@ spawnpoints_loc_12:
     .byte 232, 115
     .byte 232, 176
     .byte 40, 56
+
+    .byte 120, 115
+    .byte 168, 184
+    .byte 48, 128
+    .byte 98, 160
+
+    .byte 120, 115
+    .byte 168, 184
+    .byte 48, 128
+    .byte 98, 160
 
     .byte 120, 115
     .byte 168, 184

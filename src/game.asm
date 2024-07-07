@@ -3527,11 +3527,11 @@ RoutinesAfterFadeOut:
     lda #1
     sta MustPlayNewSong
     ;-------------------------
-    ;28 Boss room exit
+    ;29 Boss room exit
 @next25:
 
     lda ActiveMapEntryIndex
-    cmp #28
+    cmp #29
     bne @next26
 
     lda #<alien_palette
@@ -3545,7 +3545,7 @@ RoutinesAfterFadeOut:
     sta SongName
     lda #1
     sta MustPlayNewSong
-
+    ;----------------------
     ;30 exit to light cave
 @next26:
     lda ActiveMapEntryIndex
@@ -3554,7 +3554,7 @@ RoutinesAfterFadeOut:
 
     lda #1
     sta InCave
-
+    ;-----------------------
     ;14 dark cave entrance
 @next27:
     lda ActiveMapEntryIndex
@@ -3635,7 +3635,7 @@ RoutinesAfterFadeOut:
     sta MustCopyMainChr
 
     ;---------------------
-    ;39. entrance to crashsite from path
+    ;39. entrance to location with mine
 @next32:
     lda ActiveMapEntryIndex
     cmp #39
@@ -3643,9 +3643,26 @@ RoutinesAfterFadeOut:
 
     lda #1
     sta MustCopyMainChr
-
-
+    ;-------------------------
+    ;28. entrance to the path to the crashsite
 @next33:
+    lda ActiveMapEntryIndex
+    cmp #28
+    bne @next34
+
+    
+    jsr FlipStartingNametable
+    ;-------------------------
+    ;35. entrance to alien base lobby
+@next34:
+    lda ActiveMapEntryIndex
+    cmp #35
+    bne @next35
+    
+    lda #1
+    sta MustCopyMainChr
+
+@next35:
 
     lda DetectedMapType
     bne @itsAnIndoorMap

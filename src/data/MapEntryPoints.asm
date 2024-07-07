@@ -25,8 +25,8 @@ entry_points_loc0:
     .byte 3, OUTDOORS_LOC1_SCREEN_COUNT - 1, 0, 255, 0, 255, 222, 255
     ;---------------------------------------
 entry_points_loc1:
-    ;4.Bear's house entrance
-    .byte 4, 0, 118, 136, 169, 192, $68, $6F
+    ;4.Bjorn's house entrance
+    .byte 4, 0, 118, 136, 168, 192, $68, $6F
     ;5.Exit point of second location
     .byte 5, 0, 0, 255, 0, 255, 222, 255
     ;6.entrance to mine location
@@ -196,6 +196,8 @@ MapSpawnPoint:
     .byte 119, 151, 2, OUTDOORS_LOC3_SCREEN_COUNT, <Outside3_items, >Outside3_items, 0, 128, 0
     .byte 0, 0, 0, 2, 0, 0, 0
     ;---------------
+    ;The abandoned mine
+    ;---------------
     ;entrance to place where the plane is
     .byte 120, 210, 7, OUTDOORS_LOC8_SCREEN_COUNT, <Crashsite_items, >Crashsite_items, 4, 121, 1
     .byte 0, 0, 0, 0, 0, 0, 0
@@ -242,6 +244,8 @@ MapSpawnPoint:
     ;boss room entrance
     .byte 20, 120, 12, 1, <House_items, >House_items, 6, 0, 0
     .byte 1, <alien_bossroom, >alien_bossroom, 0, 0, 0, 0
+    ;--------------
+    ;A location with the mine entrance
     ;--------------
     ;exit from cave location to bjorn's location
     .byte 135, 38, 1, OUTDOORS_LOC2_SCREEN_COUNT, <Outside2_items, >Outside2_items, 5, 0, 0
