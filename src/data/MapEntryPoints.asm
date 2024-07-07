@@ -122,7 +122,7 @@ entry_points_loc16:
     ;--------------------------------------
 entry_points_loc17:
     ;36. alien base entrance bottom
-    .byte 36, 0, 200, 255, 0, 255, 120, 130
+    .byte 36, 0, 222, 255, 0, 255, 125, 140
     ;37. exit to dark cave 2
     .byte 37, 0, 32, 40, 0, 255, 119, 130
     ;--------------------------------------
@@ -239,7 +239,7 @@ MapSpawnPoint:
     .byte 200, 50, 6, OUTDOORS_LOC7_SCREEN_COUNT, <Cave_items, >Cave_items, 4, 0, 2
     .byte 0, 0, 0, 0, <cave_npcs, >cave_npcs, 0
     ;alien base exit to lobby
-    .byte 60, 200, 17, 1, <House_items, >House_items, 4, 0, 0
+    .byte 190, 140, 17, 1, <House_items, >House_items, 4, 0, 0
     .byte 0, 0, 0, 0, 0, 0, 0
     ;boss room entrance
     .byte 20, 120, 12, 1, <House_items, >House_items, 6, 0, 0

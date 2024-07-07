@@ -3484,6 +3484,7 @@ RoutinesAfterFadeOut:
     bne @next24
 
     lda #1
+    sta InCave
     sta MustCopyMainChr
     jsr IsLampInInventory
     bne @next24 ; it is
@@ -3518,7 +3519,7 @@ RoutinesAfterFadeOut:
     sta pointer + 1
     jsr LoadNpcs
 
-   
+
     lda #3
     sta VillagerIndex
 
@@ -3561,6 +3562,8 @@ RoutinesAfterFadeOut:
     cmp #14
     bne @next28
 
+    lda #1
+    sta InCave
     jsr IsLampInInventory
     bne @saveTheGame ; it is
 
@@ -3660,9 +3663,65 @@ RoutinesAfterFadeOut:
     bne @next35
     
     lda #1
+    sta InCave
     sta MustCopyMainChr
-
+    lda #<alien_palette
+    sta CurrentMapPalettePtr
+    lda #>alien_palette
+    sta CurrentMapPalettePtr + 1
+    ;---------------------------
+    ;31 dark cave 2
 @next35:
+
+    lda ActiveMapEntryIndex
+    cmp #31
+    bne @next36
+
+    lda #1
+    sta InCave
+    jsr IsLampInInventory
+    bne @next36 ; it is
+
+    lda #<dark_cave_palette
+    sta CurrentMapPalettePtr
+    lda #>dark_cave_palette
+    sta CurrentMapPalettePtr + 1
+    ;---------------------------
+    ;34 from dark cave 2 to dark cave 1
+@next36:
+    lda ActiveMapEntryIndex
+    cmp #34
+    bne @next37
+
+    lda #1
+    sta InCave
+    jsr IsLampInInventory
+    bne @next37 ; it is
+
+    lda #<dark_cave_palette
+    sta CurrentMapPalettePtr
+    lda #>dark_cave_palette
+    sta CurrentMapPalettePtr + 1
+    ;-------------------
+    ;37 exit from alien lobby to dark cave 2
+@next37:
+    lda ActiveMapEntryIndex
+    cmp #37
+    bne @next38
+
+    lda #1
+    sta InCave
+    sta MustCopyMainChr
+    jsr IsLampInInventory
+    bne @next38 ; it is
+
+    lda #<dark_cave_palette
+    sta CurrentMapPalettePtr
+    lda #>dark_cave_palette
+    sta CurrentMapPalettePtr + 1
+
+    ;---------------------
+@next38:
 
     lda DetectedMapType
     bne @itsAnIndoorMap
@@ -4202,7 +4261,9 @@ AdaptBackgroundPaletteByTime:
     lda #1
     sta MustUpdateSunMoon
     lda InHouse
-    bne @exit
+    beq @continuewith
+    rts
+@continuewith:
     lda InVillagerHut
     bne @exit
     lda LocationIndex
@@ -4215,10 +4276,19 @@ AdaptBackgroundPaletteByTime:
 
     lda LocationIndex
     cmp #LOCATION_DARK_CAVE
-    beq @dark_cave
+    beq @check_lamp
     cmp #LOCATION_SECRET_CAVE
+    beq @check_lamp
+    cmp #LOCATION_DARK_CAVE2
+    beq @check_lamp
+
+    jmp @regular_cave_check
+
+@check_lamp:
+    jsr IsLampInInventory
     beq @dark_cave
 
+@regular_cave_check:
     lda InCave
     beq @calc ; if not in cave, we need to use lookup table to get certain fade level
 
