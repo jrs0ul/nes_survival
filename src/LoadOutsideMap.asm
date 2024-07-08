@@ -155,6 +155,9 @@ LoadMainTileset:
     lda #ARGUMENT_STACK_LO
     sta sp + 1
 
+    lda MustReloadFontAndUI
+    beq @loadMainBgTiles
+@loadFontAndUI:
     lda #<font
     ldy #2
     sta (sp), y
@@ -189,6 +192,11 @@ LoadMainTileset:
     sta (sp), y
     ldx #$02
     jsr UnLZ4toVram
+
+    lda #0
+    sta MustReloadFontAndUI
+
+@loadMainBgTiles:
 
     lda #ARGUMENT_STACK_HI
     sta sp

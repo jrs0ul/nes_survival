@@ -1352,6 +1352,8 @@ SkipLastTileRowsInIndoorMaps:
     .res 1
 MustLoadCoreSprites:
     .res 1
+MustReloadFontAndUI:
+    .res 1
 
 
 BSSBuffer:
@@ -1732,6 +1734,7 @@ doneUpdatingPalette:
     jmp endOfNmi
 
 WaitNotSprite0:
+
     lda $2002
     and #%01000000
     bne WaitNotSprite0   ; wait until sprite 0 not hit
@@ -1741,7 +1744,7 @@ WaitSprite0:
     and #%01000000
     beq WaitSprite0      ; wait until sprite 0 is hit
 
-    ldx #14
+    ldx #16
 WaitScanline:
     dex
     bne WaitScanline
@@ -6184,6 +6187,7 @@ StartGame:
     sta MustLoadSomething
     sta MustCopyMainChr
     sta MustLoadCoreSprites
+    sta MustReloadFontAndUI
 
     jsr BuildRowTable
 
