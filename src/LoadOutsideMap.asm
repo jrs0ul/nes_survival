@@ -148,16 +148,17 @@ LoadMainTileset:
     lda #10
     sta (sp), y
     ldx #$06
+    lda #0
     jsr UnLZ4toVram
 
+    lda MustReloadFontAndUI
+    beq @loadMainBgTiles
+@loadFontAndUI:
     lda #ARGUMENT_STACK_HI
     sta sp
     lda #ARGUMENT_STACK_LO
     sta sp + 1
 
-    lda MustReloadFontAndUI
-    beq @loadMainBgTiles
-@loadFontAndUI:
     lda #<font
     ldy #2
     sta (sp), y
@@ -171,6 +172,7 @@ LoadMainTileset:
     lda #16
     sta (sp), y
     ldx #$03
+    lda #0
     jsr UnLZ4toVram
 
     lda #ARGUMENT_STACK_HI
@@ -191,6 +193,7 @@ LoadMainTileset:
     lda #19
     sta (sp), y
     ldx #$02
+    lda #0
     jsr UnLZ4toVram
 
     lda #0
@@ -216,6 +219,7 @@ LoadMainTileset:
     lda #21
     sta (sp), y
     ldx #11
+    lda #0
     jsr UnLZ4toVram
 
 
