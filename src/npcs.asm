@@ -170,8 +170,11 @@ GenNpcs:
     rts
 ;---------------------------------
 GenerateSingleNpc:
-    ;npc type
-    lda TempFrame
+
+    lda InCave
+    bne @makeBunny ; only "bunnies" in cave
+
+    lda TempFrame ; fade value for time of the day
     cmp #DAYTIME_NIGHT    ;check if it's night
     beq @makeWolf
 

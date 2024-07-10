@@ -118,7 +118,7 @@ entry_points_loc16:
     ;34. Dark cave2 exit to dark cave 1
     .byte 34, 1, 189, 255, 0, 255, 0, 32
     ;35. alien base lobby entrance
-    .byte 35, 0, 8, 32, 0, 255, 180, 200
+    .byte 35, 0, 107, 115, 0, 255, 185, 198
     ;--------------------------------------
 entry_points_loc17:
     ;36. alien base entrance bottom
@@ -175,7 +175,7 @@ MapSpawnPoint:
     .byte 0, 0, 0, 3, 0, 0, 3
     ;entrance to mine location
     .byte 119, 210, 11, OUTDOORS_LOC12_SCREEN_COUNT, UNUSED, UNUSED, 5, 160, 2
-    .byte 0, 0, 0, 2, 0, 0, 0
+    .byte 0, 0, 0, 2, 0, 0, 3
     ;-----------------
     ;Exit point of third location
     .byte 120, 209, 0, OUTDOORS_LOC1_SCREEN_COUNT, UNUSED, UNUSED, 0, 103, 1
@@ -201,9 +201,9 @@ MapSpawnPoint:
     ;entrance to place where the plane is
     .byte 120, 210, 7, OUTDOORS_LOC8_SCREEN_COUNT, UNUSED, UNUSED, 4, 121, 1
     .byte 0, 0, 0, 0, 0, 0, 0
-    ;cave exit to cave location
+    ;exit to mine entrance location
     .byte 119, 63, 11, OUTDOORS_LOC12_SCREEN_COUNT, UNUSED, UNUSED, 5, 24, 2
-    .byte 0, 0, 0, 2, 0, 0, 0
+    .byte 0, 0, 0, 2, 0, 0, 2
     ;dark cave entrance
     .byte 15, 50, 13, 2, UNUSED, UNUSED, 4, 0, 0
     .byte 0, 0, 0, 0, <dark_cave_npcs, >dark_cave_npcs, 0
@@ -239,7 +239,7 @@ MapSpawnPoint:
     .byte 200, 50, 6, OUTDOORS_LOC7_SCREEN_COUNT, UNUSED, UNUSED, 4, 0, 2
     .byte 0, 0, 0, 0, <cave_npcs, >cave_npcs, 0
     ;alien base exit to lobby
-    .byte 190, 140, 17, 1, UNUSED, UNUSED, 4, 0, 0
+    .byte 190, 140, 17, 1, UNUSED, UNUSED, 2, 0, 0
     .byte 0, 0, 0, 0, 0, 0, 0
     ;boss room entrance
     .byte 20, 120, 12, 1, UNUSED, UNUSED, 6, 0, 0
@@ -267,7 +267,7 @@ MapSpawnPoint:
 
     ;entrance to a second dark cave segment
     .byte 200, 60, 16, 2, UNUSED, UNUSED, 4, 0, 1
-    .byte 0, 0, 0, 0, 0, 0, 0
+    .byte 0, 0, 0, 2, 0, 0, 1
     ;---------------------
     ;secret cave exit to location 8
     .byte 156, 140, 8, OUTDOORS_LOC9_SCREEN_COUNT, UNUSED, UNUSED, 5, 0 ,2
@@ -281,7 +281,7 @@ MapSpawnPoint:
     .byte 200, 200, 13, 2, UNUSED, UNUSED, 4, 0, 1
     .byte 0, 0, 0, 0, <dark_cave_npcs, >dark_cave_npcs, 0
     ;alien base lobby entrance
-    .byte 53, 129, 17, 1, UNUSED, UNUSED, 4, 0, 0
+    .byte 53, 129, 17, 1, UNUSED, UNUSED, 2, 0, 0
     .byte 0, 0, 0, 0, 0, 0, 0
     ;------------
     ;alien base entrance bottom
@@ -289,7 +289,7 @@ MapSpawnPoint:
     .byte 0, 0, 0, 0, <alien_base_npcs, >alien_base_npcs, 0
     ;exit to dark cave 2
     .byte 80, 170, 16, 2, <House_items, >House_items, 4, 0, 0
-    .byte 0, 0, 0, 0, 0, 0, 0
+    .byte 0, 0, 0, 2, 0, 0, 0
     ;--------------------
     ;entrance to the crashsite from the path
     .byte 57, 210, 7, OUTDOORS_LOC8_SCREEN_COUNT, UNUSED, UNUSED, 4, 0, 0
@@ -390,7 +390,7 @@ LocationBanks:
     .byte 4  ;14
     .byte 3  ;15
     .byte 4  ;16
-    .byte 4  ;17
+    .byte 2  ;17
     .byte 0  ;18
 
 

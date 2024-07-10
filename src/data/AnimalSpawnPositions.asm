@@ -11,35 +11,34 @@ location_spawns_low:
     .byte 0                         ; 9
     .byte 0                         ; 10
     .byte <spawnpoints_loc_12       ; 11 mine entrance loc
-    .byte 0                         ; 11
     .byte 0                         ; 12
     .byte 0                         ; 13
     .byte 0                         ; 14
     .byte 0                         ; 15
-    .byte 0                         ; 16
+    .byte <spawnpoints_loc_17       ; 16
     .byte 0                         ; 17
     .byte 0                         ; 18
 
 location_spawns_high:
-    .byte >spawnpoints_base_loc_1
-    .byte >spawnpoints_loc_2
-    .byte >spawnpoints_loc_3
-    .byte 0
-    .byte 0
-    .byte 0
-    .byte 0
-    .byte 0
-    .byte >spawnpoints_loc_9
-    .byte 0
-    .byte 0
-    .byte >spawnpoints_loc_12
-    .byte 0
-    .byte 0
-    .byte 0
-    .byte 0
-    .byte 0
-    .byte 0
-    .byte 0
+    .byte >spawnpoints_base_loc_1   ;0
+    .byte >spawnpoints_loc_2        ;1
+    .byte >spawnpoints_loc_3        ;2
+    .byte 0                         ;3
+    .byte 0                         ;4
+    .byte 0                         ;5
+    .byte 0                         ;6
+    .byte 0                         ;7
+    .byte >spawnpoints_loc_9        ;8
+    .byte 0                         ;9
+    .byte 0                         ;10
+    .byte >spawnpoints_loc_12       ;11
+    .byte 0                         ;12
+    .byte 0                         ;13
+    .byte 0                         ;14
+    .byte 0                         ;15
+    .byte >spawnpoints_loc_17       ;16
+    .byte 0                         ;17
+    .byte 0                         ;18
 
 
 spawnpoints_base_loc_1:
@@ -121,5 +120,18 @@ spawnpoints_loc_12:
     .byte 168, 184
     .byte 48, 128
     .byte 98, 160
+
+spawnpoints_loc_17:
+    .byte 120, 115
+    .byte 168, 184
+    .byte 48, 128
+    .byte 98, 160
+
+    .byte 120, 115
+    .byte 168, 184
+    .byte 48, 128
+    .byte 98, 160
+
+
 
 

@@ -54,6 +54,7 @@ main_bg_tiles       : .incbin "main_bg_tiles.lz4"
 title_tiles_chr   :  .incbin "title_tiles.lz4"
 gameover_tiles_chr:  .incbin "gameover_tiles.lz4"
 intro_tiles_chr   :  .incbin "intro.lz4"
+.include "data/maps/cropped/alien_base_lobby_crop.asm"
 
 
 ;============================================================
@@ -79,7 +80,6 @@ alien_sprites_chr: .incbin "alien_sprites.lz4"
 
 .include "data/maps/cropped/alien_base1_crop.asm"
 .include "data/maps/cropped/alien_base2_crop.asm"
-.include "data/maps/cropped/alien_base_lobby_crop.asm"
 .include "data/maps/cropped/mine_0_crop.asm"
 .include "data/maps/cropped/mine_1_crop.asm"
 .include "data/maps/cropped/mine_2_crop.asm"
