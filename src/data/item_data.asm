@@ -39,6 +39,8 @@ item_data: ;          ---||---
     .byte $58, 2, 4, 0          ; 26 lamp
     .byte $5C, 2, 4, 0          ; 27 granny's head
     .byte $48, 1, 7, 0          ; 28 letter about the rock
+    .byte $6A, 1, 4, 0          ; 29 key
+    .byte $6C, 1, 1, %00110000  ; 30 mushroom
 
 ;item id, width, address low, address high
 document_item_data:

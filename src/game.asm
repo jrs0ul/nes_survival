@@ -1203,8 +1203,13 @@ Item_Location8_Collection_times:
     .res ITEM_COUNT_LOC8
 Item_Location9_Collection_times:
     .res ITEM_COUNT_LOC9
-Item_Location14_Collection_times:
-    .res ITEM_COUNT_LOC14
+Item_Location12_Collection_times:
+    .res ITEM_COUNT_LOC12
+Item_Location15_Collection_times:
+    .res ITEM_COUNT_LOC15
+Item_Location17_Collection_times:
+    .res ITEM_COUNT_LOC7
+
 
 Npcs:   ;animals and stuff
     .res 176 ; max 16 npcs * 11 bytes:
@@ -1357,7 +1362,7 @@ MustReloadFontAndUI:
 
 
 BSSBuffer:
-    .res 39
+    .res 36
 
 ;====================================================================================
 
@@ -3818,13 +3823,22 @@ CommonLocationRoutine:
     lda (pointer2), y
     sta ScreenCount
     iny
-    lda (pointer2), y ; lower address to item data
-    sta pointer
+    ;lda (pointer2), y ; lower address to item data
+    ;sta pointer
     iny
-    lda (pointer2), y ; upper address to item data
-    sta pointer + 1
+    ;lda (pointer2), y ; upper address to item data
+    ;sta pointer + 1
 
     sty TempY
+    lda LocationIndex
+    asl
+    tay
+    lda LocationItems, y
+    sta pointer
+    iny
+    lda LocationItems, y
+    sta pointer + 1
+
     jsr LoadItems
     ldy TempY
 

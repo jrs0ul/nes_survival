@@ -140,8 +140,8 @@ entry_points_loc18:
 ;PlayerY,
 ;LocationIndex,
 ;ScreenCount,
-;ItemListLow,
-;ItemListHigh
+;UNUSED,
+;UNUSED,
 ;location bank number
 ;scroll X
 ;active screen
@@ -155,147 +155,147 @@ entry_points_loc18:
 
 MapSpawnPoint:
     ;Entry to player's house from outside
-    .byte 128, 152, 4, 1, <House_items, >House_items, 0, 0, 0
+    .byte 128, 152, 4, 1, UNUSED, UNUSED, 0, 0, 0
     .byte 1, <house, >house, 0, <House_npcs, >House_npcs, 0
     ;Second location entry point
-    .byte 80, 208, 1, OUTDOORS_LOC2_SCREEN_COUNT, <Outside2_items, >Outside2_items, 5, 0, 0
+    .byte 80, 208, 1, OUTDOORS_LOC2_SCREEN_COUNT, UNUSED, UNUSED, 5, 0, 0
     .byte 0, 0, 0, 3, 0, 0, 0
     ;Third location entry point
-    .byte 100, 48, 2, OUTDOORS_LOC3_SCREEN_COUNT, <Outside3_items, >Outside3_items, 0, 0, 0
+    .byte 100, 48, 2, OUTDOORS_LOC3_SCREEN_COUNT, UNUSED, UNUSED, 0, 0, 0
     .byte 0, 0, 0, 2, 0, 0, 0
     ;granny location
-    .byte 77, 42, 8, OUTDOORS_LOC9_SCREEN_COUNT, <granny_location_items, >granny_location_items, 5,  0, 0
+    .byte 77, 42, 8, OUTDOORS_LOC9_SCREEN_COUNT, UNUSED, UNUSED, 5,  0, 0
     .byte 0, 0, 0, 2, 0, 0, 0
     ;---------------------
     ;Bear's house entrance
-    .byte 128, 136, 3, 1, <House_items, >House_items, 5, 0, 0
+    .byte 128, 136, 3, 1, UNUSED, UNUSED, 5, 0, 0
     .byte 1, <villager_hut, >villager_hut, 0, <Hut_npcs, >Hut_npcs, 0
     ;Exit point of second location
-    .byte 128, 32, 0, OUTDOORS_LOC1_SCREEN_COUNT, <Outside1_items, >Outside1_items, 0, 0, OUTDOORS_LOC1_SCREEN_COUNT - 1
+    .byte 128, 32, 0, OUTDOORS_LOC1_SCREEN_COUNT, UNUSED, UNUSED, 0, 0, OUTDOORS_LOC1_SCREEN_COUNT - 1
     .byte 0, 0, 0, 3, 0, 0, 3
     ;entrance to mine location
-    .byte 119, 210, 11, OUTDOORS_LOC12_SCREEN_COUNT, <House_items, >House_items, 5, 160, 2
+    .byte 119, 210, 11, OUTDOORS_LOC12_SCREEN_COUNT, UNUSED, UNUSED, 5, 160, 2
     .byte 0, 0, 0, 2, 0, 0, 0
     ;-----------------
     ;Exit point of third location
-    .byte 120, 209, 0, OUTDOORS_LOC1_SCREEN_COUNT, <Outside1_items, >Outside1_items, 0, 103, 1
+    .byte 120, 209, 0, OUTDOORS_LOC1_SCREEN_COUNT, UNUSED, UNUSED, 0, 103, 1
     .byte 0, 0, 0, 3, 0, 0, 1
     ;Second villager's house
-    .byte 128, 136, 5, 1, <House_items, >House_items, 0, 0, 0
+    .byte 128, 136, 5, 1, UNUSED, UNUSED, 0, 0, 0
     .byte 1, <villager2_hut, >villager2_hut, 0, <villager2_npcs, >villager2_npcs, 0
     ;------------------
     ;Bear's house exit
-    .byte $76, $80, 1, OUTDOORS_LOC2_SCREEN_COUNT, <Outside2_items, >Outside2_items, 5, $B8, 0
+    .byte $76, $80, 1, OUTDOORS_LOC2_SCREEN_COUNT, UNUSED, UNUSED, 5, $B8, 0
     .byte 0, 0, 0, 3, 0, 0, 1
     ;-----------------
     ;Player's house exit
-    .byte 72, 120, 0, OUTDOORS_LOC1_SCREEN_COUNT, <Outside1_items, >Outside1_items, 0, 0, 0
+    .byte 72, 120, 0, OUTDOORS_LOC1_SCREEN_COUNT, UNUSED, UNUSED, 0, 0, 0
     .byte 0, 0, 0, 3, 0, 0, 0
     ;-----------------
     ;Second villager house's exit
-    .byte 119, 151, 2, OUTDOORS_LOC3_SCREEN_COUNT, <Outside3_items, >Outside3_items, 0, 128, 0
+    .byte 119, 151, 2, OUTDOORS_LOC3_SCREEN_COUNT, UNUSED, UNUSED, 0, 128, 0
     .byte 0, 0, 0, 2, 0, 0, 0
     ;---------------
     ;The abandoned mine
     ;---------------
     ;entrance to place where the plane is
-    .byte 120, 210, 7, OUTDOORS_LOC8_SCREEN_COUNT, <Crashsite_items, >Crashsite_items, 4, 121, 1
+    .byte 120, 210, 7, OUTDOORS_LOC8_SCREEN_COUNT, UNUSED, UNUSED, 4, 121, 1
     .byte 0, 0, 0, 0, 0, 0, 0
     ;cave exit to cave location
-    .byte 119, 63, 11, OUTDOORS_LOC12_SCREEN_COUNT, <House_items, >House_items, 5, 24, 2
+    .byte 119, 63, 11, OUTDOORS_LOC12_SCREEN_COUNT, UNUSED, UNUSED, 5, 24, 2
     .byte 0, 0, 0, 2, 0, 0, 0
     ;dark cave entrance
-    .byte 15, 50, 13, 2, <House_items, >House_items, 4, 0, 0
+    .byte 15, 50, 13, 2, UNUSED, UNUSED, 4, 0, 0
     .byte 0, 0, 0, 0, <dark_cave_npcs, >dark_cave_npcs, 0
     ;alien base entrance top
-    .byte 15, 90, 10, 2, <House_items, >House_items, 4, 0, 0
+    .byte 15, 90, 10, 2, UNUSED, UNUSED, 4, 0, 0
     .byte 0, 0, 0, 0, <alien_base_npcs, >alien_base_npcs, 0
     ;Mine room entrance
-    .byte 120, 152, 15, 1, <House_items, >House_items, 0, 0, 0
+    .byte 120, 152, 15, 1, UNUSED, UNUSED, 0, 0, 0
     .byte 1, <mine_room, >mine_room, 0, <House_npcs, >House_npcs, 0
     ;---------------------
     ;crashsite exit to cave
-    .byte 120, 34, 6, OUTDOORS_LOC7_SCREEN_COUNT, <Cave_items, >Cave_items, 4, 192, 0
+    .byte 120, 34, 6, OUTDOORS_LOC7_SCREEN_COUNT, UNUSED, UNUSED, 4, 192, 0
     .byte 0, 0, 0, 0, <cave_npcs, >cave_npcs, 0
     ;crashsite exit to path
-    .byte 120, 50, 18, 1, <House_items, >House_items, 0, 0, 0
+    .byte 120, 50, 18, 1, UNUSED, UNUSED, 0, 0, 0
     .byte 0, 0, 0, 0, 0, 0, 0
     ;---------------------
     ;exit from granny's location to main
-    .byte 127, 205, 0, OUTDOORS_LOC1_SCREEN_COUNT,<Outside1_items, >Outside1_items, 0, 0, OUTDOORS_LOC1_SCREEN_COUNT - 1
+    .byte 127, 205, 0, OUTDOORS_LOC1_SCREEN_COUNT, UNUSED, UNUSED, 0, 0, OUTDOORS_LOC1_SCREEN_COUNT - 1
     .byte 0, 0, 0, 3, 0, 0, 3
     ;granny's house
-    .byte 123, 148, 9, 1, <House_items, >House_items, 0, 0, 0
+    .byte 123, 148, 9, 1, UNUSED, UNUSED, 0, 0, 0
     .byte 1, <grannys_hut, >grannys_hut, 0, <villager3_npcs, >villager3_npcs, 0
     ;secret cave
-    .byte 127, 209, 14, 1, <secret_cave_items, >secret_cave_items, 4, 0, 0
+    .byte 127, 209, 14, 1, UNUSED, UNUSED, 4, 0, 0
     .byte 0, 0, 0, 0, 0, 0, 0
     ;--------------------
     ;granny's house exit to the location 8
-    .byte 119, 126, 8, OUTDOORS_LOC9_SCREEN_COUNT, <granny_location_items, >granny_location_items, 5, 154, 0
+    .byte 119, 126, 8, OUTDOORS_LOC9_SCREEN_COUNT, UNUSED, UNUSED, 5, 154, 0
     .byte 0, 0, 0, 2, 0, 0, 0
     ;------------
     ;alien base exit top
-    .byte 200, 50, 6, OUTDOORS_LOC7_SCREEN_COUNT, <Cave_items, >Cave_items, 4, 0, 2
+    .byte 200, 50, 6, OUTDOORS_LOC7_SCREEN_COUNT, UNUSED, UNUSED, 4, 0, 2
     .byte 0, 0, 0, 0, <cave_npcs, >cave_npcs, 0
     ;alien base exit to lobby
-    .byte 190, 140, 17, 1, <House_items, >House_items, 4, 0, 0
+    .byte 190, 140, 17, 1, UNUSED, UNUSED, 4, 0, 0
     .byte 0, 0, 0, 0, 0, 0, 0
     ;boss room entrance
-    .byte 20, 120, 12, 1, <House_items, >House_items, 6, 0, 0
+    .byte 20, 120, 12, 1, UNUSED, UNUSED, 6, 0, 0
     .byte 1, <alien_bossroom, >alien_bossroom, 0, 0, 0, 0
     ;--------------
     ;A location with the mine entrance
     ;--------------
     ;exit from cave location to bjorn's location
-    .byte 135, 38, 1, OUTDOORS_LOC2_SCREEN_COUNT, <Outside2_items, >Outside2_items, 5, 0, 0
+    .byte 135, 38, 1, OUTDOORS_LOC2_SCREEN_COUNT, UNUSED, UNUSED, 5, 0, 0
     .byte 0, 0, 0, 3, 0, 0, 0
     ;cave entrance
-    .byte 120, 207, 6, OUTDOORS_LOC7_SCREEN_COUNT, <Cave_items, >Cave_items, 4, 222, 0
+    .byte 120, 207, 6, OUTDOORS_LOC7_SCREEN_COUNT, UNUSED, UNUSED, 4, 222, 0
     .byte 0, 0, 0, 0, <cave_npcs, >cave_npcs, 0
     ;entrance to the path to the crashsite
     .byte 120, 180, 18, 1, <House_items, >House_items, 0, 0, 0
     .byte 0, 0, 0, 0, 0, 0, 0
     ;---------------
     ;boss room exit
-    .byte 223, 120, 10, 2, <House_items, >House_items, 4, 0, 1
+    .byte 223, 120, 10, 2, UNUSED, UNUSED, 4, 0, 1
     .byte 0, 0, 0, 0, <alien_base_npcs, >alien_base_npcs, 0
     ;----------------
     ;Dark cave exit to light cave
-    .byte 230, 180, 6, OUTDOORS_LOC7_SCREEN_COUNT, <Cave_items, >Cave_items, 4, 0, 2
+    .byte 230, 180, 6, OUTDOORS_LOC7_SCREEN_COUNT, UNUSED, UNUSED, 4, 0, 2
     .byte 0, 0, 0, 0, <cave_npcs, >cave_npcs, 0
 
     ;entrance to a second dark cave segment
-    .byte 200, 60, 16, 2, <House_items, >House_items, 4, 0, 1
+    .byte 200, 60, 16, 2, UNUSED, UNUSED, 4, 0, 1
     .byte 0, 0, 0, 0, 0, 0, 0
     ;---------------------
     ;secret cave exit to location 8
-    .byte 156, 140, 8, OUTDOORS_LOC9_SCREEN_COUNT, <granny_location_items, >granny_location_items, 5, 0 ,2
+    .byte 156, 140, 8, OUTDOORS_LOC9_SCREEN_COUNT, UNUSED, UNUSED, 5, 0 ,2
     .byte 0, 0, 0, 2, 0, 0, 2
     ;-----------------------
     ;exit of mine room
-    .byte 120, 146, 6, OUTDOORS_LOC7_SCREEN_COUNT, <Cave_items, >Cave_items, 4, 24, 0
+    .byte 120, 146, 6, OUTDOORS_LOC7_SCREEN_COUNT, UNUSED, UNUSED, 4, 24, 0
     .byte 0, 0, 0, 0, <cave_npcs, >cave_npcs, 0
     ;-----------------------
     ;exit to first dark cave
-    .byte 200, 200, 13, 2, <House_items, >House_items, 4, 0, 1
+    .byte 200, 200, 13, 2, UNUSED, UNUSED, 4, 0, 1
     .byte 0, 0, 0, 0, <dark_cave_npcs, >dark_cave_npcs, 0
     ;alien base lobby entrance
-    .byte 80, 170, 17, 1, <House_items, >House_items, 4, 0, 0
+    .byte 53, 129, 17, 1, UNUSED, UNUSED, 4, 0, 0
     .byte 0, 0, 0, 0, 0, 0, 0
     ;------------
     ;alien base entrance bottom
-    .byte 15, 170, 10, 2, <House_items, >House_items, 4, 0, 0
+    .byte 15, 170, 10, 2, UNUSED, UNUSED, 4, 0, 0
     .byte 0, 0, 0, 0, <alien_base_npcs, >alien_base_npcs, 0
     ;exit to dark cave 2
     .byte 80, 170, 16, 2, <House_items, >House_items, 4, 0, 0
     .byte 0, 0, 0, 0, 0, 0, 0
     ;--------------------
     ;entrance to the crashsite from the path
-    .byte 57, 210, 7, OUTDOORS_LOC8_SCREEN_COUNT, <Crashsite_items, >Crashsite_items, 4, 0, 0
+    .byte 57, 210, 7, OUTDOORS_LOC8_SCREEN_COUNT, UNUSED, UNUSED, 4, 0, 0
     .byte 0, 0, 0, 0, 0, 0, 0
     ;entrance to the mine location
-    .byte 119, 100, 11, OUTDOORS_LOC12_SCREEN_COUNT, <House_items, >House_items, 5, 0, 0
+    .byte 119, 100, 11, OUTDOORS_LOC12_SCREEN_COUNT, UNUSED, UNUSED, 5, 0, 0
     .byte 0, 0, 0, 2, 0, 0, 0
 
 
@@ -318,7 +318,7 @@ LocationScreenCountList:
     .byte OUTDOORS_LOC9_SCREEN_COUNT ; 8 granny location
     .byte 1                          ; 9 granny's hut
     .byte 2                          ; 10 alien base
-    .byte OUTDOORS_LOC12_SCREEN_COUNT; 11 location where cave is
+    .byte OUTDOORS_LOC12_SCREEN_COUNT; 11 location where the mine entrance is
     .byte 1                          ; 12 boss room
     .byte 2                          ; 13 dark cave
     .byte 1                          ; 14 secret cave
@@ -395,26 +395,32 @@ LocationBanks:
 
 
 ;indexes in Item_Location1_Collection_times
+
+ITEM_IDX_LOC3 = ITEM_COUNT_LOC1 + ITEM_COUNT_LOC2
+ITEM_IDX_LOC4 = ITEM_IDX_LOC3 + ITEM_COUNT_LOC3
+ITEM_IDX_LOC8 = ITEM_IDX_LOC4 + ITEM_COUNT_LOC7
+ITEM_IDX_LOC9 = ITEM_IDX_LOC8 + ITEM_COUNT_LOC8
+
 LocationItemIndexes:
-    .byte 0                                                                     ;0
-    .byte ITEM_COUNT_LOC1                                                       ;1
-    .byte ITEM_COUNT_LOC1 + ITEM_COUNT_LOC2                                     ;2
-    .byte ITEM_COUNT_LOC1 + ITEM_COUNT_LOC2 + ITEM_COUNT_LOC3                   ;3
-    .byte ITEM_COUNT_LOC1 + ITEM_COUNT_LOC2 + ITEM_COUNT_LOC3                   ;4
-    .byte ITEM_COUNT_LOC1 + ITEM_COUNT_LOC2 + ITEM_COUNT_LOC3                   ;5
-    .byte ITEM_COUNT_LOC1 + ITEM_COUNT_LOC2 + ITEM_COUNT_LOC3                   ;6
-    .byte ITEM_COUNT_LOC1 + ITEM_COUNT_LOC2 + ITEM_COUNT_LOC3 + ITEM_COUNT_LOC7 ;7 crashsite
-    .byte ITEM_COUNT_LOC1 + ITEM_COUNT_LOC2 + ITEM_COUNT_LOC3 + ITEM_COUNT_LOC7 + ITEM_COUNT_LOC8
-    .byte 0
-    .byte 0
-    .byte 0
-    .byte 0
-    .byte 0
-    .byte ITEM_COUNT_LOC1 + ITEM_COUNT_LOC2 + ITEM_COUNT_LOC3 + ITEM_COUNT_LOC7 + ITEM_COUNT_LOC8 + ITEM_COUNT_LOC9
-    .byte 0
-    .byte 0
-    .byte 0
-    .byte 0
+    .byte 0                                                                           ;0
+    .byte ITEM_COUNT_LOC1                                                             ;1
+    .byte ITEM_IDX_LOC3                                                               ;2
+    .byte ITEM_IDX_LOC4                                                               ;3
+    .byte ITEM_IDX_LOC4                                                               ;4
+    .byte ITEM_IDX_LOC4                                                               ;5
+    .byte ITEM_IDX_LOC4                                                               ;6
+    .byte ITEM_IDX_LOC8                                                               ;7 crashsite
+    .byte ITEM_IDX_LOC9                                                               ;8
+    .byte 0                                                                           ;9
+    .byte 0                                                                           ;10
+    .byte ITEM_IDX_LOC9 + ITEM_COUNT_LOC9                                             ;11
+    .byte 0                                                                           ;12
+    .byte 0                                                                           ;13
+    .byte ITEM_IDX_LOC9 + ITEM_COUNT_LOC9 + ITEM_COUNT_LOC12                          ;14
+    .byte 0                                                                           ;15
+    .byte ITEM_IDX_LOC9 + ITEM_COUNT_LOC9 + ITEM_COUNT_LOC12 + ITEM_COUNT_LOC15       ;16
+    .byte 0                                                                           ;17
+    .byte 0                                                                           ;18
 
 LocationItemCounts:
     .byte ITEM_COUNT_LOC1  ; 0
@@ -428,12 +434,12 @@ LocationItemCounts:
     .byte ITEM_COUNT_LOC9  ; 8 granny location
     .byte 0                ; 9
     .byte 0                ; 10
-    .byte 0                ; 11
+    .byte ITEM_COUNT_LOC12 ; 11
     .byte 0                ; 12
     .byte 0                ; 13
-    .byte ITEM_COUNT_LOC14 ; 14 secret cave
+    .byte ITEM_COUNT_LOC15 ; 14 secret cave
     .byte 0                ; 15
-    .byte 0                ; 16
+    .byte ITEM_COUNT_LOC17 ; 16
     .byte 0                ; 17
     .byte 0                ; 18 path to crashsite
 
@@ -449,12 +455,12 @@ LocationsWithRespawnableItems:
     .byte 0 ; 8
     .byte 1 ; 9   granny location
     .byte 0 ; 10
-    .byte 0 ; 11
+    .byte 1 ; 11
     .byte 0 ; 12  boss
     .byte 0 ; 13  dark cave
     .byte 0 ; 14
     .byte 0 ; 15
-    .byte 0 ; 16
+    .byte 1 ; 16
     .byte 0 ; 17
     .byte 0 ; 18
 
@@ -470,11 +476,11 @@ LocationItems:
     .byte  <granny_location_items, >granny_location_items       ; 8 granny location
     .byte  <House_items,           >House_items                 ; 9 granny's hut
     .byte  <House_items,           >House_items                 ; 10 alien base
-    .byte  <House_items,           >House_items                 ; 11 location where cave is
+    .byte  <mine_location_items,   >mine_location_items         ; 11 location where cave is
     .byte  <House_items,           >House_items                 ; 12 boss room
     .byte  <House_items,           >House_items                 ; 13 dark cave
     .byte  <secret_cave_items,     >secret_cave_items           ; 14 secret cave
     .byte  <House_items,           >House_items                 ; 15 mine room
-    .byte  <House_items,           >House_items                 ; 16 dark cave extension
+    .byte  <dark_cave_2_items,     >dark_cave_2_items           ; 16 dark cave extension
     .byte  <House_items,           >House_items                 ; 17 alien base lobby
     .byte  <House_items,           >House_items                 ; 18 path to crashsite
