@@ -333,6 +333,10 @@ LoadOutsideMap:
     lda #0
     sta NametableOffsetInBytes
 
+    lda ScreenCount
+    cmp #2
+    bcc @loadRest ; there is only one screen
+
     ;Load Nametable 2
 
     ldy CurrentMapSegmentIndex

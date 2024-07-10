@@ -3645,26 +3645,17 @@ RoutinesAfterFadeOut:
 @next32:
     lda ActiveMapEntryIndex
     cmp #39
-    bne @next33
+    bne @next34
 
     lda #1
     sta MustCopyMainChr
-    ;-------------------------
-    ;28. entrance to the path to the crashsite
-@next33:
-    lda ActiveMapEntryIndex
-    cmp #28
-    bne @next34
-
-    
-    jsr FlipStartingNametable
     ;-------------------------
     ;35. entrance to alien base lobby
 @next34:
     lda ActiveMapEntryIndex
     cmp #35
     bne @next35
-    
+
     lda #1
     sta InCave
     sta MustCopyMainChr
@@ -4268,7 +4259,9 @@ AdaptBackgroundPaletteByTime:
     rts
 @continuewith:
     lda InVillagerHut
-    bne @exit
+    beq @continueWith2
+    rts
+@continueWith2:
     lda LocationIndex
     cmp #LOCATION_ALIEN_BASE
     beq @exit
@@ -4308,24 +4301,28 @@ AdaptBackgroundPaletteByTime:
 
 @calc:
     jsr GetPaletteFadeValueForHour
+    sta TempY ;backup the Fadevalue from register A
     cmp #DAYTIME_NIGHT
     bne @not_night
     lda SongName
     cmp #7
-    beq @cont
+    beq @restoreFadeValue
     lda #1
     sta MustPlayNewSong
     lda #7
     sta SongName
-    jmp @cont
+    jmp @restoreFadeValue
 @not_night:
     lda SongName
     cmp #0
-    beq @cont
+    beq @restoreFadeValue
     lda #1
     sta MustPlayNewSong
     lda #0
     sta SongName
+
+@restoreFadeValue:
+    lda TempY; restore register A value
 
 @cont:
     cmp CurrentPaletteDecrementValue
