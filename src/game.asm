@@ -3506,7 +3506,9 @@ RoutinesAfterFadeOut:
     lda #1
     sta InCave
     sta MustCopyMainChr
-    jsr IsLampInInventory
+    lda #ITEM_LAMP
+    sta TempItemIndex
+    jsr IsItemXInInventory
     bne @next24 ; it is
 
     lda #<dark_cave_palette
@@ -3584,7 +3586,9 @@ RoutinesAfterFadeOut:
 
     lda #1
     sta InCave
-    jsr IsLampInInventory
+    lda #ITEM_LAMP
+    sta TempItemIndex
+    jsr IsItemXInInventory
     bne @saveTheGame ; it is
 
     lda #<dark_cave_palette
@@ -3618,7 +3622,9 @@ RoutinesAfterFadeOut:
     lda #1
     sta MustCopyMainChr
 
-    jsr IsLampInInventory
+    lda #ITEM_LAMP
+    sta TempItemIndex
+    jsr IsItemXInInventory
     bne @next29 ; it is
 
     lda #<dark_cave_palette
@@ -3690,7 +3696,9 @@ RoutinesAfterFadeOut:
 
     lda #1
     sta InCave
-    jsr IsLampInInventory
+    lda #ITEM_LAMP
+    sta TempItemIndex
+    jsr IsItemXInInventory
     bne @next36 ; it is
 
     lda #<dark_cave_palette
@@ -3706,7 +3714,9 @@ RoutinesAfterFadeOut:
 
     lda #1
     sta InCave
-    jsr IsLampInInventory
+    lda #ITEM_LAMP
+    sta TempItemIndex
+    jsr IsItemXInInventory
     bne @next37 ; it is
 
     lda #<dark_cave_palette
@@ -3723,7 +3733,7 @@ RoutinesAfterFadeOut:
     lda #1
     sta InCave
     sta MustCopyMainChr
-    jsr IsLampInInventory
+    jsr IsItemXInInventory
     bne @next38 ; it is
 
     lda #<dark_cave_palette
@@ -3940,7 +3950,8 @@ CommonLocationRoutine:
 
     rts
 ;-------------------------------
-IsLampInInventory:
+;put item id in TempItemIndex
+IsItemXInInventory:
 
     ldy #INVENTORY_MAX_ITEMS - 1
 @loop:
@@ -3948,7 +3959,7 @@ IsLampInInventory:
     asl
     tax
     lda Inventory, x
-    cmp #ITEM_LAMP
+    cmp TempItemIndex
     beq @found
     dey
     bpl @loop
@@ -4290,7 +4301,9 @@ AdaptBackgroundPaletteByTime:
 @continueWith2:
     lda LocationIndex
     cmp #LOCATION_ALIEN_BASE
-    beq @exit
+    bne @continueWith3
+    rts
+@continueWith3:
     cmp #LOCATION_BOSS_ROOM
     beq @exit
 
@@ -4307,7 +4320,9 @@ AdaptBackgroundPaletteByTime:
     jmp @regular_cave_check
 
 @check_lamp:
-    jsr IsLampInInventory
+    lda #ITEM_LAMP
+    sta TempItemIndex
+    jsr IsItemXInInventory
     beq @dark_cave
 
 @regular_cave_check:

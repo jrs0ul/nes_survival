@@ -258,7 +258,17 @@ TestPointAgainstCollisionMapHero:
 
 @exit_collision_check:
     rts
+;-----------------------------
+IfCollidingWithLockedDoor:
 
+    lda #ITEM_KEY
+    sta TempItemIndex
+    lda #1
+    sty TempHp
+    jsr IsItemXInInventory
+    ldy TempHp
+
+    rts
 
 
 ;-----------------------------
@@ -322,14 +332,17 @@ IsCollidingWithADestructedTile:
     ;some sort of crutch to unlock the door
     ;tile is not destroyed
     ldx TempRegX
-    cpx #4 ; locked door
+    cpx #DESTRUCTIBLE_DOOR_IDX ; locked door
     bne @nextTile
-
+    jsr IfCollidingWithLockedDoor
+    cmp #0
+    beq @cont ;it's not
+    ldx TempRegX
     lda #1
     sta Destructibles, x
     inc DestroyedTilesCount
     sta MustUpdateDestructibles
-    jmp @end
+    jmp @cont
     ;---------end of crutch
 
 

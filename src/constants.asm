@@ -72,6 +72,7 @@
 
     ROW_TABLE_SIZE             = 240 ;4 screens * 32 rows * 2
 
+    DESTRUCTIBLE_DOOR_IDX      = 4
 
     DESTRUCTIBLE_COUNT         = 14
 
@@ -81,7 +82,6 @@
     ICE_TILE_B                 = $69
     FIRE_TILE                  = $80
 
-    DESTRUCTIBLE_TILE_VALUE    = $F7
 
     ROCK_TILE_1                = $DE
     ROCK_TILE_2                = $DF
