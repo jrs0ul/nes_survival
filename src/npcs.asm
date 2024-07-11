@@ -929,9 +929,6 @@ OnCollisionWithAttackRect:
 
     inc NpcsKilledByPlayer
 
-    lda TempNpcType
-    cmp #NPC_TYPE_PASSIVE ; skeleton doesn't spawn anything
-    beq @exit
 
     lda TempNpcIndex
     cmp #NPC_IDX_BOSS
@@ -1049,12 +1046,17 @@ DropItemAfterDeath:
     beq @grannysHead
     cmp #NPC_IDX_ERIKA
     beq @superHammer
+    cmp #NPC_IDX_DEADMAN
+    beq @key
 
     ;everything else
     lda #ITEM_RAW_MEAT
     jmp @storeItem
 @lamp:
     lda #ITEM_LAMP
+    jmp @storeItem
+@key:
+    lda #ITEM_KEY
     jmp @storeItem
 @grannysHead:
     lda #ITEM_GRANNYS_HEAD

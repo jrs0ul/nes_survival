@@ -269,37 +269,49 @@ destructible_tiles_list:                 ;sc  y   x
     .byte LOCATION_SECRET_CAVE, $21, $A9, 0, 13, 9,  $5E, 0
     .byte LOCATION_ALIEN_BASE,  $25, $0D, 1, 8,  13, $D8, 0
     .byte LOCATION_ALIEN_BASE,  $25, $2D, 1, 9,  13, $5A, 0
+    .byte LOCATION_MINE,        $22, $32, 0, 17, 18, $51, 0
+    .byte LOCATION_MINE,        $22, $33, 0, 17, 19, $51, 0
+    .byte LOCATION_MINE,        $22, $52, 0, 18, 18, $51, 0
+    .byte LOCATION_MINE,        $22, $53, 0, 18, 19, $51, 0
 
-;255 means there are no tiles
+;indexes of destructible tiles for a location, 255 means there are no tiles
 destructible_tile_location_lookup:
-    .byte 0 ;0
+    .byte 0   ;0
     .byte 255 ;1
     .byte 255 ;2
     .byte 255 ;3
     .byte 255 ;4
     .byte 255 ;5
-    .byte 255 ;6
+    .byte 10  ;6 abandoned mine
     .byte 255 ;7
     .byte 255 ;8
     .byte 255 ;9
-    .byte 8 ;10
+    .byte 8   ;10 alien base
     .byte 255 ;11
     .byte 255 ;12
     .byte 255 ;13
-    .byte 4 ;14
+    .byte 4   ;14
+    .byte 255 ;15
+    .byte 255 ;16
+    .byte 255 ;17
+    .byte 255 ;18
 
 ;Destructible index assigned to a tile
 linked_destructible_tiles:
-    .byte 0
-    .byte 0
-    .byte 0
-    .byte 0
-    .byte 1
-    .byte 1
-    .byte 1
-    .byte 1
-    .byte 2
-    .byte 3
+    .byte 0 ;0 boulder
+    .byte 0 ;1
+    .byte 0 ;2
+    .byte 0 ;3
+    .byte 1 ;4 rock in secret cave
+    .byte 1 ;5
+    .byte 1 ;6
+    .byte 1 ;7
+    .byte 2 ;8 door in alien base
+    .byte 3 ;9
+    .byte 4 ;10 locked door in mine
+    .byte 4 ;11
+    .byte 4 ;12
+    .byte 4 ;13
 
 
 spearSprites:
@@ -1245,7 +1257,7 @@ ProjectileIdx:
     .res 1
 
 Destructibles:
-    .res 6  ;four destructibles so far, 1 means destroyed
+    .res 6  ;5 destructibles so far, 1 means destroyed
 
 AttribHighAddress:
     .res 1
@@ -5805,6 +5817,7 @@ ResetVariables:
     sta Destructibles + 1
     sta Destructibles + 2
     sta Destructibles + 3
+    sta Destructibles + 4
     ;lda #2 ;COMMENT THIS OUT!
     sta DestroyedTilesCount
 

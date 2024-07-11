@@ -249,7 +249,7 @@ LoadOutsideMap:
 
 
     lda LocationIndex
-    cmp #LOCATION_MAIN_CAVE
+    cmp #LOCATION_MINE
     beq @load_cave
     cmp #LOCATION_SECRET_CAVE
     beq @load_cave

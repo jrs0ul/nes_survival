@@ -266,8 +266,8 @@ TestPointAgainstCollisionMapHero:
 ;tile value is in register A
 IsCollidingWithADestructedTile:
 
-    lda DestroyedTilesCount
-    beq @cont ; no tiles that have been destroyed
+    ;lda DestroyedTilesCount
+    ;beq @cont ; no tiles that have been destroyed
 
     ldx LocationIndex
     lda destructible_tile_location_lookup, x
@@ -282,10 +282,12 @@ IsCollidingWithADestructedTile:
     lda linked_destructible_tiles, x
     tax
     lda Destructibles, x
+    stx TempRegX ; store destructible index
     ldx destructibleIdx
 
-    cmp #0
-    beq @nextTile
+    sta TempDigit ; store is destroyed or not
+    ;cmp #0
+    ;beq @nextTile
 
     txa ; destructible tile index * 8
     asl
@@ -313,7 +315,25 @@ IsCollidingWithADestructedTile:
     cmp destructible_tiles_list, x
     bne @nextTile
 
+    lda TempDigit
+    cmp #1
+    beq @thisTileIsDestroyed
 
+    ;some sort of crutch to unlock the door
+    ;tile is not destroyed
+    ldx TempRegX
+    cpx #4 ; locked door
+    bne @nextTile
+
+    lda #1
+    sta Destructibles, x
+    inc DestroyedTilesCount
+    sta MustUpdateDestructibles
+    jmp @end
+    ;---------end of crutch
+
+
+@thisTileIsDestroyed:
     inx ;tile
     lda destructible_tiles_list, x
 

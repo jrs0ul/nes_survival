@@ -60,7 +60,7 @@ entry_points_loc6:
     ;15.alien base entrance top
     .byte 15, 2, 207, 230, 0, 255, 43, 63
     ;16. Mine room entrance
-    .byte 16, 0, 119, 123, 22, 28, 100, 138
+    .byte 16, 0, 119, 123, 22, 28, 120, 130
     ;--------------------------
 entry_points_loc7:
     ;17.crashsite exit to cave
@@ -312,8 +312,8 @@ LocationScreenCountList:
     .byte OUTDOORS_LOC3_SCREEN_COUNT ; 2
     .byte 1                          ; 3 Bjorn's house
     .byte 1                          ; 4 Player's house
-    .byte 1                          ; 5 Hedgehog
-    .byte OUTDOORS_LOC7_SCREEN_COUNT ; 6 cave
+    .byte 1                          ; 5 Erika's house
+    .byte OUTDOORS_LOC7_SCREEN_COUNT ; 6 mine
     .byte OUTDOORS_LOC8_SCREEN_COUNT ; 7 crashsite
     .byte OUTDOORS_LOC9_SCREEN_COUNT ; 8 granny location
     .byte 1                          ; 9 granny's hut

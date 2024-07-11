@@ -73,7 +73,7 @@
     ROW_TABLE_SIZE             = 240 ;4 screens * 32 rows * 2
 
 
-    DESTRUCTIBLE_COUNT         = 10
+    DESTRUCTIBLE_COUNT         = 14
 
     PROJECTILE_TILE            = $37
 
@@ -191,7 +191,7 @@
     PLAYER_START_Y             = 200
 
     LOCATION_FIRST             = 0
-    LOCATION_MAIN_CAVE         = 6
+    LOCATION_MINE              = 6
     LOCATION_CRASHSITE         = 7
     LOCATION_ALIEN_BASE        = 10
     LOCATION_BOSS_ROOM         = 12
@@ -279,6 +279,8 @@
     ITEM_LETTER                = 24
     ITEM_LAMP                  = 26
     ITEM_GRANNYS_HEAD          = 27
+    ITEM_KEY                   = 29
+    ITEM_MUSHROOM              = 30
 
     MAX_LETTER_OBJECT_COUNT    = 2
 
@@ -351,6 +353,7 @@
     NPC_IDX_HOUND              = 3
     NPC_IDX_ERIKA              = 4
     NPC_IDX_GRANNY             = 5
+    NPC_IDX_DEADMAN            = 6
     NPC_IDX_BOAR               = 7
     NPC_IDX_BOSS               = 8
 
