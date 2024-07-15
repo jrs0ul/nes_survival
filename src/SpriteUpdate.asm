@@ -19,6 +19,10 @@ UpdateSprites:
     iny ; increment frame
 
 @doIt:
+    lda ImportantItemTimer
+    beq @cont
+    ldy #3
+@cont:
     lda player_frame_indexes, y
     sta TempFrame
 
@@ -46,6 +50,52 @@ UpdateSprites:
 @gogo:
     ldx #0
     ldy #0
+    stx TempSpriteCount
+
+;-------------IMPORTANT ITEM DISPLAY
+    lda ImportantItemTimer
+    beq @maincharloop
+
+    ;inx
+    lda PlayerY
+    sec
+    sbc #4
+    sta FIRST_SPRITE, x
+    inx
+    lda ImportantItemTile
+    sta FIRST_SPRITE, x
+    inx
+    lda ImportantItemPaletteIdx
+    sta FIRST_SPRITE, x
+    inx
+    lda PlayerX
+    sta FIRST_SPRITE, x
+
+    inc TempSpriteCount
+
+
+    inx
+    lda PlayerY
+    sec
+    sbc #4
+    sta FIRST_SPRITE, x
+    inx
+    lda ImportantItemTile
+    clc
+    adc #1
+    sta FIRST_SPRITE, x
+    inx
+    lda ImportantItemPaletteIdx
+    sta FIRST_SPRITE, x
+    inx
+    lda PlayerX
+    clc
+    adc #8
+    sta FIRST_SPRITE, x
+
+    inc TempSpriteCount
+    inx
+
 
 @maincharloop:
 
@@ -59,7 +109,7 @@ UpdateSprites:
     asl
     asl
 
-    cpx #7
+    cpy #2
     bcc @skipAnim ; first row of sprites are not animated
 
     clc
@@ -93,10 +143,14 @@ UpdateSprites:
     bcc @maincharloop
 
     dex
-    lda #4
-    sta TempSpriteCount
+    inc TempSpriteCount
+    inc TempSpriteCount
+    inc TempSpriteCount
+    inc TempSpriteCount
+
 
 ;-------------KNIFE
+@doKnife:
     lda AttackTimer
     beq @noKnife
 

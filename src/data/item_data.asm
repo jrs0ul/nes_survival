@@ -78,3 +78,5 @@ item_wear:
     .byte 0   ;lamp
     .byte 0   ;granny's head
     .byte 0   ;letter2
+    .byte 0   ;key
+    .byte 0   ;mushroom

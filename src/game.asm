@@ -1376,9 +1376,16 @@ MustReloadFontAndUI:
     .res 1
 skipZeroSpriteCheck:
     .res 1
+ImportantItemTimer:
+    .res 1
+ImportantItemTile:
+    .res 1
+ImportantItemPaletteIdx:
+    .res 1
+
 
 BSSBuffer:
-    .res 35
+    .res 32
 
 ;====================================================================================
 
@@ -2231,6 +2238,7 @@ Logics:
 @doneLogics:
     jsr UpdateFishingRod ; bank 1
     jsr UpdateAttackTimer; bank 1
+    jsr UpdateImportantItemTimer; bank 1
     jsr CheckEntryPoints ; bank 1
 
     ;-----------------
@@ -2474,7 +2482,22 @@ CheckEntryPoints:
 
 @exit:
     rts
+;--------------------------------
+UpdateImportantItemTimer:
 
+    lda ImportantItemTimer
+    beq @exit
+
+    sec
+    sbc #1
+    sta ImportantItemTimer
+    beq @done
+    jmp @exit
+@done:
+    lda #1
+    sta PlayerAnimationRowIndex
+@exit:
+    rts
 ;--------------------------------
 UpdateFishingRod:
 
@@ -4676,6 +4699,9 @@ HandleInput:
     cmp #STATE_GAME
     bne @finishInput
 
+    lda ImportantItemTimer
+    bne @finishInput
+
     lda Buttons
     bne @checkAttackTimer ; something is pressed
     ;NO INPUT
@@ -4687,6 +4713,7 @@ HandleInput:
 @checkAttackTimer:
     lda AttackTimer
     bne @finishInput ; attack pause
+
 
     lda InputProcessed
     bne @finishInput

@@ -92,6 +92,8 @@
     INTRO_SCENE_MAX            = 7
     OUTRO_SCENE_MAX            = 4
 
+    IMPORTANT_ITEM_TIME        = 96
+
 
     DAYTIME_NIGHT              = $40
 

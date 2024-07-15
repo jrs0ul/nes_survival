@@ -1,8 +1,8 @@
 player_frame_indexes:
     .byte 0  ; LEFT
-    .byte 12 ; RIGHT
-    .byte 24 ; UP
-    .byte 36 ; DOWN
+    .byte 14 ; RIGHT
+    .byte 28 ; UP
+    .byte 42 ; DOWN
 
 
 
@@ -40,6 +40,9 @@ player_sprites:
     ;attack
     .byte 8, $19, %00000011, 0 ;3rd
     .byte 8, $1A, %00000011, 8 ;4th
+    ;display item
+    .byte 8, $9e, %00000011, 0 ;3rd
+    .byte 8, $9e, %01000011, 8 ;4th
 
     ;------------------------------
     ;RIGHT
@@ -62,6 +65,9 @@ player_sprites:
     ;attack
     .byte 8, $1A, %01000011, 0 ;3rd
     .byte 8, $19, %01000011, 8 ;4th
+    ;display item
+    .byte 8, $9e, %00000011, 0 ;3rd
+    .byte 8, $9e, %01000011, 8 ;4th
 
     ;---------------------------------
     ;UP
@@ -84,6 +90,9 @@ player_sprites:
     ;attack
     .byte 8, $1B, %00000011, 0 ;3rd
     .byte 8, $1C, %00000011, 8 ;4th
+    ;display item
+    .byte 8, $9e, %00000011, 0 ;3rd
+    .byte 8, $9e, %01000011, 8 ;4th
 
     ;---------------------------------
     ;DOWN
@@ -105,6 +114,9 @@ player_sprites:
     ;attack
     .byte 8, $1d, %00000011, 0 ;3rd
     .byte 8, $1e, %00000011, 8 ;4th
+    ;display item
+    .byte 8, $9e, %00000011, 0 ;3rd
+    .byte 8, $9e, %01000011, 8 ;4th
 ;=========================================
 player_sprites_coat:
     ;LEFT
@@ -127,6 +139,9 @@ player_sprites_coat:
     ;attack
     .byte 8, $17, %00000011, 0 ;3rd
     .byte 8, $18, %00000011, 8 ;4th
+    ;display item
+    .byte 8, $9f, %00000011, 0 ;3rd
+    .byte 8, $9f, %01000011, 8 ;4th
 
     ;------------------------------
     ;RIGHT
@@ -149,6 +164,9 @@ player_sprites_coat:
     ;attack
     .byte 8, $18, %01000011, 0 ;3rd
     .byte 8, $17, %01000011, 8 ;4th
+    ;display item
+    .byte 8, $9f, %00000011, 0 ;3rd
+    .byte 8, $9f, %01000011, 8 ;4th
 
     ;---------------------------------
     ;UP
@@ -171,6 +189,9 @@ player_sprites_coat:
     ;attack
     .byte 8, $23, %00000011, 0 ;3rd
     .byte 8, $24, %00000011, 8 ;4th
+    ;display item
+    .byte 8, $9f, %00000011, 0 ;3rd
+    .byte 8, $9f, %01000011, 8 ;4th
 
     ;---------------------------------
     ;DOWN
@@ -192,3 +213,6 @@ player_sprites_coat:
     ;attack
     .byte 8, $25, %00000011, 0 ;3rd
     .byte 8, $26, %00000011, 8 ;4th
+    ;display item
+    .byte 8, $9f, %00000011, 0 ;3rd
+    .byte 8, $9f, %01000011, 8 ;4th
