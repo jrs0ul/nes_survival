@@ -263,12 +263,15 @@ destructible_tiles_list:                 ;sc  y   x
     .byte LOCATION_FIRST,       $27, $71, 3, 27, 17, $7C, 0
     .byte LOCATION_FIRST,       $27, $90, 3, 28, 16, $7C, 0
     .byte LOCATION_FIRST,       $27, $91, 3, 28, 17, $7C, 0
+
     .byte LOCATION_SECRET_CAVE, $21, $88, 0, 12, 8,  $5E, 0
     .byte LOCATION_SECRET_CAVE, $21, $89, 0, 12, 9,  $5E, 0
     .byte LOCATION_SECRET_CAVE, $21, $A8, 0, 13, 8,  $5E, 0
     .byte LOCATION_SECRET_CAVE, $21, $A9, 0, 13, 9,  $5E, 0
+
     .byte LOCATION_ALIEN_BASE,  $25, $0D, 1, 8,  13, $D8, 0
     .byte LOCATION_ALIEN_BASE,  $25, $2D, 1, 9,  13, $5A, 0
+
     .byte LOCATION_MINE,        $22, $32, 0, 17, 18, $51, 0
     .byte LOCATION_MINE,        $22, $33, 0, 17, 19, $51, 0
     .byte LOCATION_MINE,        $22, $52, 0, 18, 18, $51, 0
@@ -1371,10 +1374,11 @@ MustLoadCoreSprites:
     .res 1
 MustReloadFontAndUI:
     .res 1
-
+skipZeroSpriteCheck:
+    .res 1
 
 BSSBuffer:
-    .res 36
+    .res 35
 
 ;====================================================================================
 
@@ -1626,11 +1630,17 @@ nmi:
     pha
     ;---
     lda NMINotFinished
-    bne transferOAM
+    bne skipSpriteZero
     lda current_bank
     sta bankBeforeNMI
     lda #1
     sta NMINotFinished
+    lda #0
+    sta skipZeroSpriteCheck
+    jmp transferOAM
+skipSpriteZero:
+    lda #1
+    sta skipZeroSpriteCheck
 transferOAM:
     ;copy sprite data
     ;lda SpritesUpdated
@@ -1741,6 +1751,8 @@ doneUpdatingPalette:
     sta $2005
     sta $2005
 
+    lda skipZeroSpriteCheck
+    bne justScroll
     lda GameState
     cmp #STATE_GAME
     beq WaitNotSprite0
@@ -2013,6 +2025,8 @@ UpdateDestructableTiles:
     lda MustUpdateDestructibles
     beq @exit
 
+    lda #0
+    sta $2001
     ldy #DESTRUCTIBLE_COUNT
 @loop:
     dey
@@ -3481,6 +3495,9 @@ RoutinesAfterFadeOut:
     cmp #16
     bne @next22
 
+    lda #2
+    sta ScrollDirection
+
     lda #1
     sta InHouse
 
@@ -3648,6 +3665,7 @@ RoutinesAfterFadeOut:
     bne @next31
 
     lda #1
+    sta ScrollDirection
     sta MustCopyMainChr
     sta InCave
     lda #0

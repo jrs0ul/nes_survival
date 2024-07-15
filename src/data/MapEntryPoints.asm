@@ -60,7 +60,7 @@ entry_points_loc6:
     ;15.alien base entrance top
     .byte 15, 2, 207, 230, 0, 255, 43, 63
     ;16. Mine room entrance
-    .byte 16, 0, 119, 123, 22, 28, 120, 130
+    .byte 16, 0, 118, 123, 22, 28, 120, 130
     ;--------------------------
 entry_points_loc7:
     ;17.crashsite exit to cave
@@ -112,7 +112,7 @@ entry_points_loc14:
     ;-------------------------------------
 entry_points_loc15:
     ;33. Mine room exit
-    .byte 33, 0, 0  , 255, 0, 255, 160, 255
+    .byte 33, 0, 0, 255, 0, 255, 160, 255
     ;--------------------------------------
 entry_points_loc16:
     ;34. Dark cave2 exit to dark cave 1
@@ -274,7 +274,7 @@ MapSpawnPoint:
     .byte 0, 0, 0, 2, 0, 0, 2
     ;-----------------------
     ;exit of mine room
-    .byte 120, 146, 6, OUTDOORS_LOC7_SCREEN_COUNT, UNUSED, UNUSED, 4, 24, 0
+    .byte 120, 145, 6, OUTDOORS_LOC7_SCREEN_COUNT, UNUSED, UNUSED, 4, 24, 0
     .byte 0, 0, 0, 0, <cave_npcs, >cave_npcs, 0
     ;-----------------------
     ;exit to first dark cave
