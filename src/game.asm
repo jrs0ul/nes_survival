@@ -3518,8 +3518,11 @@ RoutinesAfterFadeOut:
     cmp #16
     bne @next22
 
-    lda #2
-    sta ScrollDirection
+    lda #0
+    sta FirstTime
+
+    lda #1
+    sta MustRestartIndoorsMusic
 
     lda #1
     sta InHouse
@@ -6160,6 +6163,8 @@ LoadCheckPoint:
     lda #1
     sta PlayerAlive
 
+    jsr ResetNameTableAddresses
+    
     lda #6
     sta LocationIndex
     lda #3

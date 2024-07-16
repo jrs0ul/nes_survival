@@ -1057,6 +1057,10 @@ DropItemAfterDeath:
     jmp @storeItem
 @key:
     lda #ITEM_KEY
+    sta TempItemIndex
+    jsr IsItemXInInventory
+    bne @exit ; I already have the key
+    lda #ITEM_KEY
     jmp @storeItem
 @grannysHead:
     lda #ITEM_GRANNYS_HEAD
