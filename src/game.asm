@@ -1223,7 +1223,7 @@ Item_Location12_Collection_times:
 Item_Location15_Collection_times:
     .res ITEM_COUNT_LOC15
 Item_Location17_Collection_times:
-    .res ITEM_COUNT_LOC7
+    .res ITEM_COUNT_LOC17
 
 
 Npcs:   ;animals and stuff
@@ -1385,7 +1385,7 @@ ImportantItemPaletteIdx:
 
 
 BSSBuffer:
-    .res 32
+    .res 26
 
 ;====================================================================================
 

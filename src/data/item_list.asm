@@ -36,15 +36,21 @@ secret_cave_items:
 
 mine_location_items:
     .byte ITEM_COUNT_LOC12
-    .byte %00001101, 0, 150,130 ; rock
-    .byte %00001101, 3, 150,100 ; rock
-    .byte %00001101, 2, 100,80 ; rock
+    .byte %00001101, 3, 104, 128 ; rock
+    .byte %00001101, 1, 30, 160  ; rock
+    .byte %00001101, 2, 100, 80  ; rock
+    .byte %00000011, 3, 176, 96  ; stick
+    .byte %00000011, 2, 48,  200 ; stick
+    .byte %00000011, 1, 152, 128 ; stick
 
 dark_cave_2_items:
     .byte ITEM_COUNT_LOC17
-    .byte %00001101, 0, 150,130 ; rock
-    .byte %00111101, 1, 150,130 ; shroom
-    .byte %00001101, 0, 80,100 ; rock
+    .byte %00001101, 1, 144, 56  ; rock
+    .byte %00111101, 1, 72,  64  ; shroom
+    .byte %00001101, 1, 64,  184 ; rock
+    .byte %00111101, 0, 16,  96  ; shroom
+    .byte %00111101, 0, 120, 48  ; shroom
+    .byte %00111101, 0, 176, 112 ; shroom
 
 
 granny_location_items:

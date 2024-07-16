@@ -306,9 +306,9 @@
     ITEM_COUNT_LOC7            = 3 ; mine
     ITEM_COUNT_LOC8            = 1 ; crashsite
     ITEM_COUNT_LOC9            = 1 ; grany's location
-    ITEM_COUNT_LOC12           = 3 ; location where the mine entrance is
+    ITEM_COUNT_LOC12           = 6 ; location where the mine entrance is
     ITEM_COUNT_LOC15           = 5 ; secret cave
-    ITEM_COUNT_LOC17           = 3 ; dark cave 2
+    ITEM_COUNT_LOC17           = 6 ; dark cave 2
 
     ONE_TIME_ITEM_COUNT        = ITEM_COUNT_LOC15 + ITEM_COUNT_LOC8 + ITEM_COUNT_LOC7
 
