@@ -80,3 +80,38 @@ item_wear:
     .byte 0   ;letter2
     .byte 0   ;key
     .byte 0   ;mushroom
+
+;items the player character should display above its head
+important_items:
+    .byte 0   ;empty
+    .byte 0   ;stick
+    .byte 0   ;raw meat
+    .byte 0   ;cooked meat
+    .byte 0   ;rowan berries
+    .byte 1   ;jam
+    .byte 0   ;rock
+    .byte 0   ;spear
+    .byte 1   ;knife
+    .byte 0   ;poop
+    .byte 0   ;hide
+    .byte 1   ;coat
+    .byte 1   ;jumbo meat
+    .byte 1   ;cooked jumbo meat
+    .byte 0   ;rope
+    .byte 1   ;fishing rod
+    .byte 0   ;reeds
+    .byte 0   ;fish
+    .byte 1   ;cooked fish
+    .byte 1   ;radio
+    .byte 1   ;hammer
+    .byte 1   ;wooden hammer
+    .byte 1   ;slingshot
+    .byte 1   ;pie
+    .byte 0   ;letter
+    .byte 0   ;letter1
+    .byte 1   ;lamp
+    .byte 1   ;granny's head
+    .byte 0   ;letter2
+    .byte 1   ;key
+    .byte 0   ;mushroom
+

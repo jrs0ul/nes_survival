@@ -310,17 +310,9 @@ AddAndDeactivateItems:
 
 @addItem:
     sty Temp  ; store empty inventory slot
+
+
     
-
-    lda #IMPORTANT_ITEM_TIME
-    sta ImportantItemTimer
-    lda #5
-    sta PlayerAnimationRowIndex
-    lda #2
-    sta PlayerFrame
-    lda #0
-    sta AttackTimer
-
     lda #0
     sta SfxName
     lda #1
@@ -352,7 +344,20 @@ AddAndDeactivateItems:
     lda Items, x
     lsr
     sta TempItemIndex
-    
+    tay
+    lda important_items, y
+    beq @not_important
+    ;it's important
+    lda #IMPORTANT_ITEM_TIME
+    sta ImportantItemTimer
+    lda #5
+    sta PlayerAnimationRowIndex
+    lda #2
+    sta PlayerFrame
+    lda #0
+    sta AttackTimer
+
+    lda TempItemIndex
     asl
     asl
     tay
@@ -361,7 +366,7 @@ AddAndDeactivateItems:
     iny
     lda item_data, y
     sta ImportantItemPaletteIdx
-
+@not_important:
     lda TempItemIndex
     ldy Temp
     sta Inventory, y
