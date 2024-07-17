@@ -350,7 +350,7 @@ npc_HOUND_frame_LEFT_WARN:
 npc_HOUND_frame_LEFT_ATK:
     .byte 0, $AC, %00000000, 0
     .byte 0, $DB, %00000000, 8
-    .byte 8, $EA, %00000000, 0
+    .byte 8, $FD, %00000000, 0
     .byte 8, $EB, %00000000, 8
 
 
@@ -392,7 +392,7 @@ npc_HOUND_frame_RIGHT_ATK:
     .byte 0, $DB, %01000000, 0
     .byte 0, $AC, %01000000, 8
     .byte 8, $EB, %01000000, 0
-    .byte 8, $EA, %01000000, 8
+    .byte 8, $FD, %01000000, 8
 
 
 npc_HOUND_frame_UP:
