@@ -267,7 +267,7 @@ MapSpawnPoint:
 
     ;entrance to a second dark cave segment
     .byte 200, 60, 16, 2, UNUSED, UNUSED, 4, 0, 1
-    .byte 0, 0, 0, 2, 0, 0, 1
+    .byte 0, 0, 0, 3, 0, 0, 1
     ;---------------------
     ;secret cave exit to location 8
     .byte 156, 140, 8, OUTDOORS_LOC9_SCREEN_COUNT, UNUSED, UNUSED, 5, 0 ,2
@@ -289,7 +289,7 @@ MapSpawnPoint:
     .byte 0, 0, 0, 0, <alien_base_npcs, >alien_base_npcs, 0
     ;exit to dark cave 2
     .byte 80, 170, 16, 2, <House_items, >House_items, 4, 0, 0
-    .byte 0, 0, 0, 2, 0, 0, 0
+    .byte 0, 0, 0, 3, 0, 0, 0
     ;--------------------
     ;entrance to the crashsite from the path
     .byte 57, 210, 7, OUTDOORS_LOC8_SCREEN_COUNT, UNUSED, UNUSED, 4, 0, 0

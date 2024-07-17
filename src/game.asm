@@ -4414,6 +4414,7 @@ AdaptBackgroundPaletteByTime:
     beq @exit
     sta CurrentPaletteDecrementValue
 
+    ldy #1
 @paletteLoop:
     lda main_palette, y ;palette from ROM
     sec
