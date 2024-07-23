@@ -100,9 +100,6 @@ GenerateNpcs:
 ;Generate random npcs
 GenNpcs:
 
-    lda InCave
-    bne @exit
-
     jsr UpdateRandomNumber
     and TempNpcCnt
     beq @exit
@@ -275,10 +272,10 @@ EliminateInactiveNpcs:
     lda #NPC_ELIMINATION_DELAY
     sta NpcEliminationDelay
 
-    lda InCave
-    bne @exit
     lda LocationIndex
     cmp #LOCATION_ALIEN_BASE ; alien base
+    beq @exit
+    cmp #LOCATION_DARK_CAVE
     beq @exit
 
     ldy NpcCount

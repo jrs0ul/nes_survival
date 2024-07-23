@@ -3373,7 +3373,6 @@ RoutinesAfterFadeOut:
     bne @next12
 
     lda #1
-    sta InCave
     sta MustPlayNewSong
     lda #7
     sta SongName
@@ -3405,7 +3404,6 @@ RoutinesAfterFadeOut:
     bne @next14
 
     lda #1
-    sta InCave
     sta MustPlayNewSong
     lda #7
     sta SongName
@@ -3486,8 +3484,6 @@ RoutinesAfterFadeOut:
     lda #1
     sta MustCopyMainChr
 
-    lda #0
-    sta InCave
   ;TODO: perhaps it would be good to create a table for location - palette
     lda #<alien_palette
     sta CurrentMapPalettePtr
@@ -3501,8 +3497,6 @@ RoutinesAfterFadeOut:
     lda ActiveMapEntryIndex
     cmp #15
     bne @next21
-    lda #0
-    sta InCave
 
     lda #1
     sta MustCopyMainChr
@@ -3537,7 +3531,6 @@ RoutinesAfterFadeOut:
 
     lda #1
     sta MustCopyMainChr
-    sta InCave
     ;--------------------------
     ;24.alien base exit to the dark cave
 @next23:
@@ -3547,7 +3540,6 @@ RoutinesAfterFadeOut:
     bne @next24
 
     lda #1
-    sta InCave
     sta MustCopyMainChr
     lda #ITEM_LAMP
     sta TempItemIndex
@@ -3618,8 +3610,6 @@ RoutinesAfterFadeOut:
     cmp #30
     bne @next27
 
-    lda #1
-    sta InCave
     ;-----------------------
     ;14 dark cave entrance
 @next27:
@@ -3627,8 +3617,6 @@ RoutinesAfterFadeOut:
     cmp #14
     bne @next28
 
-    lda #1
-    sta InCave
     lda #ITEM_LAMP
     sta TempItemIndex
     jsr IsItemXInInventory
@@ -3693,7 +3681,6 @@ RoutinesAfterFadeOut:
     lda #1
     sta ScrollDirection
     sta MustCopyMainChr
-    sta InCave
     lda #0
     sta InHouse
 
@@ -3724,7 +3711,6 @@ RoutinesAfterFadeOut:
     bne @next35
 
     lda #1
-    sta InCave
     sta MustCopyMainChr
     lda #<alien_palette
     sta CurrentMapPalettePtr
@@ -3738,8 +3724,6 @@ RoutinesAfterFadeOut:
     cmp #31
     bne @next36
 
-    lda #1
-    sta InCave
     lda #ITEM_LAMP
     sta TempItemIndex
     jsr IsItemXInInventory
@@ -3756,8 +3740,6 @@ RoutinesAfterFadeOut:
     cmp #34
     bne @next37
 
-    lda #1
-    sta InCave
     lda #ITEM_LAMP
     sta TempItemIndex
     jsr IsItemXInInventory
@@ -3775,7 +3757,6 @@ RoutinesAfterFadeOut:
     bne @next38
 
     lda #1
-    sta InCave
     sta MustCopyMainChr
     jsr IsItemXInInventory
     bne @next38 ; it is
@@ -3845,7 +3826,6 @@ CommonLocationRoutine:
     lda #NUM_OF_BUNNIES_BEFORE_DOG
     sta DogCounter
     lda #0
-    sta InCave
     sta IsLocationRoutine
     sta PaletteFadeAnimationState
 
@@ -3889,8 +3869,8 @@ CommonLocationRoutine:
     lda (pointer2), y
     sta ScreenCount
     iny
-    ;lda (pointer2), y ; lower address to item data
-    ;sta pointer
+    lda (pointer2), y ; InCave
+    sta InCave
     iny
     ;lda (pointer2), y ; upper address to item data
     ;sta pointer + 1

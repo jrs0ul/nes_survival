@@ -122,15 +122,15 @@ spawnpoints_loc_12:
     .byte 98, 160
 
 spawnpoints_loc_17:
-    .byte 120, 115
-    .byte 168, 184
-    .byte 48, 128
-    .byte 98, 160
+    .byte 32, 56
+    .byte 132, 48
+    .byte 200, 132
+    .byte 88, 128
 
-    .byte 120, 115
-    .byte 168, 184
-    .byte 48, 128
-    .byte 98, 160
+    .byte 72, 72
+    .byte 56, 184
+    .byte 208, 200
+    .byte 8, 96
 
 
 
