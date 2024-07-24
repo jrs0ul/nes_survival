@@ -273,7 +273,9 @@ EliminateInactiveNpcs:
     sta NpcEliminationDelay
 
     lda LocationIndex
-    cmp #LOCATION_ALIEN_BASE ; alien base
+    cmp #LOCATION_ALIEN_BASE
+    beq @exit
+    cmp #LOCATION_MINE
     beq @exit
     cmp #LOCATION_DARK_CAVE
     beq @exit

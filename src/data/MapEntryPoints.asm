@@ -118,7 +118,7 @@ entry_points_loc16:
     ;34. Dark cave2 exit to dark cave 1
     .byte 34, 1, 189, 255, 0, 255, 0, 32
     ;35. alien base lobby entrance
-    .byte 35, 0, 107, 115, 0, 255, 185, 198
+    .byte 35, 0, 105, 118, 0, 255, 185, 203
     ;--------------------------------------
 entry_points_loc17:
     ;36. alien base entrance bottom
@@ -288,7 +288,7 @@ MapSpawnPoint:
     .byte 15, 170, 10, 2, 0, UNUSED, 4, 0, 0
     .byte 0, 0, 0, 0, <alien_base_npcs, >alien_base_npcs, 0
     ;exit to dark cave 2
-    .byte 80, 170, 16, 2, <House_items, >House_items, 4, 0, 0
+    .byte 96, 196, 16, 2, 1, UNUSED, 4, 0, 0
     .byte 0, 0, 0, 3, 0, 0, 0
     ;--------------------
     ;entrance to the crashsite from the path
