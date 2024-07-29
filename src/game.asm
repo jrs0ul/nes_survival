@@ -1700,7 +1700,7 @@ DoneLoadingMaps:
 
     jsr UpdateFireplace
     jsr UploadBgColumns
-    jsr UpdateDestructableTiles
+    jsr UpdateDestructibleTiles
     jsr UpdateStatusDigits
     jmp UpdatePalette
 otherState:
@@ -2027,41 +2027,31 @@ UpdateFireplace:
 @exit:
     rts
 ;--------------------------------------------
-UpdateDestructableTiles:
+UpdateDestructibleTiles:
 
     lda MustUpdateDestructibles
     beq @exit
 
     lda #0
     sta $2001
-    ldy #DESTRUCTIBLE_COUNT
-@loop:
-    dey
-    bmi @exit
-    lda linked_destructible_tiles, y ; find the destructable index that's linked to a tile
+
+    ldy LocationIndex
+    lda destructible_tile_location_lookup, y
+    tay ; get the destructible tile index for the location
+
+@tileLoop:
+    lda linked_destructible_tiles, y
     tax
     lda Destructibles, x
-    beq @loop
+    beq @nextDestructible ; tile was not destroyed or removed
 
+    ;update tiles on the screen
     tya
     asl
     asl
     asl
     tax
-    lda destructible_tiles_list, x
-    cmp LocationIndex
-    bne @loop
-
-    inx
-    inx
-    inx ; screen
-    lda CurrentMapSegmentIndex
-    clc
-    adc #1
-    cmp destructible_tiles_list, x
-    bcc @loop
-    dex ; lo
-    dex ; hi
+    inx ; skip location
 
     lda $2002
     lda destructible_tiles_list, x
@@ -2072,12 +2062,26 @@ UpdateDestructableTiles:
     inx ;screen
     inx ; y
     inx ; x
-    inx ; tile
+    inx ; tile value
     lda destructible_tiles_list, x
     sta $2007
 
 
-    jmp @loop
+@nextDestructible:
+    iny
+    cpy #DESTRUCTIBLE_COUNT
+    bcs @exit
+
+    tya
+    asl
+    asl
+    asl
+    tax
+    lda destructible_tiles_list, x
+    cmp LocationIndex
+    bne @exit ;already a different location
+
+    jmp @tileLoop
 
 @exit:
     lda #0
