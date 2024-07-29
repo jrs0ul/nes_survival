@@ -258,11 +258,12 @@ fist_collision_pos:
 ;   tile row
 ;   tile column
 ;   tile value after destruction
+;   scrollx amount to activate screen update
 destructible_tiles_list:                 ;sc  y   x
-    .byte LOCATION_FIRST,       $27, $70, 3, 27, 16, $7C, 0
-    .byte LOCATION_FIRST,       $27, $71, 3, 27, 17, $7C, 0
-    .byte LOCATION_FIRST,       $27, $90, 3, 28, 16, $7C, 0
-    .byte LOCATION_FIRST,       $27, $91, 3, 28, 17, $7C, 0
+    .byte LOCATION_FIRST,       $27, $70, 3, 27, 16, $7C, 17
+    .byte LOCATION_FIRST,       $27, $71, 3, 27, 17, $7C, 17
+    .byte LOCATION_FIRST,       $27, $90, 3, 28, 16, $7C, 17
+    .byte LOCATION_FIRST,       $27, $91, 3, 28, 17, $7C, 17
 
     .byte LOCATION_SECRET_CAVE, $21, $88, 0, 12, 8,  $5E, 0
     .byte LOCATION_SECRET_CAVE, $21, $89, 0, 12, 9,  $5E, 0
@@ -2037,6 +2038,8 @@ UpdateDestructibleTiles:
 
     ldy LocationIndex
     lda destructible_tile_location_lookup, y
+    cmp #DESTRUCTIBLES_NOT_AVAIL
+    beq @exit
     tay ; get the destructible tile index for the location
 
 @tileLoop:
@@ -2051,7 +2054,36 @@ UpdateDestructibleTiles:
     asl
     asl
     tax
-    inx ; skip location
+    inx ; skip location idx
+    inx ; skip adress high
+    inx ; skip address low
+    lda destructible_tiles_list, x
+    cmp CurrentMapSegmentIndex
+    beq @continue
+    bcc @exit
+    ;current screen idx is less than what is desired
+    sec
+    sbc #1
+    cmp CurrentMapSegmentIndex
+    beq @checkScroll
+    bcs @exit ; current idx is less than targetScreen - 1
+@checkScroll:
+
+    inx ;y
+    inx ;x
+    inx ;tile
+    inx ;scroll
+    lda ScrollX
+    cmp destructible_tiles_list, x
+    bcc @exit
+    dex
+    dex
+    dex
+    dex
+
+@continue:
+    dex ; address low
+    dex ; address high
 
     lda $2002
     lda destructible_tiles_list, x

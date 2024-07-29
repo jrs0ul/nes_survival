@@ -75,6 +75,7 @@
     DESTRUCTIBLE_DOOR_IDX      = 4
 
     DESTRUCTIBLE_COUNT         = 14
+    DESTRUCTIBLES_NOT_AVAIL    = 255
 
     PROJECTILE_TILE            = $37
 
