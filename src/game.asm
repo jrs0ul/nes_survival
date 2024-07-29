@@ -1351,8 +1351,8 @@ TempNpcAgitated:
 DialogTextContainer:
     .res 96
 
-SaveData: ; inventory         HP | Food | Fuel | Warmth | Time | Equipment
-    .res INVENTORY_MAX_SIZE + 3  +   3 +   3   +   3    +   5  +    4
+SaveData: ; inventory       |      storage       | HP | Food | Fuel | Warmth | Time | Equipment
+    .res INVENTORY_MAX_SIZE + INVENTORY_MAX_SIZE + 3  +   3 +   3   +   3    +   5  +    4
 
 FullInventoryScrollX:
     .res 1
@@ -1386,7 +1386,7 @@ ImportantItemPaletteIdx:
 
 
 BSSBuffer:
-    .res 26
+    .res 6
 
 ;====================================================================================
 
@@ -5584,21 +5584,26 @@ LoadGameOver:
 ;-------------------------------------
 SaveGame:
 
-    lda #INVENTORY_MAX_SIZE
-    tax
-    tay
-    dex
-    dey
+    ldy #0
+    ldx #0
 @InventoryLoop:
     lda Inventory, x
     sta SaveData, y
 
-    dey
-    dex
-    bpl @InventoryLoop
+    iny
+    inx
+    cpx #INVENTORY_MAX_SIZE
+    bcc @InventoryLoop
 
-    ;HP/Food/Fuel/Warmth
-    ldy #INVENTORY_MAX_SIZE
+    ldx #0
+@storageLoop:
+    lda Storage, x
+    sta SaveData, y
+
+    iny
+    inx
+    cpx #INVENTORY_MAX_SIZE
+    bcc @storageLoop
 
     ldx #0
 @HPLoop:
@@ -5668,20 +5673,26 @@ SaveGame:
 ;-------------------------------
 LoadGame:
 
-;inventory
-    lda #INVENTORY_MAX_SIZE
-    tax
-    tay
-    dex
-    dey
+    ldy #0
+    ldx #0
 @InventoryLoop:
     lda SaveData, y
     sta Inventory, x
-    dey
-    dex
-    bpl @InventoryLoop
 
-    ldy #INVENTORY_MAX_SIZE
+    iny
+    inx
+    cpx #INVENTORY_MAX_SIZE
+    bcc @InventoryLoop
+
+    ldx #0
+@storageLoop:
+    lda SaveData, y
+    sta Storage, x
+
+    iny
+    inx
+    cpx #INVENTORY_MAX_SIZE
+    bcc @storageLoop
 
     ldx #0
 @HPLoop:
