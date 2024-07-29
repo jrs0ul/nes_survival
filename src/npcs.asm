@@ -905,6 +905,8 @@ OnCollisionWithAttackRect:
     sta VillagerKilled, y
     ldy TempY
 
+    jsr ClearTextBaloon
+
 @playsfx:
     jsr PlayDamageSfx
 
@@ -954,18 +956,17 @@ OnCollisionWithAttackRect:
     sta Npcs, y
 
     lda TempNpcAgitated
-    bne @dontTouchText
+    bne @dontAgitateBoss
 
     lda TempNpcIndex
     cmp #NPC_IDX_BOSS
-    bne @dontTouchText
+    bne @dontAgitateBoss
 
     lda #1
     sta BossAgitated
-
     jsr ClearTextBaloon
 
-@dontTouchText:
+@dontAgitateBoss:
     tya
     clc
     adc #10; go to damage timer
@@ -977,7 +978,6 @@ OnCollisionWithAttackRect:
     sec
     sbc #8
     tay
-
 
 @wearWeapon:
 
