@@ -116,7 +116,7 @@ entry_points_loc15:
     ;--------------------------------------
 entry_points_loc16:
     ;34. Dark cave2 exit to dark cave 1
-    .byte 34, 1, 189, 255, 0, 255, 0, 32
+    .byte 34, 2, 189, 255, 0, 255, 0, 32
     ;35. alien base lobby entrance
     .byte 35, 0, 105, 118, 0, 255, 185, 203
     ;--------------------------------------
@@ -266,7 +266,7 @@ MapSpawnPoint:
     .byte 0, 0, 0, 0, <cave_npcs, >cave_npcs, 0
 
     ;entrance to a second dark cave segment
-    .byte 200, 60, 16, 2, 1, UNUSED, 4, 0, 1
+    .byte 200, 60, 16, 3, 1, UNUSED, 4, 0, 2
     .byte 0, 0, 0, 3, 0, 0, 1
     ;---------------------
     ;secret cave exit to location 8
@@ -288,11 +288,11 @@ MapSpawnPoint:
     .byte 15, 170, 10, 2, 0, UNUSED, 4, 0, 0
     .byte 0, 0, 0, 0, <alien_base_npcs, >alien_base_npcs, 0
     ;exit to dark cave 2
-    .byte 96, 196, 16, 2, 1, UNUSED, 4, 0, 0
+    .byte 96, 196, 16, 3, 1, UNUSED, 4, 0, 0
     .byte 0, 0, 0, 3, 0, 0, 0
     ;--------------------
     ;entrance to the crashsite from the path
-    .byte 57, 210, 7, OUTDOORS_LOC8_SCREEN_COUNT, 0, UNUSED, 4, 0, 0
+    .byte 57, 210, 7, OUTDOORS_LOC8_SCREEN_COUNT, 0, UNUSED, 2, 0, 0
     .byte 0, 0, 0, 0, 0, 0, 0
     ;entrance to the mine location
     .byte 119, 100, 11, OUTDOORS_LOC12_SCREEN_COUNT, 0, UNUSED, 5, 0, 0
@@ -323,7 +323,7 @@ LocationScreenCountList:
     .byte 2                          ; 13 dark cave
     .byte 1                          ; 14 secret cave
     .byte 1                          ; 15 mine room
-    .byte 2                          ; 16 dark cave extension
+    .byte 3                          ; 16 dark cave extension
     .byte 1                          ; 17 alien base lobby
     .byte 1                          ; 18 path to crashsite
 
@@ -380,7 +380,7 @@ LocationBanks:
     .byte 0  ;4
     .byte 0  ;5
     .byte 4  ;6
-    .byte 4  ;7 crashsite
+    .byte 2  ;7 crashsite
     .byte 5  ;8
     .byte 0  ;9
     .byte 4  ;10

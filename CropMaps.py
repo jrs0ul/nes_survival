@@ -23,6 +23,7 @@ map_files = [
             "dark_cave1.asm",
             "dark_cave2_0.asm",
             "dark_cave2_1.asm",
+            "dark_cave2_2.asm",
             "babloc1.asm",
             "babloc2.asm",
             "babloc3.asm",

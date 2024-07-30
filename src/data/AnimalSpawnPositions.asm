@@ -132,6 +132,11 @@ spawnpoints_loc_17:
     .byte 208, 200
     .byte 8, 96
 
+    .byte 72, 72
+    .byte 56, 184
+    .byte 208, 200
+    .byte 8, 96
+
 
 
 

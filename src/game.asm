@@ -55,6 +55,9 @@ title_tiles_chr   :  .incbin "title_tiles.lz4"
 gameover_tiles_chr:  .incbin "gameover_tiles.lz4"
 intro_tiles_chr   :  .incbin "intro.lz4"
 .include "data/maps/cropped/alien_base_lobby_crop.asm"
+.include "data/maps/cropped/crashsite0_crop.asm"
+.include "data/maps/cropped/crashsite1_crop.asm"
+.include "data/maps/cropped/crashsite2_crop.asm"
 
 
 ;============================================================
@@ -87,10 +90,9 @@ alien_sprites_chr: .incbin "alien_sprites.lz4"
 .include "data/maps/cropped/dark_cave1_crop.asm"
 .include "data/maps/cropped/dark_cave2_0_crop.asm"
 .include "data/maps/cropped/dark_cave2_1_crop.asm"
+.include "data/maps/cropped/dark_cave2_2_crop.asm"
 .include "data/maps/cropped/secret_cave0_crop.asm"
-.include "data/maps/cropped/crashsite0_crop.asm"
-.include "data/maps/cropped/crashsite1_crop.asm"
-.include "data/maps/cropped/crashsite2_crop.asm"
+
 
 
 ;=============================================================
