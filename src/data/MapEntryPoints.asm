@@ -174,7 +174,7 @@ MapSpawnPoint:
     .byte 128, 32, 0, OUTDOORS_LOC1_SCREEN_COUNT, 0, UNUSED, 0, 0, OUTDOORS_LOC1_SCREEN_COUNT - 1
     .byte 0, 0, 0, 3, 0, 0, 3
     ;entrance to mine location
-    .byte 119, 210, 11, OUTDOORS_LOC12_SCREEN_COUNT, 1, UNUSED, 5, 160, 2
+    .byte 119, 210, 11, OUTDOORS_LOC12_SCREEN_COUNT, 0, UNUSED, 5, 160, 2
     .byte 0, 0, 0, 2, 0, 0, 3
     ;-----------------
     ;Exit point of third location

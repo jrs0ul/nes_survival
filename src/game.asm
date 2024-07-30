@@ -3579,6 +3579,10 @@ RoutinesAfterFadeOut:
     sta MustCopyMainChr
     lda #ITEM_LAMP
     sta TempItemIndex
+    lda #<Inventory
+    sta pointer2
+    lda #>Inventory
+    sta pointer2 + 1
     jsr IsItemXInInventory
     bne @next24 ; it is
 
@@ -3655,6 +3659,10 @@ RoutinesAfterFadeOut:
 
     lda #ITEM_LAMP
     sta TempItemIndex
+    lda #<Inventory
+    sta pointer2
+    lda #>Inventory
+    sta pointer2 + 1
     jsr IsItemXInInventory
     bne @saveTheGame ; it is
 
@@ -3691,6 +3699,10 @@ RoutinesAfterFadeOut:
 
     lda #ITEM_LAMP
     sta TempItemIndex
+    lda #<Inventory
+    sta pointer2
+    lda #>Inventory
+    sta pointer2 + 1
     jsr IsItemXInInventory
     bne @next29 ; it is
 
@@ -3762,6 +3774,10 @@ RoutinesAfterFadeOut:
 
     lda #ITEM_LAMP
     sta TempItemIndex
+    lda #<Inventory
+    sta pointer2
+    lda #>Inventory
+    sta pointer2 + 1
     jsr IsItemXInInventory
     bne @next36 ; it is
 
@@ -3778,6 +3794,10 @@ RoutinesAfterFadeOut:
 
     lda #ITEM_LAMP
     sta TempItemIndex
+    lda #<Inventory
+    sta pointer2
+    lda #>Inventory
+    sta pointer2 + 1
     jsr IsItemXInInventory
     bne @next37 ; it is
 
@@ -3794,6 +3814,10 @@ RoutinesAfterFadeOut:
 
     lda #1
     sta MustCopyMainChr
+    lda #<Inventory
+    sta pointer2
+    lda #>Inventory
+    sta pointer2 + 1
     jsr IsItemXInInventory
     bne @next38 ; it is
 
@@ -4011,17 +4035,18 @@ CommonLocationRoutine:
     rts
 ;-------------------------------
 ;put item id in TempItemIndex
+;pointer2 - points to a container (inventory or storage)
 IsItemXInInventory:
 
-    ldy #INVENTORY_MAX_ITEMS - 1
+    ldx #INVENTORY_MAX_ITEMS - 1
 @loop:
-    tya
+    txa
     asl
-    tax
-    lda Inventory, x
+    tay
+    lda (pointer2), y
     cmp TempItemIndex
     beq @found
-    dey
+    dex
     bpl @loop
 
     lda #0
@@ -4365,7 +4390,9 @@ AdaptBackgroundPaletteByTime:
     rts
 @continueWith3:
     cmp #LOCATION_BOSS_ROOM
-    beq @exit
+    bne @continueWith4
+    rts
+@continueWith4:
 
     ldy #$01 ;keeps the outline for the background objects
 
@@ -4382,6 +4409,10 @@ AdaptBackgroundPaletteByTime:
 @check_lamp:
     lda #ITEM_LAMP
     sta TempItemIndex
+    lda #<Inventory
+    sta pointer2
+    lda #>Inventory
+    sta pointer2 + 1
     jsr IsItemXInInventory
     beq @dark_cave
 

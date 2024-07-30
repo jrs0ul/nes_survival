@@ -1057,6 +1057,16 @@ DropItemAfterDeath:
 @key:
     lda #ITEM_KEY
     sta TempItemIndex
+    lda #<Inventory
+    sta pointer2
+    lda #>Inventory
+    sta pointer2 + 1
+    jsr IsItemXInInventory
+    bne @exit
+    lda #<Storage
+    sta pointer2
+    lda #>Storage
+    sta pointer2 + 1
     jsr IsItemXInInventory
     bne @exit ; I already have the key
     lda #ITEM_KEY

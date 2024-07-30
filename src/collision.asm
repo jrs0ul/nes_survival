@@ -265,6 +265,10 @@ IfCollidingWithLockedDoor:
     sta TempItemIndex
     lda #1
     sty TempHp
+    lda #<Inventory
+    sta pointer2
+    lda #>Inventory
+    sta pointer2 + 1
     jsr IsItemXInInventory
     ldy TempHp
 
