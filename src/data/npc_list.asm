@@ -24,11 +24,9 @@ cave_npcs:
     .byte %01100001, 45, 90, 2, 8
 
 dark_cave_npcs:
-    .byte 4
+    .byte 2
     .byte %00000001, 64,  70,  0, 7
-    .byte %00000001, 200, 184, 0, 7
     .byte %00000001, 62,  56,  1, 7
-    .byte %00000001, 200, 120, 1, 7
 
 alien_base_npcs:
     .byte 5

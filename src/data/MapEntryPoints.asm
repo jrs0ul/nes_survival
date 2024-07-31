@@ -102,7 +102,7 @@ entry_points_loc12:
     ;-------------------------------------
 entry_points_loc13:
     ;30. Dark cave exit to light cave
-    .byte 30, 0, 0, 5, 0, 255, 32, 55
+    .byte 30, 0, 0, 5, 0, 255, 32, 76
     ;31. entrance to dark cave second segment
     .byte 31, 1, 189, 240, 0, 255, 222, 255
     ;-------------------------------------
@@ -206,7 +206,7 @@ MapSpawnPoint:
     .byte 0, 0, 0, 2, 0, 0, 2
     ;dark cave entrance
     .byte 15, 50, 13, 2, 1, UNUSED, 4, 0, 0
-    .byte 0, 0, 0, 0, <dark_cave_npcs, >dark_cave_npcs, 0
+    .byte 0, 0, 0, 3, <dark_cave_npcs, >dark_cave_npcs, 0
     ;alien base entrance top
     .byte 15, 90, 10, 2, 0, UNUSED, 4, 0, 0
     .byte 0, 0, 0, 0, <alien_base_npcs, >alien_base_npcs, 0
@@ -267,7 +267,7 @@ MapSpawnPoint:
 
     ;entrance to a second dark cave segment
     .byte 200, 60, 16, 3, 1, UNUSED, 4, 0, 2
-    .byte 0, 0, 0, 3, 0, 0, 1
+    .byte 0, 0, 0, 3, 0, 0, 2
     ;---------------------
     ;secret cave exit to location 8
     .byte 156, 140, 8, OUTDOORS_LOC9_SCREEN_COUNT, 0, UNUSED, 5, 0 ,2
@@ -279,7 +279,7 @@ MapSpawnPoint:
     ;-----------------------
     ;exit to first dark cave
     .byte 200, 200, 13, 2, 1, UNUSED, 4, 0, 1
-    .byte 0, 0, 0, 0, <dark_cave_npcs, >dark_cave_npcs, 0
+    .byte 0, 0, 0, 3, <dark_cave_npcs, >dark_cave_npcs, 1
     ;alien base lobby entrance
     .byte 53, 129, 17, 1, 1, UNUSED, 2, 0, 0
     .byte 0, 0, 0, 0, 0, 0, 0

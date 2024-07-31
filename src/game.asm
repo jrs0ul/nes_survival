@@ -3981,7 +3981,7 @@ CommonLocationRoutine:
     sty TempY
     lda (pointer2), y ;generated npc count
     sta TempScreenNpcCount
-    beq @skipGeneration
+    beq @skipGeneration ; 0 generated
     sta TempNpcCnt
     iny
     iny
@@ -3998,7 +3998,6 @@ CommonLocationRoutine:
     sta TempNpcCnt
 
     jsr GenerateNpcs
-    jmp @skipLoadingNpcs ; we're generating, no need to load
 @skipGeneration:
     ldy TempY
     iny
@@ -4563,9 +4562,12 @@ WarmthLogics:
     jsr GetPaletteFadeValueForHour
     cmp #DAYTIME_NIGHT    ; is it night ?
     beq @nightFreeze
+@dayFreeze:
     lda #WARMTH_DAY_DECREASE
     jmp @saveTempDecrease
 @nightFreeze:
+    lda InCave
+    bne @dayFreeze
     lda #WARMTH_NIGHT_DECREASE
 @saveTempDecrease:
     sta DigitChangeSize

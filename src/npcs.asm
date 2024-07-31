@@ -2,11 +2,12 @@
 LoadNpcs:
     ldy #0
     lda (pointer), y
-    sta NpcCount
     sta TempNpcCnt
     beq @exit ; no npcs
     iny
-    ldx #0
+    ldx NpcCount
+    lda npcs_ram_lookup, x
+    tax
 @npcLoop:
 
     lda (pointer), y
@@ -45,6 +46,7 @@ LoadNpcs:
     sta Npcs, x ; clear the dmg timer
     inx
 
+    inc NpcCount
     dec TempNpcCnt
     lda TempNpcCnt
     bne @npcLoop
@@ -169,8 +171,14 @@ GenNpcs:
 GenerateSingleNpc:
 
     lda InCave
-    bne @makeBunny ; only "bunnies" in cave
+    beq @notInCave
+    jsr UpdateRandomNumber
+    and #3
+    cmp #0
+    beq @makeWolf
+    jmp @makeBunny
 
+@notInCave:
     lda TempFrame ; fade value for time of the day
     cmp #DAYTIME_NIGHT    ;check if it's night
     beq @makeWolf
@@ -276,8 +284,6 @@ EliminateInactiveNpcs:
     cmp #LOCATION_ALIEN_BASE
     beq @exit
     cmp #LOCATION_MINE
-    beq @exit
-    cmp #LOCATION_DARK_CAVE
     beq @exit
 
     ldy NpcCount

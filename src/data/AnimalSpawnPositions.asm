@@ -12,7 +12,7 @@ location_spawns_low:
     .byte 0                         ; 10
     .byte <spawnpoints_loc_12       ; 11 mine entrance loc
     .byte 0                         ; 12
-    .byte 0                         ; 13
+    .byte <spawnpoints_loc_13       ; 13 dark cave
     .byte 0                         ; 14
     .byte 0                         ; 15
     .byte <spawnpoints_loc_17       ; 16
@@ -33,7 +33,7 @@ location_spawns_high:
     .byte 0                         ;10
     .byte >spawnpoints_loc_12       ;11
     .byte 0                         ;12
-    .byte 0                         ;13
+    .byte >spawnpoints_loc_13       ;13
     .byte 0                         ;14
     .byte 0                         ;15
     .byte >spawnpoints_loc_17       ;16
@@ -121,6 +121,18 @@ spawnpoints_loc_12:
     .byte 48, 128
     .byte 98, 160
 
+spawnpoints_loc_13:
+    .byte 200, 192
+    .byte 168, 48
+    .byte 56 , 192
+    .byte 144, 128
+
+    .byte 0  , 48
+    .byte 184, 48
+    .byte 200, 128
+    .byte 48 , 184
+
+
 spawnpoints_loc_17:
     .byte 32, 56
     .byte 132, 48
@@ -134,7 +146,7 @@ spawnpoints_loc_17:
 
     .byte 72, 72
     .byte 56, 184
-    .byte 208, 200
+    .byte 208, 190
     .byte 8, 96
 
 
