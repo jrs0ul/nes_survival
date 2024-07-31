@@ -58,6 +58,9 @@ intro_tiles_chr   :  .incbin "intro.lz4"
 .include "data/maps/cropped/crashsite0_crop.asm"
 .include "data/maps/cropped/crashsite1_crop.asm"
 .include "data/maps/cropped/crashsite2_crop.asm"
+.include "data/maps/cropped/pre_alien_base0_crop.asm"
+.include "data/maps/cropped/pre_alien_base1_crop.asm"
+.include "data/maps/cropped/pre_alien_base2_crop.asm"
 
 
 ;============================================================

@@ -132,6 +132,11 @@ entry_points_loc18:
     ;39. entrance to location with mine
     .byte 39, 0, 0, 255, 0, 255, 222, 255
 
+entry_points_loc19:
+    ;40 exit to alien base lobby
+    .byte 40, 0, 32, 40, 0, 255, 119, 130
+    ;41 entrance to last alien base location
+    .byte 41, 2, 0, 255, 0, 255, 0, 50
 .segment "ROM0"
 ;-----------------------------------------------------
 ;The data of the new location the player has entered 
@@ -285,8 +290,8 @@ MapSpawnPoint:
     .byte 0, 0, 0, 0, 0, 0, 0
     ;------------
     ;alien base entrance bottom
-    .byte 15, 170, 10, 2, 0, UNUSED, 4, 0, 0
-    .byte 0, 0, 0, 0, <alien_base_npcs, >alien_base_npcs, 0
+    .byte 15, 170, 19, 3, 0, UNUSED, 2, 0, 0
+    .byte 0, 0, 0, 0, 0, 0, 0
     ;exit to dark cave 2
     .byte 96, 196, 16, 3, 1, UNUSED, 4, 0, 0
     .byte 0, 0, 0, 3, 0, 0, 0
@@ -297,6 +302,13 @@ MapSpawnPoint:
     ;entrance to the mine location
     .byte 119, 100, 11, OUTDOORS_LOC12_SCREEN_COUNT, 0, UNUSED, 5, 0, 0
     .byte 0, 0, 0, 2, 0, 0, 0
+    ;------------------
+    ;exit to lobby
+    .byte 190, 140, 17, 1, 1, UNUSED, 2, 0, 0
+    .byte 0, 0, 0, 0, 0, 0, 0
+    ;entrance to last alien base segment
+    .byte 15, 170, 10, 2, 0, UNUSED, 4, 0, 0
+    .byte 0, 0, 0, 0, <alien_base_npcs, >alien_base_npcs, 0
 
 
 
@@ -326,6 +338,7 @@ LocationScreenCountList:
     .byte 3                          ; 16 dark cave extension
     .byte 1                          ; 17 alien base lobby
     .byte 1                          ; 18 path to crashsite
+    .byte 3                          ; 19 pre alien base location
 
 
 LocationEntryPointPtrs:
@@ -348,6 +361,7 @@ LocationEntryPointPtrs:
     .byte <entry_points_loc16, >entry_points_loc16
     .byte <entry_points_loc17, >entry_points_loc17
     .byte <entry_points_loc18, >entry_points_loc18
+    .byte <entry_points_loc19, >entry_points_loc19
 
 EntryPointCountForLocation:
     .byte 4 ;0
@@ -369,6 +383,7 @@ EntryPointCountForLocation:
     .byte 2 ;16 dark cave 2
     .byte 2 ;17
     .byte 2 ;18
+    .byte 2 ;19
 
 
 ;which location in which bank
@@ -392,6 +407,7 @@ LocationBanks:
     .byte 4  ;16
     .byte 2  ;17
     .byte 0  ;18
+    .byte 2  ;19
 
 
 ;indexes in Item_Location1_Collection_times
@@ -421,6 +437,7 @@ LocationItemIndexes:
     .byte ITEM_IDX_LOC9 + ITEM_COUNT_LOC9 + ITEM_COUNT_LOC12 + ITEM_COUNT_LOC15       ;16
     .byte 0                                                                           ;17
     .byte 0                                                                           ;18
+    .byte 0                                                                           ;19
 
 LocationItemCounts:
     .byte ITEM_COUNT_LOC1  ; 0
@@ -442,6 +459,7 @@ LocationItemCounts:
     .byte ITEM_COUNT_LOC17 ; 16
     .byte 0                ; 17
     .byte 0                ; 18 path to crashsite
+    .byte 0                ; 19 pre alien base
 
 LocationsWithRespawnableItems:
     .byte 1 ; 0
@@ -463,6 +481,7 @@ LocationsWithRespawnableItems:
     .byte 1 ; 16
     .byte 0 ; 17
     .byte 0 ; 18
+    .byte 0 ; 19
 
 LocationItems:
     .byte  <Outside1_items,        >Outside1_items              ; 0
@@ -484,3 +503,4 @@ LocationItems:
     .byte  <dark_cave_2_items,     >dark_cave_2_items           ; 16 dark cave extension
     .byte  <House_items,           >House_items                 ; 17 alien base lobby
     .byte  <House_items,           >House_items                 ; 18 path to crashsite
+    .byte  <House_items,           >House_items                 ; 19 pre alien base location

@@ -20,6 +20,7 @@ location_map_pos: ;index where the pointer to the first screen of each location 
     .byte 32 ;16 dark cave 2
     .byte 35 ;17 alien base lobby
     .byte 36 ;18 path to crashsite
+    .byte 37 ;19 pre alien base location
 
 map_list_low:
     .byte <field_bg            ; 0
@@ -77,6 +78,10 @@ map_list_low:
     .byte <alien_base_lobby    ; 35
 
     .byte <path_to_crashsite   ; 36
+
+    .byte <pre_alien_base0     ; 37
+    .byte <pre_alien_base1
+    .byte <pre_alien_base2
 
 
 
@@ -136,3 +141,7 @@ map_list_high:
     .byte >alien_base_lobby
 
     .byte >path_to_crashsite
+
+    .byte >pre_alien_base0
+    .byte >pre_alien_base1
+    .byte >pre_alien_base2
