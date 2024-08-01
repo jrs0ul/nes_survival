@@ -261,7 +261,7 @@ LoadOutsideMap:
     beq @load_crashsite
     cmp #LOCATION_ALIEN_BASE_LOBBY
     beq @load_alien
-    cmp #LOCATION_ALIEN_BASE
+    cmp #LOCATION_ALIEN_BASE_PRE
     beq @load_alien
     jmp @main_bank
 

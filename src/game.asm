@@ -3515,7 +3515,7 @@ RoutinesAfterFadeOut:
 
     jsr OnExitVillagerHut
     ;-----------------------------
-    ;36.alien base entrance bottom
+    ;36. pre-alien base entrance
 @next19:
 
     lda ActiveMapEntryIndex
@@ -3573,11 +3573,11 @@ RoutinesAfterFadeOut:
     lda #1
     sta MustCopyMainChr
     ;--------------------------
-    ;24.alien base exit to the dark cave
+    ;40.alien base exit to the dark cave
 @next23:
 
     lda ActiveMapEntryIndex
-    cmp #24
+    cmp #40
     bne @next24
 
     lda #1
@@ -3833,7 +3833,27 @@ RoutinesAfterFadeOut:
 
     ;---------------------
 @next38:
+    lda ActiveMapEntryIndex
+    cmp #41
+    bne @next39
 
+    lda #<alien_palette
+    sta CurrentMapPalettePtr
+    lda #>alien_palette
+    sta CurrentMapPalettePtr + 1
+    ;--------------------------
+@next39:
+    lda ActiveMapEntryIndex
+    cmp #24
+    bne @next40
+
+    lda #<alien_palette
+    sta CurrentMapPalettePtr
+    lda #>alien_palette
+    sta CurrentMapPalettePtr + 1
+
+
+@next40:
     lda DetectedMapType
     bne @itsAnIndoorMap
     lda #1
@@ -4397,6 +4417,10 @@ AdaptBackgroundPaletteByTime:
     bne @continueWith4
     rts
 @continueWith4:
+    cmp #LOCATION_ALIEN_BASE_PRE
+    bne @continueWith5
+    rts
+@continueWith5:
 
     ldy #$01 ;keeps the outline for the background objects
 

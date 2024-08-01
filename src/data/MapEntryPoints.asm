@@ -80,11 +80,12 @@ entry_points_loc9:
     ;22.exit from grannys house
     .byte 22, 0, 0, 255, 0, 255, 151, 255
     ;--------------------
+    ;alien base 2
 entry_points_loc10:
     ;23.alien base exit top
     .byte 23, 0, 23, 30, 0, 255, 99, 112
-    ;24.alien base exit bottom
-    .byte 24, 0, 0, 5, 0, 255, 160, 200
+    ;24.alien base exit to pre-alien base
+    .byte 24, 0, 0, 255, 0, 255, 222, 255
     ;25. Boss room entrance
     .byte 25, 1, 238, 255, 0, 255, 112, 128
     ;--------------------------
@@ -120,8 +121,9 @@ entry_points_loc16:
     ;35. alien base lobby entrance
     .byte 35, 0, 105, 118, 0, 255, 185, 203
     ;--------------------------------------
+    ; Lobby
 entry_points_loc17:
-    ;36. alien base entrance bottom
+    ;36. pre-alien base entrance
     .byte 36, 0, 222, 255, 0, 255, 125, 140
     ;37. exit to dark cave 2
     .byte 37, 0, 32, 40, 0, 255, 119, 130
@@ -131,12 +133,12 @@ entry_points_loc18:
     .byte 38, 0, 0, 255, 0, 255, 0, 50
     ;39. entrance to location with mine
     .byte 39, 0, 0, 255, 0, 255, 222, 255
-
+    ;----------------------
 entry_points_loc19:
     ;40 exit to alien base lobby
-    .byte 40, 0, 32, 40, 0, 255, 119, 130
+    .byte 40, 0, 0, 10, 0, 255, 119, 255
     ;41 entrance to last alien base location
-    .byte 41, 2, 0, 255, 0, 255, 0, 50
+    .byte 41, 0, 0, 255, 0, 255, 0, 50
 .segment "ROM0"
 ;-----------------------------------------------------
 ;The data of the new location the player has entered 
@@ -243,8 +245,8 @@ MapSpawnPoint:
     ;alien base exit top
     .byte 200, 50, 6, OUTDOORS_LOC7_SCREEN_COUNT, 1, UNUSED, 4, 0, 2
     .byte 0, 0, 0, 0, <cave_npcs, >cave_npcs, 0
-    ;alien base exit to lobby
-    .byte 190, 140, 17, 1, 1, UNUSED, 2, 0, 0
+    ;alien base exit to pre-alien base
+    .byte 55, 55, 19, 3, 0, UNUSED, 2, 0, 0
     .byte 0, 0, 0, 0, 0, 0, 0
     ;boss room entrance
     .byte 20, 120, 12, 1, 0, UNUSED, 6, 0, 0
@@ -307,7 +309,7 @@ MapSpawnPoint:
     .byte 190, 140, 17, 1, 1, UNUSED, 2, 0, 0
     .byte 0, 0, 0, 0, 0, 0, 0
     ;entrance to last alien base segment
-    .byte 15, 170, 10, 2, 0, UNUSED, 4, 0, 0
+    .byte 50, 210, 10, 2, 0, UNUSED, 4, 0, 0
     .byte 0, 0, 0, 0, <alien_base_npcs, >alien_base_npcs, 0
 
 
