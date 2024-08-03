@@ -183,8 +183,8 @@ banktable:              ; Write to this table to switch banks.
 .include "data/npc_list.asm"  ;npcs in maps
 
 
-.include "data/villager_quests.asm"
-.include "data/MapEntryPoints.asm"
+.include "data/villager_quests.asm" ;ROM3, ROM6, etc.
+.include "data/MapEntryPoints.asm" ; ROM1, RODATA
 
 ;collision lookup table positions
 row_table_screens:
@@ -361,8 +361,6 @@ pointer:
 TextPtr:
     .res 2
 DigitPtr:
-    .res 2
-MapPtr:
     .res 2
 IntroSpritePtr:
     .res 2
@@ -646,7 +644,11 @@ sp:
     .res 2
 sreg:
     .res 2
+VillagerIndex:
+    .res 1
 
+PageZeroFree:
+    .res 1
 
 ;--------------
 .segment "BSS" ; variables in ram
@@ -706,8 +708,6 @@ DirectionX:
     .res 1
 DirectionY:
     .res 1
-
-
 
 
 FishingRodActive:
@@ -788,8 +788,6 @@ BaseMenuIndex: ; INVENTORY OR SLEEP ?
 
 
 
-VillagerIndex:
-    .res 1
 
 ActiveVillagerQuests:
     .res MAX_VILLAGERS
@@ -1199,7 +1197,7 @@ ProjectileIdx:
     .res 1
 
 Destructibles:
-    .res 6  ;5 destructibles so far, 1 means destroyed
+    .res DESTRUCTIBLE_OBJECTS_COUNT  ;1 means destroyed
 
 AttribHighAddress:
     .res 1
@@ -1324,7 +1322,7 @@ ImportantItemPaletteIdx:
 
 
 BSSBuffer:
-    .res 6
+    .res 5
 
 ;====================================================================================
 
@@ -3364,11 +3362,8 @@ RoutinesAfterFadeOut:
     cmp #12
     bne @next13
 
-
     lda #1
     sta MustCopyMainChr
-
-
     ;------------------------------
     ;17.crashsite exit to cave
 @next13:
@@ -3457,13 +3452,6 @@ RoutinesAfterFadeOut:
 
     lda #1
     sta MustCopyMainChr
-
-  ;TODO: perhaps it would be good to create a table for location - palette
-    lda #<alien_palette
-    sta CurrentMapPalettePtr
-    lda #>alien_palette
-    sta CurrentMapPalettePtr + 1
-
     ;------------------------
     ;15.alien base entrance top
 @next20:
@@ -3474,11 +3462,6 @@ RoutinesAfterFadeOut:
 
     lda #1
     sta MustCopyMainChr
-    lda #<alien_palette
-    sta CurrentMapPalettePtr
-    lda #>alien_palette
-    sta CurrentMapPalettePtr + 1
-    
     ;------------------------
     ;16. mine room
 @next21:
@@ -3570,10 +3553,6 @@ RoutinesAfterFadeOut:
     cmp #29
     bne @next26
 
-    lda #<alien_palette
-    sta CurrentMapPalettePtr
-    lda #>alien_palette
-    sta CurrentMapPalettePtr + 1
     jsr FlipStartingNametable ; for the locked door, so the second screen would always be in adress $24**
 
     lda #7
@@ -3698,10 +3677,6 @@ RoutinesAfterFadeOut:
 
     lda #1
     sta MustCopyMainChr
-    lda #<alien_palette
-    sta CurrentMapPalettePtr
-    lda #>alien_palette
-    sta CurrentMapPalettePtr + 1
     ;---------------------------
     ;31 dark cave 2
 @next35:
@@ -3765,26 +3740,16 @@ RoutinesAfterFadeOut:
     sta CurrentMapPalettePtr + 1
 
     ;---------------------
+    ;last alien base segment entrance from first
 @next38:
     lda ActiveMapEntryIndex
     cmp #41
     bne @next39
-
-    lda #<alien_palette
-    sta CurrentMapPalettePtr
-    lda #>alien_palette
-    sta CurrentMapPalettePtr + 1
     ;--------------------------
 @next39:
     lda ActiveMapEntryIndex
     cmp #24
     bne @next40
-
-    lda #<alien_palette
-    sta CurrentMapPalettePtr
-    lda #>alien_palette
-    sta CurrentMapPalettePtr + 1
-
 
 @next40:
     lda DetectedMapType
@@ -3921,13 +3886,12 @@ CommonLocationRoutine:
     lda (pointer2), y ; is the location indoors or outdoors
     sta DetectedMapType
 
-@loadMapptr:
     iny
     lda (pointer2), y ;indoor map address (lower byte)
-    sta MapPtr
+    sta CurrentMapPalettePtr
     iny
     lda (pointer2), y ;indoor map address (higher byte)
-    sta MapPtr + 1
+    sta CurrentMapPalettePtr + 1
 ;---
     iny
 
@@ -3978,12 +3942,6 @@ CommonLocationRoutine:
 
     lda #0
     sta ScrollDirection
-
-    lda #<main_palette
-    sta CurrentMapPalettePtr
-    lda #>main_palette
-    sta CurrentMapPalettePtr + 1
-
 
     jsr BuildRowTable
     jsr ResetNameTableAddresses
@@ -5898,14 +5856,13 @@ ResetVariables:
     sta MustLoadGameOverAfterFadeOut
     sta EquipedClothing
     sta EquipedClothing + 1
-    ;lda #1 ;COMMENT THIS OUT!
-    sta Destructibles
-    sta Destructibles + 1
-    sta Destructibles + 2
-    sta Destructibles + 3
-    sta Destructibles + 4
-    ;lda #2 ;COMMENT THIS OUT!
     sta DestroyedTilesCount
+    ldy #DESTRUCTIBLE_OBJECTS_COUNT
+    lda #0
+@destructibleLoop:
+    sta Destructibles, y
+    dey
+    bne @destructibleLoop
 
     lda #PLAYER_START_X
     sta PlayerX

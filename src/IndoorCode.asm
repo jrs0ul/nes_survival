@@ -459,10 +459,15 @@ LoadIndoorMapData:
     sta MustRestartIndoorsMusic
 
 @loadHouseStuff:
-    lda MapPtr
+
+    ldy LocationIndex
+    lda location_map_pos, y
+    tay
+    lda map_list_low, y
     sta pointer
-    lda MapPtr + 1
+    lda map_list_high, y
     sta pointer + 1
+
     lda #$20    ; $20000
     sta NametableAddress
 
