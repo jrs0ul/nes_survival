@@ -26,12 +26,19 @@ destructible_tiles_list:                 ;sc  y   x
     .byte LOCATION_MINE,        $22, $52, 0, 18, 18, $51, 0
     .byte LOCATION_MINE,        $22, $53, 0, 18, 19, $51, 0
 
-    .byte LOCATION_ALIEN_BASE_PRE, $20, $A6, 0, 6, 5, $50, 0
-    .byte LOCATION_ALIEN_BASE_PRE, $20, $A7, 0, 7, 5, $6B, 0
-    .byte LOCATION_ALIEN_BASE_PRE, $20, $E6, 0, 6, 7, $50, 0
+    .byte LOCATION_ALIEN_BASE_PRE, $20, $A6, 0, 5, 6, $50, 0
+    .byte LOCATION_ALIEN_BASE_PRE, $20, $A7, 0, 5, 7, $6B, 0
+
+    .byte LOCATION_ALIEN_BASE_PRE, $20, $E6, 0, 7, 6, $50, 0
     .byte LOCATION_ALIEN_BASE_PRE, $20, $E7, 0, 7, 7, $6B, 0
-    .byte LOCATION_ALIEN_BASE_PRE, $21, $26, 0, 6, 9, $50, 0
-    .byte LOCATION_ALIEN_BASE_PRE, $21, $27, 0, 7, 9, $50, 0
+
+    .byte LOCATION_ALIEN_BASE_PRE, $21, $26, 0, 9, 9, $50, 0
+    .byte LOCATION_ALIEN_BASE_PRE, $21, $27, 0, 9, 7, $6B, 0
+
+    .byte LOCATION_ALIEN_BASE_PRE, $21, $77, 0, 11, 23, $D9, 0
+    .byte LOCATION_ALIEN_BASE_PRE, $21, $28, 0, 11, 24, $DA, 0
+    .byte LOCATION_ALIEN_BASE_PRE, $21, $97, 0, 12, 23, $B9, 0
+    .byte LOCATION_ALIEN_BASE_PRE, $21, $98, 0, 12, 24, $BA, 0
 
 ;indexes of destructible tiles for a location, 255 means there are no tiles
 destructible_tile_location_lookup:
@@ -78,4 +85,8 @@ linked_destructible_tiles:
     .byte 6 ;17
     .byte 7 ;18
     .byte 7 ;19
+    .byte 8 ;20
+    .byte 8 ;21
+    .byte 8 ;22
+    .byte 8 ;23
 

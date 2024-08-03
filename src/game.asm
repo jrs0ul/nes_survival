@@ -647,7 +647,7 @@ sreg:
 VillagerIndex:
     .res 1
 
-PageZeroFree:
+MustCopyMainChr:
     .res 1
 
 ;--------------
@@ -807,8 +807,6 @@ TextLength:
     .res 1
 
 
-MustCopyMainChr:
-    .res 1
 
 
 MustLoadHouseInterior:
