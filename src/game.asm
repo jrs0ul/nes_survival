@@ -2078,6 +2078,11 @@ UploadBgColumns:
 
 @doUpdates:
 
+    ; somewhat of a crutch, activates NMI if it was delayed before
+    ; prevents the CHR ram corruption in some cases
+    lda PPUCTRL
+    sta $2000
+
     ;calculate destination address
     lda #128 ; skip four rows
     clc
@@ -3719,7 +3724,7 @@ RoutinesAfterFadeOut:
 @next37:
     lda ActiveMapEntryIndex
     cmp #37
-    bne @next38
+    bne @next40
 
     lda #1
     sta MustCopyMainChr
@@ -3728,7 +3733,7 @@ RoutinesAfterFadeOut:
     lda #>Inventory
     sta pointer2 + 1
     jsr IsItemXInInventory
-    bne @next38 ; it is
+    bne @next40 ; it is
 
     lda #<dark_cave_palette
     sta CurrentMapPalettePtr
@@ -3736,17 +3741,6 @@ RoutinesAfterFadeOut:
     sta CurrentMapPalettePtr + 1
 
     ;---------------------
-    ;last alien base segment entrance from first
-@next38:
-    lda ActiveMapEntryIndex
-    cmp #41
-    bne @next39
-    ;--------------------------
-@next39:
-    lda ActiveMapEntryIndex
-    cmp #24
-    bne @next40
-
 @next40:
     lda DetectedMapType
     bne @itsAnIndoorMap
