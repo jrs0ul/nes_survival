@@ -138,7 +138,7 @@ entry_points_loc19:
     ;40 exit to alien base lobby
     .byte 40, 0, 0, 10, 0, 255, 119, 255
     ;41 entrance to last alien base location
-    .byte 41, 0, 0, 255, 0, 255, 0, 50
+    .byte 41, 0, 0, 255, 0, 255, 0, 32
 .segment "ROM0"
 ;-----------------------------------------------------
 ;The data of the new location the player has entered 
@@ -246,7 +246,7 @@ MapSpawnPoint:
     .byte 200, 50, 6, OUTDOORS_LOC7_SCREEN_COUNT, 1, UNUSED, 4, 0, 2
     .byte 0, <main_palette, >main_palette, 0, <cave_npcs, >cave_npcs, 0
     ;alien base exit to pre-alien base
-    .byte 55, 55, 19, 3, 0, UNUSED, 2, 0, 0
+    .byte 45, 38, 19, 3, 0, UNUSED, 2, 0, 0
     .byte 0, <alien_palette, >alien_palette, 0, 0, 0, 0
     ;boss room entrance
     .byte 20, 120, 12, 1, 0, UNUSED, 6, 0, 0

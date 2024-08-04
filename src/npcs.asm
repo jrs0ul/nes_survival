@@ -528,10 +528,6 @@ OnBossDefeat:
     sta VillagerKilled, y
     sta Destructibles + 2
     sta Destructibles + 3
-    lda DestroyedTilesCount
-    clc
-    adc #2
-    sta DestroyedTilesCount
     rts
 
 ;-------------------------------------

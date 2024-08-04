@@ -344,7 +344,6 @@ IsCollidingWithADestructedTile:
     ldx TempRegX
     lda #1
     sta Destructibles, x
-    inc DestroyedTilesCount
     sta MustUpdateDestructibles
     jmp @cont
     ;---------end of crutch

@@ -1209,8 +1209,6 @@ TempRowIndex:
 TempCollisionVar:
     .res 1
 
-DestroyedTilesCount:
-    .res 1
 
 destructibleIdx:
     .res 1
@@ -1319,8 +1317,8 @@ ImportantItemPaletteIdx:
     .res 1
 
 
-BSSBuffer:
-    .res 5
+BSS_Free_Bytes:
+    .res 6
 
 ;====================================================================================
 
@@ -5854,7 +5852,6 @@ ResetVariables:
     sta MustLoadGameOverAfterFadeOut
     sta EquipedClothing
     sta EquipedClothing + 1
-    sta DestroyedTilesCount
     ldy #DESTRUCTIBLE_OBJECTS_COUNT
     lda #0
 @destructibleLoop:
@@ -7044,8 +7041,6 @@ useHammerOnEnvironment:
     tay
     lda #1
     sta Destructibles, y
-    inc DestroyedTilesCount
-
 
     lda #1
     sta MustUpdateDestructibles

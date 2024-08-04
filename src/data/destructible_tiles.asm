@@ -32,13 +32,13 @@ destructible_tiles_list:                 ;sc  y   x
     .byte LOCATION_ALIEN_BASE_PRE, $20, $E6, 0, 7, 6, $50, 0
     .byte LOCATION_ALIEN_BASE_PRE, $20, $E7, 0, 7, 7, $6B, 0
 
-    .byte LOCATION_ALIEN_BASE_PRE, $21, $26, 0, 9, 9, $50, 0
+    .byte LOCATION_ALIEN_BASE_PRE, $21, $26, 0, 9, 6, $50, 0
     .byte LOCATION_ALIEN_BASE_PRE, $21, $27, 0, 9, 7, $6B, 0
 
     .byte LOCATION_ALIEN_BASE_PRE, $21, $77, 0, 11, 23, $D9, 0
-    .byte LOCATION_ALIEN_BASE_PRE, $21, $28, 0, 11, 24, $DA, 0
-    .byte LOCATION_ALIEN_BASE_PRE, $21, $97, 0, 12, 23, $B9, 0
-    .byte LOCATION_ALIEN_BASE_PRE, $21, $98, 0, 12, 24, $BA, 0
+    .byte LOCATION_ALIEN_BASE_PRE, $21, $78, 0, 11, 24, $DA, 0
+    .byte LOCATION_ALIEN_BASE_PRE, $21, $97, 0, 12, 23, $E9, 0
+    .byte LOCATION_ALIEN_BASE_PRE, $21, $98, 0, 12, 24, $EA, 0
 
 ;indexes of destructible tiles for a location, 255 means there are no tiles
 destructible_tile_location_lookup:
