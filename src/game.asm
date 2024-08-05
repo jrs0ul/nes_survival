@@ -1978,7 +1978,7 @@ UpdateDestructibleTiles:
     lda linked_destructible_tiles, y
     tax
     lda Destructibles, x
-    beq @nextDestructible ; tile was not destroyed or removed
+    beq @nextDestructible ; tile was not changed
 
     ;update tiles on the screen
     tya
@@ -1991,7 +1991,7 @@ UpdateDestructibleTiles:
     inx ; skip address low
     lda destructible_tiles_list, x
     cmp CurrentMapSegmentIndex
-    beq @continue
+    beq @continue ;tile matches screen
     bcc @exit
     ;current screen idx is less than what is desired
     sec
@@ -2014,6 +2014,7 @@ UpdateDestructibleTiles:
     dex
 
 @continue:
+
     dex ; address low
     dex ; address high
 
@@ -2077,6 +2078,9 @@ UploadBgColumns:
     rts
 
 @doUpdates:
+
+    lda #1
+    sta MustUpdateDestructibles
 
     ; somewhat of a crutch, activates NMI if it was delayed before
     ; prevents the CHR ram corruption in some cases
@@ -4947,7 +4951,6 @@ CalcMapColumnToUpdate:
 
     lda #1
     sta MustUpdateMapColumn
-    sta MustUpdateDestructibles
 
 @attr:
     lda BgColumnIdxToUpload
