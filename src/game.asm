@@ -3499,20 +3499,7 @@ RoutinesAfterFadeOut:
 
     lda #1
     sta MustCopyMainChr
-    lda #ITEM_LAMP
-    sta TempItemIndex
-    lda #<Inventory
-    sta pointer2
-    lda #>Inventory
-    sta pointer2 + 1
-    jsr IsItemXInInventory
-    bne @next24 ; it is
-
-    lda #<dark_cave_palette
-    sta CurrentMapPalettePtr
-    lda #>dark_cave_palette
-    sta CurrentMapPalettePtr + 1
-
+    jsr TurnDarkPaletteOn
     ;---------------------------
     ;25. Boss room entrance
 @next24:
@@ -3615,19 +3602,7 @@ RoutinesAfterFadeOut:
     lda #1
     sta MustCopyMainChr
 
-    lda #ITEM_LAMP
-    sta TempItemIndex
-    lda #<Inventory
-    sta pointer2
-    lda #>Inventory
-    sta pointer2 + 1
-    jsr IsItemXInInventory
-    bne @next29 ; it is
-
-    lda #<dark_cave_palette
-    sta CurrentMapPalettePtr
-    lda #>dark_cave_palette
-    sta CurrentMapPalettePtr + 1
+    jsr TurnDarkPaletteOn
     ;------------------------
     ;32 secret cave exit
 @next29:
@@ -3686,19 +3661,7 @@ RoutinesAfterFadeOut:
     cmp #31
     bne @next36
 
-    lda #ITEM_LAMP
-    sta TempItemIndex
-    lda #<Inventory
-    sta pointer2
-    lda #>Inventory
-    sta pointer2 + 1
-    jsr IsItemXInInventory
-    bne @next36 ; it is
-
-    lda #<dark_cave_palette
-    sta CurrentMapPalettePtr
-    lda #>dark_cave_palette
-    sta CurrentMapPalettePtr + 1
+    jsr TurnDarkPaletteOn
     ;---------------------------
     ;34 from dark cave 2 to dark cave 1
 @next36:
@@ -3706,19 +3669,7 @@ RoutinesAfterFadeOut:
     cmp #34
     bne @next37
 
-    lda #ITEM_LAMP
-    sta TempItemIndex
-    lda #<Inventory
-    sta pointer2
-    lda #>Inventory
-    sta pointer2 + 1
-    jsr IsItemXInInventory
-    bne @next37 ; it is
-
-    lda #<dark_cave_palette
-    sta CurrentMapPalettePtr
-    lda #>dark_cave_palette
-    sta CurrentMapPalettePtr + 1
+    jsr TurnDarkPaletteOn
     ;-------------------
     ;37 exit from alien lobby to dark cave 2
 @next37:
@@ -3728,17 +3679,7 @@ RoutinesAfterFadeOut:
 
     lda #1
     sta MustCopyMainChr
-    lda #<Inventory
-    sta pointer2
-    lda #>Inventory
-    sta pointer2 + 1
-    jsr IsItemXInInventory
-    bne @next40 ; it is
-
-    lda #<dark_cave_palette
-    sta CurrentMapPalettePtr
-    lda #>dark_cave_palette
-    sta CurrentMapPalettePtr + 1
+    jsr TurnDarkPaletteOn
 
     ;---------------------
 @next40:
@@ -3788,6 +3729,25 @@ RoutinesAfterFadeOut:
     sta TaintedSprites
     jsr CalcMapColumnToUpdate
 
+
+    rts
+;------------------------------
+TurnDarkPaletteOn:
+
+    lda #ITEM_LAMP
+    sta TempItemIndex
+    lda #<Inventory
+    sta pointer2
+    lda #>Inventory
+    sta pointer2 + 1
+    jsr IsItemXInInventory
+    bne @exit ; it is
+
+    lda #<dark_cave_palette
+    sta CurrentMapPalettePtr
+    lda #>dark_cave_palette
+    sta CurrentMapPalettePtr + 1
+@exit:
 
     rts
 ;------------------------------
@@ -6879,6 +6839,8 @@ CheckB:
 
 @regularAttack:
 
+    jsr ActivateTrigger
+
     lda #PLAYER_ATTACK_DELAY
     sta AttackTimer
     lda #0
@@ -6890,6 +6852,90 @@ CheckB:
 
 @exit:
 
+    rts
+;----------------------------------
+;Activate a trigger by punching it
+ActivateTrigger:
+    jsr CalcTileAddressInFrontOfPlayer
+
+    ldy LocationIndex
+    lda destructible_tile_location_lookup, y
+    cmp #DESTRUCTIBLES_NOT_AVAIL
+    beq @exit
+
+    tay
+@tileLoop:
+    lda linked_destructible_tiles, y
+    ;tax
+    ;lda Destructibles, x
+    ;bne @nextDestructible ; already used
+
+    tya
+    asl
+    asl
+    asl
+    tax
+    inx
+    inx
+    inx ;at screen
+    lda destructible_tiles_list, x
+    cmp CurrentMapSegmentIndex
+    bne @nextDestructible
+    inx
+    lda destructible_tiles_list, x
+    sec
+    sbc #4
+    cmp TempY
+    bne @nextDestructible
+    inx
+    lda destructible_tiles_list, x
+    cmp TempX
+    bne @nextDestructible
+
+    cpy #20
+    bcc @exit
+
+    ;paw trigger
+
+    lda linked_destructible_tiles, y
+    tax
+    lda Destructibles, x
+    bne @exit ; already switched on
+    lda #1
+@changeTiles:
+    ldy #8
+    sta Destructibles, y
+    ldy #7
+    sta Destructibles, y
+    ldy #6
+    sta Destructibles, y
+    ldy #5
+    sta Destructibles, y
+    lda #1
+    sta MustUpdateDestructibles
+    jmp @exit
+
+@nextDestructible:
+    iny
+    cpy #DESTRUCTIBLE_COUNT
+    bcs @exit
+
+    tya
+    asl
+    asl
+    asl
+    tax
+    lda destructible_tiles_list, x
+    cmp LocationIndex
+    bne @exit ;already a different location
+
+    jmp @tileLoop
+
+
+    lda TempX
+    lda TempY
+
+@exit:
     rts
 ;----------------------------------
 PlayAttackSfx:

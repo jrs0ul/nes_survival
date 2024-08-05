@@ -7,33 +7,33 @@
 ;   tile column
 ;   tile value after destruction
 ;   scrollx amount to activate screen update
-destructible_tiles_list:                 ;sc  y   x
-    .byte LOCATION_FIRST,       $27, $70, 3, 27, 16, $7C, 17
-    .byte LOCATION_FIRST,       $27, $71, 3, 27, 17, $7C, 17
-    .byte LOCATION_FIRST,       $27, $90, 3, 28, 16, $7C, 17
-    .byte LOCATION_FIRST,       $27, $91, 3, 28, 17, $7C, 17
+destructible_tiles_list:                    ;sc  y   x
+    .byte LOCATION_FIRST,          $27, $70, 3, 27, 16, $7C, 17
+    .byte LOCATION_FIRST,          $27, $71, 3, 27, 17, $7C, 17
+    .byte LOCATION_FIRST,          $27, $90, 3, 28, 16, $7C, 17
+    .byte LOCATION_FIRST,          $27, $91, 3, 28, 17, $7C, 17
 
-    .byte LOCATION_SECRET_CAVE, $21, $88, 0, 12, 8,  $5E, 0
-    .byte LOCATION_SECRET_CAVE, $21, $89, 0, 12, 9,  $5E, 0
-    .byte LOCATION_SECRET_CAVE, $21, $A8, 0, 13, 8,  $5E, 0
-    .byte LOCATION_SECRET_CAVE, $21, $A9, 0, 13, 9,  $5E, 0
+    .byte LOCATION_SECRET_CAVE,    $21, $88, 0, 12, 8,  $5E, 0
+    .byte LOCATION_SECRET_CAVE,    $21, $89, 0, 12, 9,  $5E, 0
+    .byte LOCATION_SECRET_CAVE,    $21, $A8, 0, 13, 8,  $5E, 0
+    .byte LOCATION_SECRET_CAVE,    $21, $A9, 0, 13, 9,  $5E, 0
 
-    .byte LOCATION_ALIEN_BASE,  $25, $0D, 1, 8,  13, $D8, 0
-    .byte LOCATION_ALIEN_BASE,  $25, $2D, 1, 9,  13, $5A, 0
+    .byte LOCATION_ALIEN_BASE,     $25, $0D, 1, 8,  13, $D8, 0
+    .byte LOCATION_ALIEN_BASE,     $25, $2D, 1, 9,  13, $5A, 0
 
-    .byte LOCATION_MINE,        $22, $32, 0, 17, 18, $51, 0
-    .byte LOCATION_MINE,        $22, $33, 0, 17, 19, $51, 0
-    .byte LOCATION_MINE,        $22, $52, 0, 18, 18, $51, 0
-    .byte LOCATION_MINE,        $22, $53, 0, 18, 19, $51, 0
+    .byte LOCATION_MINE,           $22, $32, 0, 17, 18, $51, 0
+    .byte LOCATION_MINE,           $22, $33, 0, 17, 19, $51, 0
+    .byte LOCATION_MINE,           $22, $52, 0, 18, 18, $51, 0
+    .byte LOCATION_MINE,           $22, $53, 0, 18, 19, $51, 0
 
-    .byte LOCATION_ALIEN_BASE_PRE, $20, $A6, 0, 5, 6, $50, 0
-    .byte LOCATION_ALIEN_BASE_PRE, $20, $A7, 0, 5, 7, $6B, 0
+    .byte LOCATION_ALIEN_BASE_PRE, $20, $A6, 0, 5,  6,  $50, 0
+    .byte LOCATION_ALIEN_BASE_PRE, $20, $A7, 0, 5,  7,  $6B, 0
 
-    .byte LOCATION_ALIEN_BASE_PRE, $20, $E6, 0, 7, 6, $50, 0
-    .byte LOCATION_ALIEN_BASE_PRE, $20, $E7, 0, 7, 7, $6B, 0
+    .byte LOCATION_ALIEN_BASE_PRE, $20, $E6, 0, 7,  6,  $50, 0
+    .byte LOCATION_ALIEN_BASE_PRE, $20, $E7, 0, 7,  7,  $6B, 0
 
-    .byte LOCATION_ALIEN_BASE_PRE, $21, $26, 0, 9, 6, $50, 0
-    .byte LOCATION_ALIEN_BASE_PRE, $21, $27, 0, 9, 7, $6B, 0
+    .byte LOCATION_ALIEN_BASE_PRE, $21, $26, 0, 9,  6,  $50, 0
+    .byte LOCATION_ALIEN_BASE_PRE, $21, $27, 0, 9,  7,  $6B, 0
 
     .byte LOCATION_ALIEN_BASE_PRE, $21, $77, 0, 11, 23, $D9, 0
     .byte LOCATION_ALIEN_BASE_PRE, $21, $78, 0, 11, 24, $DA, 0
