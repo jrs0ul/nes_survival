@@ -280,53 +280,55 @@ IfCollidingWithLockedDoor:
 ;tile value is in register A
 IsCollidingWithADestructedTile:
 
-    ;lda DestroyedTilesCount
-    ;beq @cont ; no tiles that have been destroyed
+    lda LocationIndex
+    asl
+    tax
+    lda mod_tiles_by_location, x
+    sta pointer2
+    inx
+    lda mod_tiles_by_location, x
+    sta pointer2 + 1
+    bne @allGood
+    cmp pointer2
+    beq @cont ; both zeroes ?
+@allGood:
 
-    ldx LocationIndex
-    lda destructible_tile_location_lookup, x
-    cmp #255
-    beq @cont
-
+    lda #0
     sta destructibleIdx ; save tile index
-    ldx destructibleIdx
+    sty TempPointY ; store y register
+    ldy destructibleIdx
 
 @destructiblesLoop:
 
-    lda linked_destructible_tiles, x
+    lda (pointer2), y ; index of Destructibles
     tax
     lda Destructibles, x
     stx TempRegX ; store destructible index
-    ldx destructibleIdx
 
     sta TempDigit ; store is destroyed or not
-    ;cmp #0
-    ;beq @nextTile
 
-    txa ; destructible tile index * 8
+    tya ; destructible tile index * 8
     asl
     asl
     asl
-    tax
-    lda destructible_tiles_list, x
-    cmp LocationIndex
-    bne @cont
-    inx
-    inx
-    inx ; move to screen
+    tay
+    iny ; skip destructables index
+    iny ; addr high
+    iny ; addr low
+    iny ; move to screen
 
-    lda destructible_tiles_list, x
+    lda (pointer2), y
     cmp TempScreen
     bne @nextTile
 
-    inx ; y
+    iny ; y
     lda PointCellY
-    cmp destructible_tiles_list, x ; compare with y
+    cmp (pointer2), y ; compare with y
     bne @nextTile
 
-    inx ; move to x
-    tya ; x divided by 8 is in y-register
-    cmp destructible_tiles_list, x
+    iny ; move to x
+    lda TempPointY ; x divided by 8, that was in Y register
+    cmp (pointer2), y
     bne @nextTile
 
     lda TempDigit
@@ -350,22 +352,25 @@ IsCollidingWithADestructedTile:
 
 
 @thisTileIsDestroyed:
-    inx ;tile
-    lda destructible_tiles_list, x
+    iny ;tile
+    lda (pointer2), y
 
     ldx #1 ;intersects with destructed tile
     jmp @end
 
 @nextTile:
     inc destructibleIdx
-    ldx destructibleIdx
-    cpx #DESTRUCTIBLE_COUNT
+    lda destructibleIdx
+    ldx LocationIndex
+    cmp mod_tiles_count_by_location, x
     bcs @cont
+    ldy destructibleIdx
     jmp @destructiblesLoop
 
 @cont:
     ldx #0
 @end:
+    ldy TempPointY ;restore Y register
     rts
 ;-----------------------------
 ;Fill ram table with map row addresses

@@ -39,6 +39,7 @@ main_bg_tiles       : .incbin "main_bg_tiles.lz4"
 .include "data/maps/cropped/path_to_crashsite_crop.asm"
 .include "data/Outside1_items.asm"
 .include "data/Outside3_items.asm"
+.include "data/mod_tiles_first.asm"
 
 
 ;===========================================================
@@ -61,6 +62,7 @@ intro_tiles_chr   :  .incbin "intro.lz4"
 .include "data/maps/cropped/pre_alien_base0_crop.asm"
 .include "data/maps/cropped/pre_alien_base1_crop.asm"
 .include "data/maps/cropped/pre_alien_base2_crop.asm"
+.include "data/mod_tiles_alien_base_pre.asm"
 
 
 ;============================================================
@@ -95,6 +97,9 @@ alien_sprites_chr: .incbin "alien_sprites.lz4"
 .include "data/maps/cropped/dark_cave2_1_crop.asm"
 .include "data/maps/cropped/dark_cave2_2_crop.asm"
 .include "data/maps/cropped/secret_cave0_crop.asm"
+.include "data/mod_tiles_secret_cave.asm"
+.include "data/mod_tiles_mine.asm"
+.include "data/mod_tiles_alien_base.asm"
 
 
 
@@ -1965,88 +1970,88 @@ UpdateDestructibleTiles:
     lda MustUpdateDestructibles
     beq @exit
 
-    lda #0
-    sta $2001
+;    lda #0
+;    sta $2001
 
-    ldy LocationIndex
-    lda destructible_tile_location_lookup, y
-    cmp #DESTRUCTIBLES_NOT_AVAIL
-    beq @exit
-    tay ; get the destructible tile index for the location
+;    ldy LocationIndex
+;    lda destructible_tile_location_lookup, y
+;    cmp #DESTRUCTIBLES_NOT_AVAIL
+;    beq @exit
+;    tay ; get the destructible tile index for the location
 
-@tileLoop:
-    lda linked_destructible_tiles, y
-    tax
-    lda Destructibles, x
-    beq @nextDestructible ; tile was not changed
+;@tileLoop:
+;    lda linked_destructible_tiles, y
+;    tax
+;    lda Destructibles, x
+;    beq @nextDestructible ; tile was not changed
 
     ;update tiles on the screen
-    tya
-    asl
-    asl
-    asl
-    tax
-    inx ; skip location idx
-    inx ; skip adress high
-    inx ; skip address low
-    lda destructible_tiles_list, x
-    cmp CurrentMapSegmentIndex
-    beq @continue ;tile matches screen
-    bcc @exit
+;    tya
+;    asl
+;    asl
+;    asl
+;    tax
+;    inx ; skip location idx
+;    inx ; skip adress high
+;    inx ; skip address low
+;    lda destructible_tiles_list, x
+;    cmp CurrentMapSegmentIndex
+;    beq @continue ;tile matches screen
+;    bcc @exit
     ;current screen idx is less than what is desired
-    sec
-    sbc #1
-    cmp CurrentMapSegmentIndex
-    beq @checkScroll
-    bcs @exit ; current idx is less than targetScreen - 1
-@checkScroll:
+;    sec
+;    sbc #1
+;    cmp CurrentMapSegmentIndex
+;    beq @checkScroll
+;    bcs @exit ; current idx is less than targetScreen - 1
+;@checkScroll:
 
-    inx ;y
-    inx ;x
-    inx ;tile
-    inx ;scroll
-    lda ScrollX
-    cmp destructible_tiles_list, x
-    bcc @exit
-    dex
-    dex
-    dex
-    dex
+;    inx ;y
+;    inx ;x
+;    inx ;tile
+;    inx ;scroll
+;    lda ScrollX
+;    cmp destructible_tiles_list, x
+;    bcc @exit
+;    dex
+;    dex
+;    dex
+;    dex
 
-@continue:
+;@continue:
 
-    dex ; address low
-    dex ; address high
+;    dex ; address low
+;    dex ; address high
 
-    lda $2002
-    lda destructible_tiles_list, x
-    sta $2006
-    inx ;address lo
-    lda destructible_tiles_list, x
-    sta $2006
-    inx ;screen
-    inx ; y
-    inx ; x
-    inx ; tile value
-    lda destructible_tiles_list, x
-    sta $2007
+;    lda $2002
+;    lda destructible_tiles_list, x
+;    sta $2006
+;    inx ;address lo
+;    lda destructible_tiles_list, x
+;    sta $2006
+;    inx ;screen
+;    inx ; y
+;    inx ; x
+;    inx ; tile value
+;    lda destructible_tiles_list, x
+;    sta $2007
 
 
-@nextDestructible:
-    iny
-    cpy #DESTRUCTIBLE_COUNT
-    bcs @exit
+;@nextDestructible:
+;    iny
+;    cpy #DESTRUCTIBLE_COUNT
+;    bcs @exit
 
-    tya
-    asl
-    asl
-    asl
-    tax
-    lda destructible_tiles_list, x
-    cmp LocationIndex
-    bne @exit ;already a different location
+;    tya
+;    asl
+;    asl
+;    asl
+;    tax
+;    lda destructible_tiles_list, x
+;    cmp LocationIndex
+;    bne @exit ;already a different location
 
-    jmp @tileLoop
+;    jmp @tileLoop
 
 @exit:
     lda #0
@@ -6861,37 +6866,41 @@ CheckB:
 ActivateTrigger:
     jsr CalcTileAddressInFrontOfPlayer
 
-    ldy LocationIndex
-    lda destructible_tile_location_lookup, y
-    cmp #DESTRUCTIBLES_NOT_AVAIL
+    lda LocationIndex
+    asl
+    tay
+    lda mod_tiles_by_location, y
+    sta pointer2
+    iny
+    lda mod_tiles_by_location, y
+    sta pointer2 + 1
+    bne @allGood
+    cmp pointer2
     beq @exit
 
-    tay
+@allGood:
+    ldy #0
 @tileLoop:
-    lda linked_destructible_tiles, y
-    ;tax
-    ;lda Destructibles, x
-    ;bne @nextDestructible ; already used
 
     tya
     asl
     asl
     asl
-    tax
-    inx
-    inx
-    inx ;at screen
-    lda destructible_tiles_list, x
+    tay
+    iny
+    iny
+    iny ;at screen
+    lda (pointer2), y
     cmp CurrentMapSegmentIndex
     bne @nextDestructible
-    inx
-    lda destructible_tiles_list, x
+    iny
+    lda (pointer2), y
     sec
     sbc #4
     cmp TempY
     bne @nextDestructible
-    inx
-    lda destructible_tiles_list, x
+    iny
+    lda (pointer2), y
     cmp TempX
     bne @nextDestructible
 
@@ -6900,43 +6909,32 @@ ActivateTrigger:
 
     ;paw trigger
 
-    lda linked_destructible_tiles, y
-    tax
-    lda Destructibles, x
-    bne @exit ; already switched on
-    lda #1
+    ;lda linked_destructible_tiles, y
+    ;tax
+    ;lda Destructibles, x
+    ;bne @exit ; already switched on
+    ;lda #1
 @changeTiles:
-    ldy #8
-    sta Destructibles, y
-    ldy #7
-    sta Destructibles, y
-    ldy #6
-    sta Destructibles, y
-    ldy #5
-    sta Destructibles, y
+ ;   ldy #8
+  ;  sta Destructibles, y
+   ; ldy #7
+   ; sta Destructibles, y
+   ; ldy #6
+   ; sta Destructibles, y
+   ; ldy #5
+   ; sta Destructibles, y
     lda #1
     sta MustUpdateDestructibles
     jmp @exit
 
 @nextDestructible:
     iny
-    cpy #DESTRUCTIBLE_COUNT
+    tya
+    ldx LocationIndex
+    cmp mod_tiles_by_location, x
     bcs @exit
 
-    tya
-    asl
-    asl
-    asl
-    tax
-    lda destructible_tiles_list, x
-    cmp LocationIndex
-    bne @exit ;already a different location
-
     jmp @tileLoop
-
-
-    lda TempX
-    lda TempY
 
 @exit:
     rts
@@ -7054,36 +7052,36 @@ useHammerOnEnvironment:
     cmp #ITEM_WOOD_HAMMER
     beq @check_other_tiles
 
-    ldy #DESTRUCTIBLE_COUNT
+    ;ldy #DESTRUCTIBLE_COUNT
 @destructable_loop:
-    dey
-    bmi @exit
+    ;dey
+    ;bmi @exit
 
-    tya
-    asl
-    asl
-    asl
-    tax
-    lda destructible_tiles_list, x
-    cmp LocationIndex
-    bne @destructable_loop
-    inx ;addr hi
-    inx ;addr lo
-    inx ;scr
-    inx ; y
-    lda destructible_tiles_list, x
-    cmp TempY
-    bne @destructable_loop
-    inx ; x
-    lda destructible_tiles_list, x
-    cmp TempX
-    bne @destructable_loop
+    ;tya
+    ;asl
+    ;asl
+    ;asl
+    ;tax
+    ;lda destructible_tiles_list, x
+    ;cmp LocationIndex
+    ;bne @destructable_loop
+    ;inx ;addr hi
+    ;inx ;addr lo
+    ;inx ;scr
+    ;inx ; y
+    ;lda destructible_tiles_list, x
+    ;cmp TempY
+    ;bne @destructable_loop
+    ;inx ; x
+    ;lda destructible_tiles_list, x
+    ;cmp TempX
+    ;bne @destructable_loop
 
 
-    lda linked_destructible_tiles, y
-    tay
-    lda #1
-    sta Destructibles, y
+    ;lda linked_destructible_tiles, y
+    ;tay
+    ;lda #1
+    ;sta Destructibles, y
 
     lda #1
     sta MustUpdateDestructibles
