@@ -1621,7 +1621,7 @@ DoneLoadingMaps:
 
     jsr UpdateFireplace
     jsr UploadBgColumns
-    jsr UpdateDestructibleTiles
+    jsr UploadModifiedTiles
     jsr UpdateStatusDigits
     jmp UpdatePalette
 otherState:
@@ -1948,15 +1948,64 @@ UpdateFireplace:
 @exit:
     rts
 ;--------------------------------------------
-UpdateDestructibleTiles:
+UploadModifiedTiles:
+
+    lda ModifiedTilesToDraw
+    beq @done
+
+    tay
+@tileLoop:
+    dey
+    bpl @done
+
+    tya
+    asl
+    asl
+    tax
+    lda $2002
+    lda ModifiedTilesToDraw, x
+    sta $2006
+    inx
+    lda ModifiedTilesToDraw, x
+    sta $2006
+    inx
+    lda ModifiedTilesToDraw, x
+    sta $2007
+    inx
+    lda ModifiedTilesToDraw, x
+    cmp #255
+    beq @tileLoop
+    sta $2007
+
+    jmp @tileLoop
+
+@done:
+    lda #0
+    sta ModifiedTilesToDraw
+
+    rts
+
+;--------------------------------------------
+UpdateModifiedTiles:
 
     lda MustUpdateDestructibles
     beq @exit
 
-;    lda #0
-;    sta $2001
+    ldy LocationIndex
+    lda mod_tiles_by_location, y
+    beq @exit ; no tiles
 
-;    ldy LocationIndex
+    lda LocationIndex
+    asl
+    tay
+    lda mod_tiles_by_location, y
+    sta pointer2
+    iny
+    lda mod_tiles_by_location, y
+    sta pointer2 + 1
+
+    ldy #0
+
 ;    lda destructible_tile_location_lookup, y
 ;    cmp #DESTRUCTIBLES_NOT_AVAIL
 ;    beq @exit
@@ -2211,6 +2260,7 @@ Logics:
     jsr bankswitch_y
     ;------------------
 
+    jsr UpdateModifiedTiles
     jsr UpdateProjectiles
     jsr UpdateSpear
 
