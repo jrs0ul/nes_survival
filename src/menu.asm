@@ -626,8 +626,9 @@ DrawDocument:
     rts
 ;---------------------------------
 DrawSleepMenu:
-    lda MustDrawSleepMenu
-    beq @exit
+    lda MustDrawMenu
+    cmp #SUBMENU_SLEEP
+    bne @exit
 
     lda FirstNametableAddr
     clc
@@ -651,7 +652,7 @@ DrawSleepMenu:
     beq @exit ; not done
 
     lda #0
-    sta MustDrawSleepMenu
+    sta MustDrawMenu
     sta menuTileTransferRowIdx
 
 
@@ -930,8 +931,9 @@ DrawStashItemMenu:
     rts
 ;-------------------------
 DrawToolMenu:
-    lda MustDrawToolMenu
-    beq @exit
+    lda MustDrawMenu
+    cmp #SUBMENU_TOOL
+    bne @exit
 
     lda FirstNametableAddr
     clc
@@ -981,7 +983,7 @@ DrawToolMenu:
     beq @exit ; not finished transfering
 
     lda #0
-    sta MustDrawToolMenu
+    sta MustDrawMenu
     sta menuTileTransferRowIdx
 
 @exit:
@@ -2206,13 +2208,14 @@ ToolItemClicked:
 
     lda #1
     sta MustLoadSomething
-    sta MustDrawToolMenu
     lda #SUBMENU_TOOL
     sta SubMenuIndex
     jsr ActivateSubmenu
     lda #0
     sta ItemMenuIndex
     sta InventoryActivated
+    lda #SUBMENU_TOOL
+    sta MustDrawMenu
     
     jmp @exit
 
@@ -3468,10 +3471,10 @@ OpenupSleep:
     sta ItemMenuIndex
     lda #1
     sta MustLoadSomething
-    sta MustDrawSleepMenu
     sta MustDrawMenuTitle
     lda #SUBMENU_SLEEP
     sta SubMenuIndex
+    sta MustDrawMenu
 
     lda #1
     sta SubMenuActivated
@@ -4131,7 +4134,7 @@ ExitMenuState:
     sta MustDrawStashFoodMenu
     sta MustDrawStashToolMenu
     sta MustDrawStashMaterialMenu
-    sta MustDrawToolMenu
+    sta MustDrawMenu
     sta MustDrawMaterialMenu
     sta MustDrawItemMenu
     sta MustDrawFoodMenu
@@ -4141,7 +4144,6 @@ ExitMenuState:
     sta MustDrawEquipmentGrid
     sta MustDrawInventoryGrid
     sta MustDrawMenuTitle
-    sta MustDrawSleepMenu
     sta MustDrawSleepMessage
     sta MustResetMenu
 

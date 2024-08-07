@@ -861,15 +861,13 @@ MustDrawStashFoodMenu:
     .res 1
 MustDrawStashMaterialMenu:
     .res 1
-MustDrawToolMenu:
+MustDrawMenu:
     .res 1
 MustDrawDocumentMenu:
     .res 1
 MustDrawStashDocumentMenu:
     .res 1
 MustDrawStashToolMenu:
-    .res 1
-MustDrawSleepMenu:
     .res 1
 MustDrawSleepMessage:
     .res 1
@@ -1321,9 +1319,14 @@ ImportantItemTile:
 ImportantItemPaletteIdx:
     .res 1
 
+ModifiedTilesToDraw:
+    .res 1
+
+ModifiedTilesBuffer:
+    .res 4
 
 BSS_Free_Bytes:
-    .res 6
+    .res 2
 
 ;====================================================================================
 
@@ -6847,7 +6850,7 @@ CheckB:
 
 @regularAttack:
 
-    jsr ActivateTrigger
+    ;jsr ActivateTrigger
 
     lda #PLAYER_ATTACK_DELAY
     sta AttackTimer

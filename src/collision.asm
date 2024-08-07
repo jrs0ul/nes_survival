@@ -241,7 +241,8 @@ TestPointAgainstCollisionMapHero:
     jsr CalculateXYCellsForCollision
     bne @collides ;already colliding
 
-    jsr IsCollidingWithADestructedTile
+    ;jsr IsCollidingWithADestructedTile
+    ldx #0
     cpx #1
     beq @compare
 
