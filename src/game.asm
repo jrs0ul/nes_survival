@@ -658,6 +658,17 @@ MustCopyMainChr:
 ;--------------
 .segment "BSS" ; variables in ram
 
+DialogTextContainer:
+    .res 96
+
+MustDrawInventoryGrid = DialogTextContainer
+MustDrawEquipmentGrid = DialogTextContainer + 1
+MustDrawMenu          = DialogTextContainer + 2
+MustDrawSleepMessage  = DialogTextContainer + 3
+MustDrawDocument      = DialogTextContainer + 4
+MustClearSubMenu      = DialogTextContainer + 5
+
+
 CurrentPaletteDecrementValue: ;a helper value to prevent doing too much of palette changing
     .res 1
 
@@ -845,18 +856,6 @@ MustShowOutroAfterFadeout:
 MustShowTitleAfterFadeout:
     .res 1
 
-MustDrawInventoryGrid:
-    .res 1
-MustDrawEquipmentGrid:
-    .res 1
-MustDrawMenu:
-    .res 1
-MustDrawSleepMessage:
-    .res 1
-MustDrawDocument:
-    .res 1
-MustClearSubMenu:
-    .res 1
 MustRestartIndoorsMusic:
     .res 1
 ;--
@@ -1265,8 +1264,7 @@ TempNpcDamaged:
 TempNpcAgitated:
     .res 1
 
-DialogTextContainer:
-    .res 96
+
 
 SaveData: ; inventory       |      storage       | HP | Food | Fuel | Warmth | Time | Equipment
     .res INVENTORY_MAX_SIZE + INVENTORY_MAX_SIZE + 3  +   3 +   3   +   3    +   5  +    4
@@ -1304,11 +1302,11 @@ ImportantItemPaletteIdx:
 ModifiedTilesToDraw:
     .res 1
 
-ModifiedTilesBuffer:
-    .res 12
+ModifiedTilesBuffer: ; 5 * 4(Address low, Address high, value1, value2)
+    .res 20
 
 BSS_Free_Bytes:
-    .res 3
+    .res 1
 
 ;====================================================================================
 
@@ -6306,6 +6304,7 @@ CheckStartButton:
     lda #1
     sta MustLoadMenu
     sta MustLoadSomething
+    jsr ResetOverlayedMenuVars
     lda #STATE_MENU
     sta GameState
     jmp @exit
@@ -7776,6 +7775,7 @@ CheckBed:
     sta PlayerInteractedWithBed
     ldy #1
     jsr bankswitch_y
+    jsr ResetOverlayedMenuVars
     lda #STATE_MENU
     sta GameState
 
@@ -7807,6 +7807,7 @@ CheckFireplace:
     sta PlayerInteractedWithFireplace
     ldy #1
     jsr bankswitch_y
+    jsr ResetOverlayedMenuVars
     lda #STATE_MENU
     sta GameState
 
@@ -7838,6 +7839,7 @@ CheckStashBox:
     sta PlayerInteractedWithStorage
     ldy #1
     jsr bankswitch_y
+    jsr ResetOverlayedMenuVars
     lda #STATE_MENU
     sta GameState
 
@@ -7870,6 +7872,7 @@ CheckToolTable:
     sta PlayerInteractedWithTooltable
     ldy #1
     jsr bankswitch_y
+    jsr ResetOverlayedMenuVars
     lda #STATE_MENU
     sta GameState
 

@@ -73,6 +73,20 @@ inventorypositions:
     .byte MENU_ITEM_SPRITE_MIN_Y + INVENTORY_STEP_PIXELS * 10
 
 ;------------------------------------------
+ResetOverlayedMenuVars:
+
+    lda #0
+    sta MustClearSubMenu
+    sta MustDrawDocument
+    sta MustDrawSleepMessage
+    sta MustDrawInventoryGrid
+    sta MustDrawEquipmentGrid
+    sta MustDrawMenu
+
+
+    rts
+
+;------------------------------------------
 ResetMenuVars:
 
     lda #0
@@ -84,6 +98,7 @@ ResetMenuVars:
     sta EquipmentActivated
     sta BaseMenuIndex
     sta SubMenuIndex
+    
 
     lda #INVENTORY_POINTER_X
     sta InventoryPointerX
