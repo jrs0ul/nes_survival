@@ -849,25 +849,7 @@ MustDrawInventoryGrid:
     .res 1
 MustDrawEquipmentGrid:
     .res 1
-MustDrawFoodMenu:
-    .res 1
-MustDrawItemMenu:
-    .res 1
-MustDrawMaterialMenu:
-    .res 1
-MustDrawStashItemMenu:
-    .res 1
-MustDrawStashFoodMenu:
-    .res 1
-MustDrawStashMaterialMenu:
-    .res 1
 MustDrawMenu:
-    .res 1
-MustDrawDocumentMenu:
-    .res 1
-MustDrawStashDocumentMenu:
-    .res 1
-MustDrawStashToolMenu:
     .res 1
 MustDrawSleepMessage:
     .res 1
@@ -1323,10 +1305,10 @@ ModifiedTilesToDraw:
     .res 1
 
 ModifiedTilesBuffer:
-    .res 4
+    .res 12
 
 BSS_Free_Bytes:
-    .res 2
+    .res 3
 
 ;====================================================================================
 
