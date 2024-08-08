@@ -241,8 +241,8 @@ TestPointAgainstCollisionMapHero:
     jsr CalculateXYCellsForCollision
     bne @collides ;already colliding
 
-    ;jsr IsCollidingWithADestructedTile
-    ldx #0
+    jsr IsCollidingWithADestructedTile
+
     cpx #1
     beq @compare
 
@@ -282,6 +282,12 @@ IfCollidingWithLockedDoor:
 IsCollidingWithADestructedTile:
 
     lda LocationIndex
+    tax
+    lda mod_tiles_count_by_location, x
+    bne @allGood
+    rts
+@allGood:
+    lda LocationIndex
     asl
     tax
     lda mod_tiles_by_location, x
@@ -289,18 +295,18 @@ IsCollidingWithADestructedTile:
     inx
     lda mod_tiles_by_location, x
     sta pointer2 + 1
-    bne @allGood
-    cmp pointer2
-    beq @cont ; both zeroes ?
-@allGood:
 
     lda #0
     sta destructibleIdx ; save tile index
-    sty TempPointY ; store y register
+    sty TempNpcIndex ; store y register
     ldy destructibleIdx
 
 @destructiblesLoop:
-
+    tya ; destructible tile index * 8
+    asl
+    asl
+    asl
+    tay
     lda (pointer2), y ; index of Destructibles
     tax
     lda Destructibles, x
@@ -308,16 +314,9 @@ IsCollidingWithADestructedTile:
 
     sta TempDigit ; store is destroyed or not
 
-    tya ; destructible tile index * 8
-    asl
-    asl
-    asl
-    tay
-    iny ; skip destructables index
     iny ; addr high
     iny ; addr low
-    iny ; move to screen
-
+    iny ; screen
     lda (pointer2), y
     cmp TempScreen
     bne @nextTile
@@ -328,7 +327,7 @@ IsCollidingWithADestructedTile:
     bne @nextTile
 
     iny ; move to x
-    lda TempPointY ; x divided by 8, that was in Y register
+    lda TempNpcIndex ; x divided by 8, that was in Y register
     cmp (pointer2), y
     bne @nextTile
 
@@ -371,7 +370,7 @@ IsCollidingWithADestructedTile:
 @cont:
     ldx #0
 @end:
-    ldy TempPointY ;restore Y register
+    ldy TempNpcIndex ;restore Y register
     rts
 ;-----------------------------
 ;Fill ram table with map row addresses

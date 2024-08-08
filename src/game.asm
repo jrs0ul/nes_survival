@@ -7147,36 +7147,55 @@ useHammerOnEnvironment:
     cmp #ITEM_WOOD_HAMMER
     beq @check_other_tiles
 
-    ;ldy #DESTRUCTIBLE_COUNT
+    ldx LocationIndex
+    lda mod_tiles_count_by_location, x
+    sta TempNpcCnt
+    bne @hasDestructibles
+    rts
+
+@hasDestructibles:
+    lda LocationIndex
+    asl
+    tax
+    lda mod_tiles_by_location, x
+    sta pointer2
+    inx
+    lda mod_tiles_by_location, x
+    sta pointer2 + 1
+
+    ldx TempNpcCnt
 @destructable_loop:
-    ;dey
-    ;bmi @exit
+    dex
+    bmi @exit
 
-    ;tya
-    ;asl
-    ;asl
-    ;asl
-    ;tax
-    ;lda destructible_tiles_list, x
-    ;cmp LocationIndex
-    ;bne @destructable_loop
-    ;inx ;addr hi
-    ;inx ;addr lo
-    ;inx ;scr
-    ;inx ; y
-    ;lda destructible_tiles_list, x
-    ;cmp TempY
-    ;bne @destructable_loop
-    ;inx ; x
-    ;lda destructible_tiles_list, x
-    ;cmp TempX
-    ;bne @destructable_loop
+    txa
+    asl
+    asl
+    asl
+    tay
+    lda (pointer2), y
+    iny ;hi
+    iny ;lo
+    iny ;scr
+    iny ;y
 
+    lda (pointer2), y
+    cmp TempY
+    bne @destructable_loop
+    iny ; x
+    lda (pointer2), y
+    cmp TempX
+    bne @destructable_loop
+    dey ; y
+    dey ; scr
+    dey ; lo
+    dey ; hi
+    dey ; status idx
 
-    ;lda linked_destructible_tiles, y
-    ;tay
-    ;lda #1
-    ;sta Destructibles, y
+    lda (pointer2), y
+    tay
+    lda #1
+    sta Destructibles, y
 
     lda #1
     sta MustUpdateDestructibles
