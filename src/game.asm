@@ -1301,12 +1301,14 @@ ImportantItemPaletteIdx:
 
 ModifiedTilesToDraw:
     .res 1
+ModifiedTileHalfFull:
+    .res 1
 
 ModifiedTilesBuffer: ; 5 * 4(Address low, Address high, value1, value2)
     .res 20
 
-BSS_Free_Bytes:
-    .res 1
+;BSS_Free_Bytes:
+;    .res 1
 
 ;====================================================================================
 
@@ -1956,23 +1958,23 @@ UploadModifiedTiles:
     tay
 @tileLoop:
     dey
-    bpl @done
+    bmi @done
 
     tya
     asl
     asl
     tax
     lda $2002
-    lda ModifiedTilesToDraw, x
+    lda ModifiedTilesBuffer, x
     sta $2006
     inx
-    lda ModifiedTilesToDraw, x
+    lda ModifiedTilesBuffer, x
     sta $2006
     inx
-    lda ModifiedTilesToDraw, x
+    lda ModifiedTilesBuffer, x
     sta $2007
     inx
-    lda ModifiedTilesToDraw, x
+    lda ModifiedTilesBuffer, x
     cmp #255
     beq @tileLoop
     sta $2007
@@ -1989,12 +1991,16 @@ UploadModifiedTiles:
 UpdateModifiedTiles:
 
     lda MustUpdateDestructibles
-    beq @exit
+    bne @proceed
+    rts
 
+@proceed:
     ldy LocationIndex
-    lda mod_tiles_by_location, y
-    beq @exit ; no tiles
+    lda mod_tiles_count_by_location, y
+    bne @hasTiles
+    rts
 
+@hasTiles:
     lda LocationIndex
     asl
     tay
@@ -2005,38 +2011,41 @@ UpdateModifiedTiles:
     sta pointer2 + 1
 
     ldy #0
+    sty TempNpcCnt
 
-;    lda destructible_tile_location_lookup, y
-;    cmp #DESTRUCTIBLES_NOT_AVAIL
-;    beq @exit
-;    tay ; get the destructible tile index for the location
+@tileLoop:
+    lda TempNpcCnt ; idx * 8
+    asl
+    asl
+    asl
+    tay
 
-;@tileLoop:
-;    lda linked_destructible_tiles, y
-;    tax
-;    lda Destructibles, x
-;    beq @nextDestructible ; tile was not changed
+    lda (pointer2), y
+    tax
+    lda Destructibles, x
+    beq @nextTile ; this tile was not changed
 
-    ;update tiles on the screen
-;    tya
-;    asl
-;    asl
-;    asl
-;    tax
-;    inx ; skip location idx
-;    inx ; skip adress high
-;    inx ; skip address low
-;    lda destructible_tiles_list, x
-;    cmp CurrentMapSegmentIndex
-;    beq @continue ;tile matches screen
-;    bcc @exit
+    lda ModifiedTilesToDraw
+    cmp #5
+    bcc @stillHaveSpace
+
+    rts
+
+@stillHaveSpace:
+    iny ; tile status idx
+    iny ; skip adress high
+    iny ; skip address low
+    lda (pointer2), y
+    cmp CurrentMapSegmentIndex
+    beq @continue ;tile matches screen
+    bcc @nextTile
     ;current screen idx is less than what is desired
-;    sec
-;    sbc #1
-;    cmp CurrentMapSegmentIndex
-;    beq @checkScroll
-;    bcs @exit ; current idx is less than targetScreen - 1
-;@checkScroll:
+    sec
+    sbc #1
+    cmp CurrentMapSegmentIndex
+    beq @checkScroll
+    bcs @nextTile ; current idx is less than targetScreen - 1
+@checkScroll:
 
 ;    inx ;y
 ;    inx ;x
@@ -2050,42 +2059,94 @@ UpdateModifiedTiles:
 ;    dex
 ;    dex
 
-;@continue:
+@continue:
 
-;    dex ; address low
-;    dex ; address high
+    dey ; address low
+    dey ; address high
 
-;    lda $2002
-;    lda destructible_tiles_list, x
-;    sta $2006
-;    inx ;address lo
-;    lda destructible_tiles_list, x
-;    sta $2006
-;    inx ;screen
-;    inx ; y
-;    inx ; x
-;    inx ; tile value
-;    lda destructible_tiles_list, x
-;    sta $2007
+@newTile:
+    lda ModifiedTilesToDraw
+    asl
+    asl
+    tax
 
+    lda ModifiedTileHalfFull
+    bne @tryToCompleteTile
 
-;@nextDestructible:
-;    iny
-;    cpy #DESTRUCTIBLE_COUNT
-;    bcs @exit
+    lda (pointer2), y
+    sta ModifiedTilesBuffer, x
+    iny ;address lo
+    inx
+    lda (pointer2), y
+    sta ModifiedTilesBuffer, x
+    iny ;screen
+    iny ; y
+    iny ; x
+    iny ; tile value
+    inx
+    lda (pointer2), y
+    sta ModifiedTilesBuffer, x
+    inx
+    lda #255
+    sta ModifiedTilesBuffer, x
 
-;    tya
-;    asl
-;    asl
-;    asl
-;    tax
-;    lda destructible_tiles_list, x
-;    cmp LocationIndex
-;    bne @exit ;already a different location
+    lda #1
+    sta ModifiedTileHalfFull
+    jmp @nextTile
 
-;    jmp @tileLoop
+@tryToCompleteTile:
+    lda (pointer2), y
+    cmp ModifiedTilesBuffer, x
+    beq @continueCompletion
+
+@jumptoNew:
+    inc ModifiedTilesToDraw
+    jmp @newTile
+
+@continueCompletion:
+    iny
+    inx
+    lda (pointer2), y
+    sec
+    sbc #1
+    cmp ModifiedTilesBuffer, x
+    beq @completeIt
+
+    dey
+    jmp @jumptoNew
+
+@completeIt:
+    iny ;screen
+    iny ;x
+    iny ;y
+    iny ;value
+
+    inx ; skip previous tile value
+    inx ; at value 2
+    lda #0
+    sta ModifiedTileHalfFull
+    lda (pointer2), y
+    sta ModifiedTilesBuffer, x
+    inc ModifiedTilesToDraw
+
+@nextTile:
+    inc TempNpcCnt
+    lda TempNpcCnt
+    ldx LocationIndex
+    cmp mod_tiles_count_by_location, x
+    bcs @exit
+
+    jmp @tileLoop
 
 @exit:
+    lda ModifiedTilesToDraw
+    bne @ok
+    lda ModifiedTileHalfFull
+    beq @ok
+    inc ModifiedTilesToDraw
+    lda #0
+    sta ModifiedTileHalfFull
+@ok:
     lda #0
     sta MustUpdateDestructibles
 
