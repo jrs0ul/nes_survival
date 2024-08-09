@@ -73,6 +73,20 @@ inventorypositions:
     .byte MENU_ITEM_SPRITE_MIN_Y + INVENTORY_STEP_PIXELS * 10
 
 ;------------------------------------------
+ResetOverlayedMenuVars:
+
+    lda #0
+    sta MustClearSubMenu
+    sta MustDrawDocument
+    sta MustDrawSleepMessage
+    sta MustDrawInventoryGrid
+    sta MustDrawEquipmentGrid
+    sta MustDrawMenu
+
+
+    rts
+
+;------------------------------------------
 ResetMenuVars:
 
     lda #0
@@ -84,6 +98,7 @@ ResetMenuVars:
     sta EquipmentActivated
     sta BaseMenuIndex
     sta SubMenuIndex
+    
 
     lda #INVENTORY_POINTER_X
     sta InventoryPointerX
@@ -132,11 +147,12 @@ UpdateMenuGfx:
     sta MustLoadSomething
     lda StashActivated
     bne @stash
-    lda #1
-    sta MustDrawDocumentMenu
+    lda #SUBMENU_DOCUMENT
+    sta MustDrawMenu
     jmp @exit
 @stash:
-    sta MustDrawStashDocumentMenu
+    lda #SUBMENU_STASH_DOCUMENT
+    sta MustDrawMenu
 
 @exit:
     rts
@@ -626,8 +642,9 @@ DrawDocument:
     rts
 ;---------------------------------
 DrawSleepMenu:
-    lda MustDrawSleepMenu
-    beq @exit
+    lda MustDrawMenu
+    cmp #SUBMENU_SLEEP
+    bne @exit
 
     lda FirstNametableAddr
     clc
@@ -651,7 +668,7 @@ DrawSleepMenu:
     beq @exit ; not done
 
     lda #0
-    sta MustDrawSleepMenu
+    sta MustDrawMenu
     sta menuTileTransferRowIdx
 
 
@@ -661,8 +678,9 @@ DrawSleepMenu:
 ;----------------------------------
 DrawStashDocumentMenu:
 
-    lda MustDrawStashDocumentMenu
-    beq @exit
+    lda MustDrawMenu
+    cmp #SUBMENU_STASH_DOCUMENT
+    bne @exit
 
     lda FirstNametableAddr
     clc
@@ -691,7 +709,7 @@ DrawStashDocumentMenu:
     beq @exit ; not done
 
     lda #0
-    sta MustDrawStashDocumentMenu
+    sta MustDrawMenu
     sta menuTileTransferRowIdx
 
 
@@ -700,8 +718,9 @@ DrawStashDocumentMenu:
 ;----------------------------------
 DrawDocumentMenu:
 
-    lda MustDrawDocumentMenu
-    beq @exit
+    lda MustDrawMenu
+    cmp #SUBMENU_DOCUMENT
+    bne @exit
 
     lda FirstNametableAddr
     clc
@@ -755,15 +774,16 @@ DrawDocumentMenu:
     beq @exit ; not done
 
     lda #0
-    sta MustDrawDocumentMenu
+    sta MustDrawMenu
     sta menuTileTransferRowIdx
 
 @exit:
     rts
 ;----------------------------------
 DrawFoodMenu:
-    lda MustDrawFoodMenu
-    beq @exit
+    lda MustDrawMenu
+    cmp #SUBMENU_FOOD
+    bne @exit
 
     lda FirstNametableAddr
     clc
@@ -841,15 +861,16 @@ DrawFoodMenu:
     beq @exit ; not done
 
     lda #0
-    sta MustDrawFoodMenu
+    sta MustDrawMenu
     sta menuTileTransferRowIdx
 
 @exit:
     rts
 ;-------------------------
 DrawStashFoodMenu:
-    lda MustDrawStashFoodMenu
-    beq @exit
+    lda MustDrawMenu
+    cmp #SUBMENU_STASH_FOOD
+    bne @exit
 
     lda FirstNametableAddr
     clc
@@ -891,15 +912,16 @@ DrawStashFoodMenu:
     beq @exit ; not fully transfered yet
 
     lda #0
-    sta MustDrawStashFoodMenu
+    sta MustDrawMenu
     sta menuTileTransferRowIdx
 
 @exit:
     rts
 ;-------------------------
 DrawStashItemMenu:
-    lda MustDrawStashItemMenu
-    beq @exit
+    lda MustDrawMenu
+    cmp #SUBMENU_STASH_ITEM
+    bne @exit
 
     lda FirstNametableAddr
     clc
@@ -922,7 +944,7 @@ DrawStashItemMenu:
     beq @exit
 
     lda #0
-    sta MustDrawStashItemMenu
+    sta MustDrawMenu
     sta menuTileTransferRowIdx
 
 @exit:
@@ -930,8 +952,9 @@ DrawStashItemMenu:
     rts
 ;-------------------------
 DrawToolMenu:
-    lda MustDrawToolMenu
-    beq @exit
+    lda MustDrawMenu
+    cmp #SUBMENU_TOOL
+    bne @exit
 
     lda FirstNametableAddr
     clc
@@ -981,15 +1004,16 @@ DrawToolMenu:
     beq @exit ; not finished transfering
 
     lda #0
-    sta MustDrawToolMenu
+    sta MustDrawMenu
     sta menuTileTransferRowIdx
 
 @exit:
     rts
 ;-------------------------
 DrawStashToolMenu:
-    lda MustDrawStashToolMenu
-    beq @exit
+    lda MustDrawMenu
+    cmp #SUBMENU_STASH_TOOL
+    bne @exit
 
     lda FirstNametableAddr
     clc
@@ -1012,7 +1036,7 @@ DrawStashToolMenu:
     beq @exit
 
     lda #0
-    sta MustDrawStashToolMenu
+    sta MustDrawMenu
     sta menuTileTransferRowIdx
 
 @exit:
@@ -1043,8 +1067,9 @@ CanItemBeUsedOutdoors:
     rts
 ;-------------------------
 DrawItemMenu:
-    lda MustDrawItemMenu
-    beq @exit
+    lda MustDrawMenu
+    cmp #SUBMENU_ITEM
+    bne @exit
 
     lda FirstNametableAddr
     clc
@@ -1119,15 +1144,16 @@ DrawItemMenu:
     beq @exit ; not done
 
     lda #0
-    sta MustDrawItemMenu
+    sta MustDrawMenu
     sta menuTileTransferRowIdx
 
 @exit:
     rts
 ;---------------------------
 DrawMaterialMenu:
-    lda MustDrawMaterialMenu
-    beq @exit
+    lda MustDrawMenu
+    cmp #SUBMENU_MATERIAL
+    bne @exit
 
     lda FirstNametableAddr
     clc
@@ -1177,15 +1203,16 @@ DrawMaterialMenu:
     beq @exit ; not finished transfering
 
     lda #0
-    sta MustDrawMaterialMenu
+    sta MustDrawMenu
     sta menuTileTransferRowIdx
 
 @exit:
     rts
 ;---------------------------
 DrawStashMaterialMenu:
-    lda MustDrawStashMaterialMenu
-    beq @exit
+    lda MustDrawMenu
+    cmp #SUBMENU_STASH_MATERIAL
+    bne @exit
 
     lda FirstNametableAddr
     clc
@@ -1208,7 +1235,7 @@ DrawStashMaterialMenu:
     beq @exit
 
     lda #0
-    sta MustDrawStashMaterialMenu
+    sta MustDrawMenu
     sta menuTileTransferRowIdx
 
 @exit:
@@ -2102,8 +2129,8 @@ OnItemClicked:
 
     lda #1
     sta MustLoadSomething
-    sta MustDrawStashItemMenu
     lda #SUBMENU_STASH_ITEM
+    sta MustDrawMenu
     sta SubMenuIndex
     jsr ActivateSubmenu
     lda #0
@@ -2122,8 +2149,8 @@ OnItemClicked:
 
     lda #1
     sta MustLoadSomething
-    sta MustDrawStashFoodMenu
     lda #SUBMENU_STASH_FOOD
+    sta MustDrawMenu
     sta SubMenuIndex
     jsr ActivateSubmenu
     lda #0
@@ -2134,9 +2161,9 @@ OnItemClicked:
 @useFromInventory:
     lda #1
     sta MustLoadSomething
-    sta MustDrawFoodMenu
     lda #SUBMENU_FOOD
     sta SubMenuIndex
+    sta MustDrawMenu
     jsr ActivateSubmenu
     lda #0
     sta FoodMenuIndex
@@ -2164,8 +2191,8 @@ OnItemClicked:
 RegularItemClicked:
     lda #1
     sta MustLoadSomething
-    sta MustDrawItemMenu
     lda #SUBMENU_ITEM
+    sta MustDrawMenu
     sta SubMenuIndex
     jsr ActivateSubmenu
     lda #0
@@ -2177,21 +2204,22 @@ RegularItemClicked:
 DocumentItemClicked:
     lda #1
     sta MustLoadSomething
-    sta MustDrawDocumentMenu
     lda #SUBMENU_DOCUMENT
     sta SubMenuIndex
     jsr ActivateSubmenu
     lda #0
     sta ItemMenuIndex
     sta InventoryActivated
+    lda #SUBMENU_DOCUMENT
+    sta MustDrawMenu
     rts
 ;------------------------------------
 DocumentItemClickedInStash:
     lda #1
     sta MustLoadSomething
-    sta MustDrawStashDocumentMenu
     lda #SUBMENU_STASH_DOCUMENT
     sta SubMenuIndex
+    sta MustDrawMenu
     jsr ActivateSubmenu
     lda #0
     sta ItemMenuIndex
@@ -2206,13 +2234,14 @@ ToolItemClicked:
 
     lda #1
     sta MustLoadSomething
-    sta MustDrawToolMenu
     lda #SUBMENU_TOOL
     sta SubMenuIndex
     jsr ActivateSubmenu
     lda #0
     sta ItemMenuIndex
     sta InventoryActivated
+    lda #SUBMENU_TOOL
+    sta MustDrawMenu
     
     jmp @exit
 
@@ -2220,9 +2249,9 @@ ToolItemClicked:
 
     lda #1
     sta MustLoadSomething
-    sta MustDrawStashToolMenu
     lda #SUBMENU_STASH_TOOL
     sta SubMenuIndex
+    sta MustDrawMenu
     jsr ActivateSubmenu
     lda #0
     sta ItemMenuIndex
@@ -2238,8 +2267,8 @@ MaterialItemClicked:
 
     lda #1
     sta MustLoadSomething
-    sta MustDrawMaterialMenu
     lda #SUBMENU_MATERIAL
+    sta MustDrawMenu
     sta SubMenuIndex
     jsr ActivateSubmenu
     lda #0
@@ -2250,8 +2279,8 @@ MaterialItemClicked:
 @stashedMaterial:
     lda #1
     sta MustLoadSomething
-    sta MustDrawStashMaterialMenu
     lda #SUBMENU_STASH_MATERIAL
+    sta MustDrawMenu
     sta SubMenuIndex
     jsr ActivateSubmenu
     lda #0
@@ -3468,10 +3497,10 @@ OpenupSleep:
     sta ItemMenuIndex
     lda #1
     sta MustLoadSomething
-    sta MustDrawSleepMenu
     sta MustDrawMenuTitle
     lda #SUBMENU_SLEEP
     sta SubMenuIndex
+    sta MustDrawMenu
 
     lda #1
     sta SubMenuActivated
@@ -4127,24 +4156,13 @@ ExitMenuState:
     sta MustLoadMenu
     sta menuTileTransferRowIdx
     sta MustClearSubMenu
-    sta MustDrawStashItemMenu
-    sta MustDrawStashFoodMenu
-    sta MustDrawStashToolMenu
-    sta MustDrawStashMaterialMenu
-    sta MustDrawToolMenu
-    sta MustDrawMaterialMenu
-    sta MustDrawItemMenu
-    sta MustDrawFoodMenu
-    sta MustDrawStashDocumentMenu
-    sta MustDrawDocumentMenu
+    sta MustDrawMenu
     sta DocumentJustClosed
     sta MustDrawEquipmentGrid
     sta MustDrawInventoryGrid
     sta MustDrawMenuTitle
-    sta MustDrawSleepMenu
     sta MustDrawSleepMessage
     sta MustResetMenu
-
 
     lda OldInventoryPointerY
     sta InventoryPointerY

@@ -39,6 +39,7 @@ main_bg_tiles       : .incbin "main_bg_tiles.lz4"
 .include "data/maps/cropped/path_to_crashsite_crop.asm"
 .include "data/Outside1_items.asm"
 .include "data/Outside3_items.asm"
+.include "data/mod_tiles_first.asm"
 
 
 ;===========================================================
@@ -61,6 +62,7 @@ intro_tiles_chr   :  .incbin "intro.lz4"
 .include "data/maps/cropped/pre_alien_base0_crop.asm"
 .include "data/maps/cropped/pre_alien_base1_crop.asm"
 .include "data/maps/cropped/pre_alien_base2_crop.asm"
+.include "data/mod_tiles_alien_base_pre.asm"
 
 
 ;============================================================
@@ -95,6 +97,9 @@ alien_sprites_chr: .incbin "alien_sprites.lz4"
 .include "data/maps/cropped/dark_cave2_1_crop.asm"
 .include "data/maps/cropped/dark_cave2_2_crop.asm"
 .include "data/maps/cropped/secret_cave0_crop.asm"
+.include "data/mod_tiles_secret_cave.asm"
+.include "data/mod_tiles_mine.asm"
+.include "data/mod_tiles_alien_base.asm"
 
 
 
@@ -653,6 +658,17 @@ MustCopyMainChr:
 ;--------------
 .segment "BSS" ; variables in ram
 
+DialogTextContainer:
+    .res 96
+
+MustDrawInventoryGrid = DialogTextContainer
+MustDrawEquipmentGrid = DialogTextContainer + 1
+MustDrawMenu          = DialogTextContainer + 2
+MustDrawSleepMessage  = DialogTextContainer + 3
+MustDrawDocument      = DialogTextContainer + 4
+MustClearSubMenu      = DialogTextContainer + 5
+
+
 CurrentPaletteDecrementValue: ;a helper value to prevent doing too much of palette changing
     .res 1
 
@@ -840,38 +856,6 @@ MustShowOutroAfterFadeout:
 MustShowTitleAfterFadeout:
     .res 1
 
-MustDrawInventoryGrid:
-    .res 1
-MustDrawEquipmentGrid:
-    .res 1
-MustDrawFoodMenu:
-    .res 1
-MustDrawItemMenu:
-    .res 1
-MustDrawMaterialMenu:
-    .res 1
-MustDrawStashItemMenu:
-    .res 1
-MustDrawStashFoodMenu:
-    .res 1
-MustDrawStashMaterialMenu:
-    .res 1
-MustDrawToolMenu:
-    .res 1
-MustDrawDocumentMenu:
-    .res 1
-MustDrawStashDocumentMenu:
-    .res 1
-MustDrawStashToolMenu:
-    .res 1
-MustDrawSleepMenu:
-    .res 1
-MustDrawSleepMessage:
-    .res 1
-MustDrawDocument:
-    .res 1
-MustClearSubMenu:
-    .res 1
 MustRestartIndoorsMusic:
     .res 1
 ;--
@@ -1280,8 +1264,7 @@ TempNpcDamaged:
 TempNpcAgitated:
     .res 1
 
-DialogTextContainer:
-    .res 96
+
 
 SaveData: ; inventory       |      storage       | HP | Food | Fuel | Warmth | Time | Equipment
     .res INVENTORY_MAX_SIZE + INVENTORY_MAX_SIZE + 3  +   3 +   3   +   3    +   5  +    4
@@ -1316,9 +1299,16 @@ ImportantItemTile:
 ImportantItemPaletteIdx:
     .res 1
 
+ModifiedTilesToDraw:
+    .res 1
+ModifiedTileHalfFull:
+    .res 1
 
-BSS_Free_Bytes:
-    .res 6
+ModifiedTilesBuffer: ; 5 * 4(Address low, Address high, value1, value2)
+    .res 20
+
+;BSS_Free_Bytes:
+;    .res 1
 
 ;====================================================================================
 
@@ -1633,7 +1623,7 @@ DoneLoadingMaps:
 
     jsr UpdateFireplace
     jsr UploadBgColumns
-    jsr UpdateDestructibleTiles
+    jsr UploadModifiedTiles
     jsr UpdateStatusDigits
     jmp UpdatePalette
 otherState:
@@ -1960,97 +1950,211 @@ UpdateFireplace:
 @exit:
     rts
 ;--------------------------------------------
-UpdateDestructibleTiles:
+UploadModifiedTiles:
 
-    lda MustUpdateDestructibles
-    beq @exit
+    lda ModifiedTilesToDraw
+    beq @done
 
-    lda #0
-    sta $2001
-
-    ldy LocationIndex
-    lda destructible_tile_location_lookup, y
-    cmp #DESTRUCTIBLES_NOT_AVAIL
-    beq @exit
-    tay ; get the destructible tile index for the location
-
+    tay
 @tileLoop:
-    lda linked_destructible_tiles, y
-    tax
-    lda Destructibles, x
-    beq @nextDestructible ; tile was not changed
+    dey
+    bmi @done
 
-    ;update tiles on the screen
     tya
     asl
     asl
-    asl
     tax
-    inx ; skip location idx
-    inx ; skip adress high
-    inx ; skip address low
-    lda destructible_tiles_list, x
+    lda $2002
+    lda ModifiedTilesBuffer, x
+    sta $2006
+    inx
+    lda ModifiedTilesBuffer, x
+    sta $2006
+    inx
+    lda ModifiedTilesBuffer, x
+    sta $2007
+    inx
+    lda ModifiedTilesBuffer, x
+    cmp #255
+    beq @tileLoop
+    sta $2007
+
+    jmp @tileLoop
+
+@done:
+    lda #0
+    sta ModifiedTilesToDraw
+
+    rts
+
+;--------------------------------------------
+UpdateModifiedTiles:
+
+    lda MustUpdateDestructibles
+    bne @proceed
+    rts
+
+@proceed:
+    ldy LocationIndex
+    lda mod_tiles_count_by_location, y
+    bne @hasTiles
+    rts
+
+@hasTiles:
+    lda LocationIndex
+    asl
+    tay
+    lda mod_tiles_by_location, y
+    sta pointer2
+    iny
+    lda mod_tiles_by_location, y
+    sta pointer2 + 1
+
+    ldy #0
+    sty TempNpcCnt
+
+@tileLoop:
+    lda TempNpcCnt ; idx * 8
+    asl
+    asl
+    asl
+    tay
+
+    lda (pointer2), y
+    tax
+    lda Destructibles, x
+    beq @nextTile ; this tile was not changed
+
+    lda ModifiedTilesToDraw
+    cmp #5
+    bcc @stillHaveSpace
+
+    rts
+
+@stillHaveSpace:
+    iny ; tile status idx
+    iny ; skip adress high
+    iny ; skip address low
+    lda (pointer2), y
     cmp CurrentMapSegmentIndex
     beq @continue ;tile matches screen
-    bcc @exit
+    bcc @nextTile
     ;current screen idx is less than what is desired
     sec
     sbc #1
     cmp CurrentMapSegmentIndex
     beq @checkScroll
-    bcs @exit ; current idx is less than targetScreen - 1
+    bcs @nextTile ; current idx is less than targetScreen - 1
 @checkScroll:
 
-    inx ;y
-    inx ;x
-    inx ;tile
-    inx ;scroll
-    lda ScrollX
-    cmp destructible_tiles_list, x
-    bcc @exit
-    dex
-    dex
-    dex
-    dex
+;    inx ;y
+;    inx ;x
+;    inx ;tile
+;    inx ;scroll
+;    lda ScrollX
+;    cmp destructible_tiles_list, x
+;    bcc @exit
+;    dex
+;    dex
+;    dex
+;    dex
 
 @continue:
 
-    dex ; address low
-    dex ; address high
+    dey ; address low
+    dey ; address high
 
-    lda $2002
-    lda destructible_tiles_list, x
-    sta $2006
-    inx ;address lo
-    lda destructible_tiles_list, x
-    sta $2006
-    inx ;screen
-    inx ; y
-    inx ; x
-    inx ; tile value
-    lda destructible_tiles_list, x
-    sta $2007
-
-
-@nextDestructible:
-    iny
-    cpy #DESTRUCTIBLE_COUNT
-    bcs @exit
-
-    tya
-    asl
+@newTile:
+    lda ModifiedTilesToDraw
     asl
     asl
     tax
-    lda destructible_tiles_list, x
-    cmp LocationIndex
-    bne @exit ;already a different location
+
+    lda ModifiedTileHalfFull
+    bne @tryToCompleteTile
+    
+    jsr StoreModTileToDraw
+
+    jmp @nextTile
+
+@tryToCompleteTile:
+    lda (pointer2), y
+    cmp ModifiedTilesBuffer, x
+    beq @continueCompletion
+
+@jumptoNew:
+    inc ModifiedTilesToDraw
+    lda #0
+    sta ModifiedTileHalfFull
+    jmp @newTile
+
+@continueCompletion:
+    iny
+    inx
+    lda (pointer2), y
+    sec
+    sbc #1
+    cmp ModifiedTilesBuffer, x
+    beq @completeIt
+
+    dey
+    jmp @jumptoNew
+
+@completeIt:
+    iny ;screen
+    iny ;x
+    iny ;y
+    iny ;value
+
+    inx ; skip previous tile value
+    inx ; at value 2
+    lda #0
+    sta ModifiedTileHalfFull
+    lda (pointer2), y
+    sta ModifiedTilesBuffer, x
+    inc ModifiedTilesToDraw
+
+@nextTile:
+    inc TempNpcCnt
+    lda TempNpcCnt
+    ldx LocationIndex
+    cmp mod_tiles_count_by_location, x
+    bcs @exit
 
     jmp @tileLoop
 
 @exit:
+    lda ModifiedTileHalfFull
+    beq @ok
+    inc ModifiedTilesToDraw
+    lda #0
+    sta ModifiedTileHalfFull
+@ok:
     lda #0
     sta MustUpdateDestructibles
+
+    rts
+;--------------------------------------------
+StoreModTileToDraw:
+    lda (pointer2), y
+    sta ModifiedTilesBuffer, x
+    iny ;address lo
+    inx
+    lda (pointer2), y
+    sta ModifiedTilesBuffer, x
+    iny ;screen
+    iny ; y
+    iny ; x
+    iny ; tile value
+    inx
+    lda (pointer2), y
+    sta ModifiedTilesBuffer, x
+    inx
+    lda #255
+    sta ModifiedTilesBuffer, x
+
+    lda #1
+    sta ModifiedTileHalfFull
 
     rts
 
@@ -2223,6 +2327,7 @@ Logics:
     jsr bankswitch_y
     ;------------------
 
+    jsr UpdateModifiedTiles
     jsr UpdateProjectiles
     jsr UpdateSpear
 
@@ -3765,6 +3870,8 @@ CommonLocationRoutine:
     lda #0
     sta IsLocationRoutine
     sta PaletteFadeAnimationState
+    sta ModifiedTilesToDraw
+    sta ModifiedTileHalfFull
 
     lda #<MapSpawnPoint
     sta pointer2
@@ -6316,6 +6423,7 @@ CheckStartButton:
     lda #1
     sta MustLoadMenu
     sta MustLoadSomething
+    jsr ResetOverlayedMenuVars
     lda #STATE_MENU
     sta GameState
     jmp @exit
@@ -6861,82 +6969,82 @@ CheckB:
 ActivateTrigger:
     jsr CalcTileAddressInFrontOfPlayer
 
-    ldy LocationIndex
-    lda destructible_tile_location_lookup, y
-    cmp #DESTRUCTIBLES_NOT_AVAIL
+    lda LocationIndex
+    ;TODO: compare with a list of trigger locations perhaps
+    cmp #LOCATION_ALIEN_BASE_PRE
+    bne @exit
+    asl
+    tay
+    lda mod_tiles_by_location, y
+    sta pointer2
+    iny
+    lda mod_tiles_by_location, y
+    sta pointer2 + 1
+    bne @allGood
+    cmp pointer2
     beq @exit
 
-    tay
+@allGood:
+    ldx #0
 @tileLoop:
-    lda linked_destructible_tiles, y
-    ;tax
-    ;lda Destructibles, x
-    ;bne @nextDestructible ; already used
 
-    tya
+    txa ;tile index * 8
     asl
     asl
     asl
-    tax
-    inx
-    inx
-    inx ;at screen
-    lda destructible_tiles_list, x
+    tay
+    iny
+    iny
+    iny ;at screen
+    lda (pointer2), y
     cmp CurrentMapSegmentIndex
     bne @nextDestructible
-    inx
-    lda destructible_tiles_list, x
+    iny
+    lda (pointer2), y
     sec
     sbc #4
     cmp TempY
     bne @nextDestructible
-    inx
-    lda destructible_tiles_list, x
+    iny
+    lda (pointer2), y
     cmp TempX
     bne @nextDestructible
 
-    cpy #20
+    cpx #6
     bcc @exit
 
     ;paw trigger
 
-    lda linked_destructible_tiles, y
-    tax
-    lda Destructibles, x
+    dey ;row
+    dey ;screen
+    dey ;lo
+    dey ;hi
+    dey ;status idx
+    lda (pointer2), y
+    tay
+    lda Destructibles, y
     bne @exit ; already switched on
     lda #1
 @changeTiles:
     ldy #8
+@changeLoop:
     sta Destructibles, y
-    ldy #7
-    sta Destructibles, y
-    ldy #6
-    sta Destructibles, y
-    ldy #5
-    sta Destructibles, y
+    dey
+    cpy #4
+    bcs @changeLoop
+
     lda #1
     sta MustUpdateDestructibles
     jmp @exit
 
 @nextDestructible:
-    iny
-    cpy #DESTRUCTIBLE_COUNT
+    inx
+    txa
+    ldy LocationIndex
+    cmp mod_tiles_count_by_location, y
     bcs @exit
 
-    tya
-    asl
-    asl
-    asl
-    tax
-    lda destructible_tiles_list, x
-    cmp LocationIndex
-    bne @exit ;already a different location
-
     jmp @tileLoop
-
-
-    lda TempX
-    lda TempY
 
 @exit:
     rts
@@ -7054,33 +7162,52 @@ useHammerOnEnvironment:
     cmp #ITEM_WOOD_HAMMER
     beq @check_other_tiles
 
-    ldy #DESTRUCTIBLE_COUNT
-@destructable_loop:
-    dey
-    bmi @exit
+    ldx LocationIndex
+    lda mod_tiles_count_by_location, x
+    sta TempNpcCnt
+    bne @hasDestructibles
+    rts
 
-    tya
-    asl
-    asl
+@hasDestructibles:
+    lda LocationIndex
     asl
     tax
-    lda destructible_tiles_list, x
-    cmp LocationIndex
-    bne @destructable_loop
-    inx ;addr hi
-    inx ;addr lo
-    inx ;scr
-    inx ; y
-    lda destructible_tiles_list, x
+    lda mod_tiles_by_location, x
+    sta pointer2
+    inx
+    lda mod_tiles_by_location, x
+    sta pointer2 + 1
+
+    ldx TempNpcCnt
+@destructable_loop:
+    dex
+    bmi @exit
+
+    txa
+    asl
+    asl
+    asl
+    tay
+    lda (pointer2), y
+    iny ;hi
+    iny ;lo
+    iny ;scr
+    iny ;y
+
+    lda (pointer2), y
     cmp TempY
     bne @destructable_loop
-    inx ; x
-    lda destructible_tiles_list, x
+    iny ; x
+    lda (pointer2), y
     cmp TempX
     bne @destructable_loop
+    dey ; y
+    dey ; scr
+    dey ; lo
+    dey ; hi
+    dey ; status idx
 
-
-    lda linked_destructible_tiles, y
+    lda (pointer2), y
     tay
     lda #1
     sta Destructibles, y
@@ -7793,6 +7920,7 @@ CheckBed:
     sta PlayerInteractedWithBed
     ldy #1
     jsr bankswitch_y
+    jsr ResetOverlayedMenuVars
     lda #STATE_MENU
     sta GameState
 
@@ -7824,6 +7952,7 @@ CheckFireplace:
     sta PlayerInteractedWithFireplace
     ldy #1
     jsr bankswitch_y
+    jsr ResetOverlayedMenuVars
     lda #STATE_MENU
     sta GameState
 
@@ -7855,6 +7984,7 @@ CheckStashBox:
     sta PlayerInteractedWithStorage
     ldy #1
     jsr bankswitch_y
+    jsr ResetOverlayedMenuVars
     lda #STATE_MENU
     sta GameState
 
@@ -7887,6 +8017,7 @@ CheckToolTable:
     sta PlayerInteractedWithTooltable
     ldy #1
     jsr bankswitch_y
+    jsr ResetOverlayedMenuVars
     lda #STATE_MENU
     sta GameState
 

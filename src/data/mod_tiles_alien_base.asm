@@ -1,0 +1,14 @@
+;Tiles that can be modified:
+;   state index in Destructibles
+;   tile address high, (in video memory)
+;   tile address low,
+;   screen
+;   tile row
+;   tile column
+;   tile value ON
+;   tile value OFF
+
+
+mod_tiles_alien_base:
+    .byte 2,  $25, $0D, 1, 8,  13, $D8, $0
+    .byte 2,  $25, $2D, 1, 9,  13, $5A, $0

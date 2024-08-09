@@ -72,11 +72,9 @@
 
     ROW_TABLE_SIZE             = 240 ;4 screens * 32 rows * 2
 
-    DESTRUCTIBLE_DOOR_IDX      = 4
+    DESTRUCTIBLE_DOOR_IDX      = 3
 
-    DESTRUCTIBLE_COUNT         = 24 ;tiles
     DESTRUCTIBLE_OBJECTS_COUNT = 9
-    DESTRUCTIBLES_NOT_AVAIL    = 255
 
     PROJECTILE_TILE            = $37
 
