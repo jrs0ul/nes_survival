@@ -6942,7 +6942,7 @@ CheckB:
 
 @regularAttack:
 
-    ;jsr ActivateTrigger
+    jsr ActivateTrigger
 
     lda #PLAYER_ATTACK_DELAY
     sta AttackTimer
@@ -6962,6 +6962,9 @@ ActivateTrigger:
     jsr CalcTileAddressInFrontOfPlayer
 
     lda LocationIndex
+    ;TODO: compare with a list of trigger locations perhaps
+    cmp #LOCATION_ALIEN_BASE_PRE
+    bne @exit
     asl
     tay
     lda mod_tiles_by_location, y
@@ -6974,10 +6977,10 @@ ActivateTrigger:
     beq @exit
 
 @allGood:
-    ldy #0
+    ldx #0
 @tileLoop:
 
-    tya
+    txa ;tile index * 8
     asl
     asl
     asl
@@ -6999,34 +7002,38 @@ ActivateTrigger:
     cmp TempX
     bne @nextDestructible
 
-    cpy #20
+    cpx #6
     bcc @exit
 
     ;paw trigger
 
-    ;lda linked_destructible_tiles, y
-    ;tax
-    ;lda Destructibles, x
-    ;bne @exit ; already switched on
-    ;lda #1
+    dey ;row
+    dey ;screen
+    dey ;lo
+    dey ;hi
+    dey ;status idx
+    lda (pointer2), y
+    tay
+    lda Destructibles, y
+    bne @exit ; already switched on
+    lda #1
 @changeTiles:
- ;   ldy #8
-  ;  sta Destructibles, y
-   ; ldy #7
-   ; sta Destructibles, y
-   ; ldy #6
-   ; sta Destructibles, y
-   ; ldy #5
-   ; sta Destructibles, y
+    ldy #8
+@changeLoop:
+    sta Destructibles, y
+    dey
+    cpy #4
+    bcs @changeLoop
+
     lda #1
     sta MustUpdateDestructibles
     jmp @exit
 
 @nextDestructible:
-    iny
-    tya
-    ldx LocationIndex
-    cmp mod_tiles_by_location, x
+    inx
+    txa
+    ldy LocationIndex
+    cmp mod_tiles_count_by_location, y
     bcs @exit
 
     jmp @tileLoop
