@@ -2072,26 +2072,9 @@ UpdateModifiedTiles:
 
     lda ModifiedTileHalfFull
     bne @tryToCompleteTile
+    
+    jsr StoreModTileToDraw
 
-    lda (pointer2), y
-    sta ModifiedTilesBuffer, x
-    iny ;address lo
-    inx
-    lda (pointer2), y
-    sta ModifiedTilesBuffer, x
-    iny ;screen
-    iny ; y
-    iny ; x
-    iny ; tile value
-    inx
-    lda (pointer2), y
-    sta ModifiedTilesBuffer, x
-    inx
-    lda #255
-    sta ModifiedTilesBuffer, x
-
-    lda #1
-    sta ModifiedTileHalfFull
     jmp @nextTile
 
 @tryToCompleteTile:
@@ -2101,6 +2084,8 @@ UpdateModifiedTiles:
 
 @jumptoNew:
     inc ModifiedTilesToDraw
+    lda #0
+    sta ModifiedTileHalfFull
     jmp @newTile
 
 @continueCompletion:
@@ -2139,8 +2124,6 @@ UpdateModifiedTiles:
     jmp @tileLoop
 
 @exit:
-    lda ModifiedTilesToDraw
-    bne @ok
     lda ModifiedTileHalfFull
     beq @ok
     inc ModifiedTilesToDraw
@@ -2149,6 +2132,29 @@ UpdateModifiedTiles:
 @ok:
     lda #0
     sta MustUpdateDestructibles
+
+    rts
+;--------------------------------------------
+StoreModTileToDraw:
+    lda (pointer2), y
+    sta ModifiedTilesBuffer, x
+    iny ;address lo
+    inx
+    lda (pointer2), y
+    sta ModifiedTilesBuffer, x
+    iny ;screen
+    iny ; y
+    iny ; x
+    iny ; tile value
+    inx
+    lda (pointer2), y
+    sta ModifiedTilesBuffer, x
+    inx
+    lda #255
+    sta ModifiedTilesBuffer, x
+
+    lda #1
+    sta ModifiedTileHalfFull
 
     rts
 
@@ -3864,6 +3870,8 @@ CommonLocationRoutine:
     lda #0
     sta IsLocationRoutine
     sta PaletteFadeAnimationState
+    sta ModifiedTilesToDraw
+    sta ModifiedTileHalfFull
 
     lda #<MapSpawnPoint
     sta pointer2
