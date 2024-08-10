@@ -1048,10 +1048,10 @@ famistudio_ptr1_hi = famistudio_ptr1+1
 .endif
 .export famistudio_sfx_init
 .export famistudio_sfx_play
-.exportzp FAMISTUDIO_SFX_CH0
-.exportzp FAMISTUDIO_SFX_CH1
-.exportzp FAMISTUDIO_SFX_CH2
-.exportzp FAMISTUDIO_SFX_CH3
+;.exportzp FAMISTUDIO_SFX_CH0
+;.exportzp FAMISTUDIO_SFX_CH1
+;.exportzp FAMISTUDIO_SFX_CH2
+;.exportzp FAMISTUDIO_SFX_CH3
 .endif
 .if FAMISTUDIO_USE_DPCM_BANKSWITCHING
 .global famistudio_dpcm_bank_callback

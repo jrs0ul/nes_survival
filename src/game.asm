@@ -387,9 +387,11 @@ tmpAttribAddress:
 
 InputUpdateDelay:
     .res 1
-CutsceneDelay:
 ItemUpdateDelay:
     .res 1
+
+CutsceneDelay = ItemUpdateDelay
+
 NpcAIUpdateDelay:
     .res 1
 NpcCollisionDelay:
@@ -612,11 +614,13 @@ InHouse:    ;is the player inside his hut?
 InCave:
     .res 1
 
-InVillagerHut:
-    .res 1
 
 ScreenCount:
     .res 1
+
+InVillagerHut:
+    .res 1
+
 
 BgColumnIdxToUpload: ; index of a column to be uploaded
     .res 1
