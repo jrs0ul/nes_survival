@@ -206,7 +206,7 @@ MapSpawnPoint:
     ;The abandoned mine
     ;---------------
     ;entrance to place where the plane is
-    .byte 120, 210, 7, OUTDOORS_LOC8_SCREEN_COUNT, 0, UNUSED, 4, 121, 1
+    .byte 120, 210, 7, OUTDOORS_LOC8_SCREEN_COUNT, 0, UNUSED, 2, 121, 1
     .byte 0, <main_palette, >main_palette, 0, 0, 0, 0
     ;exit to mine entrance location
     .byte 119, 63, 11, OUTDOORS_LOC12_SCREEN_COUNT, 0, UNUSED, 5, 24, 2

@@ -242,7 +242,6 @@ TestPointAgainstCollisionMapHero:
     bne @collides ;already colliding
 
     jsr IsCollidingWithADestructedTile
-
     cpx #1
     beq @compare
 
@@ -285,6 +284,7 @@ IsCollidingWithADestructedTile:
     tax
     lda mod_tiles_count_by_location, x
     bne @allGood
+    ldx #0
     rts
 @allGood:
     lda LocationIndex

@@ -5801,14 +5801,13 @@ ResetVariables:
     lda #254
     sta PreviouslyEquipedItemIdx
 
-    lda #0
-    sta ActiveVillagerQuests
-    sta ActiveVillagerQuests + 1
-    sta ActiveVillagerQuests + 2
-    sta TakenQuestItems
-    sta TakenQuestItems + 1
-    sta TakenQuestItems + 2
+    lda #120
+    sta Hours
 
+    lda #PLAYER_STAMINA_SIZE
+    sta Stamina
+
+    lda #0
     sta HP + 1
     sta HP + 2
     sta Warmth + 1
@@ -5817,13 +5816,7 @@ ResetVariables:
     sta Food + 2
     sta Fuel + 1
     sta Fuel + 2
-    lda #PLAYER_STAMINA_SIZE
-    sta Stamina
-
-    lda #120
-    sta Hours
-
-    lda #0
+    
     sta Minutes
     sta Days
     sta Days + 1
@@ -5901,6 +5894,8 @@ ResetVariables:
 @villagerLoop:
     sta SpecialItemsDelivered, x
     sta CompletedSpecialQuests, x
+    sta ActiveVillagerQuests, x
+    sta TakenQuestItems, x
     sta VillagerKilled, x
     dex
     bpl @villagerLoop
@@ -5920,8 +5915,9 @@ ResetVariables:
     sta MustLoadGameOverAfterFadeOut
     sta EquipedClothing
     sta EquipedClothing + 1
+
     ldy #DESTRUCTIBLE_OBJECTS_COUNT
-    lda #0
+
 @destructibleLoop:
     sta Destructibles, y
     dey
@@ -7737,16 +7733,6 @@ LaunchSpear:
 
     rts
 
-;-------------------------------
-SetupCheckLeft:
-
-    lda #1
-    sta DirectionX
-    sta ScrollDirection
-    lda #0
-    sta PlayerFrame
-
-    rts
 
 
 ;----------------------------------
@@ -7755,7 +7741,11 @@ CheckLeft:
     and #BUTTON_LEFT_MASK
     beq @exit
 
-    jsr SetupCheckLeft
+    lda #1
+    sta DirectionX
+    sta ScrollDirection
+    lda #0
+    sta PlayerFrame
 
     lda PlayerX
     cmp #SCREEN_MIDDLE    ;check if player is in the left side of the screen
