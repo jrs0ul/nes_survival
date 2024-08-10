@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+#python ConvertBytes.py '$00,$00,$00,$00,$42,$5a,$5a,$5a,$00,$50,$3a,$42,$4d,$3e,$3d,$5a'
 import sys
 assert sys.version_info[0] >= 3, "Python 3 required."
 

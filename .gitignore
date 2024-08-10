@@ -1,2 +1,22 @@
 #compressed gfx
 src/*.lz4
+
+#debug data and labels
+*.dbg
+*.nl
+*labels.txt
+map.txt
+
+#top secret documents
+*.ods
+
+#vim swap files
+*.swp
+src/*.swp
+src/data/*.swp
+
+#speedcalc binary
+editor/diagonalSpeedCalc
+
+#tmp_quest
+src/data/tmp_quest.asm
