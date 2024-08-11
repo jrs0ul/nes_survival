@@ -215,8 +215,9 @@ FireplaceUpdate:
 ;---------------------------------
 SetupVillagerText:
 
-    lda InVillagerHut
-    beq @checkPlayersHouse
+    lda LocationType
+    cmp #LOCATION_TYPE_VILLAGER
+    bne @checkPlayersHouse
 
     lda VillagerIndex
     bne @skipNightCheck ;everyone except Bjorn
@@ -295,8 +296,9 @@ SetupVillagerText:
     jmp @exit
 
 @checkPlayersHouse:
-    lda InHouse
-    beq @exit
+    lda LocationType
+    cmp #LOCATION_TYPE_HOUSE
+    bne @exit
     lda FirstTime
     beq @exit
 

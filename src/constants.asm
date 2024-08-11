@@ -192,6 +192,14 @@
     PLAYER_START_X             = $50
     PLAYER_START_Y             = 200
 
+
+    LOCATION_TYPE_OUTDOORS     = 0
+    LOCATION_TYPE_VILLAGER     = 1
+    LOCATION_TYPE_HOUSE        = 2
+    LOCATION_TYPE_CAVE         = 3
+    LOCATION_TYPE_DARK         = 4
+    LOCATION_TYPE_ALIEN_BASE   = 5
+
     LOCATION_FIRST             = 0
     LOCATION_MINE              = 6
     LOCATION_CRASHSITE         = 7

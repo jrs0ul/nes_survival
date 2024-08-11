@@ -44,8 +44,9 @@ LoadMenu:
     sta MustUpdatePalette
     sta MustLoadSomething
 
-    lda InHouse
-    beq @exit
+    lda LocationType
+    cmp #LOCATION_TYPE_HOUSE
+    bne @exit
 
     lda #$00
     sta Temp
@@ -237,8 +238,9 @@ ResetMenu:
     lda #1
     sta MustDrawMenuTitle
 
-    lda InHouse
-    bne @exit
+    lda LocationType
+    cmp #LOCATION_TYPE_HOUSE
+    beq @exit
 
 
     lda #$FF
@@ -348,8 +350,9 @@ DrawInventoryGrid:
     lda MustDrawInventoryGrid
     beq @exit
 
-    lda InHouse
-    bne @cont
+    lda LocationType
+    cmp #LOCATION_TYPE_HOUSE
+    beq @cont
 
 
     lda #$00
@@ -391,8 +394,9 @@ DrawEquipmentGrid:
     lda MustDrawEquipmentGrid
     beq @exit
 
-    lda InHouse
-    bne @cont
+    lda LocationType
+    cmp #LOCATION_TYPE_HOUSE
+    beq @cont
 
     lda #$00
     sta Temp
@@ -734,10 +738,11 @@ DrawDocumentMenu:
     sta TempPointX
 
 
-    lda InVillagerHut
-    bne @villagerDocument
-    lda InHouse
-    bne @atHomeDocument
+    lda LocationType
+    cmp #LOCATION_TYPE_VILLAGER
+    beq @villagerDocument
+    cmp #LOCATION_TYPE_HOUSE
+    beq @atHomeDocument
 
     lda #<DocumentMenu
     sta pointer
@@ -796,11 +801,11 @@ DrawFoodMenu:
     lda #9
     sta TempPointX
 
-    lda InVillagerHut
-    bne @smallmenu
-
-    lda InHouse
-    beq @smallestmenu
+    lda LocationType
+    cmp #LOCATION_TYPE_VILLAGER
+    beq @smallmenu
+    cmp #LOCATION_TYPE_HOUSE
+    bne @smallestmenu
 
     lda #11
     jmp @storeY
@@ -816,12 +821,11 @@ DrawFoodMenu:
 @storeY:
     sta TempPointY
 
-
-    lda InVillagerHut
-    bne @villagerMenu
-
-    lda InHouse
-    beq @outdoorsMenu
+    lda LocationType
+    cmp #LOCATION_TYPE_VILLAGER
+    beq @villagerMenu
+    cmp #LOCATION_TYPE_HOUSE
+    bne @outdoorsMenu
 
     jsr IsFoodCooked
     bne @foodIsCooked
@@ -970,11 +974,11 @@ DrawToolMenu:
     sta TempPointY
 
 
-    lda InHouse
-    bne @regularMenu
-
-    lda InVillagerHut
-    beq @outdoorMenu
+    lda LocationType
+    cmp #LOCATION_TYPE_HOUSE
+    beq @regularMenu
+    cmp #LOCATION_TYPE_VILLAGER
+    bne @outdoorMenu
 
     lda #<ToolMenuVillager
     sta pointer
@@ -1085,12 +1089,11 @@ DrawItemMenu:
     lda #9
     sta TempPointY
 
-
-    lda InHouse
-    bne @regularMenu
-
-    lda InVillagerHut
-    beq @outdoors
+    lda LocationType
+    cmp #LOCATION_TYPE_HOUSE
+    beq @regularMenu
+    cmp #LOCATION_TYPE_VILLAGER
+    bne @outdoors
 
     jsr CanItemBeUsedOutdoors
     bne @usableVillager
@@ -1168,12 +1171,11 @@ DrawMaterialMenu:
     lda #7
     sta TempPointY
 
-    lda InVillagerHut
-    bne @villagermenu
-
-    lda InHouse
-    beq @outdoorsMenu
-
+    lda LocationType
+    cmp #LOCATION_TYPE_VILLAGER
+    beq @villagermenu
+    cmp #LOCATION_TYPE_HOUSE
+    bne @outdoorsMenu
 
     lda #<MaterialMenu
     sta pointer
@@ -1386,8 +1388,9 @@ UpdateMenuStats:
     cpy #3
     bne @warmthLoop
 
-    lda InHouse
-    bne @fuelcounter
+    lda LocationType
+    cmp #LOCATION_TYPE_HOUSE
+    beq @fuelcounter
 
     lda $2002
     lda FirstNametableAddr
@@ -1709,16 +1712,16 @@ DocumentMenuInput:
     sta pointer + 1
 
 
-    lda InVillagerHut
-    bne @atVillager
-    lda InHouse
-    bne @atVillager
+    lda LocationType
+    cmp #LOCATION_TYPE_VILLAGER
+    beq @atVillager
+    cmp #LOCATION_TYPE_HOUSE
+    beq @atVillager
 
     lda #112
     sta MenuLowerLimit
     lda #2
     sta MenuMaxItem
-
 
     jmp @doInput
 
@@ -1754,8 +1757,9 @@ DocumentMenuInput:
     jmp @CheckA
 
 @otherOptions:
-    lda InHouse
-    beq @notAtHome
+    lda LocationType
+    cmp #LOCATION_TYPE_HOUSE
+    bne @notAtHome
 
     ;options at home
     lda StashActivated
@@ -1783,8 +1787,9 @@ DocumentMenuInput:
 
 @notAtHome: ;give, drop
 
-    lda InVillagerHut
-    beq @justDropIt
+    lda LocationType
+    cmp #LOCATION_TYPE_VILLAGER
+    bne @justDropIt
 
     ;give or drop
     lda ItemMenuIndex
@@ -2308,10 +2313,11 @@ FoodMenuInput:
     lda #16
     sta MenuStep
 
-    lda InVillagerHut
-    bne @smallerMenu
-    lda InHouse
-    beq @smallestMenu
+    lda LocationType
+    cmp #LOCATION_TYPE_VILLAGER
+    beq @smallerMenu
+    cmp #LOCATION_TYPE_HOUSE
+    bne @smallestMenu
 
     jsr IsFoodCooked
     bne @smallerMenu
@@ -2334,11 +2340,11 @@ FoodMenuInput:
     lda #>FoodMenuIndex
     sta pointer + 1
 
-    lda InVillagerHut
-    bne @villagerMenuHeight
-
-    lda InHouse
-    beq @OutdoorMenuHeight
+    lda LocationType
+    cmp #LOCATION_TYPE_VILLAGER
+    beq @villagerMenuHeight
+    cmp #LOCATION_TYPE_HOUSE
+    bne @OutdoorMenuHeight
 
     jsr IsFoodCooked
     bne @villagerMenuHeight ; cooked food menu same height as villager menu
@@ -2365,11 +2371,11 @@ FoodMenuInput:
     jsr LoadSelectedItemInfo
     beq @exit
 
-    lda InVillagerHut
-    bne @villagerInput
-
-    lda InHouse
-    beq @outdoorInput
+    lda LocationType
+    cmp #LOCATION_TYPE_VILLAGER
+    beq @villagerInput
+    cmp #LOCATION_TYPE_HOUSE
+    bne @outdoorInput
 
     jsr IsFoodCooked
     bne @cookedFoodInput
@@ -2594,10 +2600,11 @@ MaterialMenuInput:
     lda #16
     sta MenuStep
 
-    lda InVillagerHut
-    bne @normal
-    lda InHouse
-    beq @CheckB
+    lda LocationType
+    cmp #LOCATION_TYPE_VILLAGER
+    beq @normal
+    cmp #LOCATION_TYPE_HOUSE
+    bne @CheckB
 
 @normal:
     lda #112
@@ -2621,17 +2628,19 @@ MaterialMenuInput:
     jsr LoadSelectedItemInfo
     beq @exit
 
-    lda InHouse
-    bne @cont
-    lda InVillagerHut
-    beq @outdoor
+    lda LocationType
+    cmp #LOCATION_TYPE_HOUSE
+    beq @cont
+    cmp #LOCATION_TYPE_VILLAGER
+    bne @outdoor
 
 @cont:
     lda ItemMenuIndex
     bne @clearItem ; DROP
 
-    lda InVillagerHut
-    bne @giveItem
+    lda LocationType
+    cmp #LOCATION_TYPE_VILLAGER
+    beq @giveItem
 
     lda StashActivated
     bne @take_from_stash
@@ -2674,10 +2683,11 @@ ToolInput:
     lda #>ItemMenuIndex
     sta pointer + 1
 
-    lda InHouse
-    bne @threeoptions
-    lda InVillagerHut
-    bne @threeoptions
+    lda LocationType
+    cmp #LOCATION_TYPE_HOUSE
+    beq @threeoptions
+    cmp #LOCATION_TYPE_VILLAGER
+    beq @threeoptions
 
     lda #112
     sta MenuLowerLimit
@@ -2708,15 +2718,17 @@ ToolInput:
     jsr LoadSelectedItemInfo
     beq @exit
 
-    lda InVillagerHut
-    beq @checkIfOutdoors
+    lda LocationType
+    cmp #LOCATION_TYPE_VILLAGER
+    bne @checkIfOutdoors
 
     jsr ToolMenuInputVillager
     jmp @exit
 
 @checkIfOutdoors:
-    lda InHouse
-    bne @atHome
+    lda LocationType
+    cmp #LOCATION_TYPE_HOUSE
+    beq @atHome
 
     jsr ToolMenuInputOutdoors
     jmp @exit
@@ -3115,10 +3127,11 @@ ItemMenuInput:
     lda #>ItemMenuIndex
     sta pointer + 1
 
-    lda InHouse
-    bne @house
-    lda InVillagerHut
-    bne @house ;same amount of items
+    lda LocationType
+    cmp #LOCATION_TYPE_HOUSE
+    beq @house
+    cmp #LOCATION_TYPE_VILLAGER
+    beq @house ;same amount of items
 
     jsr CanItemBeUsedOutdoors
     beq @CheckB
@@ -3146,14 +3159,16 @@ ItemMenuInput:
     jsr LoadSelectedItemInfo
     beq @exit
 
-    lda InHouse
-    bne @inHouse
+    lda LocationType
+    cmp #LOCATION_TYPE_HOUSE
+    beq @inHouse
 
     jsr CanItemBeUsedOutdoors
     bne @inHouse
 
-    lda InVillagerHut
-    beq @inHouse
+    lda LocationType
+    cmp #LOCATION_TYPE_VILLAGER
+    bne @inHouse
 
     lda ItemMenuIndex
     bne @clearItem
@@ -3184,12 +3199,11 @@ ItemMenuInput:
     cmp #1
     bne @clearItem ; go to DROP
 
-    lda InHouse
-    bne @stashStuff
-
-
-    lda InVillagerHut
-    beq @clearItem ; not at home and not at villager, must be 'drop'
+    lda LocationType
+    cmp #LOCATION_TYPE_HOUSE
+    beq @stashStuff
+    cmp #LOCATION_TYPE_VILLAGER
+    bne @clearItem ; not at home and not at villager, must be 'drop'
 @give_item:
     ;'give'
     jsr GiveItem
@@ -3281,8 +3295,9 @@ TakeItemFromStash:
 ;------------------------------------
 ;x is inventory item index
 StoreItemInStash:
-    lda InHouse
-    beq @fail
+    lda LocationType
+    cmp #LOCATION_TYPE_HOUSE
+    bne @fail
     ldy #254
 @stashLoop:
     iny
@@ -3356,8 +3371,9 @@ DoRegularInput:
     beq @equipment
 
     ;sleep
-    lda InHouse
-    beq @exit
+    lda LocationType
+    cmp #LOCATION_TYPE_HOUSE
+    bne @exit
 
 
     jsr OpenupSleep
@@ -3373,8 +3389,9 @@ DoRegularInput:
     jmp @exit
 
 @stashList:
-    lda InHouse
-    beq @exit
+    lda LocationType
+    cmp #LOCATION_TYPE_HOUSE
+    bne @exit
     jsr OpenUpStash
     jmp @exit
 
@@ -3471,8 +3488,9 @@ OpenEquipment:
     rts
 ;------------------------------------
 OpenupCrafting:
-    lda InHouse
-    beq @exit
+    lda LocationType
+    cmp #LOCATION_TYPE_HOUSE
+    bne @exit
     lda #1
     sta MustLoadSomething
     sta MustDrawInventoryGrid
@@ -3598,8 +3616,9 @@ StartSleep:
     rts
 ;--------------------------------------
 CookMeat:
-    lda InHouse
-    beq @cantcook
+    lda LocationType
+    cmp #LOCATION_TYPE_HOUSE
+    bne @cantcook
 
     lda TempItemIndex
     cmp #ITEM_RAW_MEAT
@@ -4189,12 +4208,13 @@ ExitMenuState:
     sta PaletteUpdateSize
 
 @cont:
-    lda InHouse
-    beq @checkVillager ;InHouse = 0
+    lda LocationType
+    cmp #LOCATION_TYPE_HOUSE
+    bne @checkVillager
     jmp @indoorLoading
 @checkVillager:
-    lda InVillagerHut
-    beq @loadOutside
+    cmp #LOCATION_TYPE_VILLAGER
+    bne @loadOutside
 @indoorLoading:
     lda #1
     sta MustLoadHouseInterior

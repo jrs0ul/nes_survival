@@ -407,8 +407,9 @@ UpdateSprites:
 
 ;-----------TEXT DIALOG SPRITES
 
-    lda InVillagerHut
-    beq @hidesprites
+    lda LocationType
+    cmp #LOCATION_TYPE_VILLAGER
+    bne @hidesprites
 
     jsr UpdateVillagerDialogSprites 
 

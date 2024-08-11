@@ -378,8 +378,9 @@ AddAndDeactivateItems:
     and #%11111110
     sta Items, x
 
-    lda InVillagerHut
-    beq @exit
+    lda LocationType
+    cmp #LOCATION_TYPE_VILLAGER
+    bne @exit
 
     ldy VillagerIndex
     jsr GetItemIdForTheQuest

@@ -608,17 +608,10 @@ PlayerAlive:
 PlayerWins:
     .res 1
 
-InHouse:    ;is the player inside his hut?
+LocationType:
     .res 1
-
-InCave:
-    .res 1
-
 
 ScreenCount:
-    .res 1
-
-InVillagerHut:
     .res 1
 
 
@@ -658,19 +651,34 @@ VillagerIndex:
 
 MustCopyMainChr:
     .res 1
+TempIndex:
+    .res 1
+TempRegX:
+    .res 1
 
 ;--------------
 .segment "BSS" ; variables in ram
 
 DialogTextContainer:
     .res 96
-
-MustDrawInventoryGrid = DialogTextContainer
-MustDrawEquipmentGrid = DialogTextContainer + 1
-MustDrawMenu          = DialogTextContainer + 2
-MustDrawSleepMessage  = DialogTextContainer + 3
-MustDrawDocument      = DialogTextContainer + 4
-MustClearSubMenu      = DialogTextContainer + 5
+;--menu vars
+MustDrawInventoryGrid   = DialogTextContainer
+MustDrawEquipmentGrid   = DialogTextContainer + 1
+MustDrawMenu            = DialogTextContainer + 2
+MustDrawSleepMessage    = DialogTextContainer + 3
+MustDrawDocument        = DialogTextContainer + 4
+MustClearSubMenu        = DialogTextContainer + 5
+;--Cutscene vars
+CutsceneSceneIdx        = DialogTextContainer
+CutsceneTimer           = DialogTextContainer + 1
+CutsceneSpriteCount     = DialogTextContainer + 2
+CutsceneMetaspriteCount = DialogTextContainer + 3
+CutsceneMetaspriteIndex = DialogTextContainer + 4
+CutsceneSprite1X        = DialogTextContainer + 5
+CutsceneSprite1Y        = DialogTextContainer + 6
+CutsceneSprite2X        = DialogTextContainer + 7
+CutsceneSprite2Y        = DialogTextContainer + 8
+CutsceneSpriteAnimFrame = DialogTextContainer + 9
 
 
 CurrentPaletteDecrementValue: ;a helper value to prevent doing too much of palette changing
@@ -697,8 +705,6 @@ OldScrollDirection:
 
 NametableAddress:
     .res 1
-
-
 
 PlayerAnimationRowIndex: ;which animation row to use for player sprites at the moment
     .res 1
@@ -920,31 +926,6 @@ PaletteFadeTimer:
 FadeIdx:
     .res 1
 
-CutsceneSceneIdx:
-    .res 1
-
-CutsceneTimer:
-    .res 1
-
-CutsceneSpriteCount:
-    .res 1
-
-CutsceneMetaspriteCount:
-    .res 1
-CutsceneMetaspriteIndex:
-    .res 1
-
-CutsceneSprite1X:
-    .res 1
-CutsceneSprite1Y:
-    .res 1
-CutsceneSprite2X:
-    .res 1
-CutsceneSprite2Y:
-    .res 1
-
-CutsceneSpriteAnimFrame:
-    .res 1
 
 
 KilledNpcScreenIdx:
@@ -962,10 +943,6 @@ DamagedPaletteMask:
     .res 1
 
 
-TempIndex:
-    .res 1
-TempRegX:
-    .res 1
 
 TempAnimIndex:
     .res 1
@@ -1311,8 +1288,8 @@ ModifiedTileHalfFull:
 ModifiedTilesBuffer: ; 5 * 4(Address low, Address high, value1, value2)
     .res 20
 
-;BSS_Free_Bytes:
-;    .res 1
+BSS_Free_Bytes:
+    .res 12
 
 ;====================================================================================
 
@@ -1944,8 +1921,9 @@ ResetNameTableAddresses:
 ;----------------------------------
 UpdateFireplace:
 
-    lda InHouse
-    beq @exit
+    lda LocationType
+    cmp #LOCATION_TYPE_HOUSE
+    bne @exit
 
     ldy #3
     jsr bankswitch_y
@@ -3333,9 +3311,6 @@ RoutinesAfterFadeOut:
 
     lda #0
     sta VillagerIndex
-    lda #1
-    sta InVillagerHut
-    sta MustRestartIndoorsMusic
 
     ldy #0
     lda VillagerKilled, y
@@ -3390,7 +3365,6 @@ RoutinesAfterFadeOut:
 
     lda #1
     sta MustRestartIndoorsMusic
-    sta InHouse
     ;---------------------------------------------
     ;10.Player's house exit
 @next7:
@@ -3400,7 +3374,6 @@ RoutinesAfterFadeOut:
     bne @next8
 
     lda #0
-    sta InHouse
     sta FirstTime
 
     lda #1
@@ -3425,8 +3398,6 @@ RoutinesAfterFadeOut:
     bne @next10
 
     lda #1
-    sta MustRestartIndoorsMusic
-    sta InVillagerHut
     sta VillagerIndex
 
     tay
@@ -3527,9 +3498,6 @@ RoutinesAfterFadeOut:
     cmp #20
     bne @next18
 
-    lda #1
-    sta MustRestartIndoorsMusic
-    sta InVillagerHut
     lda #2
     sta VillagerIndex
 
@@ -3588,10 +3556,6 @@ RoutinesAfterFadeOut:
 
     lda #1
     sta MustRestartIndoorsMusic
-
-    lda #1
-    sta InHouse
-
     ;--------------------
     ;23.alien base exit top
 @next22:
@@ -3626,8 +3590,6 @@ RoutinesAfterFadeOut:
     lda #>alien_palette
     sta PalettePtr + 1
 
-    lda #1
-    sta InVillagerHut
 
     ldy #3
     lda VillagerKilled, y
@@ -3735,8 +3697,6 @@ RoutinesAfterFadeOut:
     lda #1
     sta ScrollDirection
     sta MustCopyMainChr
-    lda #0
-    sta InHouse
 
     ;-----------------
     ;38. entrance to crashsite from path
@@ -3801,10 +3761,9 @@ RoutinesAfterFadeOut:
     lda #1
     sta MustLoadOutside
     sta MustUpdateDestructibles
-    lda InVillagerHut  ;let's check if we previously were inside a villager house
-    beq @finish
-    lda #0              ;so we're leaving the villager house
-    sta InVillagerHut
+    lda LocationType
+    cmp #LOCATION_TYPE_VILLAGER
+    bne @finish
 
     lda ActiveMapEntryIndex
     cmp #29     ; CRUTCH for bossroom exit
@@ -3917,8 +3876,8 @@ CommonLocationRoutine:
     lda (pointer2), y
     sta ScreenCount
     iny
-    lda (pointer2), y ; InCave
-    sta InCave
+    lda (pointer2), y ; Location type
+    sta LocationType
     iny
     ;lda (pointer2), y ; upper address to item data
     ;sta pointer + 1
@@ -4356,36 +4315,21 @@ RotFood:
 AdaptBackgroundPaletteByTime:
     lda #1
     sta MustUpdateSunMoon
-    lda InHouse
+    lda LocationType
+    cmp #LOCATION_TYPE_CAVE
+    beq @continuewith
+    cmp #LOCATION_TYPE_DARK
+    beq @continuewith
+    cmp #LOCATION_TYPE_OUTDOORS
     beq @continuewith
     rts
+
 @continuewith:
-    lda InVillagerHut
-    beq @continueWith2
-    rts
-@continueWith2:
-    lda LocationIndex
-    cmp #LOCATION_ALIEN_BASE
-    bne @continueWith3
-    rts
-@continueWith3:
-    cmp #LOCATION_BOSS_ROOM
-    bne @continueWith4
-    rts
-@continueWith4:
-    cmp #LOCATION_ALIEN_BASE_PRE
-    bne @continueWith5
-    rts
-@continueWith5:
 
     ldy #$01 ;keeps the outline for the background objects
 
-    lda LocationIndex
-    cmp #LOCATION_DARK_CAVE
-    beq @check_lamp
-    cmp #LOCATION_SECRET_CAVE
-    beq @check_lamp
-    cmp #LOCATION_DARK_CAVE2
+    lda LocationType
+    cmp #LOCATION_TYPE_DARK
     beq @check_lamp
 
     jmp @regular_cave_check
@@ -4401,8 +4345,9 @@ AdaptBackgroundPaletteByTime:
     beq @dark_cave
 
 @regular_cave_check:
-    lda InCave
-    beq @calc ; if not in cave, we need to use lookup table to get certain fade level
+    lda LocationType
+    cmp #LOCATION_TYPE_CAVE
+    bne @calc ; if not in cave, we need to use lookup table to get certain fade level
 
 
     ldx #5 ; evening time index
@@ -4522,10 +4467,11 @@ WarmthLogics:
     jmp @exit
 
 @resetWarmthDelay:
-    lda InHouse
-    bne @increaseWarmth
-    lda InVillagerHut
-    bne @ignoreFuel
+    lda LocationType
+    cmp #LOCATION_TYPE_HOUSE
+    beq @increaseWarmth
+    cmp #LOCATION_TYPE_VILLAGER
+    beq @ignoreFuel
     jmp @decreaseWarmth
 @increaseWarmth:
     lda Fuel
@@ -4549,8 +4495,9 @@ WarmthLogics:
     lda #WARMTH_DAY_DECREASE
     jmp @saveTempDecrease
 @nightFreeze:
-    lda InCave
-    bne @dayFreeze
+    lda LocationType
+    cmp #LOCATION_TYPE_CAVE
+    beq @dayFreeze
     lda #WARMTH_NIGHT_DECREASE
 @saveTempDecrease:
     sta DigitChangeSize
@@ -5905,9 +5852,7 @@ ResetVariables:
     sta PaletteFadeTimer
     sta ScrollX
     sta BaseMenuIndex
-    sta InHouse
-    sta InCave
-    sta InVillagerHut
+    sta LocationType
     sta LocationIndex
     sta SpearData
     sta FishBiteTimer
@@ -6217,7 +6162,6 @@ LoadCheckPoint:
     sta ProjectileCount ; reset projectiles
     sta SpearData       ; reset spear
     sta ScrollX
-    sta InVillagerHut   ; if you were killed in boss room
     lda #$77
     sta PlayerX
     lda #$70
@@ -6240,7 +6184,6 @@ LoadCheckPoint:
     sta PalettePtr + 1
 
     lda #0
-    sta InVillagerHut
     sta BossAgitated
     lda #7
     sta SongName
@@ -6256,8 +6199,9 @@ LoadCheckPoint:
     jsr LoadNpcs
     jsr BuildRowTable
 
+    lda #LOCATION_TYPE_CAVE
+    sta LocationType
     lda #1
-    sta InCave
     sta MustLoadOutside
     sta MustUpdateDestructibles
     sta MustLoadSomething
@@ -6897,8 +6841,9 @@ CheckB:
     and #BUTTON_B_MASK
     bne @exit
 
-    lda InHouse
-    beq @useForAttack
+    lda LocationType
+    cmp #LOCATION_TYPE_HOUSE
+    bne @useForAttack
 
     jsr CheckBed
     bne @exit
@@ -7129,16 +7074,9 @@ CanTileBeDestroyed:
 ;----------------------------------
 useHammerOnEnvironment:
 
-    lda InHouse
-    beq @checkBase
-    rts
-
-@checkBase:
-    lda LocationIndex
-    cmp #LOCATION_ALIEN_BASE
-    beq @abort
-    cmp #LOCATION_BOSS_ROOM
-    beq @abort
+    lda LocationType
+    cmp #LOCATION_TYPE_OUTDOORS
+    bne @abort
 
     jmp @cont
 
@@ -7524,18 +7462,9 @@ CalcTileAddressInFrontOfPlayer:
 CanCastRodHere:
     ;let's check if I can throw there
 
-    lda InHouse
+    lda LocationType
+    cmp #LOCATION_TYPE_OUTDOORS
     bne @exit
-    lda InVillagerHut
-    bne @exit
-    lda InCave
-    bne @exit
-
-    lda LocationIndex
-    cmp #LOCATION_ALIEN_BASE
-    beq @exit
-    cmp #LOCATION_BOSS_ROOM
-    beq @exit
 
     jsr CalcTileAddressInFrontOfPlayer
 

@@ -170,8 +170,11 @@ GenNpcs:
 ;---------------------------------
 GenerateSingleNpc:
 
-    lda InCave
-    beq @notInCave
+    lda LocationType
+    cmp #LOCATION_TYPE_CAVE
+    bne @notInCave
+    cmp #LOCATION_TYPE_DARK
+    bne @notInCave
     jsr UpdateRandomNumber
     and #3
     cmp #0
