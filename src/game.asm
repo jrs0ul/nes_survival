@@ -651,10 +651,9 @@ VillagerIndex:
 
 MustCopyMainChr:
     .res 1
-TempIndex:
-    .res 1
-TempRegX:
-    .res 1
+
+ZP_Free:
+    .res 2
 
 ;--------------
 .segment "BSS" ; variables in ram
@@ -765,8 +764,6 @@ FireFrame:  ;an animation frame of fire in the fireplace
 FireFrameDelay:
     .res 1
 
-
-
 Fuel:       ;how much fuel you have at home in the fireplace
     .res 3
 
@@ -813,8 +810,6 @@ BaseMenuIndex: ; INVENTORY OR SLEEP ?
     .res 1
 
 
-
-
 ActiveVillagerQuests:
     .res MAX_VILLAGERS
 TakenQuestItems:
@@ -831,8 +826,6 @@ TextBaloonIndex:
     .res 1
 TextLength:
     .res 1
-
-
 
 
 MustLoadHouseInterior:
@@ -927,7 +920,6 @@ FadeIdx:
     .res 1
 
 
-
 KilledNpcScreenIdx:
     .res 1
 
@@ -941,7 +933,6 @@ ItemMapScreenIndex:
 
 DamagedPaletteMask:
     .res 1
-
 
 
 TempAnimIndex:
@@ -1185,9 +1176,6 @@ RedCounter:
 EnteredBeforeNightfall:
     .res 1
 
-DetectedMapType:
-    .res 1
-
 InitiateCompleteItemRespawn:
     .res 1
 
@@ -1246,7 +1234,6 @@ TempNpcAgitated:
     .res 1
 
 
-
 SaveData: ; inventory       |      storage       | HP | Food | Fuel | Warmth | Time | Equipment
     .res INVENTORY_MAX_SIZE + INVENTORY_MAX_SIZE + 3  +   3 +   3   +   3    +   5  +    4
 
@@ -1288,8 +1275,14 @@ ModifiedTileHalfFull:
 ModifiedTilesBuffer: ; 5 * 4(Address low, Address high, value1, value2)
     .res 20
 
+TempIndex:
+    .res 1
+TempRegX:
+    .res 1
+
+
 BSS_Free_Bytes:
-    .res 12
+    .res 11
 
 ;====================================================================================
 
@@ -3352,19 +3345,9 @@ RoutinesAfterFadeOut:
 @next4:
     lda ActiveMapEntryIndex
     cmp #5
-    bne @next5
-
-    jsr FlipStartingNametable ; for the breakable rock
-    ;-----------------------------------------
-    ;0. entered player's house
-@next5:
-
-    lda ActiveMapEntryIndex
-    cmp #0
     bne @next7
 
-    lda #1
-    sta MustRestartIndoorsMusic
+    jsr FlipStartingNametable ; for the breakable rock
     ;---------------------------------------------
     ;10.Player's house exit
 @next7:
@@ -3488,7 +3471,6 @@ RoutinesAfterFadeOut:
     lda ActiveMapEntryIndex
     cmp #19
     bne @next17
-
 
     jsr FlipStartingNametable ; for the breakable rock
     ;----------------------------
@@ -3756,14 +3738,14 @@ RoutinesAfterFadeOut:
 
     ;---------------------
 @next40:
-    lda DetectedMapType
-    bne @itsAnIndoorMap
+    lda LocationType
+    cmp #LOCATION_TYPE_VILLAGER
+    beq @itsAnIndoorMap
+    cmp #LOCATION_TYPE_HOUSE
+    beq @itsAnIndoorMap
     lda #1
     sta MustLoadOutside
     sta MustUpdateDestructibles
-    lda LocationType
-    cmp #LOCATION_TYPE_VILLAGER
-    bne @finish
 
     lda ActiveMapEntryIndex
     cmp #29     ; CRUTCH for bossroom exit
@@ -3779,6 +3761,7 @@ RoutinesAfterFadeOut:
 @itsAnIndoorMap:
     lda #1
     sta MustLoadHouseInterior
+    sta MustRestartIndoorsMusic
 
     lda ActiveMapEntryIndex
     cmp #25   ;ANOTHER CRUTCH for bossroom entrance
@@ -3908,7 +3891,7 @@ CommonLocationRoutine:
     sta CurrentMapSegmentIndex
     iny
     lda (pointer2), y ; is the location indoors or outdoors
-    sta DetectedMapType
+    ;sta DetectedMapType
 
     iny
     lda (pointer2), y ;indoor map address (lower byte)
