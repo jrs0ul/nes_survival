@@ -6869,7 +6869,11 @@ ActivateTrigger:
     lda LocationIndex
     ;TODO: compare with a list of trigger locations perhaps
     cmp #LOCATION_ALIEN_BASE_PRE
-    bne @exit
+    beq @cont
+    rts
+
+@cont:
+
     asl
     tay
     lda mod_tiles_by_location, y
@@ -6877,11 +6881,7 @@ ActivateTrigger:
     iny
     lda mod_tiles_by_location, y
     sta pointer2 + 1
-    bne @allGood
-    cmp pointer2
-    beq @exit
 
-@allGood:
     ldx #0
 @tileLoop:
 
@@ -6893,8 +6893,17 @@ ActivateTrigger:
     iny
     iny
     iny ;at screen
-    lda (pointer2), y
-    cmp CurrentMapSegmentIndex
+    lda ScrollX
+    cmp #128
+    bcs @addScreen
+    lda CurrentMapSegmentIndex
+    jmp @compare
+@addScreen:
+    lda CurrentMapSegmentIndex
+    clc
+    adc #1
+@compare:
+    cmp (pointer2), y
     bne @nextDestructible
     iny
     lda (pointer2), y
@@ -6909,6 +6918,8 @@ ActivateTrigger:
 
     cpx #6
     bcc @exit
+    cpx #10
+    bcs @secondTrigger
 
     ;paw trigger
 
@@ -6926,13 +6937,36 @@ ActivateTrigger:
 @turnOff:
     lda #0
 @changeTiles:
-    ldy #8
+    ldy #7
 @changeLoop:
     sta Destructibles, y
     dey
     cpy #4
     bcs @changeLoop
+    jmp @redraw
 
+@secondTrigger:
+
+    dey ;row
+    dey ;screen
+    dey ;lo
+    dey ;hi
+    dey ;status idx
+    lda (pointer2), y
+    tay
+    lda Destructibles, y
+    bne @turnOff2 ; already switched on
+    lda #1
+    jmp @changeTiles2
+@turnOff2:
+    lda #0
+@changeTiles2:
+    ldy #8
+    sta Destructibles, y
+
+
+
+@redraw:
     lda #1
     sta MustUpdateDestructibles
     jmp @exit
