@@ -12,3 +12,9 @@ mod_tiles_mine:
     .byte 3,  $22, $33, 0, 17, 19, $51, $0
     .byte 3,  $22, $52, 0, 18, 18, $51, $0
     .byte 3,  $22, $53, 0, 18, 19, $51, $0
+
+mod_tile_scroll_mine:
+    .byte 0
+    .byte 0
+    .byte 0
+    .byte 0

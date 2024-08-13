@@ -288,8 +288,8 @@ MapSpawnPoint:
     .byte 200, 200, 13, 2, LOCATION_TYPE_DARK, UNUSED, 4, 0, 1
     .byte UNUSED, <main_palette, >main_palette, 3, <dark_cave_npcs, >dark_cave_npcs, 1
     ;alien base lobby entrance
-    .byte 53, 129, 17, 1, LOCATION_TYPE_DARK, UNUSED, 2, 0, 0
-    .byte UNUSED, <alien_palette, >alien_palette, 0, 0, 0, 0
+    .byte 53, 129, 17, 1, LOCATION_TYPE_ALIEN_BASE, UNUSED, 2, 0, 0
+    .byte UNUSED, <main_palette, >main_palette, 0, 0, 0, 0
     ;------------
     ;alien base entrance bottom (pre)
     .byte 15, 170, 19, 3, LOCATION_TYPE_ALIEN_BASE, UNUSED, 2, 0, 0
@@ -306,8 +306,8 @@ MapSpawnPoint:
     .byte UNUSED, <main_palette, >main_palette, 2, 0, 0, 0
     ;------------------
     ;exit to lobby
-    .byte 190, 140, 17, 1, LOCATION_TYPE_CAVE, UNUSED, 2, 0, 0
-    .byte UNUSED, <alien_palette, >alien_palette, 0, 0, 0, 0
+    .byte 190, 140, 17, 1, LOCATION_TYPE_ALIEN_BASE, UNUSED, 2, 0, 0
+    .byte UNUSED, <main_palette, >main_palette, 0, 0, 0, 0
     ;entrance to last alien base segment
     .byte 50, 210, 10, 2, LOCATION_TYPE_ALIEN_BASE, UNUSED, 4, 0, 0
     .byte UNUSED, <alien_palette, >alien_palette, 0, <alien_base_npcs, >alien_base_npcs, 0

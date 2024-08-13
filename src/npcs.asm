@@ -172,9 +172,11 @@ GenerateSingleNpc:
 
     lda LocationType
     cmp #LOCATION_TYPE_CAVE
-    bne @notInCave
+    beq @cave
     cmp #LOCATION_TYPE_DARK
-    bne @notInCave
+    beq @cave
+    jmp @notInCave
+@cave:
     jsr UpdateRandomNumber
     and #3
     cmp #0

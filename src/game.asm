@@ -652,8 +652,11 @@ VillagerIndex:
 MustCopyMainChr:
     .res 1
 
+PlayerFrame:
+    .res 1
+
 ZP_Free:
-    .res 2
+    .res 1
 
 ;--------------
 .segment "BSS" ; variables in ram
@@ -678,6 +681,7 @@ CutsceneSprite1Y        = DialogTextContainer + 6
 CutsceneSprite2X        = DialogTextContainer + 7
 CutsceneSprite2Y        = DialogTextContainer + 8
 CutsceneSpriteAnimFrame = DialogTextContainer + 9
+SnowDelay               = DialogTextContainer + 10
 
 
 CurrentPaletteDecrementValue: ;a helper value to prevent doing too much of palette changing
@@ -712,8 +716,6 @@ WalkTimer:
 AttackTimer:
     .res 1
 NpcsKilledByPlayer: ; kills by a single strike
-    .res 1
-PlayerFrame:
     .res 1
 TempNpcFrame:
     .res 1
@@ -1213,9 +1215,6 @@ TempNpcWidth:
 CurrentSpritesInRow:
     .res 1
 
-SnowDelay:
-    .res 1
-
 TempScreenPos:
     .res 1
 
@@ -1282,7 +1281,7 @@ TempRegX:
 
 
 BSS_Free_Bytes:
-    .res 11
+    .res 13
 
 ;====================================================================================
 
@@ -1986,7 +1985,7 @@ UpdateModifiedTiles:
     sta pointer2 + 1
 
     ldy #0
-    sty TempNpcCnt
+    sty TempNpcCnt ;will use this as a tile index
 
 @tileLoop:
     lda TempNpcCnt ; idx * 8
@@ -1998,7 +1997,7 @@ UpdateModifiedTiles:
     lda (pointer2), y
     tax
     lda Destructibles, x
-    beq @nextTile ; this tile was not changed
+    sta TempNpcState ;store if the tile is modified
 
     lda ModifiedTilesToDraw
     cmp #5
@@ -2022,17 +2021,20 @@ UpdateModifiedTiles:
     bcs @nextTile ; current idx is less than targetScreen - 1
 @checkScroll:
 
-;    inx ;y
-;    inx ;x
-;    inx ;tile
-;    inx ;scroll
-;    lda ScrollX
-;    cmp destructible_tiles_list, x
-;    bcc @exit
-;    dex
-;    dex
-;    dex
-;    dex
+    sty TempNpcSpeed
+    ldy LocationIndex
+    lda mod_tiles_count_by_location, y
+    asl
+    asl
+    asl
+    clc
+    adc LocationIndex
+    tay
+
+    lda ScrollX
+    cmp (pointer2), y
+    bcc @nextTile
+    ldy TempNpcSpeed
 
 @continue:
 
@@ -2080,6 +2082,10 @@ UpdateModifiedTiles:
     iny ;x
     iny ;y
     iny ;value
+    lda TempNpcState
+    bne @moded
+    iny
+@moded:
 
     inx ; skip previous tile value
     inx ; at value 2
@@ -2121,6 +2127,10 @@ StoreModTileToDraw:
     iny ; y
     iny ; x
     iny ; tile value
+    lda TempNpcState ; is tile modified or not
+    bne @cont
+    iny ; second tile value
+@cont:
     inx
     lda (pointer2), y
     sta ModifiedTilesBuffer, x
@@ -3414,7 +3424,7 @@ RoutinesAfterFadeOut:
 
     lda #1
     sta MustPlayNewSong
-    lda #7
+    lda #SONG_OUTSIDE_NIGHT
     sta SongName
 
     lda #2
@@ -3442,7 +3452,7 @@ RoutinesAfterFadeOut:
 
     lda #1
     sta MustPlayNewSong
-    lda #7
+    lda #SONG_OUTSIDE_NIGHT
     sta SongName
 
     lda #2
@@ -3500,32 +3510,12 @@ RoutinesAfterFadeOut:
 @next18:
     lda ActiveMapEntryIndex
     cmp #22
-    bne @next19
+    bne @next21
 
     lda #2
     sta ScrollDirection
 
     jsr OnExitVillagerHut
-    ;-----------------------------
-    ;36. pre-alien base entrance
-@next19:
-
-    lda ActiveMapEntryIndex
-    cmp #36
-    bne @next20
-
-    lda #1
-    sta MustCopyMainChr
-    ;------------------------
-    ;15.alien base entrance top
-@next20:
-
-    lda ActiveMapEntryIndex
-    cmp #15
-    bne @next21
-
-    lda #1
-    sta MustCopyMainChr
     ;------------------------
     ;16. mine room
 @next21:
@@ -3535,30 +3525,16 @@ RoutinesAfterFadeOut:
 
     lda #0
     sta FirstTime
-
-    lda #1
-    sta MustRestartIndoorsMusic
     ;--------------------
     ;23.alien base exit top
 @next22:
 
     lda ActiveMapEntryIndex
     cmp #23
-    bne @next23
-
-    lda #1
-    sta MustCopyMainChr
-    ;--------------------------
-    ;40.alien base exit to the dark cave
-@next23:
-
-    lda ActiveMapEntryIndex
-    cmp #40
     bne @next24
 
     lda #1
     sta MustCopyMainChr
-    jsr TurnDarkPaletteOn
     ;---------------------------
     ;25. Boss room entrance
 @next24:
@@ -3586,7 +3562,7 @@ RoutinesAfterFadeOut:
     lda #3
     sta VillagerIndex
 
-    lda #6
+    lda #SONG_BOSS
     sta SongName
     lda #1
     sta MustPlayNewSong
@@ -3596,22 +3572,16 @@ RoutinesAfterFadeOut:
 
     lda ActiveMapEntryIndex
     cmp #29
-    bne @next26
+    bne @next27
 
     jsr FlipStartingNametable ; for the locked door, so the second screen would always be in adress $24**
 
-    lda #7
+    lda #0
     sta BossAgitated
+    lda #SONG_OUTSIDE_NIGHT
     sta SongName
     lda #1
     sta MustPlayNewSong
-    ;----------------------
-    ;30 exit to light cave
-@next26:
-    lda ActiveMapEntryIndex
-    cmp #30
-    bne @next27
-
     ;-----------------------
     ;14 dark cave entrance
 @next27:
@@ -3770,6 +3740,7 @@ RoutinesAfterFadeOut:
     jmp @saveCHRloading
 @BossRoom:
     lda #0
+    sta MustRestartIndoorsMusic
 @saveCHRloading:
     sta MustCopyMainChr
 
@@ -4329,9 +4300,8 @@ AdaptBackgroundPaletteByTime:
 
 @regular_cave_check:
     lda LocationType
-    cmp #LOCATION_TYPE_CAVE
-    bne @calc ; if not in cave, we need to use lookup table to get certain fade level
-
+    cmp #LOCATION_TYPE_OUTDOORS
+    beq @calc ; if not in cave, we need to use lookup table to get certain fade level
 
     ldx #5 ; evening time index
     lda palette_fade_for_periods, x
@@ -4349,20 +4319,20 @@ AdaptBackgroundPaletteByTime:
     cmp #DAYTIME_NIGHT
     bne @not_night
     lda SongName
-    cmp #7
+    cmp #SONG_OUTSIDE_NIGHT
     beq @restoreFadeValue
     lda #1
     sta MustPlayNewSong
-    lda #7
+    lda #SONG_OUTSIDE_NIGHT
     sta SongName
     jmp @restoreFadeValue
 @not_night:
     lda SongName
-    cmp #0
+    cmp #SONG_OUTSIDE_DAY
     beq @restoreFadeValue
     lda #1
     sta MustPlayNewSong
-    lda #0
+    lda #SONG_OUTSIDE_DAY
     sta SongName
 
 @restoreFadeValue:
@@ -5400,7 +5370,7 @@ LoadTitle:
     beq @exit
 
 
-    lda #2
+    lda #SONG_TITLE
     sta SongName
     lda #1
     sta MustPlayNewSong
@@ -5449,7 +5419,7 @@ LoadGameOver:
 @cont:
     lda #1
     sta MustPlayNewSong
-    lda #3
+    lda #SONG_GAME_OVER
     sta SongName
 
     lda #0
@@ -6074,11 +6044,11 @@ LoadOutro:
     cmp #0
     bne @evilEnding
 
-    lda #9
+    lda #SONG_ENDING_GOOD
     sta SongName
     jmp @activateNewSong
 @evilEnding:
-    lda #8
+    lda #SONG_ENDING_EVIL
     sta SongName
 
 @activateNewSong:
@@ -6168,7 +6138,7 @@ LoadCheckPoint:
 
     lda #0
     sta BossAgitated
-    lda #7
+    lda #SONG_OUTSIDE_NIGHT
     sta SongName
     lda #1
     sta MustPlayNewSong
@@ -6246,10 +6216,9 @@ StartGame:
 
     jsr BuildRowTable
 
-    lda #0
+    lda #SONG_OUTSIDE_DAY
     sta SongName
     sta InitiateCompleteItemRespawn
-
 
     rts
 
@@ -6951,8 +6920,11 @@ ActivateTrigger:
     lda (pointer2), y
     tay
     lda Destructibles, y
-    bne @exit ; already switched on
+    bne @turnOff ; already switched on
     lda #1
+    jmp @changeTiles
+@turnOff:
+    lda #0
 @changeTiles:
     ldy #8
 @changeLoop:

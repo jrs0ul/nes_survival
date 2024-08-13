@@ -450,11 +450,9 @@ LoadIndoorMapData:
 
 @skipLoadingCHR:
 
-
-
     lda MustRestartIndoorsMusic
     beq @loadHouseStuff
-    lda #1
+    lda #SONG_INDOORS
     sta SongName
     sta MustPlayNewSong
     lda #0

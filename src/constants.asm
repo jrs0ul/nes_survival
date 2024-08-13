@@ -213,7 +213,7 @@
     LOCATION_PATH_TO_CRASHSITE = 18
     LOCATION_ALIEN_BASE_PRE    = 19
 
-    MAX_LOCATIONS              = 19
+    MAX_LOCATIONS              = 20
 
     MIN_SCREEN_COUNT_TO_UPDATE = 3
 
@@ -240,6 +240,17 @@
     FIRE_ANIMATION_DELAY       = $20
 
     COOKING_FUEL_COST          = 5
+
+    SONG_OUTSIDE_DAY           = 0
+    SONG_INDOORS               = 1
+    SONG_TITLE                 = 2
+    SONG_GAME_OVER             = 3
+    SONG_DEFEAT                = 4
+    SONG_BOSS                  = 5
+    SONG_OUTSIDE_NIGHT         = 6
+    SONG_ENDING_EVIL           = 7
+    SONG_ENDING_GOOD           = 8
+
 
     SFX_INVENTORY_FULL         = 4
 

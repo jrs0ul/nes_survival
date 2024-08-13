@@ -26,3 +26,23 @@ mod_tiles_alien_base_pre:
     .byte 8, $25, $70, 1, 11, 16, $DA, $AA
     .byte 8, $25, $8F, 1, 12, 15, $E9, $B9
     .byte 8, $25, $90, 1, 12, 16, $EA, $BA
+
+mod_tiles_scroll_alien_base_pre:
+    .byte 165
+    .byte 165
+    
+    .byte 165
+    .byte 165
+    
+    .byte 165
+    .byte 165
+
+    .byte 0
+    .byte 0
+    .byte 0
+    .byte 0
+
+    .byte 0
+    .byte 0
+    .byte 0
+    .byte 0

@@ -247,22 +247,17 @@ LoadOutsideMap:
     lda MustCopyMainChr
     beq @continueLoad ;nope we don't need to load CHR
 
+    lda LocationType
+    cmp #LOCATION_TYPE_CAVE
+    beq @load_cave
+    cmp #LOCATION_TYPE_DARK
+    beq @load_cave
+    cmp #LOCATION_TYPE_ALIEN_BASE
+    beq @load_alien
 
     lda LocationIndex
-    cmp #LOCATION_MINE
-    beq @load_cave
-    cmp #LOCATION_SECRET_CAVE
-    beq @load_cave
-    cmp #LOCATION_DARK_CAVE
-    beq @load_cave
-    cmp #LOCATION_DARK_CAVE2
-    beq @load_cave
     cmp #LOCATION_CRASHSITE
     beq @load_crashsite
-    cmp #LOCATION_ALIEN_BASE_LOBBY
-    beq @load_alien
-    cmp #LOCATION_ALIEN_BASE_PRE
-    beq @load_alien
     jmp @main_bank
 
 @load_alien:
