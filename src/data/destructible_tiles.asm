@@ -40,4 +40,4 @@ mod_tiles_count_by_location:
     .byte 0 ;16
     .byte 0 ;17
     .byte 0 ;18
-    .byte 14 ;19
+    .byte 18 ;19

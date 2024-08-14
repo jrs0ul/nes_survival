@@ -1281,7 +1281,7 @@ TempRegX:
 
 
 BSS_Free_Bytes:
-    .res 13
+    .res 12
 
 ;====================================================================================
 
@@ -1725,6 +1725,7 @@ noBankSwitch:
 .include "IntroCode.asm"
 .include "IndoorCode.asm"
 .include "SpriteUpdate.asm"
+.include "AlienBasePreSwitchesLogic.asm"
 ;-----------------------------------
 AnimateTitleTiles:
 
@@ -6847,7 +6848,7 @@ CheckB:
 
 @regularAttack:
 
-    jsr ActivateTrigger
+    jsr ActivateSwitch
 
     lda #PLAYER_ATTACK_DELAY
     sta AttackTimer
@@ -6862,123 +6863,25 @@ CheckB:
 
     rts
 ;----------------------------------
-;Activate a trigger by punching it
-ActivateTrigger:
+;Activate a switch by punching it
+ActivateSwitch:
     jsr CalcTileAddressInFrontOfPlayer
 
     lda LocationIndex
     ;TODO: compare with a list of trigger locations perhaps
     cmp #LOCATION_ALIEN_BASE_PRE
-    beq @cont
-    rts
+    bne @exit
 
-@cont:
+    ldy current_bank
+    sty oldbank
+    ldy #2
+    jsr bankswitch_y
 
-    asl
-    tay
-    lda mod_tiles_by_location, y
-    sta pointer2
-    iny
-    lda mod_tiles_by_location, y
-    sta pointer2 + 1
+    jsr SwitchesLogic ; bank 2
 
-    ldx #0
-@tileLoop:
+    ldy oldbank
+    jsr bankswitch_y
 
-    txa ;tile index * 8
-    asl
-    asl
-    asl
-    tay
-    iny
-    iny
-    iny ;at screen
-    lda ScrollX
-    cmp #128
-    bcs @addScreen
-    lda CurrentMapSegmentIndex
-    jmp @compare
-@addScreen:
-    lda CurrentMapSegmentIndex
-    clc
-    adc #1
-@compare:
-    cmp (pointer2), y
-    bne @nextDestructible
-    iny
-    lda (pointer2), y
-    sec
-    sbc #4
-    cmp TempY
-    bne @nextDestructible
-    iny
-    lda (pointer2), y
-    cmp TempX
-    bne @nextDestructible
-
-    cpx #6
-    bcc @exit
-    cpx #10
-    bcs @secondTrigger
-
-    ;paw trigger
-
-    dey ;row
-    dey ;screen
-    dey ;lo
-    dey ;hi
-    dey ;status idx
-    lda (pointer2), y
-    tay
-    lda Destructibles, y
-    bne @turnOff ; already switched on
-    lda #1
-    jmp @changeTiles
-@turnOff:
-    lda #0
-@changeTiles:
-    ldy #7
-@changeLoop:
-    sta Destructibles, y
-    dey
-    cpy #4
-    bcs @changeLoop
-    jmp @redraw
-
-@secondTrigger:
-
-    dey ;row
-    dey ;screen
-    dey ;lo
-    dey ;hi
-    dey ;status idx
-    lda (pointer2), y
-    tay
-    lda Destructibles, y
-    bne @turnOff2 ; already switched on
-    lda #1
-    jmp @changeTiles2
-@turnOff2:
-    lda #0
-@changeTiles2:
-    ldy #8
-    sta Destructibles, y
-
-
-
-@redraw:
-    lda #1
-    sta MustUpdateDestructibles
-    jmp @exit
-
-@nextDestructible:
-    inx
-    txa
-    ldy LocationIndex
-    cmp mod_tiles_count_by_location, y
-    bcs @exit
-
-    jmp @tileLoop
 
 @exit:
     rts
