@@ -6113,6 +6113,7 @@ LoadCheckPoint:
     sta LocationBankNo
     lda #0
     sta hadKnockBack
+    sta ModifiedTilesToDraw
     sta ProjectileCount ; reset projectiles
     sta SpearData       ; reset spear
     sta ScrollX

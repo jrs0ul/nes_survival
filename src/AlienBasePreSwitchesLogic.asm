@@ -1,85 +1,91 @@
 
 .segment "ROM2"
 
-Switch1Logic:
-     dey ;row
-    dey ;screen
-    dey ;lo
-    dey ;hi
-    dey ;status idx
-    lda (pointer2), y
-    tay
-    lda Destructibles, y
-    bne @turnOff ; already switched on
-    lda #1
-    jmp @changeTiles
-@turnOff:
-    lda #0
-@changeTiles:
-    ldy #7
-    sta Destructibles, y
+;destructible idx in y register
+SwitchPlate:
 
-    ldy #4 ; first lock
     lda Destructibles, y
-    beq @switchLock1On
+    beq @switchLockOn
     lda #0
     jmp @saveLock
-@switchLock1On:
+@switchLockOn:
     lda #1
 @saveLock:
     sta Destructibles, y
 
-    ldy #6 ;third lock
+    rts
+
+;---------------------------
+Switch1Logic:
+
+    ldy #7
+    jsr SwitchPlate
+
+    ldy #9
     lda Destructibles, y
-    beq @switchLock3On
-    lda #0
-    jmp @saveLock3
-@switchLock3On:
-    lda #1
-@saveLock3:
+    ldy #8
+    clc
+    adc Destructibles, y
+    cmp #0
+    beq @first_lock
+
+    lda Destructibles, y ;8
+    bne @third_lock
+    ;second lock
+    ldy #7
+    lda Destructibles, y
+    ldy #5
+    sta Destructibles, y
+    jmp @done
+
+@third_lock:
+    ldy #7
+    lda Destructibles, y
+    ldy #4
+    sta Destructibles, y
+    jmp @done
+
+@first_lock:
+    ldy #7
+    lda Destructibles, y
+    ldy #6
     sta Destructibles, y
 
+@done:
     rts
 ;------------------------
 Switch2Logic:
-    dey ;row
-    dey ;screen
-    dey ;lo
-    dey ;hi
-    dey ;status idx
-    lda (pointer2), y
-    tay
+    ldy #4
     lda Destructibles, y
-    bne @turnOff2 ; already switched on
-    lda #1
-    jmp @changeTiles2
-@turnOff2:
-    lda #0
-@changeTiles2:
+    ldy #7
+    sta Destructibles, y
+
     ldy #8
-    sta Destructibles, y
-
-    ldy #5 ;second switch
+    jsr SwitchPlate
     lda Destructibles, y
-    beq @switchLock2On
+    beq @done
+    ldy #9
     lda #0
-    jmp @changeSwitch2
-@switchLock2On:
-    lda #1
-@changeSwitch2:
     sta Destructibles, y
-
-    lda #6
-    lda Destructibles, y
-    beq @switchLock3On
-    lda #0
-    jmp @changeSwitch3
-@switchLock3On:
-    lda #1
-@changeSwitch3:
-    sta Destructibles, y
+@done:
     rts
+;------------------------
+Switch3Logic:
+    ldy #5
+    lda Destructibles, y
+    ldy #7
+    sta Destructibles, y
 
+    ldy #9
+    jsr SwitchPlate
+    lda Destructibles, y
+    beq @done
+    ldy #8
+    lda #0
+    sta Destructibles, y
+
+@done:
+    rts
 
 ;------------------------
 
@@ -147,43 +153,7 @@ SwitchesLogic:
 
 @thirdTrigger:
 
-    dey ;row
-    dey ;screen
-    dey ;lo
-    dey ;hi
-    dey ;status idx
-    lda (pointer2), y
-    tay
-    lda Destructibles, y
-    bne @turnOff3 ; already switched on
-    lda #1
-    jmp @changeTiles3
-@turnOff3:
-    lda #0
-@changeTiles3:
-    ldy #9
-    sta Destructibles, y
-
-    ldy #4
-    lda Destructibles, y
-    beq @turnSwitch1On
-    lda #0
-    jmp @saveLock1
-@turnSwitch1On:
-    lda #1
-@saveLock1:
-    sta Destructibles, y
-
-    ldy #5
-    lda Destructibles, y
-    beq @turnSwitch2On
-    lda #0
-    jmp @saveLock2
-@turnSwitch2On:
-    lda #1
-@saveLock2:
-    sta Destructibles, y
-
+   jsr Switch3Logic
 
 @redraw:
     lda #1
