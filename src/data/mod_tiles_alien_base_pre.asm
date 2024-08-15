@@ -52,7 +52,7 @@ mod_tiles_scroll_alien_base_pre:
     .byte 0
     .byte 0
 
-    .byte 0
-    .byte 0
-    .byte 0
-    .byte 0
+    .byte 230
+    .byte 230
+    .byte 230
+    .byte 230

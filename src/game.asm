@@ -2022,23 +2022,33 @@ UpdateModifiedTiles:
     bcs @nextTile ; current idx is less than targetScreen - 1
 @checkScroll:
 
-    sty TempNpcSpeed
-    ldy LocationIndex
-    lda mod_tiles_count_by_location, y
+    ;TODO: remove this scroll checking
+    lda DirectionX
+    cmp #1
+    bne @pass
+
+    jsr CheckModTileScroll
+    bcc @nextTile
+    ldy TempNpcSpeed
+    jmp @pass
+
+
+@continue: ;tile matches the current screen
+    iny ;y
+    iny ;x
+
+    lda (pointer2), y
     asl
     asl
     asl
     clc
-    adc LocationIndex
-    tay
-
-    lda ScrollX
-    cmp (pointer2), y
+    adc #8
+    cmp ScrollX
     bcc @nextTile
-    ldy TempNpcSpeed
 
-@continue:
-
+    dey ; y
+    dey ; screen
+@pass:
     dey ; address low
     dey ; address high
 
@@ -2116,6 +2126,23 @@ UpdateModifiedTiles:
     sta MustUpdateDestructibles
 
     rts
+;-------------------------------------------
+CheckModTileScroll:
+    sty TempNpcSpeed
+    ldy LocationIndex
+    lda mod_tiles_count_by_location, y
+    asl
+    asl
+    asl
+    clc
+    adc LocationIndex
+    tay
+
+    lda ScrollX
+    cmp (pointer2), y
+    
+    rts
+
 ;--------------------------------------------
 StoreModTileToDraw:
     lda (pointer2), y
@@ -4426,6 +4453,8 @@ WarmthLogics:
     beq @increaseWarmth
     cmp #LOCATION_TYPE_VILLAGER
     beq @ignoreFuel
+    cmp #LOCATION_TYPE_ALIEN_BASE
+    beq @exit
     jmp @decreaseWarmth
 @increaseWarmth:
     lda Fuel
@@ -4963,6 +4992,7 @@ CalcMapColumnToUpdate:
 
     lda #1
     sta MustUpdateMapColumn
+    sta MustUpdateDestructibles
 
 @attr:
     lda BgColumnIdxToUpload
