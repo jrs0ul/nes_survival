@@ -3363,6 +3363,8 @@ RoutinesAfterFadeOut:
     sta pointer
     lda #>Hut_npcs_night
     sta pointer + 1
+    lda #0
+    sta NpcCount
     jsr LoadNpcs
     jmp @next2
 
@@ -3584,6 +3586,8 @@ RoutinesAfterFadeOut:
     sta pointer
     lda #>boss_npcs
     sta pointer + 1
+    lda #0
+    sta NpcCount
     jsr LoadNpcs
 
 
