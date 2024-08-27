@@ -1,9 +1,9 @@
 ;-------------------------------------
 ;Load Items from ROM data to RAM
-;pointer points to the items data
+;ItemListPtr points to the items data
 LoadItems:
     ldy #0
-    lda (pointer), y
+    lda (ItemListPtr), y
     sta ItemCount
     lda ItemCount
     beq @exit   ; no items
@@ -44,7 +44,7 @@ LoadItems:
     iny
 
 
-    lda (pointer), y ; id + status
+    lda (ItemListPtr), y ; id + status
     dey
     sta Items, y
 
@@ -68,17 +68,17 @@ LoadItems:
 
     iny
     iny
-    lda (pointer), y ; screen
+    lda (ItemListPtr), y ; screen
     dey
     sta Items, y
     iny
     iny
-    lda (pointer), y
+    lda (ItemListPtr), y
     dey
     sta Items, y
     iny
     iny
-    lda (pointer), y
+    lda (ItemListPtr), y
     dey
     sta Items, y
     jmp @decrementItemIndex

@@ -485,24 +485,27 @@ LocationsWithRespawnableItems:
     .byte 0 ; 18
     .byte 0 ; 19
 
+item_list_empty:
+    .byte 0
+
 LocationItems:
     .byte  <Outside1_items,        >Outside1_items              ; 0
     .byte  <Outside2_items,        >Outside2_items              ; 1
     .byte  <Outside3_items,        >Outside3_items              ; 2
-    .byte  <House_items,           >House_items                 ; 3 Bjorn's house
-    .byte  <House_items,           >House_items                 ; 4 Player's house
-    .byte  <House_items,           >House_items                 ; 5 Erika
-    .byte  <Cave_items,            >Cave_items                  ; 6 cave
+    .byte  <item_list_empty,       >item_list_empty             ; 3 Bjorn's house
+    .byte  <item_list_empty,       >item_list_empty             ; 4 Player's house
+    .byte  <item_list_empty,       >item_list_empty             ; 5 Erika
+    .byte  <Cave_items,            >Cave_items                  ; 6 mine
     .byte  <Crashsite_items,       >Crashsite_items             ; 7 crashsite
     .byte  <granny_location_items, >granny_location_items       ; 8 granny location
-    .byte  <House_items,           >House_items                 ; 9 granny's hut
-    .byte  <House_items,           >House_items                 ; 10 alien base
+    .byte  <item_list_empty,       >item_list_empty             ; 9 granny's hut
+    .byte  <item_list_empty,       >item_list_empty             ; 10 alien base
     .byte  <mine_location_items,   >mine_location_items         ; 11 location where cave is
-    .byte  <House_items,           >House_items                 ; 12 boss room
-    .byte  <House_items,           >House_items                 ; 13 dark cave
+    .byte  <item_list_empty,       >item_list_empty             ; 12 boss room
+    .byte  <item_list_empty,       >item_list_empty             ; 13 dark cave
     .byte  <secret_cave_items,     >secret_cave_items           ; 14 secret cave
-    .byte  <House_items,           >House_items                 ; 15 mine room
+    .byte  <item_list_empty,       >item_list_empty             ; 15 mine room
     .byte  <dark_cave_2_items,     >dark_cave_2_items           ; 16 dark cave extension
-    .byte  <House_items,           >House_items                 ; 17 alien base lobby
-    .byte  <House_items,           >House_items                 ; 18 path to crashsite
-    .byte  <House_items,           >House_items                 ; 19 pre alien base location
+    .byte  <item_list_empty,       >item_list_empty             ; 17 alien base lobby
+    .byte  <item_list_empty,       >item_list_empty             ; 18 path to crashsite
+    .byte  <item_list_empty,       >item_list_empty             ; 19 pre alien base location

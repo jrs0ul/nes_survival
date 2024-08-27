@@ -63,7 +63,7 @@ intro_tiles_chr   :  .incbin "intro.lz4"
 .include "data/maps/cropped/pre_alien_base1_crop.asm"
 .include "data/maps/cropped/pre_alien_base2_crop.asm"
 .include "data/mod_tiles_alien_base_pre.asm"
-
+.include "data/item_list_crashsite.asm"
 
 ;============================================================
 .segment "ROM3" ; indoors
@@ -100,6 +100,9 @@ alien_sprites_chr: .incbin "alien_sprites.lz4"
 .include "data/mod_tiles_secret_cave.asm"
 .include "data/mod_tiles_mine.asm"
 .include "data/mod_tiles_alien_base.asm"
+.include "data/item_list_dark_cave2.asm"
+.include "data/item_list_secret_cave.asm"
+.include "data/item_list_mine.asm"
 
 
 
@@ -158,6 +161,10 @@ game_over_sprites:
 .include "data/maps/cropped/location_with_cave2_crop.asm"
 .include "data/maps/cropped/location_with_cave3_crop.asm"
 
+.include "data/item_list_mine_location.asm"
+.include "data/item_list_granny_location.asm"
+.include "data/item_list_outside2.asm"
+
 ;=============================================================
 .segment "ROM6"
 FAMISTUDIO_DPCM_OFF = $FBBA
@@ -184,7 +191,6 @@ banktable:              ; Write to this table to switch banks.
 .include "data/item_data.asm"
 .include "data/npc_data.asm"
 
-.include "data/item_list.asm" ;items in maps
 .include "data/npc_list.asm"  ;npcs in maps
 
 
@@ -367,8 +373,11 @@ TextPtr:
     .res 2
 DigitPtr:
     .res 2
+
 IntroSpritePtr:
     .res 2
+ItemListPtr = IntroSpritePtr
+
 IntroSpriteCoordPtr:
     .res 2
 pointer2:
@@ -3873,19 +3882,17 @@ CommonLocationRoutine:
     asl
     tay
     lda LocationItems, y
-    sta pointer
+    sta ItemListPtr
     iny
     lda LocationItems, y
-    sta pointer + 1
+    sta ItemListPtr + 1
 
-    jsr LoadItems
     ldy TempY
 
     iny
     lda (pointer2), y ;rom bank for the location
     sta LocationBankNo
 
-;@continue:
     iny
     lda (pointer2), y ; scroll X
     sta ScrollX
@@ -3949,6 +3956,8 @@ CommonLocationRoutine:
 
     ldy LocationBankNo
     jsr bankswitch_y
+
+    jsr LoadItems
 
     lda #0
     sta ScrollDirection
@@ -6160,9 +6169,9 @@ LoadCheckPoint:
     jsr bankswitch_y
 
     lda #<Cave_items
-    sta pointer
+    sta ItemListPtr
     lda #>Cave_items
-    sta pointer + 1
+    sta ItemListPtr + 1
     jsr LoadItems
 
     lda #<alien_palette
@@ -6210,9 +6219,9 @@ StartGame:
 
 
     lda #<Outside1_items
-    sta pointer
+    sta ItemListPtr
     lda #>Outside1_items
-    sta pointer + 1
+    sta ItemListPtr + 1
     jsr LoadItems
 
     lda #NUM_OF_BUNNIES_BEFORE_DOG

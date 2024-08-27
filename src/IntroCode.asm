@@ -913,7 +913,7 @@ UpdateGameOverSprites:
     cmp #2
     bne @cont2
 
-    lda #5
+    lda #SONG_DEFEAT
     sta SongName
     lda #1
     sta MustPlayNewSong
