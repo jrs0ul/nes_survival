@@ -64,6 +64,7 @@ intro_tiles_chr   :  .incbin "intro.lz4"
 .include "data/maps/cropped/pre_alien_base2_crop.asm"
 .include "data/mod_tiles_alien_base_pre.asm"
 .include "data/item_list_crashsite.asm"
+.include "data/item_list_alien_puzzle.asm"
 
 ;============================================================
 .segment "ROM3" ; indoors
@@ -1126,6 +1127,8 @@ Item_Location15_Collection_times:
     .res ITEM_COUNT_LOC15
 Item_Location17_Collection_times:
     .res ITEM_COUNT_LOC17
+Item_Location19_Collection_times:
+    .res ITEM_COUNT_LOC19
 
 
 Npcs:   ;animals and stuff
@@ -1290,7 +1293,7 @@ TempRegX:
 
 
 BSS_Free_Bytes:
-    .res 12
+    .res 9
 
 ;====================================================================================
 

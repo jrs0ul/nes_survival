@@ -329,6 +329,7 @@
     ITEM_COUNT_LOC12           = 6 ; location where the mine entrance is
     ITEM_COUNT_LOC15           = 5 ; secret cave
     ITEM_COUNT_LOC17           = 6 ; dark cave 2
+    ITEM_COUNT_LOC19           = 3 ; Alien base + puzzle
 
     ONE_TIME_ITEM_COUNT        = ITEM_COUNT_LOC15 + ITEM_COUNT_LOC8 + ITEM_COUNT_LOC7
 
