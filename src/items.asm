@@ -443,11 +443,13 @@ ResetTimesWhenItemsWerePicked:
     iny
     lda LocationItems, y
     sta pointer + 1
+
+    ldy TempPointY
     lda LocationBanks, y
     tay
     jsr bankswitch_y
-
     ldy TempPointY
+
     lda InitiateCompleteItemRespawn
     bne @location_loop
     lda LocationsWithRespawnableItems, y
