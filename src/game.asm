@@ -246,8 +246,8 @@ game_over_palette:
     .byte $0f,$30,$30,$30,$0f,$10,$10,$10,$0f,$30,$30,$30,$0f,$30,$30,$30
 
 
-sprites:
-    .byte $1A, $00, %00000011, $01  ; sprite 0 
+zero_sprite:
+    .byte $16, $00, %00000011, $FA  ; sprite 0 
 
 knife_sprite_data:
     .byte 8,  $29, %00000000, 248 ; left (248 = -8)
@@ -1619,9 +1619,26 @@ otherState:
     jmp UpdatePalette
 checkTitleState:
     cmp #STATE_TITLE
-    bne UpdatePalette
+    bne checkMenuStateUpdate
 
     jsr AnimateTitleTiles
+checkMenuStateUpdate:
+    cmp #STATE_MENU
+    bne UpdatePalette
+
+    ;lda #0
+    ;sta $2001
+
+    lda $2002
+    lda FirstNametableAddr
+    clc
+    adc #$02
+    sta $2006
+    lda #$79
+    sta $2006
+
+    jsr UpdateSunMoonTiles
+
 
 
 UpdatePalette:
@@ -1688,10 +1705,10 @@ WaitSprite0:
     and #%01000000
     beq WaitSprite0      ; wait until sprite 0 is hit
 
-    ldx #16
-WaitScanline:
-    dex
-    bne WaitScanline
+;    ldx #1
+;WaitScanline:
+;    dex
+;    bne WaitScanline
 
 justScroll:
     lda ScrollX
@@ -5274,6 +5291,13 @@ UpdateStatusDigits:
     lda #$5B
     sta $2006
 
+    jsr UpdateSunMoonTiles
+@exit:
+    rts
+
+;-----------------------------------
+;Must put the address of the time indicator into $2006
+UpdateSunMoonTiles:
     lda Hours
     lsr
     lsr
@@ -5297,7 +5321,7 @@ UpdateStatusDigits:
     lda #0
     sta MustUpdateSunMoon
 
-@exit:
+
     rts
 
 ;-----------------------------------
@@ -7908,7 +7932,7 @@ LoadInteriorMap:
 initZeroSprite:
     ldx #$00
 spriteLoadLoop:
-    lda sprites, x
+    lda zero_sprite, x
     sta FIRST_SPRITE - 4, x
     inx
     cpx #4

@@ -241,7 +241,7 @@ TestPointAgainstCollisionMapHero:
     jsr CalculateXYCellsForCollision
     bne @collides ;already colliding
 
-    jsr IsCollidingWithADestructedTile
+    jsr IsCollidingWithAModifiedTile
     cpx #1
     beq @compare
 
@@ -278,7 +278,7 @@ IfCollidingWithLockedDoor:
 ;-----------------------------
 ;puts 1 into register X if the cell intersects with destructed tile
 ;tile value is in register A
-IsCollidingWithADestructedTile:
+IsCollidingWithAModifiedTile:
 
     lda LocationIndex
     tax

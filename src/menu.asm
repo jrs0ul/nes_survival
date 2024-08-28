@@ -133,6 +133,7 @@ UpdateMenuGfx:
     jsr DrawSleepMessage
     jsr ClearSubMenu
 
+    
     lda menuTileTransferRowIdx
     bne @exit ; not finished updating gfx
     lda #0
