@@ -602,46 +602,23 @@ DrawDocument:
     sta MustDrawDocument
     sta menuTileTransferRowIdx
 
-    lda $2002
-    lda FirstNametableAddr
-    clc
-    adc #3
-    sta $2006
-    lda #$D4
-    sta $2006
-    lda #09
-    sta $2007
+    ldy #0
+@attributeLoop:
 
     lda $2002
     lda FirstNametableAddr
     clc
-    adc #3
+    adc document_attributes, y
     sta $2006
-    lda #$DC
+    iny
+    lda document_attributes, y
     sta $2006
-    lda #0
+    iny
+    lda document_attributes, y
     sta $2007
-
-    lda $2002
-    lda FirstNametableAddr
-    clc
-    adc #3
-    sta $2006
-    lda #$E4
-    sta $2006
-    lda #0
-    sta $2007
-
-    lda $2002
-    lda FirstNametableAddr
-    clc
-    adc #3
-    sta $2006
-    lda #$EC
-    sta $2006
-    lda #$50
-    sta $2007
-
+    iny
+    cpy #18
+    bcc @attributeLoop
 
 @exit:
     rts
@@ -1266,18 +1243,12 @@ ClearSubMenu:
     lda #12
     sta TempPointY
 
-    lda #1
-    sta RepeatSameRowInTransfer
-
     lda #<PopUpMenuClear
     sta pointer
     lda #>PopUpMenuClear
     sta pointer + 1
     jsr TransferTiles
     beq @exit
-
-    lda #0
-    sta RepeatSameRowInTransfer
 
 
     lda #0
@@ -1290,46 +1261,24 @@ ClearSubMenu:
     lda #1
     sta DocumentJustClosed
 
-    lda $2002
-    lda FirstNametableAddr
-    clc
-    adc #3
-    sta $2006
-    lda #$D4
-    sta $2006
-    lda #$19
-    sta $2007
+    ldy #0
+@attributeLoop:
 
     lda $2002
     lda FirstNametableAddr
     clc
-    adc #3
+    adc bg_attributes_after_clear, y
     sta $2006
-    lda #$DC
+    iny
+    lda bg_attributes_after_clear, y
     sta $2006
-    lda #$11
+    iny
+    lda bg_attributes_after_clear, y
     sta $2007
+    iny
+    cpy #18
+    bcc @attributeLoop
 
-    lda $2002
-    lda FirstNametableAddr
-    clc
-    adc #3
-    sta $2006
-    lda #$E4
-    sta $2006
-    lda #$11
-    sta $2007
-
-    lda $2002
-    lda FirstNametableAddr
-    clc
-    adc #3
-    sta $2006
-    lda #$EC
-    sta $2006
-    lda #$51
-    sta $2007
-    
 @exit:
     rts
 ;----------------------------------
@@ -1418,7 +1367,7 @@ UpdateMenuStats:
     clc
     adc #1
     sta $2006
-    lda #$DB
+    lda #$FB
     sta $2006
 
 
