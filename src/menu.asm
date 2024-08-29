@@ -1398,10 +1398,10 @@ UpdateMenuStats:
     clc
     adc #1
     sta $2006
-    lda #$D6
+    lda #$F4
     sta $2006
 
-    ldy #8
+    ldy #10
 @hideFuelLoop:
 
     lda #0

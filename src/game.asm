@@ -1626,15 +1626,13 @@ checkMenuStateUpdate:
     cmp #STATE_MENU
     bne UpdatePalette
 
-    ;lda #0
-    ;sta $2001
 
     lda $2002
     lda FirstNametableAddr
     clc
     adc #$02
     sta $2006
-    lda #$79
+    lda #$9A
     sta $2006
 
     jsr UpdateSunMoonTiles
