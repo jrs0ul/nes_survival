@@ -40,6 +40,9 @@ LoadMenu:
 
     jsr ResetMenuVars
 
+    lda #1
+    sta MustUpdateSunMoon
+
     lda #0
     sta MustUpdatePalette
     sta MustLoadSomething
@@ -1243,10 +1246,24 @@ ClearSubMenu:
     lda #12
     sta TempPointY
 
-    lda #<PopUpMenuClear
+
+    lda LocationType
+    cmp #LOCATION_TYPE_HOUSE
+    bne @ClearOutdoor
+
+    lda #<PopUpMenuClear_Home
     sta pointer
-    lda #>PopUpMenuClear
+    lda #>PopUpMenuClear_Home
     sta pointer + 1
+    jmp @transfer
+
+@ClearOutdoor:
+    lda #<PopUpMenuClear_Outside
+    sta pointer
+    lda #>PopUpMenuClear_Outside
+    sta pointer + 1
+@transfer:
+
     jsr TransferTiles
     beq @exit
 
@@ -1260,6 +1277,7 @@ ClearSubMenu:
 
     lda #1
     sta DocumentJustClosed
+
 
     ldy #0
 @attributeLoop:
@@ -1908,6 +1926,8 @@ CraftFromSelectedComponents:
     lda #CRAFTING_TIME
     sta ParamTimeValue
     jsr SkipTime
+    lda #1
+    sta MustUpdateSunMoon
 
 
 @exit:
@@ -3653,6 +3673,8 @@ DoCooking:
 
     ldx TempPush
 
+    lda #1
+    sta MustUpdateSunMoon
 
     rts
 

@@ -1627,6 +1627,8 @@ checkMenuStateUpdate:
     bne UpdatePalette
 
 
+    lda MustUpdateSunMoon
+    beq UpdatePalette
     lda $2002
     lda FirstNametableAddr
     clc
@@ -1636,7 +1638,6 @@ checkMenuStateUpdate:
     sta $2006
 
     jsr UpdateSunMoonTiles
-
 
 
 UpdatePalette:
@@ -1702,11 +1703,6 @@ WaitSprite0:
     lda $2002
     and #%01000000
     beq WaitSprite0      ; wait until sprite 0 is hit
-
-;    ldx #1
-;WaitScanline:
-;    dex
-;    bne WaitScanline
 
 justScroll:
     lda ScrollX
