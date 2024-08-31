@@ -1737,21 +1737,9 @@ doNpcAI:
 FetchNpcVars:
     lda Npcs, x
     and #NPC_DAMAGED_BIT
-    beq @not_damaged
-    lda #1
-    jmp @cont
-@not_damaged:
-    lda #0
-@cont:
     sta TempNpcDamaged
     lda Npcs, x
     and #NPC_AGITATION_BIT
-    beq @not_agitated
-    lda #1
-    jmp @agicont
-@not_agitated:
-    lda #0
-@agicont:
     sta TempNpcAgitated
 
     lda Npcs, x ;type & status

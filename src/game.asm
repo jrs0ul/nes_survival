@@ -2811,8 +2811,7 @@ ScreenFilter:
 @skipPrev:
     lda CurrentMapSegmentIndex
     cmp NextItemMapScreenIndex
-    bcs @disable
-    jmp @exit
+    bcc @exit
 
 @disable:
     lda #1
