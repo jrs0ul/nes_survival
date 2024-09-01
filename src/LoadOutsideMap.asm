@@ -303,8 +303,6 @@ LoadOutsideMap:
 
 @main_bank:
     jsr LoadMainTileset
-    lda #1
-    sta MustPlayNewSong
 
 @done_copying:
     lda #0

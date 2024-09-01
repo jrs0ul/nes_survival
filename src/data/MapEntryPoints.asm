@@ -148,7 +148,7 @@ entry_points_loc19:
 ;LocationIndex,
 ;ScreenCount,
 ;LocationType, e.g. LOCATION_TYPE_OUTDOORS, LOCATION_TYPE_CAVE etc.
-;UNUSED,
+;SongName,
 ;location bank number
 ;scroll X
 ;active screen
@@ -162,156 +162,155 @@ entry_points_loc19:
 
 MapSpawnPoint:
     ;Entry to player's house from outside
-    .byte 128, 152, 4, 1, LOCATION_TYPE_HOUSE, UNUSED, 0, 0, 0
-    .byte 1, <house_palette, >house_palette, 0, <House_npcs, >House_npcs, 0
+    .byte 128, 152, 4, 1, LOCATION_TYPE_HOUSE, SONG_INDOORS, 0, 0, 0
+    .byte UNUSED, <house_palette, >house_palette, 0, <House_npcs, >House_npcs, 0
     ;Second location entry point
-    .byte 80, 208, 1, OUTDOORS_LOC2_SCREEN_COUNT, LOCATION_TYPE_OUTDOORS, UNUSED, 5, 0, 0
-    .byte 0, <main_palette, >main_palette, 3, 0, 0, 0
+    .byte 80, 208, 1, OUTDOORS_LOC2_SCREEN_COUNT, LOCATION_TYPE_OUTDOORS, SONG_OUTSIDE_DAY, 5, 0, 0
+    .byte UNUSED, <main_palette, >main_palette, 3, 0, 0, 0
     ;Third location entry point
-    .byte 100, 48, 2, OUTDOORS_LOC3_SCREEN_COUNT, LOCATION_TYPE_OUTDOORS, UNUSED, 0, 0, 0
-    .byte 0, <main_palette, >main_palette, 2, 0, 0, 0
+    .byte 100, 48, 2, OUTDOORS_LOC3_SCREEN_COUNT, LOCATION_TYPE_OUTDOORS, SONG_OUTSIDE_DAY, 0, 0, 0
+    .byte UNUSED, <main_palette, >main_palette, 2, 0, 0, 0
     ;granny location
-    .byte 77, 42, 8, OUTDOORS_LOC9_SCREEN_COUNT, LOCATION_TYPE_OUTDOORS, UNUSED, 5,  0, 0
-    .byte 0, <main_palette, >main_palette, 2, 0, 0, 0
+    .byte 77, 42, 8, OUTDOORS_LOC9_SCREEN_COUNT, LOCATION_TYPE_OUTDOORS, SONG_OUTSIDE_DAY, 5,  0, 0
+    .byte UNUSED, <main_palette, >main_palette, 2, 0, 0, 0
     ;---------------------
     ;Bear's house entrance
-    .byte 128, 136, 3, 1, LOCATION_TYPE_VILLAGER, UNUSED, 5, 0, 0
-    .byte 1, <house_palette, >house_palette, 0, <Hut_npcs, >Hut_npcs, 0
+    .byte 128, 136, 3, 1, LOCATION_TYPE_VILLAGER, SONG_INDOORS, 5, 0, 0
+    .byte UNUSED, <house_palette, >house_palette, 0, <Hut_npcs, >Hut_npcs, 0
     ;Exit point of second location
-    .byte 128, 32, 0, OUTDOORS_LOC1_SCREEN_COUNT, LOCATION_TYPE_OUTDOORS, UNUSED, 0, 0, OUTDOORS_LOC1_SCREEN_COUNT - 1
-    .byte 0, <main_palette, >main_palette, 3, 0, 0, 3
+    .byte 128, 32, 0, OUTDOORS_LOC1_SCREEN_COUNT, LOCATION_TYPE_OUTDOORS, SONG_OUTSIDE_DAY, 0, 0, OUTDOORS_LOC1_SCREEN_COUNT - 1
+    .byte UNUSED, <main_palette, >main_palette, 3, 0, 0, 3
     ;entrance to mine location
-    .byte 119, 210, 11, OUTDOORS_LOC12_SCREEN_COUNT, LOCATION_TYPE_OUTDOORS, UNUSED, 5, 160, 2
-    .byte 0, <main_palette, >main_palette, 2, 0, 0, 3
+    .byte 119, 210, 11, OUTDOORS_LOC12_SCREEN_COUNT, LOCATION_TYPE_OUTDOORS, SONG_OUTSIDE_DAY, 5, 160, 2
+    .byte UNUSED, <main_palette, >main_palette, 2, 0, 0, 3
     ;-----------------
     ;Exit point of third location
-    .byte 120, 209, 0, OUTDOORS_LOC1_SCREEN_COUNT, LOCATION_TYPE_OUTDOORS, UNUSED, 0, 103, 1
-    .byte 0, <main_palette, >main_palette, 3, 0, 0, 1
+    .byte 120, 209, 0, OUTDOORS_LOC1_SCREEN_COUNT, LOCATION_TYPE_OUTDOORS, SONG_OUTSIDE_DAY, 0, 103, 1
+    .byte UNUSED, <main_palette, >main_palette, 3, 0, 0, 1
     ;Second villager's house
-    .byte 128, 136, 5, 1, LOCATION_TYPE_VILLAGER, UNUSED, 0, 0, 0
-    .byte 1, <house_palette, >house_palette, 0, <villager2_npcs, >villager2_npcs, 0
+    .byte 128, 136, 5, 1, LOCATION_TYPE_VILLAGER, SONG_INDOORS, 0, 0, 0
+    .byte UNUSED, <house_palette, >house_palette, 0, <villager2_npcs, >villager2_npcs, 0
     ;------------------
     ;Bjorn's house exit
-    .byte $76, $80, 1, OUTDOORS_LOC2_SCREEN_COUNT, LOCATION_TYPE_OUTDOORS, UNUSED, 5, $B8, 0
-    .byte 0, <main_palette, >house_palette, 3, 0, 0, 1
+    .byte $76, $80, 1, OUTDOORS_LOC2_SCREEN_COUNT, LOCATION_TYPE_OUTDOORS, SONG_INDOORS, 5, $B8, 0
+    .byte UNUSED, <main_palette, >house_palette, 3, 0, 0, 1
     ;-----------------
     ;Player's house exit
-    .byte 72, 120, 0, OUTDOORS_LOC1_SCREEN_COUNT, LOCATION_TYPE_OUTDOORS, UNUSED, 0, 0, 0
-    .byte 0, <main_palette, >main_palette, 3, 0, 0, 0
+    .byte 72, 120, 0, OUTDOORS_LOC1_SCREEN_COUNT, LOCATION_TYPE_OUTDOORS, SONG_OUTSIDE_DAY, 0, 0, 0
+    .byte UNUSED, <main_palette, >main_palette, 3, 0, 0, 0
     ;-----------------
     ;Second villager house's exit
-    .byte 119, 151, 2, OUTDOORS_LOC3_SCREEN_COUNT, LOCATION_TYPE_OUTDOORS, UNUSED, 0, 128, 0
-    .byte 0, <main_palette, >main_palette, 2, 0, 0, 0
+    .byte 119, 151, 2, OUTDOORS_LOC3_SCREEN_COUNT, LOCATION_TYPE_OUTDOORS, SONG_OUTSIDE_DAY, 0, 128, 0
+    .byte UNUSED, <main_palette, >main_palette, 2, 0, 0, 0
     ;---------------
     ;The abandoned mine
     ;---------------
     ;entrance to place where the plane is
-    .byte 120, 210, 7, OUTDOORS_LOC8_SCREEN_COUNT, LOCATION_TYPE_OUTDOORS, UNUSED, 2, 121, 1
+    .byte 120, 210, 7, OUTDOORS_LOC8_SCREEN_COUNT, LOCATION_TYPE_OUTDOORS, SONG_OUTSIDE_DAY, 2, 121, 1
     .byte UNUSED, <main_palette, >main_palette, 0, 0, 0, 0
     ;exit to mine entrance location
-    .byte 119, 63, 11, OUTDOORS_LOC12_SCREEN_COUNT, LOCATION_TYPE_OUTDOORS, UNUSED, 5, 24, 2
+    .byte 119, 63, 11, OUTDOORS_LOC12_SCREEN_COUNT, LOCATION_TYPE_OUTDOORS, SONG_OUTSIDE_DAY, 5, 24, 2
     .byte UNUSED, <main_palette, >main_palette, 2, 0, 0, 2
     ;dark cave entrance
-    .byte 15, 50, 13, 2, LOCATION_TYPE_DARK, UNUSED, 4, 0, 0
+    .byte 15, 50, 13, 2, LOCATION_TYPE_DARK, SONG_OUTSIDE_NIGHT, 4, 0, 0
     .byte UNUSED, <main_palette, >main_palette, 3, <dark_cave_npcs, >dark_cave_npcs, 0
     ;alien base entrance top
-    .byte 15, 90, 10, 2, LOCATION_TYPE_ALIEN_BASE, UNUSED, 4, 0, 0
+    .byte 15, 90, 10, 2, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 4, 0, 0
     .byte UNUSED, <alien_palette, >alien_palette, 0, <alien_base_npcs, >alien_base_npcs, 0
     ;Mine room entrance
-    .byte 120, 152, 15, 1, LOCATION_TYPE_HOUSE, UNUSED, 0, 0, 0
+    .byte 120, 152, 15, 1, LOCATION_TYPE_HOUSE, SONG_INDOORS, 0, 0, 0
     .byte UNUSED, <house_palette, >house_palette, 0, <House_npcs, >House_npcs, 0
     ;---------------------
     ;crashsite exit to cave
-    .byte 120, 34, 6, OUTDOORS_LOC7_SCREEN_COUNT, LOCATION_TYPE_CAVE, UNUSED, 4, 192, 0
-    .byte 0, <main_palette, >main_palette, 0, <cave_npcs, >cave_npcs, 0
+    .byte 120, 34, 6, OUTDOORS_LOC7_SCREEN_COUNT, LOCATION_TYPE_CAVE, SONG_OUTSIDE_NIGHT, 4, 192, 0
+    .byte UNUSED, <main_palette, >main_palette, 0, <cave_npcs, >cave_npcs, 0
     ;crashsite exit to path
-    .byte 120, 50, 18, 1, LOCATION_TYPE_OUTDOORS, UNUSED, 0, 0, 0
-    .byte 0, <main_palette, >main_palette, 0, 0, 0, 0
+    .byte 120, 50, 18, 1, LOCATION_TYPE_OUTDOORS, SONG_OUTSIDE_DAY, 0, 0, 0
+    .byte UNUSED, <main_palette, >main_palette, 0, 0, 0, 0
     ;---------------------
     ;exit from granny's location to main
-    .byte 127, 205, 0, OUTDOORS_LOC1_SCREEN_COUNT, LOCATION_TYPE_OUTDOORS, UNUSED, 0, 0, OUTDOORS_LOC1_SCREEN_COUNT - 1
+    .byte 127, 205, 0, OUTDOORS_LOC1_SCREEN_COUNT, LOCATION_TYPE_OUTDOORS, SONG_OUTSIDE_DAY, 0, 0, OUTDOORS_LOC1_SCREEN_COUNT - 1
     .byte UNUSED, <main_palette, >main_palette, 3, 0, 0, 3
     ;granny's house
-    .byte 123, 148, 9, 1, LOCATION_TYPE_VILLAGER, UNUSED, 0, 0, 0
+    .byte 123, 148, 9, 1, LOCATION_TYPE_VILLAGER, SONG_INDOORS, 0, 0, 0
     .byte UNUSED, <house_palette, >house_palette, 0, <villager3_npcs, >villager3_npcs, 0
     ;secret cave
-    .byte 127, 209, 14, 1, LOCATION_TYPE_DARK, UNUSED, 4, 0, 0
+    .byte 127, 209, 14, 1, LOCATION_TYPE_DARK, SONG_OUTSIDE_NIGHT, 4, 0, 0
     .byte UNUSED, <main_palette, >main_palette, 0, 0, 0, 0
     ;--------------------
     ;granny's house exit to the location 8
-    .byte 119, 126, 8, OUTDOORS_LOC9_SCREEN_COUNT, LOCATION_TYPE_OUTDOORS, UNUSED, 5, 154, 0
+    .byte 119, 126, 8, OUTDOORS_LOC9_SCREEN_COUNT, LOCATION_TYPE_OUTDOORS, SONG_OUTSIDE_NIGHT, 5, 154, 0
     .byte UNUSED, <main_palette, >main_palette, 2, 0, 0, 0
     ;------------
     ;alien base exit top
-    .byte 200, 50, 6, OUTDOORS_LOC7_SCREEN_COUNT, LOCATION_TYPE_CAVE, UNUSED, 4, 0, 2
+    .byte 200, 50, 6, OUTDOORS_LOC7_SCREEN_COUNT, LOCATION_TYPE_CAVE, SONG_OUTSIDE_NIGHT, 4, 0, 2
     .byte UNUSED, <main_palette, >main_palette, 0, <cave_npcs, >cave_npcs, 0
     ;alien base exit to pre-alien base
-    .byte 45, 38, 19, 3, LOCATION_TYPE_ALIEN_BASE, UNUSED, 2, 0, 0
+    .byte 45, 38, 19, 3, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 2, 0, 0
     .byte UNUSED, <alien_palette, >alien_palette, 0, 0, 0, 0
     ;boss room entrance
-    .byte 20, 120, 12, 1, LOCATION_TYPE_VILLAGER, UNUSED, 6, 0, 0
+    .byte 20, 120, 12, 1, LOCATION_TYPE_VILLAGER, SONG_BOSS, 6, 0, 0
     .byte UNUSED, <alien_palette, >alien_palette, 0, 0, 0, 0
     ;--------------
     ;A location with the mine entrance
     ;--------------
     ;exit from cave location to bjorn's location
-    .byte 135, 38, 1, OUTDOORS_LOC2_SCREEN_COUNT, LOCATION_TYPE_OUTDOORS, UNUSED, 5, 0, 0
+    .byte 135, 38, 1, OUTDOORS_LOC2_SCREEN_COUNT, LOCATION_TYPE_OUTDOORS, SONG_OUTSIDE_DAY, 5, 0, 0
     .byte UNUSED, <main_palette, >main_palette, 3, 0, 0, 0
     ;cave entrance
-    .byte 120, 207, 6, OUTDOORS_LOC7_SCREEN_COUNT, LOCATION_TYPE_CAVE, UNUSED, 4, 222, 0
+    .byte 120, 207, 6, OUTDOORS_LOC7_SCREEN_COUNT, LOCATION_TYPE_CAVE, SONG_OUTSIDE_NIGHT, 4, 222, 0
     .byte UNUSED, <main_palette, >main_palette, 0, <cave_npcs, >cave_npcs, 0
     ;entrance to the path to the crashsite
-    .byte 120, 180, 18, 1, LOCATION_TYPE_OUTDOORS, UNUSED, 0, 0, 0
+    .byte 120, 180, 18, 1, LOCATION_TYPE_OUTDOORS, SONG_OUTSIDE_NIGHT, 0, 0, 0
     .byte UNUSED, <main_palette, >main_palette, 0, 0, 0, 0
     ;---------------
     ;boss room exit
-    .byte 223, 120, 10, 2, LOCATION_TYPE_ALIEN_BASE, UNUSED, 4, 0, 1
+    .byte 223, 120, 10, 2, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 4, 0, 1
     .byte UNUSED, <alien_palette, >alien_palette, 0, <alien_base_npcs, >alien_base_npcs, 0
     ;----------------
     ;Dark cave exit to light cave
-    .byte 230, 180, 6, OUTDOORS_LOC7_SCREEN_COUNT, LOCATION_TYPE_CAVE, UNUSED, 4, 0, 2
+    .byte 230, 180, 6, OUTDOORS_LOC7_SCREEN_COUNT, LOCATION_TYPE_CAVE, SONG_OUTSIDE_NIGHT, 4, 0, 2
     .byte UNUSED, <main_palette, >main_palette, 0, <cave_npcs, >cave_npcs, 0
 
     ;entrance to a second dark cave segment
-    .byte 200, 60, 16, 3, LOCATION_TYPE_DARK, UNUSED, 4, 0, 2
+    .byte 200, 60, 16, 3, LOCATION_TYPE_DARK, SONG_OUTSIDE_NIGHT, 4, 0, 2
     .byte UNUSED, <main_palette, >main_palette, 3, 0, 0, 2
     ;---------------------
     ;secret cave exit to location 8
-    .byte 156, 140, 8, OUTDOORS_LOC9_SCREEN_COUNT, LOCATION_TYPE_OUTDOORS, UNUSED, 5, 0 ,2
+    .byte 156, 140, 8, OUTDOORS_LOC9_SCREEN_COUNT, LOCATION_TYPE_OUTDOORS, SONG_OUTSIDE_DAY, 5, 0 ,2
     .byte UNUSED, <main_palette, >main_palette, 2, 0, 0, 2
     ;-----------------------
     ;exit of mine room
-    .byte 120, 145, 6, OUTDOORS_LOC7_SCREEN_COUNT, LOCATION_TYPE_CAVE, UNUSED, 4, 24, 0
+    .byte 120, 145, 6, OUTDOORS_LOC7_SCREEN_COUNT, LOCATION_TYPE_CAVE, SONG_OUTSIDE_NIGHT, 4, 24, 0
     .byte UNUSED, <main_palette, >main_palette, 0, <cave_npcs, >cave_npcs, 0
     ;-----------------------
     ;exit to first dark cave
-    .byte 200, 200, 13, 2, LOCATION_TYPE_DARK, UNUSED, 4, 0, 1
+    .byte 200, 200, 13, 2, LOCATION_TYPE_DARK, SONG_OUTSIDE_NIGHT, 4, 0, 1
     .byte UNUSED, <main_palette, >main_palette, 3, <dark_cave_npcs, >dark_cave_npcs, 1
     ;alien base lobby entrance
-    .byte 53, 129, 17, 1, LOCATION_TYPE_ALIEN_BASE, UNUSED, 2, 0, 0
+    .byte 53, 129, 17, 1, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 2, 0, 0
     .byte UNUSED, <main_palette, >main_palette, 0, 0, 0, 0
     ;------------
     ;alien base entrance bottom (pre)
-    .byte 15, 170, 19, 3, LOCATION_TYPE_ALIEN_BASE, UNUSED, 2, 0, 0
+    .byte 15, 170, 19, 3, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 2, 0, 0
     .byte UNUSED, <alien_palette, >alien_palette, 0, 0, 0, 0
     ;exit to dark cave 2
-    .byte 96, 196, 16, 3, LOCATION_TYPE_DARK, UNUSED, 4, 0, 0
+    .byte 96, 196, 16, 3, LOCATION_TYPE_DARK, SONG_OUTSIDE_NIGHT, 4, 0, 0
     .byte UNUSED, <main_palette, >main_palette, 3, 0, 0, 0
     ;--------------------
     ;entrance to the crashsite from the path
-    .byte 57, 210, 7, OUTDOORS_LOC8_SCREEN_COUNT, 0, UNUSED, 2, 0, 0
+    .byte 57, 210, 7, OUTDOORS_LOC8_SCREEN_COUNT, LOCATION_TYPE_OUTDOORS, SONG_OUTSIDE_DAY, 2, 0, 0
     .byte UNUSED, <main_palette, >main_palette, 0, 0, 0, 0
     ;entrance to the mine location
-    .byte 119, 100, 11, OUTDOORS_LOC12_SCREEN_COUNT, 0, UNUSED, 5, 0, 0
+    .byte 119, 100, 11, OUTDOORS_LOC12_SCREEN_COUNT, LOCATION_TYPE_OUTDOORS, SONG_OUTSIDE_DAY, 5, 0, 0
     .byte UNUSED, <main_palette, >main_palette, 2, 0, 0, 0
     ;------------------
     ;exit to lobby
-    .byte 190, 140, 17, 1, LOCATION_TYPE_ALIEN_BASE, UNUSED, 2, 0, 0
+    .byte 190, 140, 17, 1, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 2, 0, 0
     .byte UNUSED, <main_palette, >main_palette, 0, 0, 0, 0
     ;entrance to last alien base segment
-    .byte 50, 210, 10, 2, LOCATION_TYPE_ALIEN_BASE, UNUSED, 4, 0, 0
+    .byte 50, 210, 10, 2, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 4, 0, 0
     .byte UNUSED, <alien_palette, >alien_palette, 0, <alien_base_npcs, >alien_base_npcs, 0
-
 
 
 

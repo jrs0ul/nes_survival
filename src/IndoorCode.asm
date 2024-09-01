@@ -438,7 +438,6 @@ LoadIndoorMapData:
     jsr UnLZ4toVram
 
 
-
     lda #0
     sta MustCopyMainChr
 
@@ -449,16 +448,6 @@ LoadIndoorMapData:
     sta PalettePtr + 1
 
 @skipLoadingCHR:
-
-    lda MustRestartIndoorsMusic
-    beq @loadHouseStuff
-    lda #SONG_INDOORS
-    sta SongName
-    sta MustPlayNewSong
-    lda #0
-    sta MustRestartIndoorsMusic
-
-@loadHouseStuff:
 
     ldy LocationIndex
     lda location_map_pos, y

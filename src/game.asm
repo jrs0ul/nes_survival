@@ -871,8 +871,6 @@ MustShowOutroAfterFadeout:
 MustShowTitleAfterFadeout:
     .res 1
 
-MustRestartIndoorsMusic:
-    .res 1
 ;--
 
 PlayerInteractedWithStorage:
@@ -1293,7 +1291,7 @@ TempRegX:
 
 
 BSS_Free_Bytes:
-    .res 9
+    .res 10
 
 ;====================================================================================
 
@@ -3474,11 +3472,6 @@ RoutinesAfterFadeOut:
     cmp #27
     bne @next12
 
-    lda #1
-    sta MustPlayNewSong
-    lda #SONG_OUTSIDE_NIGHT
-    sta SongName
-
     lda #2
     sta ScrollDirection
 
@@ -3501,11 +3494,6 @@ RoutinesAfterFadeOut:
     lda ActiveMapEntryIndex
     cmp #17
     bne @next14
-
-    lda #1
-    sta MustPlayNewSong
-    lda #SONG_OUTSIDE_NIGHT
-    sta SongName
 
     lda #2
     sta ScrollDirection
@@ -3615,11 +3603,6 @@ RoutinesAfterFadeOut:
 
     lda #3
     sta VillagerIndex
-
-    lda #SONG_BOSS
-    sta SongName
-    lda #1
-    sta MustPlayNewSong
     ;-------------------------
     ;29 Boss room exit
 @next25:
@@ -3632,10 +3615,6 @@ RoutinesAfterFadeOut:
 
     lda #0
     sta BossAgitated
-    lda #SONG_OUTSIDE_NIGHT
-    sta SongName
-    lda #1
-    sta MustPlayNewSong
     ;-----------------------
     ;14 dark cave entrance
 @next27:
@@ -3785,7 +3764,6 @@ RoutinesAfterFadeOut:
 @itsAnIndoorMap:
     lda #1
     sta MustLoadHouseInterior
-    sta MustRestartIndoorsMusic
 
     lda ActiveMapEntryIndex
     cmp #25   ;ANOTHER CRUTCH for bossroom entrance
@@ -3794,7 +3772,6 @@ RoutinesAfterFadeOut:
     jmp @saveCHRloading
 @BossRoom:
     lda #0
-    sta MustRestartIndoorsMusic
 @saveCHRloading:
     sta MustCopyMainChr
 
@@ -3885,10 +3862,15 @@ CommonLocationRoutine:
     sta ScreenCount
     iny
     lda (pointer2), y ; Location type
+    cmp LocationType
+    beq @sameLocationType
     sta LocationType
+    lda #1
+    sta MustPlayNewSong
+@sameLocationType:
     iny
-    ;lda (pointer2), y ; upper address to item data
-    ;sta pointer + 1
+    lda (pointer2), y ; upper address to item data
+    sta SongName
 
     sty TempY
     lda LocationIndex
@@ -6284,6 +6266,8 @@ StartGame:
     lda #SONG_OUTSIDE_DAY
     sta SongName
     sta InitiateCompleteItemRespawn
+    lda #1
+    sta MustPlayNewSong
 
     rts
 
