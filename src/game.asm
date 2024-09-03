@@ -1846,8 +1846,11 @@ doIntro:
     ;bankswitch
     jsr bankswitch_y
 
-    jsr IntroLogics
-    jsr UpdateIntroSprites
+    jsr CutsceneLogics
+    beq @SpriteUpdate
+    jsr FadeOutToStartGame
+@SpriteUpdate:
+    jsr UpdateCutsceneSprites
 
     ldy oldbank
     ;bankswitch
@@ -1857,7 +1860,7 @@ doIntro:
 doOutro:
 
     ldx CutsceneSceneIdx
-    lda outro_scenes_delay, x
+    lda outro_scenes_good_delay, x
     sta CutsceneDelay
 
     ldy current_bank
@@ -1866,8 +1869,8 @@ doOutro:
     ;bankswitch
     jsr bankswitch_y
 
-    jsr OutroLogics
-    jsr UpdateOutroSprites
+    jsr CutsceneLogics
+    jsr UpdateCutsceneSprites
 
     ldy oldbank
     ;bankswitch

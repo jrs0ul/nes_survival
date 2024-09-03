@@ -10,57 +10,95 @@
 .include "data/outro_bg_busted_comp.asm"
 .include "data/outro_bg_victory_comp.asm"
 
+;ALL cutscenes
+cutscenes:
+    .byte <cutscene_intro,      >cutscene_intro
+    .byte <cutscene_good_outro, >cutscene_good_outro
+    .byte <cutscene_bad_outro,  >cutscene_bad_outro
 
-intro_scenes_low:
-    .byte <intro_bg_mowdens_comp
-    .byte <intro_bg_cockpit_comp
-    .byte <intro_bg_mowdens_comp
-    .byte <intro_bg_boom_comp
-    .byte <intro_bg_mowdens_comp
-    .byte <intro_bg_mowdens_base_comp
-    .byte <intro_bg_mowdens_top_comp
+;---------------------------------
+cutscene_intro:
+    .byte <intro_scenes,                 >intro_scenes                  ; scenes
+    .byte <intro_scenes_delay,           >intro_scenes_delay            ; delay
+    .byte <intro_scenes_duration,        >intro_scenes_duration         ; duration
+    .byte <intro_sprite_count,           >intro_sprite_count            ; sprite count
+    .byte <intro_sprite_pos_y,           >intro_sprite_pos_y            ; sprites Y position
+    .byte <intro_sprite_pos_x,           >intro_sprite_pos_x            ; sprites X position
+    .byte <intro_sprite_dir_x,           >intro_sprite_dir_x            ; movement direction x
+    .byte <intro_sprite_dir_y,           >intro_sprite_dir_y            ; movement direction y
+    .byte <intro_scroll_dir_x,           >intro_scroll_dir_x            ; scroll x
+    .byte <intro_scroll_dir_y,           >intro_scroll_dir_y            ; scroll y
+    .byte <intro_palette_anim_scenes,    >intro_palette_anim_scenes     ; scenes that do palette animation
+    .byte <intro_sprites_low,            >intro_sprites_low             ; sprite ptr low
+    .byte <intro_sprites_high,           >intro_sprites_high            ; sprite ptr high
+    .byte <intro_sprites_2_low,          >intro_sprites_2_low           ; alternate frame sprite ptr low
+    .byte <intro_sprites_2_high,         >intro_sprites_2_high          ; alternate frame sprite ptr low
+    .byte <intro_meta_sprite_count,      >intro_meta_sprite_count       ; meta-sprite count
 
-intro_scenes_high:
-    .byte >intro_bg_mowdens_comp
-    .byte >intro_bg_cockpit_comp
-    .byte >intro_bg_mowdens_comp
-    .byte >intro_bg_boom_comp
-    .byte >intro_bg_mowdens_comp
-    .byte >intro_bg_mowdens_base_comp
-    .byte >intro_bg_mowdens_top_comp
 
-;----------------
+cutscene_good_outro:
+    .byte <outro_scenes_good,               >outro_scenes_good               ;scenes
+    .byte <outro_scenes_good_delay,         >outro_scenes_good_delay         ; delay
+    .byte <outro_scenes_good_duration,      >outro_scenes_good_duration      ; duration
+    .byte <outro_good_sprite_count,         >outro_good_sprite_count         ; sprite count
+    .byte <outro_good_sprite_pos_y,         >outro_good_sprite_pos_y         ; sprites Y position
+    .byte <outro_good_sprite_pos_x,         >outro_good_sprite_pos_x         ; sprites X position
+    .byte <outro_good_sprite_dir_x,         >outro_good_sprite_dir_x         ; movement direction x
+    .byte <outro_good_sprite_dir_y,         >outro_good_sprite_dir_y         ; movement direction x
+    .byte <outro_good_scroll_dir_x,         >outro_good_scroll_dir_x         ; scroll x
+    .byte <outro_good_scroll_dir_y,         >outro_good_scroll_dir_y         ; scroll y
+    .byte <outro_good_palette_anim_scenes,  >outro_good_palette_anim_scenes  ; scenes that do palette animation
+    .byte <outro_good_sprites_low,          >outro_good_sprites_low          ; sprite ptr low
+    .byte <outro_good_sprites_high,         >outro_good_sprites_high         ; sprite ptr high
+    .byte <outro_good_sprites_2_low,        >outro_good_sprites_2_low        ; alternate frame sprite ptr low
+    .byte <outro_good_sprites_2_high,       >outro_good_sprites_2_high       ; alternate frame sprite ptr low
+    .byte <outro_good_meta_sprite_count,    >outro_good_meta_sprite_count    ; meta-sprite count
 
-outro_scenes_low:
-    .byte <outro_bg_sos_comp
-    .byte <outro_bg_that_same_day_comp
-    .byte <outro_bg_chopper_comes_comp
-    .byte <outro_bg_victory_comp
 
-outro_scenes_high:
-    .byte >outro_bg_sos_comp
-    .byte >outro_bg_that_same_day_comp
-    .byte >outro_bg_chopper_comes_comp
-    .byte >outro_bg_victory_comp
+cutscene_bad_outro:
+    .byte <outro_scenes_bad,              >outro_scenes_bad               ;scenes
+    .byte <outro_scenes_bad_delay,        >outro_scenes_bad_delay         ; delay
+    .byte <outro_scenes_bad_duration,     >outro_scenes_bad_duration      ; duration
+    .byte <outro_bad_sprite_count,        >outro_bad_sprite_count         ; sprite count
+    .byte <outro_bad_sprite_pos_y,        >outro_bad_sprite_pos_y         ; sprites Y position
+    .byte <outro_bad_sprite_pos_x,        >outro_bad_sprite_pos_x         ; sprites X position
+    .byte <outro_bad_sprite_dir_x,        >outro_bad_sprite_dir_x         ; movement direction x
+    .byte <outro_bad_sprite_dir_y,        >outro_bad_sprite_dir_y         ; movement direction x
+    .byte <outro_bad_scroll_dir_x,        >outro_bad_scroll_dir_x         ; scroll x
+    .byte <outro_bad_scroll_dir_y,        >outro_bad_scroll_dir_y         ; scroll y
+    .byte <outro_bad_palette_anim_scenes, >outro_bad_palette_anim_scenes  ; scenes that do palette animation
+    .byte <outro_bad_sprites_low,         >outro_bad_sprites_low          ; sprite ptr low
+    .byte <outro_bad_sprites_high,        >outro_bad_sprites_high         ; sprite ptr high
+    .byte <outro_bad_sprites_2_low,       >outro_bad_sprites_2_low        ; alternate frame sprite ptr low
+    .byte <outro_bad_sprites_2_high,      >outro_bad_sprites_2_high       ; alternate frame sprite ptr low
+    .byte <outro_bad_meta_sprite_count,   >outro_bad_meta_sprite_count    ; meta-sprite count
 
-;----------------
 
-bad_outro_scenes_low:
-    .byte <outro_bg_sos_comp
-    .byte <outro_bg_that_same_day_comp
-    .byte <outro_bg_chopper_comes_comp
-    .byte <outro_bg_busted_comp
-    .byte <outro_bg_victory_comp
+;---------------------------------
+intro_scenes:
+    .byte <intro_bg_mowdens_comp,      >intro_bg_mowdens_comp
+    .byte <intro_bg_cockpit_comp,      >intro_bg_cockpit_comp
+    .byte <intro_bg_mowdens_comp,      >intro_bg_mowdens_comp
+    .byte <intro_bg_boom_comp,         >intro_bg_boom_comp
+    .byte <intro_bg_mowdens_comp,      >intro_bg_mowdens_comp
+    .byte <intro_bg_mowdens_base_comp, >intro_bg_mowdens_base_comp
+    .byte <intro_bg_mowdens_top_comp,  >intro_bg_mowdens_top_comp
 
-bad_outro_scenes_high:
-    .byte >outro_bg_sos_comp
-    .byte >outro_bg_that_same_day_comp
-    .byte >outro_bg_chopper_comes_comp
-    .byte >outro_bg_busted_comp
-    .byte >outro_bg_victory_comp
+outro_scenes_good:
+    .byte <outro_bg_sos_comp,           >outro_bg_sos_comp
+    .byte <outro_bg_that_same_day_comp, >outro_bg_that_same_day_comp
+    .byte <outro_bg_chopper_comes_comp, >outro_bg_chopper_comes_comp
+    .byte <outro_bg_victory_comp,       >outro_bg_victory_comp
 
-;----------------
 
+outro_scenes_bad:
+    .byte <outro_bg_sos_comp,            >outro_bg_sos_comp
+    .byte <outro_bg_that_same_day_comp,  >outro_bg_that_same_day_comp
+    .byte <outro_bg_chopper_comes_comp,  >outro_bg_chopper_comes_comp
+    .byte <outro_bg_busted_comp,         >outro_bg_busted_comp
+    .byte <outro_bg_victory_comp,        >outro_bg_victory_comp
+
+;---------------------------
 
 intro_scenes_delay:
     .byte 5
@@ -80,18 +118,33 @@ intro_scenes_duration:
     .byte 12
     .byte 10
 
-outro_scenes_duration:
+outro_scenes_good_duration:
     .byte 70
     .byte 50
     .byte 39
     .byte 63
 
-outro_scenes_delay:
+outro_scenes_good_delay:
     .byte 5
     .byte 8
     .byte 11
     .byte 5
 
+outro_scenes_bad_duration:
+    .byte 70
+    .byte 50
+    .byte 39
+    .byte 50
+    .byte 63
+
+outro_scenes_bad_delay:
+    .byte 5
+    .byte 8
+    .byte 11
+    .byte 5
+    .byte 5
+
+;SPRITE DATA
 
 plane_flies:
     .byte 240,$00,0,228
@@ -412,7 +465,7 @@ intro_sprite_count:
     .byte 12 * 4
     .byte 0
 
-outro_sprite_count:
+outro_good_sprite_count:
    .byte 6 * 4
    .byte 0
 
@@ -424,6 +477,23 @@ outro_sprite_count:
 
    .byte 45 * 4
    .byte 0
+
+outro_bad_sprite_count:
+   .byte 6 * 4
+   .byte 0
+
+   .byte 0
+   .byte 0
+
+   .byte 45 * 4
+   .byte 9 * 4
+
+   .byte 35 * 4
+   .byte 0
+
+   .byte 45 * 4
+   .byte 0
+
 
 
 
@@ -472,7 +542,7 @@ intro_sprite_pos_x:
     .byte 0
 
 
-outro_sprite_pos_x:
+outro_good_sprite_pos_x:
     .byte 112
     .byte 0
 
@@ -486,7 +556,7 @@ outro_sprite_pos_x:
     .byte 0
 
 
-outro_sprite_pos_y:
+outro_good_sprite_pos_y:
     .byte 130
     .byte 0
 
@@ -499,7 +569,41 @@ outro_sprite_pos_y:
     .byte 90
     .byte 0
 
-outro_sprite_dir_y:
+outro_bad_sprite_pos_x:
+    .byte 112
+    .byte 0
+
+    .byte 0
+    .byte 0
+
+    .byte 160
+    .byte 90
+
+    .byte 100
+    .byte 0
+
+    .byte 65
+    .byte 0
+
+
+outro_bad_sprite_pos_y:
+    .byte 130
+    .byte 0
+
+    .byte 0
+    .byte 0
+
+    .byte 30
+    .byte 139
+
+    .byte 80
+    .byte 0
+
+    .byte 90
+    .byte 0
+
+
+outro_good_sprite_dir_y:
     .byte 0
     .byte 0
     .byte 0
@@ -520,7 +624,7 @@ outro_sprite_dir_y:
     .byte 255
     .byte 0
 
-outro_sprite_dir_x:
+outro_good_sprite_dir_x:
 
     .byte 0
     .byte 0
@@ -542,17 +646,87 @@ outro_sprite_dir_x:
     .byte 3
     .byte 0
 
-outro_scroll_dir_x:
+outro_bad_sprite_dir_y:
+    .byte 0
+    .byte 0
+    .byte 0
+    .byte 0
+
+    .byte 0
+    .byte 0
+    .byte 0
+    .byte 0
+
+    .byte 1
+    .byte 0
+    .byte 1
+    .byte 0
+
+    .byte 0
+    .byte 0
+    .byte 0
+    .byte 0
+
+    .byte 0
+    .byte 0
+    .byte 255
+    .byte 0
+
+outro_bad_sprite_dir_x:
+
+    .byte 0
+    .byte 0
+    .byte 0
+    .byte 0
+
+    .byte 0
+    .byte 0
+    .byte 0
+    .byte 0
+
+    .byte 0
+    .byte 1
+    .byte 0
+    .byte 255
+
+    .byte 0
+    .byte 0
+    .byte 0
+    .byte 0
+
+    .byte 2
+    .byte 0
+    .byte 3
+    .byte 0
+
+
+outro_good_scroll_dir_x:
     .byte 0
     .byte 0
 
     .byte 0
     .byte 1
 
-outro_scroll_dir_y:
+outro_good_scroll_dir_y:
     .byte 0
     .byte 0
 
+    .byte 0
+    .byte 0
+
+outro_bad_scroll_dir_x:
+    .byte 0
+    .byte 0
+
+    .byte 0
+    .byte 0
+    .byte 1
+
+outro_bad_scroll_dir_y:
+    .byte 0
+    .byte 0
+
+    .byte 0
     .byte 0
     .byte 0
 
@@ -655,7 +829,7 @@ intro_scroll_dir_y:
     .byte 0
     .byte 0
 
-Scenes_that_do_palette_anim:
+intro_palette_anim_scenes:
     .byte 0
     .byte 0
     .byte 0
@@ -663,6 +837,25 @@ Scenes_that_do_palette_anim:
     .byte 0
     .byte 0
     .byte 0
+
+outro_good_palette_anim_scenes:
+    .byte 0
+    .byte 0
+    .byte 0
+    .byte 0
+    .byte 0
+    .byte 0
+    .byte 0
+
+outro_bad_palette_anim_scenes:
+    .byte 0
+    .byte 0
+    .byte 0
+    .byte 0
+    .byte 0
+    .byte 0
+    .byte 0
+
 
 intro_palette_changes:
     .byte $38
@@ -759,7 +952,7 @@ intro_sprites_high:
     .byte >dude_climbs
     .byte 0
 
-outro_sprites_high:
+outro_good_sprites_high:
     .byte >radio_hand
     .byte 0
 
@@ -772,7 +965,24 @@ outro_sprites_high:
     .byte >chopper_flipped
     .byte 0
 
-outro_sprites_low:
+outro_bad_sprites_high:
+    .byte >radio_hand
+    .byte 0
+
+    .byte 0
+    .byte 0
+
+    .byte >chopper
+    .byte >raised_hand
+
+    .byte >busted
+    .byte 0
+
+    .byte >chopper_flipped
+    .byte 0
+
+
+outro_good_sprites_low:
     .byte <radio_hand
     .byte 0
 
@@ -785,7 +995,24 @@ outro_sprites_low:
     .byte <chopper_flipped
     .byte 0
 
-outro_sprites_2_high:
+outro_bad_sprites_low:
+    .byte <radio_hand
+    .byte 0
+
+    .byte 0
+    .byte 0
+
+    .byte <chopper
+    .byte <raised_hand
+
+    .byte <busted
+    .byte 0
+
+    .byte <chopper_flipped
+    .byte 0
+
+
+outro_good_sprites_2_high:
     .byte 0
     .byte 0
 
@@ -798,7 +1025,34 @@ outro_sprites_2_high:
     .byte 0
     .byte 0
 
-outro_sprites_2_low:
+outro_bad_sprites_2_high:
+    .byte 0
+    .byte 0
+
+    .byte 0
+    .byte 0
+
+    .byte 0
+    .byte 0
+
+    .byte 0
+    .byte 0
+
+
+outro_good_sprites_2_low:
+    .byte 0
+    .byte 0
+
+    .byte 0
+    .byte 0
+
+    .byte 0
+    .byte 0
+
+    .byte 0
+    .byte 0
+
+outro_bad_sprites_2_low:
     .byte 0
     .byte 0
 
@@ -868,8 +1122,15 @@ intro_meta_sprite_count:
     .byte 1
     .byte 1
 
-outro_meta_sprite_count:
+outro_good_meta_sprite_count:
     .byte 1
     .byte 0
     .byte 2
+    .byte 1
+
+outro_bad_meta_sprite_count:
+    .byte 1
+    .byte 0
+    .byte 2
+    .byte 1
     .byte 1

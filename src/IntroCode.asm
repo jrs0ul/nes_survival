@@ -169,7 +169,7 @@ IntroNameTableUpdate:
 DoPaletteAnim:
 
     ldx CutsceneSceneIdx
-    lda Scenes_that_do_palette_anim, x
+    lda intro_palette_anim_scenes, x
     beq @exit
 
     lda PaletteFadeAnimationState
@@ -203,7 +203,7 @@ DoScrolling:
     rts
 
 ;-----------------------------
-IntroLogics:
+CutsceneLogics:
 
 
     inc CutsceneSpriteAnimFrame
@@ -263,7 +263,7 @@ IntroLogics:
     inc CutsceneSceneIdx
     lda CutsceneSceneIdx
     cmp #INTRO_SCENE_MAX
-    bcs @StartGame
+    bcs @SequenceIsComplete
 
     ldx CutsceneSceneIdx
     lda intro_scenes_duration, x
@@ -289,108 +289,12 @@ IntroLogics:
     sta MustLoadIntroChr
     sta ScrollX
 
-    jmp @exit
-
-@StartGame:
-    jsr FadeOutToStartGame
 @exit:
-    rts
-;---------------------------------
-OutroLogics:
-
-
-    inc CutsceneSpriteAnimFrame
-    lda CutsceneSpriteAnimFrame
-    cmp #2
-    bcc @go
     lda #0
-    sta CutsceneSpriteAnimFrame
-@go:
-    lda CutsceneSceneIdx
-    cmp #OUTRO_SCENE_MAX
-    bcc @gogo
-    rts
-@gogo:
-    tax
-
-    ;do some scrolling
-    lda ScrollX
-    clc
-    adc outro_scroll_dir_x, x
-    sta ScrollX
-
-    lda ScrollY
-    clc
-    adc outro_scroll_dir_y, x
-    sta ScrollY
-
-
-    lda outro_scenes_duration, x
-    lsr
-    sta TempHp ; let's store half of the scene duration
-
-    lda CutsceneSceneIdx
-    asl
-    asl
-    tax
-
-    lda CutsceneTimer
-    cmp TempHp
-    bcs @cont
-
-    inx
-    inx
-
-@cont:
-    txa
-    tay
-    lda #<outro_sprite_dir_x
-    sta pointer
-    lda #<outro_sprite_dir_y
-    sta pointer2
-    lda #>outro_sprite_dir_x
-    sta pointer + 1
-    lda #>outro_sprite_dir_y
-    sta pointer2 + 1
-    jsr MoveCutsceneSprites
-    tya
-    tax
-
-    dec CutsceneTimer
-    beq @increaseScene
-    jmp @exit
-
-@increaseScene:
-    inc CutsceneSceneIdx
-    lda CutsceneSceneIdx
-    cmp #OUTRO_SCENE_MAX
-    bcs @exit
-
-    ldx CutsceneSceneIdx
-    lda outro_scenes_duration, x
-    sta CutsceneTimer
-    lda CutsceneSceneIdx
-    asl
-    tax
-    lda outro_sprite_pos_x, x
-    sta CutsceneSprite1X
-    lda outro_sprite_pos_y, x
-    sta CutsceneSprite1Y
-    inx
-    lda outro_sprite_pos_x, x
-    sta CutsceneSprite2X
-    lda outro_sprite_pos_y, x
-    sta CutsceneSprite2Y
-
-
+    jmp @end
+@SequenceIsComplete:
     lda #1
-    sta MustLoadOutro
-    sta MustLoadSomething
-    lda #0
-    sta MustLoadIntroChr
-    sta ScrollX
-
-@exit:
+@end:
     rts
 
 ;------------------------------
@@ -437,7 +341,7 @@ UpdateOutroSprites:
     sty TempSpriteCount
     sty CutsceneMetaspriteIndex
 
-    lda outro_meta_sprite_count, x
+    lda outro_good_meta_sprite_count, x
     sta CutsceneMetaspriteCount
     beq @hide
 
@@ -447,22 +351,22 @@ UpdateOutroSprites:
     tax
 
 @metaspriteloop:
-    lda outro_sprite_count, x
+    lda outro_good_sprite_count, x
     sta CutsceneSpriteCount
 
     lda CutsceneSpriteAnimFrame
     bne @secondFrame
 
 @firstFrame:
-    lda outro_sprites_low, x
+    lda outro_good_sprites_low, x
     sta IntroSpritePtr
-    lda outro_sprites_high, x
+    lda outro_good_sprites_high, x
     sta IntroSpritePtr + 1
     jmp @cont
 @secondFrame:
-    lda outro_sprites_2_low, x
+    lda outro_good_sprites_2_low, x
     sta IntroSpritePtr
-    lda outro_sprites_2_high, x
+    lda outro_good_sprites_2_high, x
     sta IntroSpritePtr + 1
     clc
     adc IntroSpritePtr
@@ -512,7 +416,7 @@ UpdateOutroSprites:
     rts
 
 ;---------------------------------
-UpdateIntroSprites:
+UpdateCutsceneSprites:
 
 
     lda #<CutsceneSprite1X
@@ -679,10 +583,14 @@ HideCutsceneSprites:
 LoadIntroScene:
 
     ldy CutsceneSceneIdx
+    tya
+    asl
+    tay
 
-    lda intro_scenes_low, y
+    lda intro_scenes, y
     sta pointer
-    lda intro_scenes_high, y
+    iny
+    lda intro_scenes, y
     sta pointer+1
 
     lda #$24
@@ -691,9 +599,14 @@ LoadIntroScene:
     jsr DecompressRLE
 
     ldy CutsceneSceneIdx
-    lda intro_scenes_low, y
+    tya
+    asl
+    tay
+
+    lda intro_scenes, y
     sta pointer
-    lda intro_scenes_high, y
+    iny
+    lda intro_scenes, y
     sta pointer+1
 
     lda #$20
@@ -725,18 +638,27 @@ LoadIntroScene:
 ;------------------------------------
 LoadOutroScene:
     ldy CutsceneSceneIdx
+    tya
+    asl
+    tay
 
-    lda outro_scenes_low, y
+    lda outro_scenes_good, y
     sta pointer
-    lda outro_scenes_high, y
+    iny
+    lda outro_scenes_good, y
     sta pointer+1
     lda #$24
     sta NametableAddress
     jsr DecompressRLE
+
     ldy CutsceneSceneIdx
-    lda outro_scenes_low, y
+    tya
+    asl
+    tay
+    lda outro_scenes_good, y
     sta pointer
-    lda outro_scenes_high, y
+    iny
+    lda outro_scenes_good, y
     sta pointer+1
 
     lda #$20
@@ -799,25 +721,25 @@ InitOutro:
     sta ScrollX
     asl
     tax
-    lda outro_sprite_pos_x, x
+    lda outro_good_sprite_pos_x, x
     sta CutsceneSprite1X
-    lda outro_sprite_pos_y, x
+    lda outro_good_sprite_pos_y, x
     sta CutsceneSprite1Y
     inx
-    lda outro_sprite_pos_x, x
+    lda outro_good_sprite_pos_x, x
     sta CutsceneSprite2X
-    lda outro_sprite_pos_y, x
+    lda outro_good_sprite_pos_y, x
     sta CutsceneSprite2Y
 
     ldx CutsceneSceneIdx
-    lda outro_scenes_duration, x
+    lda outro_scenes_good_duration, x
     sta CutsceneTimer
 
 
     lda #STATE_OUTRO
     sta GameState
 
-    lda outro_scenes_delay, x
+    lda outro_scenes_good_delay, x
     sta CutsceneDelay
 
 
