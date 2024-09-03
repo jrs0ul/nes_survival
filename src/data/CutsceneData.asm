@@ -7,6 +7,7 @@
 .include "data/outro_bg_sos_comp.asm"
 .include "data/outro_bg_that_same_day_comp.asm"
 .include "data/outro_bg_chopper_comes_comp.asm"
+.include "data/outro_bg_busted_comp.asm"
 .include "data/outro_bg_victory_comp.asm"
 
 
@@ -28,6 +29,8 @@ intro_scenes_high:
     .byte >intro_bg_mowdens_base_comp
     .byte >intro_bg_mowdens_top_comp
 
+;----------------
+
 outro_scenes_low:
     .byte <outro_bg_sos_comp
     .byte <outro_bg_that_same_day_comp
@@ -39,6 +42,25 @@ outro_scenes_high:
     .byte >outro_bg_that_same_day_comp
     .byte >outro_bg_chopper_comes_comp
     .byte >outro_bg_victory_comp
+
+;----------------
+
+bad_outro_scenes_low:
+    .byte <outro_bg_sos_comp
+    .byte <outro_bg_that_same_day_comp
+    .byte <outro_bg_chopper_comes_comp
+    .byte <outro_bg_busted_comp
+    .byte <outro_bg_victory_comp
+
+bad_outro_scenes_high:
+    .byte >outro_bg_sos_comp
+    .byte >outro_bg_that_same_day_comp
+    .byte >outro_bg_chopper_comes_comp
+    .byte >outro_bg_busted_comp
+    .byte >outro_bg_victory_comp
+
+;----------------
+
 
 intro_scenes_delay:
     .byte 5
@@ -328,6 +350,44 @@ radio_hand:
     .byte 252,$8f,%00000010,  0
     .byte   4,$9e,%00000010,248
     .byte   4,$9f,%00000010,  0
+
+busted:
+    .byte 236,$a0,0,232
+    .byte 236,$a1,0,240
+    .byte 236,$a2,0,248
+    .byte 236,$a3,0,  0
+    .byte 236,$a4,0,  8
+    .byte 236,$a5,0, 16
+    .byte 244,$b0,0,232
+    .byte 244,$b1,0,240
+    .byte 244,$b2,0,248
+    .byte 244,$b3,0,  0
+    .byte 244,$b4,0,  8
+    .byte 244,$b5,0, 16
+    .byte 244,$b6,0, 24
+    .byte 252,$c0,0,224
+    .byte 252,$c1,0,232
+    .byte 252,$c2,0,240
+    .byte 252,$c3,0,248
+    .byte 252,$c4,0,  0
+    .byte 252,$c5,0,  8
+    .byte 252,$c6,0, 16
+    .byte 252,$c7,0, 24
+    .byte   4,$d0,0,224
+    .byte   4,$d1,0,232
+    .byte   4,$d2,0,240
+    .byte   4,$d3,0,248
+    .byte   4,$d4,0,  0
+    .byte   4,$d5,0,  8
+    .byte   4,$d6,0, 16
+    .byte   4,$d7,0, 24
+    .byte  12,$e1,0,232
+    .byte  12,$e2,0,240
+    .byte  12,$e3,0,248
+    .byte  12,$e5,0,  8
+    .byte  12,$e6,0, 16
+    .byte  12,$e7,0, 24
+
 
 
 intro_sprite_count:
