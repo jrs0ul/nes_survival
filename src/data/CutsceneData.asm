@@ -39,6 +39,8 @@ cutscene_intro:
     .byte <intro_sprites_2_low,          >intro_sprites_2_low           ; alternate frame sprite ptr low
     .byte <intro_sprites_2_high,         >intro_sprites_2_high          ; alternate frame sprite ptr low
     .byte <intro_meta_sprite_count,      >intro_meta_sprite_count       ; meta-sprite count
+    .byte <intro_palette_changes,        >intro_palette_changes         ; palette animations
+    .byte <intro_scenes_with_tile_anim,  >intro_scenes_with_tile_anim   ; scenes with tile animations
 
 
 cutscene_good_outro:
@@ -58,6 +60,8 @@ cutscene_good_outro:
     .byte <outro_good_sprites_2_low,        >outro_good_sprites_2_low        ; alternate frame sprite ptr low
     .byte <outro_good_sprites_2_high,       >outro_good_sprites_2_high       ; alternate frame sprite ptr low
     .byte <outro_good_meta_sprite_count,    >outro_good_meta_sprite_count    ; meta-sprite count
+    .byte <outro_palette_changes,           >outro_palette_changes           ; palette animations
+    .byte <outro_scenes_with_tile_anim,     >outro_scenes_with_tile_anim     ; scenes with tile animations
 
 
 cutscene_bad_outro:
@@ -77,6 +81,8 @@ cutscene_bad_outro:
     .byte <outro_bad_sprites_2_low,       >outro_bad_sprites_2_low        ; alternate frame sprite ptr low
     .byte <outro_bad_sprites_2_high,      >outro_bad_sprites_2_high       ; alternate frame sprite ptr low
     .byte <outro_bad_meta_sprite_count,   >outro_bad_meta_sprite_count    ; meta-sprite count
+    .byte <outro_palette_changes,         >outro_palette_changes          ; palette animations
+    .byte <outro_scenes_with_tile_anim,   >outro_scenes_with_tile_anim    ; scenes with tile animations
 
 
 ;---------------------------------
@@ -884,13 +890,44 @@ intro_palette_changes:
     .byte $38
     .byte $16
 
+outro_palette_changes:
+    .byte $38
+    .byte $16
+    .byte $38
+    .byte $16
+    .byte $38
+    .byte $16
+    .byte $38
+    .byte $16
+    .byte $38
+    .byte $16
+    .byte $38
+    .byte $16
+    .byte $38
+    .byte $16
+    .byte $38
+    .byte $16
+    .byte $38
+    .byte $16
+    .byte $38
+    .byte $16
+
 
 
 ;scenes that do some kind of animation with background tiles are 1
-Scenes_that_do_tile_anim:
+intro_scenes_with_tile_anim:
     .byte 0
     .byte 0
     .byte 1
+    .byte 0
+    .byte 0
+    .byte 0
+    .byte 0
+
+outro_scenes_with_tile_anim:
+    .byte 0
+    .byte 0
+    .byte 0
     .byte 0
     .byte 0
     .byte 0

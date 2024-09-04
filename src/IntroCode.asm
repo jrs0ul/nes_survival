@@ -129,9 +129,8 @@ TitleTilesAnim:
 IntroNameTableUpdate:
 
     ldx CutsceneSceneIdx
-    lda Scenes_that_do_tile_anim, x
+    lda intro_scenes_with_tile_anim, x
     beq @exit
-
 
     lda CutsceneTimer
     sta Temp
@@ -168,16 +167,29 @@ IntroNameTableUpdate:
 ;-----------------------------
 DoPaletteAnim:
 
-    ldx CutsceneSceneIdx
-    lda intro_palette_anim_scenes, x
+    ldy #CUTSCENE_PALETTE_ANIM_SCENE_POS
+    lda (CutsceneDataPtr), y
+    sta pointer
+    iny
+    lda (CutsceneDataPtr), y
+    sta pointer + 1
+
+    ldy CutsceneSceneIdx
+    lda (pointer), y
     beq @exit
 
     lda PaletteFadeAnimationState
     bne @exit
 
+    ldy #CUTSCENE_PALETTE_ANIMS_POS
+    lda (CutsceneDataPtr), y
+    sta pointer
+    iny
+    lda (CutsceneDataPtr), y
+    sta pointer + 1
 
-    ldx CutsceneTimer
-    lda intro_palette_changes, x
+    ldy CutsceneTimer
+    lda (pointer), y
     ldx #9
     sta RamPalette, x
 
@@ -190,16 +202,33 @@ DoPaletteAnim:
 ;-----------------------------
 ;x register is CutsceneSceneIdx
 DoScrolling:
-    ;do some scrolling
+
+    ldy #CUTSCENE_SCROLL_DIR_X_POS
+    lda (CutsceneDataPtr), y
+    sta pointer
+    iny
+    lda (CutsceneDataPtr), y
+    sta pointer + 1
+
+    ldy CutsceneSceneIdx
 
     lda ScrollX
     clc
-    adc intro_scroll_dir_x, x
+    adc (pointer), y
     sta ScrollX
+
+    ldy #CUTSCENE_SCROLL_DIR_Y_POS
+    lda (CutsceneDataPtr), y
+    sta pointer
+    iny
+    lda (CutsceneDataPtr), y
+    sta pointer + 1
+
+    ldy CutsceneSceneIdx
 
     lda ScrollY
     clc
-    adc intro_scroll_dir_y, x
+    adc (pointer), y
     sta ScrollY
 
     rts
@@ -208,14 +237,14 @@ DoScrolling:
 ;x register is CutsceneSceneIdx
 CutsceneLogics:
 
-    ;lda CutsceneIdx
-    ;asl
-    ;tay
-    ;lda cutscenes, y
-    ;sta CutsceneDataPtr
-    ;iny
-    ;lda cutscenes, y
-    ;sta CutsceneDataPtr + 1
+    lda CutsceneIdx
+    asl
+    tay
+    lda cutscenes, y
+    sta CutsceneDataPtr
+    iny
+    lda cutscenes, y
+    sta CutsceneDataPtr + 1
 
 
 
@@ -237,8 +266,17 @@ CutsceneLogics:
 
     jsr DoScrolling
 
+    ldy #CUTSCENE_SCENE_DURATION_POS
+    lda (CutsceneDataPtr), y
+    sta pointer
+    iny
+    lda (CutsceneDataPtr), y
+    sta pointer + 1
 
-    lda intro_scenes_duration, x
+    txa
+    tay
+
+    lda (pointer), y
     lsr
     sta TempHp ; let's store half of the scene duration
 
@@ -255,19 +293,26 @@ CutsceneLogics:
     inx
 
 @cont:
-    txa
-    tay
-    lda #<intro_sprite_dir_x
+    stx TempRegX
+
+    ldy #CUTSCENE_SPITE_DIR_X_POS
+    lda (CutsceneDataPtr), y
     sta pointer
-    lda #<intro_sprite_dir_y
-    sta pointer2
-    lda #>intro_sprite_dir_x
+    iny
+    lda (CutsceneDataPtr), y
     sta pointer + 1
-    lda #>intro_sprite_dir_y
+
+    ldy #CUTSCENE_SPITE_DIR_Y_POS
+    lda (CutsceneDataPtr), y
+    sta pointer2
+    iny
+    lda (CutsceneDataPtr), y
     sta pointer2 + 1
+
+    ldy TempRegX
     jsr MoveCutsceneSprites
-    tya
-    tax
+
+    ldx TempRegX
     jsr DoPaletteAnim
 
     dec CutsceneTimer
@@ -281,20 +326,53 @@ CutsceneLogics:
     cmp cutscene_len, y
     bcs @SequenceIsComplete
 
-    ldx CutsceneSceneIdx
-    lda intro_scenes_duration, x
+
+    ldy #CUTSCENE_SCENE_DURATION_POS
+    lda (CutsceneDataPtr), y
+    sta pointer
+    iny
+    lda (CutsceneDataPtr), y
+    sta pointer + 1
+
+    ldy CutsceneSceneIdx
+    lda (pointer), y ; load scene duration
     sta CutsceneTimer
+
+
+    ldy #CUTSCENE_SPRITE_POS_X_POS
+    lda (CutsceneDataPtr), y
+    sta pointer
+    iny
+    lda (CutsceneDataPtr), y
+    sta pointer + 1
+
     lda CutsceneSceneIdx
     asl
-    tax
-    lda intro_sprite_pos_x, x
+    tay
+
+    lda (pointer), y
     sta CutsceneSprite1X
-    lda intro_sprite_pos_y, x
-    sta CutsceneSprite1Y
-    inx
-    lda intro_sprite_pos_x, x
+
+    iny
+
+    lda (pointer), y
     sta CutsceneSprite2X
-    lda intro_sprite_pos_y, x
+
+    ldy #CUTSCENE_SPRITE_POS_Y_POS
+    lda (CutsceneDataPtr), y
+    sta pointer
+    iny
+    lda (CutsceneDataPtr), y
+    sta pointer + 1
+
+    lda CutsceneSceneIdx
+    asl
+    tay
+
+    lda (pointer), y
+    sta CutsceneSprite1Y
+    iny
+    lda (pointer), y
     sta CutsceneSprite2Y
 
 
@@ -687,70 +765,85 @@ LoadCutScene:
     sta MustLoadIntro
     sta MustLoadSomething
 
-
-
     rts
 
 ;-------------------------------
-InitIntro:
-    lda #0
-    sta CutsceneSceneIdx
-    sta ScrollX
+InitCutscene:
+
+    lda CutsceneIdx
     asl
-    tax
-    lda intro_sprite_pos_x, x
-    sta CutsceneSprite1X
-    lda intro_sprite_pos_y, x
-    sta CutsceneSprite1Y
-    inx
-    lda intro_sprite_pos_x, x
-    sta CutsceneSprite2X
-    lda intro_sprite_pos_y, x
-    sta CutsceneSprite2Y
-
-    ldx CutsceneSceneIdx
-    lda intro_scenes_duration, x
-    sta CutsceneTimer
-    lda intro_scenes_delay, x
-    sta CutsceneDelay
-
-    lda #STATE_INTRO
-    sta GameState
+    tay
+    lda cutscenes, y
+    sta CutsceneDataPtr
+    iny
+    lda cutscenes, y
+    sta CutsceneDataPtr + 1
 
 
-    rts
-;-------------------------------------
-InitOutro:
+    ldy #CUTSCENE_SPRITE_POS_X_POS
+    lda (CutsceneDataPtr), y
+    sta pointer
+    iny
+    lda (CutsceneDataPtr), y
+    sta pointer + 1
 
     lda #0
     sta CutsceneSceneIdx
     sta ScrollX
     asl
-    tax
-    lda outro_good_sprite_pos_x, x
+    tay
+
+    lda (pointer), y
     sta CutsceneSprite1X
-    lda outro_good_sprite_pos_y, x
-    sta CutsceneSprite1Y
-    inx
-    lda outro_good_sprite_pos_x, x
+    iny
+    lda (pointer), y
     sta CutsceneSprite2X
-    lda outro_good_sprite_pos_y, x
+
+    ldy #CUTSCENE_SPRITE_POS_Y_POS
+    lda (CutsceneDataPtr), y
+    sta pointer
+    iny
+    lda (CutsceneDataPtr), y
+    sta pointer + 1
+
+    lda CutsceneSceneIdx
+    asl
+    tay
+
+    lda (pointer), y
+    sta CutsceneSprite1Y
+    iny
+    lda (pointer), y
     sta CutsceneSprite2Y
 
-    ldx CutsceneSceneIdx
-    lda outro_scenes_good_duration, x
+
+    ldy #CUTSCENE_SCENE_DURATION_POS
+    lda (CutsceneDataPtr), y
+    sta pointer
+    iny
+    lda (CutsceneDataPtr), y
+    sta pointer + 1
+
+    ldy CutsceneSceneIdx
+    lda (pointer), y
     sta CutsceneTimer
 
 
-    lda #STATE_OUTRO
-    sta GameState
+    ldy #CUTSCENE_SCENE_DELAY_POS
+    lda (CutsceneDataPtr), y
+    sta pointer
+    iny
+    lda (CutsceneDataPtr), y
+    sta pointer + 1
 
-    lda outro_scenes_good_delay, x
+    ldy CutsceneSceneIdx
+    lda (pointer), y
     sta CutsceneDelay
 
+    lda #STATE_CUTSCENE
+    sta GameState
 
     rts
-
 ;--------------------------------------
 ;technicaly doesn't have anything in common with Intro, but should reside in bank5
 LoadTitleData:

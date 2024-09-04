@@ -1494,22 +1494,12 @@ updateInventory:
     jmp runrandom
 
 checkIntro:
-    cmp #STATE_INTRO
-    bne checkOutro ; you win ?
+    cmp #STATE_CUTSCENE
+    bne checkTitle
     dec CutsceneDelay
     bne runrandom
 
-    jsr doIntro
-    jmp runrandom
-
-checkOutro:
-    cmp #STATE_OUTRO
-    bne checkTitle ; some other state
-
-    dec CutsceneDelay
-    bne runrandom
-
-    jsr doOutro
+    jsr doCutscene
     jmp runrandom
 
 checkTitle:
@@ -1616,7 +1606,7 @@ DoneLoadingMaps:
     jsr UpdateStatusDigits
     jmp UpdatePalette
 otherState:
-    cmp #STATE_INTRO
+    cmp #STATE_CUTSCENE
     bne checkTitleState
 
     jsr IntroNametableAnimations
@@ -1691,9 +1681,7 @@ doneUpdatingPalette:
     lda GameState
     cmp #STATE_GAME
     beq WaitNotSprite0
-    cmp #STATE_INTRO
-    beq justScroll
-    cmp #STATE_OUTRO
+    cmp #STATE_CUTSCENE
     beq justScroll
     jmp endOfNmi
 
@@ -1841,9 +1829,17 @@ doGameOver:
     rts
 
 ;---------------------------------
-doIntro:
-    ldx CutsceneSceneIdx
-    lda intro_scenes_delay, x
+doCutscene:
+
+    ldy #CUTSCENE_SCENE_DELAY_POS
+    lda (CutsceneDataPtr), y
+    sta pointer
+    iny
+    lda (CutsceneDataPtr), y
+    sta pointer + 1
+
+    ldy CutsceneSceneIdx
+    lda (pointer), y
     sta CutsceneDelay
 
     ldy current_bank
@@ -1863,27 +1859,6 @@ doIntro:
     jsr bankswitch_y
     rts
 ;---------------------------------
-doOutro:
-
-    ldx CutsceneSceneIdx
-    lda outro_scenes_good_delay, x
-    sta CutsceneDelay
-
-    ldy current_bank
-    sty oldbank
-    ldy #5
-    ;bankswitch
-    jsr bankswitch_y
-
-    jsr CutsceneLogics
-    jsr UpdateCutsceneSprites
-
-    ldy oldbank
-    ;bankswitch
-    jsr bankswitch_y
-
-    rts
-;--------------------------------------
 doTitle:
 
     ldy current_bank
@@ -3324,7 +3299,7 @@ RoutinesAfterFadeOut:
 
     ldy #5
     jsr bankswitch_y
-    jsr InitOutro
+    jsr InitCutscene
 
     rts
 
@@ -6335,21 +6310,29 @@ CheckStartButton:
     ldy #5
     jsr bankswitch_y
 
-    jsr InitIntro ; from bank 5
+    jsr InitCutscene ; from bank 5
 
     jmp @exit
 @someOtherState: ; not title
 
 
-    cmp #STATE_INTRO
+    cmp #STATE_CUTSCENE
     bne @checkGameOver
 
+    lda CutsceneIdx
+    beq @onIntro ; intro
+    jmp @onOutro
+@onIntro:
     jsr FadeOutToStartGame
     jmp @exit
+@onOutro:
+    lda #1
+    sta MustLoadTitleCHR
+    jmp @goToTitle
 
 @checkGameOver:
     cmp #STATE_GAME_OVER
-    bne @CheckOutro
+    bne @CheckOnGame
 @goToTitle:
     lda #1
     sta MustLoadSomething
@@ -6359,12 +6342,7 @@ CheckStartButton:
     sta PPUCTRL
 
     jmp @exit
-@CheckOutro:
-    cmp #STATE_OUTRO
-    bne @CheckOnGame
-    lda #1
-    sta MustLoadTitleCHR
-    jmp @goToTitle
+    
 @CheckOnGame:
     cmp #STATE_GAME
     beq @enterMenuScreen

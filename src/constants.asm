@@ -7,8 +7,7 @@
     STATE_GAME                 = 1
     STATE_MENU                 = 2
     STATE_GAME_OVER            = 3
-    STATE_INTRO                = 4
-    STATE_OUTRO                = 5
+    STATE_CUTSCENE             = 4
 
     BUTTON_RIGHT_DOWN_MASK     = %00000101
     BUTTON_RIGHT_UP_MASK       = %00001001
@@ -411,9 +410,19 @@
     SUBMENU_SLEEP              = 11
 
     ;cutscene pointer positions
+    CUTSCENE_SCENE_DELAY_POS        = 2
+    CUTSCENE_SCENE_DURATION_POS     = 4
     CUTSCENE_SPRITE_COUNT_POS       = 6
-    CUTSCENE_META_SPRITE_COUNT_POS  = 30
+    CUTSCENE_SPRITE_POS_Y_POS       = 8
+    CUTSCENE_SPRITE_POS_X_POS       = 10
+    CUTSCENE_SPITE_DIR_X_POS        = 12
+    CUTSCENE_SPITE_DIR_Y_POS        = 14
+    CUTSCENE_SCROLL_DIR_X_POS       = 16
+    CUTSCENE_SCROLL_DIR_Y_POS       = 18
+    CUTSCENE_PALETTE_ANIM_SCENE_POS = 20
     CUTSCENE_SPRITE_1_LOW_POS       = 22
     CUTSCENE_SPRITE_1_HIGH_POS      = 24
     CUTSCENE_SPRITE_2_LOW_POS       = 26
     CUTSCENE_SPRITE_2_HIGH_POS      = 28
+    CUTSCENE_META_SPRITE_COUNT_POS  = 30
+    CUTSCENE_PALETTE_ANIMS_POS      = 32
