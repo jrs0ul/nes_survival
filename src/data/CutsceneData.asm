@@ -152,7 +152,7 @@ outro_scenes_bad_delay:
     .byte 5
     .byte 8
     .byte 11
-    .byte 5
+    .byte 10
     .byte 5
 
 ;SPRITE DATA
@@ -419,38 +419,38 @@ busted:
     .byte 236,$a0,0,232
     .byte 236,$a1,0,240
     .byte 236,$a2,0,248
-    .byte 236,$a3,0,  0
-    .byte 236,$a4,0,  8
-    .byte 236,$a5,0, 16
+    .byte 236,$a3,1,  0
+    .byte 236,$a4,1,  8
+    .byte 236,$a5,1, 16
     .byte 244,$b0,0,232
     .byte 244,$b1,0,240
     .byte 244,$b2,0,248
-    .byte 244,$b3,0,  0
-    .byte 244,$b4,0,  8
-    .byte 244,$b5,0, 16
-    .byte 244,$b6,0, 24
+    .byte 244,$b3,1,  0
+    .byte 244,$b4,1,  8
+    .byte 244,$b5,1, 16
+    .byte 244,$b6,1, 24
     .byte 252,$c0,0,224
     .byte 252,$c1,0,232
     .byte 252,$c2,0,240
     .byte 252,$c3,0,248
-    .byte 252,$c4,0,  0
-    .byte 252,$c5,0,  8
-    .byte 252,$c6,0, 16
-    .byte 252,$c7,0, 24
+    .byte 252,$c4,1,  0
+    .byte 252,$c5,1,  8
+    .byte 252,$c6,1, 16
+    .byte 252,$c7,1, 24
     .byte   4,$d0,0,224
     .byte   4,$d1,0,232
     .byte   4,$d2,0,240
-    .byte   4,$d3,0,248
-    .byte   4,$d4,0,  0
-    .byte   4,$d5,0,  8
-    .byte   4,$d6,0, 16
-    .byte   4,$d7,0, 24
+    .byte   4,$d3,1,248
+    .byte   4,$d4,1,  0
+    .byte   4,$d5,1,  8
+    .byte   4,$d6,1, 16
+    .byte   4,$d7,1, 24
     .byte  12,$e1,0,232
     .byte  12,$e2,0,240
     .byte  12,$e3,0,248
-    .byte  12,$e5,0,  8
-    .byte  12,$e6,0, 16
-    .byte  12,$e7,0, 24
+    .byte  12,$e5,1,  8
+    .byte  12,$e6,1, 16
+    .byte  12,$e7,1, 24
 
 
 
@@ -590,7 +590,7 @@ outro_bad_sprite_pos_x:
     .byte 160
     .byte 90
 
-    .byte 100
+    .byte 120
     .byte 0
 
     .byte 65
@@ -607,7 +607,7 @@ outro_bad_sprite_pos_y:
     .byte 30
     .byte 139
 
-    .byte 80
+    .byte 107
     .byte 0
 
     .byte 90

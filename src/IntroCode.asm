@@ -126,10 +126,17 @@ TitleTilesAnim:
     rts
 
 ;-----------------------------
-IntroNameTableUpdate:
+CutsceneNameTableUpdate:
 
-    ldx CutsceneSceneIdx
-    lda intro_scenes_with_tile_anim, x
+    ldy #CUTSCENE_TILE_ANIM_SCENES_POS
+    lda (CutsceneDataPtr), y
+    sta pointer
+    iny
+    lda (CutsceneDataPtr), y
+    sta pointer + 1
+
+    ldy CutsceneSceneIdx
+    lda (pointer), y
     beq @exit
 
     lda CutsceneTimer
@@ -157,8 +164,6 @@ IntroNameTableUpdate:
 @first:
     lda #$65
     sta $2007
-
-
 
 
 @exit:

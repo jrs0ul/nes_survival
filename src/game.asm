@@ -1388,7 +1388,7 @@ vblankwait2:      ; Second wait for vblank, PPU is ready after this
     lda #%00011110   ; enable sprites
     sta $2001
 
-    lda #2
+    lda #0
     sta CutsceneIdx
 
     lda #INPUT_DELAY
@@ -1609,7 +1609,7 @@ otherState:
     cmp #STATE_CUTSCENE
     bne checkTitleState
 
-    jsr IntroNametableAnimations
+    jsr CutsceneNametableAnimations
     jmp UpdatePalette
 checkTitleState:
     cmp #STATE_TITLE
@@ -5051,13 +5051,13 @@ CalcMapColumnToUpdate:
     rts
 
 ;--------------------------------
-IntroNametableAnimations:
+CutsceneNametableAnimations:
 
 
     ldy #5
     jsr bankswitch_y
 
-    jsr IntroNameTableUpdate
+    jsr CutsceneNameTableUpdate
 
     rts
 
