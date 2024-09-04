@@ -188,8 +188,10 @@ DoPaletteAnim:
     rts
 
 ;-----------------------------
+;x register is CutsceneSceneIdx
 DoScrolling:
     ;do some scrolling
+
     lda ScrollX
     clc
     adc intro_scroll_dir_x, x
@@ -203,7 +205,18 @@ DoScrolling:
     rts
 
 ;-----------------------------
+;x register is CutsceneSceneIdx
 CutsceneLogics:
+
+    ;lda CutsceneIdx
+    ;asl
+    ;tay
+    ;lda cutscenes, y
+    ;sta CutsceneDataPtr
+    ;iny
+    ;lda cutscenes, y
+    ;sta CutsceneDataPtr + 1
+
 
 
     inc CutsceneSpriteAnimFrame
@@ -214,11 +227,13 @@ CutsceneLogics:
     sta CutsceneSpriteAnimFrame
 @go:
     lda CutsceneSceneIdx
-    cmp #INTRO_SCENE_MAX
+    ldy CutsceneIdx
+    cmp cutscene_len, y
     bcc @gogo
     rts
 @gogo:
     tax
+
 
     jsr DoScrolling
 
@@ -262,7 +277,8 @@ CutsceneLogics:
 @increaseScene:
     inc CutsceneSceneIdx
     lda CutsceneSceneIdx
-    cmp #INTRO_SCENE_MAX
+    ldy CutsceneIdx
+    cmp cutscene_len, y
     bcs @SequenceIsComplete
 
     ldx CutsceneSceneIdx
@@ -323,146 +339,168 @@ MoveCutsceneSprites:
     adc (pointer2), y
     sta CutsceneSprite2Y
     rts
-;--------------------------------
-UpdateOutroSprites:
 
+;------------------------------
+LoadFirstFramePointers:
+    ldy #CUTSCENE_SPRITE_1_LOW_POS
+    lda (CutsceneDataPtr), y
+    sta pointer
+    iny
+    lda (CutsceneDataPtr), y
+    sta pointer + 1
 
-    lda #<CutsceneSprite1X
-    sta IntroSpriteCoordPtr
-    lda #>CutsceneSprite1X
-    sta IntroSpriteCoordPtr + 1
-
-
-    ldx CutsceneSceneIdx
-    cpx #OUTRO_SCENE_MAX
-    bcs @done
-
-    ldy #0
-    sty TempSpriteCount
-    sty CutsceneMetaspriteIndex
-
-    lda outro_good_meta_sprite_count, x
-    sta CutsceneMetaspriteCount
-    beq @hide
-
-
-    txa
+    lda CutsceneSceneIdx
     asl
-    tax
-
-@metaspriteloop:
-    lda outro_good_sprite_count, x
-    sta CutsceneSpriteCount
-
-    lda CutsceneSpriteAnimFrame
-    bne @secondFrame
-
-@firstFrame:
-    lda outro_good_sprites_low, x
-    sta IntroSpritePtr
-    lda outro_good_sprites_high, x
-    sta IntroSpritePtr + 1
-    jmp @cont
-@secondFrame:
-    lda outro_good_sprites_2_low, x
-    sta IntroSpritePtr
-    lda outro_good_sprites_2_high, x
-    sta IntroSpritePtr + 1
     clc
-    adc IntroSpritePtr
-    beq @firstFrame
-
-@cont:
-    tya
-    sta TempPointY2 ;backup y for writing
-    sec
-    sbc TempSpriteCount
-    sta TempPointY ; backup y for reading
+    adc CutsceneMetaspriteIndex
     tay
 
+    lda (pointer), y
+    sta IntroSpritePtr
 
-@updateLoop:
+    ldy #CUTSCENE_SPRITE_1_HIGH_POS
+    lda (CutsceneDataPtr), y
+    sta pointer
+    iny
+    lda (CutsceneDataPtr), y
+    sta pointer + 1
 
-    jsr DoCutsceneSpriteUpdate
-
-    cpy CutsceneSpriteCount
-    bcc @updateLoop
-
-    lda TempSpriteCount
+    lda CutsceneSceneIdx
+    asl
     clc
-    adc CutsceneSpriteCount
-    sta TempSpriteCount
+    adc CutsceneMetaspriteIndex
+    tay
 
-    inc IntroSpriteCoordPtr ;increment pointer to point to next metasprite coordinates
-    inc IntroSpriteCoordPtr
+    lda (pointer), y
+    sta IntroSpritePtr + 1
 
-    inc CutsceneMetaspriteIndex
-    inx
-    lda CutsceneMetaspriteIndex
-    cmp CutsceneMetaspriteCount
-    bcc @metaspriteloop
+    rts
+;--------------------------------
+LoadSecondFramePointers:
+    ldy #CUTSCENE_SPRITE_2_LOW_POS
+    lda (CutsceneDataPtr), y
+    sta pointer
+    iny
+    lda (CutsceneDataPtr), y
+    sta pointer + 1
+
+    lda CutsceneSceneIdx
+    asl
+    clc
+    adc CutsceneMetaspriteIndex
+    tay
+
+    lda (pointer), y
+    sta IntroSpritePtr
+
+    ldy #CUTSCENE_SPRITE_2_HIGH_POS
+    lda (CutsceneDataPtr), y
+    sta pointer
+    iny
+    lda (CutsceneDataPtr), y
+    sta pointer + 1
+
+    lda CutsceneSceneIdx
+    asl
+    clc
+    adc CutsceneMetaspriteIndex
+    tay
+
+    lda (pointer), y
+    sta IntroSpritePtr + 1
 
 
-    lda TempSpriteCount
-    lsr
-    lsr
-    sta TempSpriteCount
-
-    ldy TempPointY2
-@hide:
-    jsr HideCutsceneSprites
-
-@done:
     rts
 
 ;---------------------------------
 UpdateCutsceneSprites:
 
-
     lda #<CutsceneSprite1X
     sta IntroSpriteCoordPtr
     lda #>CutsceneSprite1X
     sta IntroSpriteCoordPtr + 1
 
 
-    ldx CutsceneSceneIdx
-    cpx #INTRO_SCENE_MAX
-    bcs @done
+    lda CutsceneSceneIdx
+    ldy CutsceneIdx
+    cmp cutscene_len, y
+    bcc @proceed
+
+    rts
+@proceed:
+    tya
+    asl
+    tay
+    lda cutscenes, y
+    sta CutsceneDataPtr
+    iny
+    lda cutscenes, y
+    sta CutsceneDataPtr + 1
 
     ldy #0
     sty TempSpriteCount
     sty CutsceneMetaspriteIndex
+    sty TempPointY2
 
-    lda intro_meta_sprite_count, x
+    lda CutsceneSceneIdx
+    tax
+
+    ldy #CUTSCENE_META_SPRITE_COUNT_POS
+    lda (CutsceneDataPtr), y
+    sta pointer
+    iny
+    lda (CutsceneDataPtr), y
+    sta pointer + 1
+
+    ldy CutsceneSceneIdx
+    lda (pointer), y ; load metasprite count
     sta CutsceneMetaspriteCount
     beq @hide
 
 
-    txa
+    lda CutsceneSceneIdx
     asl
     tax
 
 @metaspriteloop:
-    lda intro_sprite_count, x
+
+    ldy #CUTSCENE_SPRITE_COUNT_POS
+    lda (CutsceneDataPtr), y
+    sta pointer
+    iny
+    lda (CutsceneDataPtr), y
+    sta pointer + 1
+
+    txa
+    tay
+
+    lda (pointer), y ; load sprite count for the scene
     sta CutsceneSpriteCount
 
+    ldy TempPointY2
     lda CutsceneSpriteAnimFrame
     bne @secondFrame
 
 @firstFrame:
-    lda intro_sprites_low, x
-    sta IntroSpritePtr
-    lda intro_sprites_high, x
-    sta IntroSpritePtr + 1
+
+    jsr LoadFirstFramePointers ; load data pointers of the first sprite
+
+    ldy TempPointY2
+
     jmp @cont
 @secondFrame:
-    lda intro_sprites_2_low, x
-    sta IntroSpritePtr
-    lda intro_sprites_2_high, x
-    sta IntroSpritePtr + 1
+   
+
+    jsr LoadSecondFramePointers
+
     clc
     adc IntroSpritePtr
     beq @firstFrame
+
+    ldy TempPointY2
+    lda CutsceneSceneIdx
+    asl
+    tax
 
 @cont:
     tya
@@ -580,17 +618,34 @@ HideCutsceneSprites:
 
     rts
 ;---------------------
-LoadIntroScene:
+LoadCutScene:
+
+    lda CutsceneIdx
+    asl
+    tay
+    lda cutscenes, y
+    sta CutsceneDataPtr
+    iny
+    lda cutscenes, y
+    sta CutsceneDataPtr + 1
+
+
+    ldy #0
+    lda (CutsceneDataPtr), y
+    sta pointer2
+    iny
+    lda (CutsceneDataPtr), y
+    sta pointer2 + 1
 
     ldy CutsceneSceneIdx
     tya
     asl
     tay
 
-    lda intro_scenes, y
+    lda (pointer2), y
     sta pointer
     iny
-    lda intro_scenes, y
+    lda (pointer2), y
     sta pointer+1
 
     lda #$24
@@ -603,10 +658,10 @@ LoadIntroScene:
     asl
     tay
 
-    lda intro_scenes, y
+    lda (pointer2), y
     sta pointer
     iny
-    lda intro_scenes, y
+    lda (pointer2), y
     sta pointer+1
 
     lda #$20
@@ -633,55 +688,6 @@ LoadIntroScene:
     sta MustLoadSomething
 
 
-
-    rts
-;------------------------------------
-LoadOutroScene:
-    ldy CutsceneSceneIdx
-    tya
-    asl
-    tay
-
-    lda outro_scenes_good, y
-    sta pointer
-    iny
-    lda outro_scenes_good, y
-    sta pointer+1
-    lda #$24
-    sta NametableAddress
-    jsr DecompressRLE
-
-    ldy CutsceneSceneIdx
-    tya
-    asl
-    tay
-    lda outro_scenes_good, y
-    sta pointer
-    iny
-    lda outro_scenes_good, y
-    sta pointer+1
-
-    lda #$20
-    sta NametableAddress
-    jsr DecompressRLE
-
-    jsr ClearPalette
-
-    lda #<intro_palette
-    sta PalettePtr
-    lda #>intro_palette
-    sta PalettePtr + 1
-
-    lda #PALETTE_STATE_FADE_IN
-    sta PaletteFadeAnimationState
-    lda #PALETTE_FADE_MAX_ITERATION
-    sta FadeIdx
-    lda #FADE_DELAY_GAME_OVER
-    sta PaletteAnimDelay
-
-    lda #0
-    sta MustLoadOutro
-    sta MustLoadSomething
 
     rts
 

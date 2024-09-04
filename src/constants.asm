@@ -410,3 +410,10 @@
     SUBMENU_STASH_DOCUMENT     = 10
     SUBMENU_SLEEP              = 11
 
+    ;cutscene pointer positions
+    CUTSCENE_SPRITE_COUNT_POS       = 6
+    CUTSCENE_META_SPRITE_COUNT_POS  = 30
+    CUTSCENE_SPRITE_1_LOW_POS       = 22
+    CUTSCENE_SPRITE_1_HIGH_POS      = 24
+    CUTSCENE_SPRITE_2_LOW_POS       = 26
+    CUTSCENE_SPRITE_2_HIGH_POS      = 28

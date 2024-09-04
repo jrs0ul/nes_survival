@@ -374,6 +374,7 @@ TextPtr:
     .res 2
 DigitPtr:
     .res 2
+CutsceneDataPtr = DigitPtr
 
 IntroSpritePtr:
     .res 2
@@ -1289,9 +1290,12 @@ TempIndex:
 TempRegX:
     .res 1
 
+CutsceneIdx: ; what cutscene to display
+    .res 1
+
 
 BSS_Free_Bytes:
-    .res 10
+    .res 9
 
 ;====================================================================================
 
@@ -1384,6 +1388,8 @@ vblankwait2:      ; Second wait for vblank, PPU is ready after this
     lda #%00011110   ; enable sprites
     sta $2001
 
+    lda #2
+    sta CutsceneIdx
 
     lda #INPUT_DELAY
     sta InputUpdateDelay
@@ -5456,6 +5462,8 @@ LoadTitle:
     sta MustLoadTitle
     sta MustLoadSomething
     sta MustUpdatePalette
+    sta CutsceneIdx
+
 @exit:
     rts
 ;-------------------------------------
@@ -6071,7 +6079,7 @@ LoadIntro:
     ldy #5
     jsr bankswitch_y
 
-    jsr LoadIntroScene ; from bank 5
+    jsr LoadCutScene ; from bank 5
 @exit:
     rts
 ;-----------------------------------
@@ -6130,7 +6138,7 @@ LoadOutro:
     ldy #5
     jsr bankswitch_y
 
-    jsr LoadOutroScene ; from bank 5
+    jsr LoadCutScene ; from bank 5
 
 @exit:
     rts

@@ -16,6 +16,11 @@ cutscenes:
     .byte <cutscene_good_outro, >cutscene_good_outro
     .byte <cutscene_bad_outro,  >cutscene_bad_outro
 
+cutscene_len:
+    .byte INTRO_SCENE_MAX
+    .byte OUTRO_SCENE_MAX
+    .byte OUTRO_SCENE_MAX + 1
+
 ;---------------------------------
 cutscene_intro:
     .byte <intro_scenes,                 >intro_scenes                  ; scenes
