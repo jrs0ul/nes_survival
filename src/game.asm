@@ -113,13 +113,14 @@ alien_sprites_chr: .incbin "alien_sprites.lz4"
 .include "data/game_over_comp.asm"
 .include "data/title_comp.asm"
 crashed_plane_tiles_chr: .incbin "crashed_plane_tiles.lz4"
+
 title_palette:
     .byte $0F,$00,$11,$20, $0F,$01,$11,$07, $0F,$30,$11,$38, $0F,$07,$11,$35    ;background
     .byte $0F,$0f,$17,$20, $0F,$06,$26,$39, $0F,$17,$21,$31, $0F,$0f,$37,$26    ;OAM sprites
 
 intro_palette:
     .byte $0C,$00,$31,$30, $0C,$01,$31,$30, $0C,$16,$31,$36, $0C,$18,$07,$30 ; background
-    .byte $0C,$06,$16,$30, $0C,$0c,$35,$21, $0C,$0c,$16,$36, $0C,$01,$07,$21 ; sprites
+    .byte $0C,$06,$16,$30, $0C,$0c,$1B,$36, $0C,$0c,$16,$36, $0C,$01,$07,$21 ; sprites
 
 push_start:
     .byte $1a,$1f,$1d,$12,$00,$1d,$1e,$0b,$1c,$1e
@@ -854,11 +855,9 @@ MustLoadTitleCHR:
     .res 1
 MustLoadGameOver:
     .res 1
-MustLoadIntro:
+MustLoadCutscene:
     .res 1
 MustLoadIntroChr:
-    .res 1
-MustLoadOutro:
     .res 1
 MustDrawMenuTitle:
     .res 1
@@ -1295,7 +1294,7 @@ CutsceneIdx: ; what cutscene to display
 
 
 BSS_Free_Bytes:
-    .res 9
+    .res 10
 
 ;====================================================================================
 
@@ -1850,6 +1849,10 @@ doCutscene:
 
     jsr CutsceneLogics
     beq @SpriteUpdate
+
+    lda CutsceneIdx
+    bne @SpriteUpdate ; don't start the game if idx is 1 or 2
+
     jsr FadeOutToStartGame
 @SpriteUpdate:
     jsr UpdateCutsceneSprites
@@ -1888,8 +1891,7 @@ LoadBackgroundsIfNeeded:
 
     jsr LoadTitle
     jsr LoadGameOver
-    jsr LoadIntro
-    jsr LoadOutro
+    jsr LoadCutscene
     jsr LoadMenu
 
     jsr LoadInteriorMap
@@ -3261,6 +3263,44 @@ FadeAfterSleep:
     lda #PALETTE_FADE_MAX_ITERATION
     sta FadeIdx
     rts
+;-----------------------------
+OnYouWin:
+    lda #1
+    sta MustLoadCutscene
+    sta MustLoadSomething
+    sta MustLoadIntroChr
+    lda #0
+    sta PaletteFadeAnimationState
+    sta MustShowOutroAfterFadeout
+
+
+    lda VillagerKilled
+    clc
+    adc VillagerKilled + 1
+    adc VillagerKilled + 2
+    cmp #0
+    bne @evilEnding
+
+    lda #SONG_ENDING_GOOD
+    sta SongName
+    lda #1
+    sta CutsceneIdx
+    jmp @activateNewSong
+@evilEnding:
+    lda #2
+    sta CutsceneIdx
+    lda #SONG_ENDING_EVIL
+    sta SongName
+
+@activateNewSong:
+    lda #1
+    sta MustPlayNewSong
+
+
+    ldy #5
+    jsr bankswitch_y
+    jsr InitCutscene
+    rts
 
 ;------------------------------
 RoutinesAfterFadeOut:
@@ -3289,17 +3329,7 @@ RoutinesAfterFadeOut:
     lda MustShowOutroAfterFadeout
     beq @showTitle
 
-    lda #1
-    sta MustLoadOutro
-    sta MustLoadSomething
-    sta MustLoadIntroChr
-    lda #0
-    sta PaletteFadeAnimationState
-    sta MustShowOutroAfterFadeout
-
-    ldy #5
-    jsr bankswitch_y
-    jsr InitCutscene
+    jsr OnYouWin
 
     rts
 
@@ -6013,53 +6043,9 @@ ClearPalette:
 
     rts
 
-;-------------------------------------
-LoadIntro:
-
-    lda MustLoadIntro
-    beq @exit
-
-    lda #0
-    sta $2000
-    sta $2001
-
-
-    lda MustLoadIntroChr
-    beq @loadScene
-
-    ldy #2
-    jsr bankswitch_y
-
-    lda #ARGUMENT_STACK_HI
-    sta sp
-    lda #ARGUMENT_STACK_LO
-    sta sp + 1
-
-    lda #<intro_tiles_chr
-    ldy #$02
-    sta (sp),y
-    iny
-    lda #>intro_tiles_chr
-    sta (sp),y
-    lda #$00
-    tay
-    sta (sp),y
-    iny
-    sta (sp),y
-    ldx #$20
-    jsr UnLZ4toVram
-
-@loadScene:
-
-    ldy #5
-    jsr bankswitch_y
-
-    jsr LoadCutScene ; from bank 5
-@exit:
-    rts
 ;-----------------------------------
-LoadOutro:
-    lda MustLoadOutro
+LoadCutscene:
+    lda MustLoadCutscene
     beq @exit
 
     lda #0
@@ -6069,23 +6055,6 @@ LoadOutro:
     lda MustLoadIntroChr
     beq @loadScene
 
-    lda VillagerKilled
-    clc
-    adc VillagerKilled + 1
-    adc VillagerKilled + 2
-    cmp #0
-    bne @evilEnding
-
-    lda #SONG_ENDING_GOOD
-    sta SongName
-    jmp @activateNewSong
-@evilEnding:
-    lda #SONG_ENDING_EVIL
-    sta SongName
-
-@activateNewSong:
-    lda #1
-    sta MustPlayNewSong
 
     ldy #2
     jsr bankswitch_y
@@ -6305,7 +6274,7 @@ CheckStartButton:
 
     lda #1
     sta MustLoadSomething
-    sta MustLoadIntro
+    sta MustLoadCutscene
     sta MustLoadIntroChr
     ldy #5
     jsr bankswitch_y
@@ -6342,7 +6311,7 @@ CheckStartButton:
     sta PPUCTRL
 
     jmp @exit
-    
+
 @CheckOnGame:
     cmp #STATE_GAME
     beq @enterMenuScreen

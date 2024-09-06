@@ -382,7 +382,7 @@ CutsceneLogics:
 
 
     lda #1
-    sta MustLoadIntro
+    sta MustLoadCutscene
     sta MustLoadSomething
     lda #0
     sta MustLoadIntroChr
@@ -767,7 +767,7 @@ LoadCutScene:
 
 
     lda #0
-    sta MustLoadIntro
+    sta MustLoadCutscene
     sta MustLoadSomething
 
     rts
