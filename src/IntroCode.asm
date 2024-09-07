@@ -23,10 +23,24 @@ TitleLogics:
     lda #0
     sta SnowDelay
 
-    
 @incframe:
 
-    
+    inc TitleScreenTimer
+    lda TitleScreenTimer
+    cmp #40
+    bcc @proceed
+
+    lda #1
+    sta MustLoadSomething
+    sta MustLoadCutscene
+    sta MustLoadIntroChr
+    sta DemoModeOn
+
+    jsr InitCutscene ; from bank 5
+
+    jmp @exit
+
+@proceed:
     inc SnowFrame
     lda SnowFrame
     cmp #2

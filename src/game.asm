@@ -694,6 +694,8 @@ CutsceneSprite2X        = DialogTextContainer + 7
 CutsceneSprite2Y        = DialogTextContainer + 8
 CutsceneSpriteAnimFrame = DialogTextContainer + 9
 SnowDelay               = DialogTextContainer + 10
+DemoModeOn              = DialogTextContainer + 11 ; demo mode enabled, basically shows intro cutscene
+TitleScreenTimer        = DialogTextContainer + 12
 
 
 CurrentPaletteDecrementValue: ;a helper value to prevent doing too much of palette changing
@@ -1853,6 +1855,24 @@ doCutscene:
     lda CutsceneIdx
     bne @SpriteUpdate ; don't start the game if idx is 1 or 2
 
+    lda DemoModeOn
+    beq @startGame
+
+    lda #0
+    sta DemoModeOn
+    sta TitleScreenTimer
+
+    lda #1
+    sta MustLoadTitleCHR
+    lda #1
+    sta MustLoadSomething
+    sta MustLoadTitle
+
+    lda #%10010000
+    sta PPUCTRL
+    jmp @exit
+
+@startGame:
     jsr FadeOutToStartGame
 @SpriteUpdate:
     jsr UpdateCutsceneSprites
@@ -1860,6 +1880,7 @@ doCutscene:
     ldy oldbank
     ;bankswitch
     jsr bankswitch_y
+@exit:
     rts
 ;---------------------------------
 doTitle:
@@ -6284,7 +6305,6 @@ CheckStartButton:
     jmp @exit
 @someOtherState: ; not title
 
-
     cmp #STATE_CUTSCENE
     bne @checkGameOver
 
@@ -6292,6 +6312,16 @@ CheckStartButton:
     beq @onIntro ; intro
     jmp @onOutro
 @onIntro:
+    
+    lda DemoModeOn
+    beq @startGame
+
+    lda #0
+    sta DemoModeOn
+    sta TitleScreenTimer
+    jmp @onOutro
+
+@startGame:
     jsr FadeOutToStartGame
     jmp @exit
 @onOutro:
