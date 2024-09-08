@@ -658,6 +658,8 @@ CollisionWithProjectiles:
     lda TempPointX
     clc
     adc TempNpcWidth
+    clc
+    adc #4
     sta TempPointX2
 
     lda TempNpcRows
@@ -666,6 +668,8 @@ CollisionWithProjectiles:
     asl
     clc
     adc TempPointY ; TempPointY2 = rows * 8 + y
+    clc
+    adc #4
     sta TempPointY2
 
 
@@ -739,51 +743,51 @@ SingleProjectileCollision:
     sbc ScrollX
 
 @cont:
+    clc
+    adc #4
     sta ProjectileX
     iny ;x2
     iny ;screen
     iny ;y
     lda Projectiles, y ; y
+    clc
+    adc #4
     sta ProjectileY
+    ;--------
 
-    lda ProjectileX
-    clc
-    adc #8
-    cmp TempPointX
-    bcc @checkOtherPoint
-
-    cmp TempPointX
-    bcs @checkOtherPoint
-
-    lda ProjectileY
-    clc
-    adc #8
-    cmp TempPointY
-    bcc @checkOtherPoint
-
-    cmp TempPointY2
-    bcs @checkOtherPoint
-
-    jmp @collisionDetected
-
-@checkOtherPoint:
-
-    lda ProjectileX
-    cmp TempPointX
-    bcc @exit
-
+    lda TempPointX
+    sec
+    sbc #4
     cmp TempPointX2
+    bcs @checkSecondPoint ; X1 is negative, thus larger than X2
+
+    cmp ProjectileX
     bcs @exit
 
-    lda ProjectileY
-    cmp TempPointY
+@checkSecondPoint:
+    lda TempPointX2
+    cmp TempPointX
+    bcc @testX1Again ; X2 is less than X1
+    cmp ProjectileX
     bcc @exit
-
-    cmp TempPointY2
+    jmp @testY
+@testX1Again:
+    lda TempPointX
+    sec
+    sbc #4
+    cmp ProjectileX
     bcs @exit
 
+@testY:
+    lda TempPointY
+    sec
+    sbc #4
+    cmp ProjectileY
+    bcs @exit
 
-@collisionDetected:
+    lda TempPointY2
+    cmp ProjectileY
+    bcc @exit
 
     ldy ProjectileIdx
     lda projectiles_ram_lookup, y

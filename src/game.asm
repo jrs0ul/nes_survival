@@ -7508,7 +7508,11 @@ ShootSlingshot:
     inx ; X
 
     lda PlayerX
+    clc
+    adc #4
+    clc
     adc ScrollX
+
     bcs @incrementScreen
 
 
