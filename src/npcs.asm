@@ -700,7 +700,7 @@ SingleProjectileCollision:
     lsr
     bcs @proceed
 
-    rts
+    rts ; projectile is not active, exit
 
 @proceed:
     iny;x
@@ -711,7 +711,7 @@ SingleProjectileCollision:
     jsr ScreenFilter
     beq @gogo
 
-    rts
+    rts ; projectile is not in the same screen, exit
 
 @gogo:
 
