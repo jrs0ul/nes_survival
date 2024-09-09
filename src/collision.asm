@@ -1,10 +1,10 @@
 ;Checks 2 points against the collision map
 CanPlayerGo:
 
-    lda PlayerX
+    lda NewPlayerX
     clc
     adc #PLAYER_COLLISION_LINE_X1
-    adc ScrollX
+    adc NewScrollX
     sta TempPointX
     bcs @increment
 
@@ -18,7 +18,7 @@ CanPlayerGo:
 @cont:
     sta TempScreen
 
-    lda PlayerY
+    lda NewPlayerY
     clc
     adc #PLAYER_COLLISION_LINE_Y1
     sta TempPointY
@@ -26,10 +26,10 @@ CanPlayerGo:
     jsr TestPointAgainstCollisionMapHero
     bne @collides
 ;------------ 
-    lda PlayerX
+    lda NewPlayerX
     clc
     adc #PLAYER_COLLISION_LINE_X2
-    adc ScrollX
+    adc NewScrollX
     sta TempPointX
     bcs @increment2
     lda TempCollisionVar
@@ -55,10 +55,10 @@ CanPlayerGo:
 ;Checks 2 points against the collision map
 CanPlayerGoWithOldY:
 
-    lda PlayerX
+    lda NewPlayerX
     clc
     adc #PLAYER_COLLISION_LINE_X1
-    adc ScrollX
+    adc NewScrollX
     sta TempPointX
     bcs @increment
 
@@ -71,7 +71,7 @@ CanPlayerGoWithOldY:
 @cont:
     sta TempScreen
 
-    lda OldPlayerY
+    lda PlayerY
     clc
     adc #PLAYER_COLLISION_LINE_Y1
     sta TempPointY
@@ -80,10 +80,10 @@ CanPlayerGoWithOldY:
     bne @collides
 ;----------- 
 
-    lda PlayerX
+    lda NewPlayerX
     clc
     adc #PLAYER_COLLISION_LINE_X2
-    adc ScrollX
+    adc NewScrollX
     sta TempPointX
     bcs @increment2
 
@@ -111,10 +111,10 @@ CanPlayerGoWithOldY:
 ;Checks 2 points against the collision map
 CanPlayerGoWithOldX:
 
-    lda OldPlayerX
+    lda PlayerX
     clc
     adc #PLAYER_COLLISION_LINE_X1
-    adc OldScrollX
+    adc ScrollX
     sta TempPointX
     bcs @increment
     lda TempCollisionVar
@@ -126,7 +126,7 @@ CanPlayerGoWithOldX:
 @cont:
     sta TempScreen
 
-    lda PlayerY
+    lda NewPlayerY
     clc
     adc #PLAYER_COLLISION_LINE_Y1
     sta TempPointY
@@ -135,10 +135,10 @@ CanPlayerGoWithOldX:
     bne @collides
 ;----
 
-    lda OldPlayerX
+    lda PlayerX
     clc
     adc #PLAYER_COLLISION_LINE_X2
-    adc OldScrollX
+    adc ScrollX
     sta TempPointX
     bcs @increment2
     lda TempCollisionVar

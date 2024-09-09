@@ -1299,8 +1299,21 @@ CutsceneIdx: ; what cutscene to display
     .res 1
 
 
-BSS_Free_Bytes:
-    .res 10
+NewPlayerY:
+    .res 2
+NewPlayerX:
+    .res 2
+NewScrollX:
+    .res 2
+NewScrollDirection:
+    .res 1
+NewCurrentMapSegmentIndex:
+    .res 1
+
+
+
+;BSS_Free_Bytes:
+;    .res 10
 
 ;====================================================================================
 
@@ -4784,14 +4797,16 @@ HandleInput:
     ;the obstacles are on the Y axis
 
     lda DirectionX
-    beq @resetJustY
+    beq @storeXMovement
 
     lda #0
     sta PlayerFrame
 @resetJustY:
-    jsr ResetOnlyPlayerY
+    ;jsr ResetOnlyPlayerY
 
-    jmp @contInput
+    ;jmp @contInput
+
+    jmp @storeXMovement
 
 @thirdcheck:
     lda DirectionX
@@ -4802,18 +4817,22 @@ HandleInput:
     bne @resetStuff
 
     ;the obstacles are on X axis
-    jsr ResetPlayerXMovement
+    ;jsr ResetPlayerXMovement
 
     jmp @contInput
 
 @resetStuff:
     ;obstacle ahead, restore previous position
-    jsr ResetPlayerXMovement
-    jsr ResetOnlyPlayerY
+    ;jsr ResetPlayerXMovement
+    ;jsr ResetOnlyPlayerY
 
     jmp @finishInput
 
 @contInput:
+
+    jsr StoreYMovement
+@storeXMovement:
+    jsr StoreXMovement
 
     jsr GenerateNpcsIfNeeded
 
@@ -4839,27 +4858,56 @@ ResetOnlyPlayerY:
 BackupMovement:
 
     lda PlayerX
-    sta OldPlayerX
+    sta NewPlayerX
     lda PlayerX + 1
-    sta OldPlayerX + 1
+    sta NewPlayerX + 1
 
     lda PlayerY
-    sta OldPlayerY
+    sta NewPlayerY
     lda PlayerY + 1
-    sta OldPlayerY + 1
+    sta NewPlayerY + 1
 
     lda ScrollX
-    sta OldScrollX
+    sta NewScrollX
     lda ScrollX + 1
-    sta OldScrollX + 1
+    sta NewScrollX + 1
 
     lda ScrollDirection
-    sta OldScrollDirection
+    sta NewScrollDirection
 
     lda CurrentMapSegmentIndex
-    sta OldCurrentMapSegmentIndex
+    sta NewCurrentMapSegmentIndex
 
     rts
+
+;-------------------------------
+StoreXMovement:
+    lda NewPlayerX + 1
+    sta PlayerX + 1
+    lda NewPlayerX
+    sta PlayerX
+
+    lda NewScrollX + 1
+    sta ScrollX + 1
+    lda NewScrollX
+    sta ScrollX
+
+    lda NewScrollDirection
+    sta ScrollDirection
+
+    lda NewCurrentMapSegmentIndex
+    sta CurrentMapSegmentIndex
+    rts
+;-------------------------------
+StoreYMovement:
+
+    lda NewPlayerY + 1
+    sta PlayerY + 1
+    lda NewPlayerY
+    sta PlayerY
+
+    rts
+
 ;--------------------------------
 GenerateNpcsIfNeeded:
 
@@ -4902,25 +4950,25 @@ GenerateNpcsIfNeeded:
 @exit:
     rts
 ;--------------------------------
-ResetPlayerXMovement:
-
-    lda OldPlayerX
-    sta PlayerX
-    lda OldPlayerX + 1
-    sta PlayerX + 1
-    lda OldScrollX
-    sta ScrollX
-    lda OldScrollX + 1
-    sta OldScrollX + 1
-    lda OldScrollDirection
-    sta ScrollDirection
-    lda OldCurrentMapSegmentIndex
-    sta CurrentMapSegmentIndex
-    lda #0
-    sta CurrentScreenWasIncremented
-    sta CurrentScreenWasDecremented
-
-    rts
+;ResetPlayerXMovement:
+;
+;    lda OldPlayerX
+;    sta PlayerX
+;    lda OldPlayerX + 1
+;    sta PlayerX + 1
+;    lda OldScrollX
+;    sta ScrollX
+;    lda OldScrollX + 1
+;    sta ScrollX + 1
+;    lda OldScrollDirection
+;    sta ScrollDirection
+;    lda OldCurrentMapSegmentIndex
+;    sta CurrentMapSegmentIndex
+;    lda #0
+;    sta CurrentScreenWasIncremented
+;    sta CurrentScreenWasDecremented
+;
+;    rts
 
 ;-----------------------------
 ;Calculates depending on ScrollX and ScrollDirection:
@@ -6494,43 +6542,43 @@ CheckDiagonal:
 KnockedBackLeft:
 
     lda #1
-    sta ScrollDirection
+    sta NewScrollDirection
 
     lda OldDirectionX
     sta DirectionX
 
-    lda PlayerX
+    lda NewPlayerX
     cmp #SCREEN_MIDDLE
     bcs @moveLeft
 
-    lda CurrentMapSegmentIndex ; is first screen
+    lda NewCurrentMapSegmentIndex ; is first screen
     bne @scrollLeft                  ; nope
-    lda ScrollX
+    lda NewScrollX
     beq @moveLeft
 @scrollLeft:
 
     ldy KnockBackIndex
 
-    lda ScrollX + 1
+    lda NewScrollX + 1
     sec
     sbc knockBackValuesFractions, y
-    sta ScrollX + 1
+    sta NewScrollX + 1
 
-    lda ScrollX
+    lda NewScrollX
     sbc knockBackValuesInteger, y
-    sta ScrollX
+    sta NewScrollX
 
     bcs @end
 
-    lda CurrentMapSegmentIndex
+    lda NewCurrentMapSegmentIndex
     beq @firstScreen
-    dec CurrentMapSegmentIndex
+    dec NewCurrentMapSegmentIndex
     lda #1
     sta CurrentScreenWasDecremented
     jmp @end
 @firstScreen:
     lda #0
-    sta ScrollX
+    sta NewScrollX
 
     jmp @end
 
@@ -6538,15 +6586,15 @@ KnockedBackLeft:
 @moveLeft:
 
     ldy KnockBackIndex
-    lda PlayerX + 1
+    lda NewPlayerX + 1
     sec
     sbc knockBackValuesFractions, y
-    sta PlayerX + 1
+    sta NewPlayerX + 1
 
-    lda PlayerX
+    lda NewPlayerX
     beq @end
     sbc knockBackValuesInteger, y
-    sta PlayerX
+    sta NewPlayerX
 @end:
     rts
 ;--------------------------------------
@@ -6554,17 +6602,17 @@ KnockedBackLeft:
 KnockedBackRight:
 
     lda #2
-    sta ScrollDirection
+    sta NewScrollDirection
 
     lda OldDirectionX
     sta DirectionX
 
 
-    lda PlayerX
+    lda NewPlayerX
     cmp #SCREEN_MIDDLE
     bcc @moveRight
 
-    lda CurrentMapSegmentIndex ; CurrentMapSegment + 1 == ScreenCount -> do not scroll
+    lda NewCurrentMapSegmentIndex ; CurrentMapSegment + 1 == ScreenCount -> do not scroll
     clc
     adc #1
     cmp ScreenCount
@@ -6572,22 +6620,22 @@ KnockedBackRight:
 
     ldy KnockBackIndex
 
-    lda ScrollX + 1
+    lda NewScrollX + 1
     clc
     adc knockBackValuesFractions, y
-    sta ScrollX + 1
+    sta NewScrollX + 1
 
-    lda ScrollX
+    lda NewScrollX
     adc knockBackValuesInteger, y
-    sta ScrollX
+    sta NewScrollX
 
     bcc @end
 
-    inc CurrentMapSegmentIndex
+    inc NewCurrentMapSegmentIndex
     lda #1
     sta CurrentScreenWasIncremented
 
-    lda CurrentMapSegmentIndex
+    lda NewCurrentMapSegmentIndex
     clc
     adc #1
     cmp ScreenCount
@@ -6597,7 +6645,7 @@ KnockedBackRight:
 
 @preLastScreen:
     lda #0          ;finshed to the last screen, set scroll to zero
-    sta ScrollX
+    sta NewScrollX
 
     jmp @end
 
@@ -6605,21 +6653,21 @@ KnockedBackRight:
 
 @moveRight:
     ldy KnockBackIndex
-    lda PlayerX + 1
+    lda NewPlayerX + 1
     clc
     adc knockBackValuesFractions, y
-    sta PlayerX + 1
+    sta NewPlayerX + 1
 
-    lda PlayerX
+    lda NewPlayerX
     adc knockBackValuesInteger, y
-    sta PlayerX
+    sta NewPlayerX
     adc #PLAYER_WIDTH
     bcc @end
 
     lda #$FF
     sec
     sbc #PLAYER_WIDTH
-    sta PlayerX
+    sta NewPlayerX
 
 
 @end:
@@ -6649,14 +6697,14 @@ addKnockBack:
 
     ldy KnockBackIndex
 
-    lda PlayerY + 1
+    lda NewPlayerY + 1
     sec
     sbc knockBackValuesFractions, y
-    sta PlayerY + 1
+    sta NewPlayerY + 1
 
-    lda PlayerY
+    lda NewPlayerY
     sbc knockBackValuesInteger, y
-    sta PlayerY
+    sta NewPlayerY
     jmp @end
 
 @knockBackDown:
@@ -6664,14 +6712,14 @@ addKnockBack:
     bne @horizontal
     ldy KnockBackIndex
 
-    lda PlayerY + 1
+    lda NewPlayerY + 1
     clc
     adc knockBackValuesFractions, y
-    sta PlayerY + 1
+    sta NewPlayerY + 1
 
-    lda PlayerY
+    lda NewPlayerY
     adc knockBackValuesInteger, y
-    sta PlayerY
+    sta NewPlayerY
     jmp @end
 ;------
 @horizontal:
@@ -6765,14 +6813,14 @@ ProcessButtons:
     sta PlayerFrame
 
 
-    lda PlayerY + 1 ; fraction
+    lda NewPlayerY + 1 ; fraction
     sec
     sbc PlayerSpeed + 1
-    sta PlayerY + 1
+    sta NewPlayerY + 1
 
-    lda PlayerY
+    lda NewPlayerY
     sbc PlayerSpeed
-    sta PlayerY
+    sta NewPlayerY
 
 @CheckDown:
     lda Buttons
@@ -6785,14 +6833,14 @@ ProcessButtons:
     sta PlayerFrame
 
 
-    lda PlayerY + 1 ; fraction
+    lda NewPlayerY + 1 ; fraction
     clc
     adc PlayerSpeed + 1
-    sta PlayerY + 1
+    sta NewPlayerY + 1
 
-    lda PlayerY
+    lda NewPlayerY
     adc PlayerSpeed
-    sta PlayerY
+    sta NewPlayerY
 @exit:
     lda #1
     sta InputProcessed
@@ -7612,7 +7660,7 @@ CheckLeft:
 
     lda #1
     sta DirectionX
-    sta ScrollDirection
+    sta NewScrollDirection
     lda #0
     sta PlayerFrame
 
@@ -7629,24 +7677,26 @@ CheckLeft:
     lda ScrollX + 1
     sec
     sbc PlayerSpeed + 1
-    sta ScrollX + 1
+    sta NewScrollX + 1
 
-    lda ScrollX
+    lda NewScrollX
     sbc PlayerSpeed
 
-    sta ScrollX
+    sta NewScrollX
     bcs @exit
 
 
     lda CurrentMapSegmentIndex
     beq @firstScreen
-    dec CurrentMapSegmentIndex
+    sec
+    sbc #1
+    sta NewCurrentMapSegmentIndex
     lda #1
     sta CurrentScreenWasDecremented
     jmp @exit
 @firstScreen:
     lda #0
-    sta ScrollX
+    sta NewScrollX
 
     jmp @exit
 
@@ -7655,28 +7705,17 @@ CheckLeft:
     lda PlayerX + 1 ; fraction
     sec
     sbc PlayerSpeed + 1
-    sta PlayerX + 1
+    sta NewPlayerX + 1
 
     lda PlayerX
     beq @exit ; already x=0
 
     sbc PlayerSpeed
-    sta PlayerX
+    sta NewPlayerX
 
 @exit:
 
     rts
-
-;---------------------------------
-SetupCheckRight:
-    lda #2
-    sta DirectionX
-    sta ScrollDirection
-    lda #0
-    sta PlayerFrame
-
-    rts
-
 ;----------------------------------
 ;Right on dpad is pressed
 CheckRight:
@@ -7684,34 +7723,41 @@ CheckRight:
     and #BUTTON_RIGHT_MASK
     beq @exit
 
-    jsr SetupCheckRight
+    lda #2
+    sta DirectionX
+    sta NewScrollDirection
+    lda #0
+    sta PlayerFrame
 
-    lda PlayerX
+    lda NewPlayerX
     cmp #SCREEN_MIDDLE
     bcc @moveRight  ;not gonna scroll until playerx + 8 >= 128
 
-    lda CurrentMapSegmentIndex ; CurrentMapSegment + 1 == ScreenCount -> do not scroll
+    lda NewCurrentMapSegmentIndex ; CurrentMapSegment + 1 == ScreenCount -> do not scroll
     clc
     adc #1
     cmp ScreenCount
     beq @moveRight
 
-    lda ScrollX + 1
+    lda NewScrollX + 1
     clc
     adc PlayerSpeed + 1
-    sta ScrollX + 1
+    sta NewScrollX + 1
 
-    lda ScrollX
+    lda NewScrollX
     adc PlayerSpeed
-    sta ScrollX
+    sta NewScrollX
 
     bcc @exit ; no overflow
 
-    inc CurrentMapSegmentIndex
+    lda NewCurrentMapSegmentIndex
+    clc
+    adc #1
+    sta NewCurrentMapSegmentIndex
     lda #1
     sta CurrentScreenWasIncremented
 
-    lda CurrentMapSegmentIndex
+    lda NewCurrentMapSegmentIndex
     clc
     adc #1
     cmp ScreenCount
@@ -7721,20 +7767,20 @@ CheckRight:
 
 @preLastScreen:
     lda #0          ;finshed to the last screen, set scroll to zero
-    sta ScrollX
+    sta NewScrollX
 
     jmp @exit
 
 @moveRight:
 
-    lda PlayerX + 1
+    lda NewPlayerX + 1
     clc
     adc PlayerSpeed + 1
-    sta PlayerX + 1
+    sta NewPlayerX + 1
 
-    lda PlayerX
+    lda NewPlayerX
     adc PlayerSpeed
-    sta PlayerX
+    sta NewPlayerX
 
     adc #PLAYER_WIDTH
     bcc @exit ; not greater than 255? Then fine
@@ -7742,7 +7788,7 @@ CheckRight:
     lda #$FF
     sec
     sbc #PLAYER_WIDTH
-    sta PlayerX
+    sta NewPlayerX
 
 @exit:
 
