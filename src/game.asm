@@ -77,6 +77,10 @@ house_sprites_chr: .incbin "house_sprites.lz4"
 .include "data/maps/cropped/grannys_hut_crop.asm"
 .include "data/maps/cropped/alien_bossroom_crop.asm"
 .include "data/maps/cropped/mine_room_crop.asm"
+.include "data/npc_list_alien_bossroom.asm"
+.include "data/npc_list_bjorn_house.asm"
+.include "data/npc_list_erikas_house.asm"
+.include "data/npc_list_grannys_house.asm"
 
 
 ;============================================================
@@ -104,6 +108,9 @@ alien_sprites_chr: .incbin "alien_sprites.lz4"
 .include "data/item_list_dark_cave2.asm"
 .include "data/item_list_secret_cave.asm"
 .include "data/item_list_mine.asm"
+.include "data/npc_list_mine.asm"
+.include "data/npc_list_alien_base.asm"
+.include "data/npc_list_dark_cave.asm"
 
 
 
@@ -192,9 +199,6 @@ banktable:              ; Write to this table to switch banks.
 
 .include "data/item_data.asm"
 .include "data/npc_data.asm"
-
-.include "data/npc_list.asm"  ;npcs in maps
-
 
 .include "data/villager_quests.asm" ;ROM3, ROM6, etc.
 .include "data/MapEntryPoints.asm" ; ROM1, RODATA
@@ -3976,11 +3980,15 @@ CommonLocationRoutine:
     lda pointer
     cmp #0
     beq @checkAnother
+
     jmp @loadNpcs
 @checkAnother:
     cmp pointer + 1
     beq @skipLoadingNpcs
 @loadNpcs:
+    ldy LocationBankNo
+    jsr bankswitch_y
+
     jsr LoadNpcs
 @skipLoadingNpcs:
 

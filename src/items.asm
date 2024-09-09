@@ -84,7 +84,7 @@ LoadItems:
     jmp @decrementItemIndex
 
 @deactivatedItem:
-   jsr DeactivatedItem
+    jsr DeactivatedItem
 
 @decrementItemIndex:
     inx

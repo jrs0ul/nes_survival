@@ -139,7 +139,11 @@ entry_points_loc19:
     .byte 40, 0, 0, 10, 0, 255, 119, 255
     ;41 entrance to last alien base location
     .byte 41, 0, 0, 255, 0, 255, 0, 32
+
+
 .segment "ROM0"
+
+
 ;-----------------------------------------------------
 ;The data of the new location the player has entered 
 ;---------------------------------------
@@ -163,7 +167,7 @@ entry_points_loc19:
 MapSpawnPoint:
     ;Entry to player's house from outside
     .byte 128, 152, 4, 1, LOCATION_TYPE_HOUSE, SONG_INDOORS, 0, 0, 0
-    .byte UNUSED, <house_palette, >house_palette, 0, <House_npcs, >House_npcs, 0
+    .byte UNUSED, <house_palette, >house_palette, 0, <list_empty, >list_empty, 0
     ;Second location entry point
     .byte 80, 208, 1, OUTDOORS_LOC2_SCREEN_COUNT, LOCATION_TYPE_OUTDOORS, SONG_OUTSIDE_DAY, 5, 0, 0
     .byte UNUSED, <main_palette, >main_palette, 3, 0, 0, 0
@@ -175,7 +179,7 @@ MapSpawnPoint:
     .byte UNUSED, <main_palette, >main_palette, 2, 0, 0, 0
     ;---------------------
     ;Bear's house entrance
-    .byte 128, 136, 3, 1, LOCATION_TYPE_VILLAGER, SONG_INDOORS, 5, 0, 0
+    .byte 128, 136, 3, 1, LOCATION_TYPE_VILLAGER, SONG_INDOORS, 3, 0, 0
     .byte UNUSED, <house_palette, >house_palette, 0, <Hut_npcs, >Hut_npcs, 0
     ;Exit point of second location
     .byte 128, 32, 0, OUTDOORS_LOC1_SCREEN_COUNT, LOCATION_TYPE_OUTDOORS, SONG_OUTSIDE_DAY, 0, 0, OUTDOORS_LOC1_SCREEN_COUNT - 1
@@ -188,7 +192,7 @@ MapSpawnPoint:
     .byte 120, 209, 0, OUTDOORS_LOC1_SCREEN_COUNT, LOCATION_TYPE_OUTDOORS, SONG_OUTSIDE_DAY, 0, 103, 1
     .byte UNUSED, <main_palette, >main_palette, 3, 0, 0, 1
     ;Second villager's house
-    .byte 128, 136, 5, 1, LOCATION_TYPE_VILLAGER, SONG_INDOORS, 0, 0, 0
+    .byte 128, 136, 5, 1, LOCATION_TYPE_VILLAGER, SONG_INDOORS, 3, 0, 0
     .byte UNUSED, <house_palette, >house_palette, 0, <villager2_npcs, >villager2_npcs, 0
     ;------------------
     ;Bjorn's house exit
@@ -219,7 +223,7 @@ MapSpawnPoint:
     .byte UNUSED, <alien_palette, >alien_palette, 0, <alien_base_npcs, >alien_base_npcs, 0
     ;Mine room entrance
     .byte 120, 152, 15, 1, LOCATION_TYPE_HOUSE, SONG_INDOORS, 0, 0, 0
-    .byte UNUSED, <house_palette, >house_palette, 0, <House_npcs, >House_npcs, 0
+    .byte UNUSED, <house_palette, >house_palette, 0, <list_empty, >list_empty, 0
     ;---------------------
     ;crashsite exit to cave
     .byte 120, 34, 6, OUTDOORS_LOC7_SCREEN_COUNT, LOCATION_TYPE_CAVE, SONG_OUTSIDE_NIGHT, 4, 192, 0
@@ -232,7 +236,7 @@ MapSpawnPoint:
     .byte 127, 205, 0, OUTDOORS_LOC1_SCREEN_COUNT, LOCATION_TYPE_OUTDOORS, SONG_OUTSIDE_DAY, 0, 0, OUTDOORS_LOC1_SCREEN_COUNT - 1
     .byte UNUSED, <main_palette, >main_palette, 3, 0, 0, 3
     ;granny's house
-    .byte 123, 148, 9, 1, LOCATION_TYPE_VILLAGER, SONG_INDOORS, 0, 0, 0
+    .byte 123, 148, 9, 1, LOCATION_TYPE_VILLAGER, SONG_INDOORS, 3, 0, 0
     .byte UNUSED, <house_palette, >house_palette, 0, <villager3_npcs, >villager3_npcs, 0
     ;secret cave
     .byte 127, 209, 14, 1, LOCATION_TYPE_DARK, SONG_OUTSIDE_NIGHT, 4, 0, 0
@@ -249,7 +253,7 @@ MapSpawnPoint:
     .byte 45, 38, 19, 3, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 2, 0, 0
     .byte UNUSED, <alien_palette, >alien_palette, 0, 0, 0, 0
     ;boss room entrance
-    .byte 20, 120, 12, 1, LOCATION_TYPE_VILLAGER, SONG_BOSS, 6, 0, 0
+    .byte 20, 120, 12, 1, LOCATION_TYPE_VILLAGER, SONG_BOSS, 3, 0, 0
     .byte UNUSED, <alien_palette, >alien_palette, 0, 0, 0, 0
     ;--------------
     ;A location with the mine entrance
@@ -485,27 +489,27 @@ LocationsWithRespawnableItems:
     .byte 0 ; 18
     .byte 1 ; 19
 
-item_list_empty:
+list_empty:
     .byte 0
 
 LocationItems:
     .byte  <Outside1_items,         >Outside1_items              ; 0
     .byte  <Outside2_items,         >Outside2_items              ; 1
     .byte  <Outside3_items,         >Outside3_items              ; 2
-    .byte  <item_list_empty,        >item_list_empty             ; 3 Bjorn's house
-    .byte  <item_list_empty,        >item_list_empty             ; 4 Player's house
-    .byte  <item_list_empty,        >item_list_empty             ; 5 Erika
+    .byte  <list_empty,             >list_empty                  ; 3 Bjorn's house
+    .byte  <list_empty,             >list_empty                  ; 4 Player's house
+    .byte  <list_empty,             >list_empty                  ; 5 Erika
     .byte  <Cave_items,             >Cave_items                  ; 6 mine
     .byte  <Crashsite_items,        >Crashsite_items             ; 7 crashsite
     .byte  <granny_location_items,  >granny_location_items       ; 8 granny location
-    .byte  <item_list_empty,        >item_list_empty             ; 9 granny's hut
-    .byte  <item_list_empty,        >item_list_empty             ; 10 alien base
+    .byte  <list_empty,             >list_empty                  ; 9 granny's hut
+    .byte  <list_empty,             >list_empty                  ; 10 alien base
     .byte  <mine_location_items,    >mine_location_items         ; 11 location where cave is
-    .byte  <item_list_empty,        >item_list_empty             ; 12 boss room
-    .byte  <item_list_empty,        >item_list_empty             ; 13 dark cave
+    .byte  <list_empty,             >list_empty                  ; 12 boss room
+    .byte  <list_empty,             >list_empty                  ; 13 dark cave
     .byte  <secret_cave_items,      >secret_cave_items           ; 14 secret cave
-    .byte  <item_list_empty,        >item_list_empty             ; 15 mine room
+    .byte  <list_empty,             >list_empty                  ; 15 mine room
     .byte  <dark_cave_2_items,      >dark_cave_2_items           ; 16 dark cave extension
-    .byte  <item_list_empty,        >item_list_empty             ; 17 alien base lobby
-    .byte  <item_list_empty,        >item_list_empty             ; 18 path to crashsite
+    .byte  <list_empty,             >list_empty                  ; 17 alien base lobby
+    .byte  <list_empty,             >list_empty                  ; 18 path to crashsite
     .byte  <item_list_alien_puzzle, >item_list_alien_puzzle      ; 19 pre alien base location
