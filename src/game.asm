@@ -574,9 +574,9 @@ TempMapColumnY:
 TempDestructibleTileIdx:
     .res 1
 
-OldPlayerX:
+NewPlayerX:
     .res 2
-OldPlayerY:
+NewPlayerY:
     .res 2
 
 PlayerX:
@@ -587,7 +587,7 @@ PlayerY:
 PlayerSpeed:
     .res 2
 
-OldScrollX:
+NewScrollX:
     .res 2
 ScrollX:
     .res 2
@@ -603,7 +603,7 @@ bankBeforeItemReset:
 
 CurrentMapSegmentIndex: ;starting screen
     .res 1
-OldCurrentMapSegmentIndex:
+NewCurrentMapSegmentIndex:
     .res 1
 
 CurrentScreenWasIncremented:
@@ -720,7 +720,7 @@ SecondNametableAddr:
 
 ScrollDirection:
     .res 1
-OldScrollDirection:
+NewScrollDirection:
     .res 1
 
 
@@ -1299,17 +1299,10 @@ CutsceneIdx: ; what cutscene to display
     .res 1
 
 
-NewPlayerY:
-    .res 2
-NewPlayerX:
-    .res 2
-NewScrollX:
-    .res 2
-NewScrollDirection:
+NewCurrentScreenWasIncremented:
     .res 1
-NewCurrentMapSegmentIndex:
+NewCurrentScreenWasDecremented:
     .res 1
-
 
 
 ;BSS_Free_Bytes:
@@ -4775,11 +4768,10 @@ HandleInput:
     jsr addKnockBack
 
     jsr IsPlayerCollidingWithNpcs
-    bne @resetStuff
-
+    bne @finishInput
 
     ;calc screen for collision
-    lda CurrentMapSegmentIndex
+    lda NewCurrentMapSegmentIndex
     sta TempCollisionVar
 
     ;first general check of newX and newY
@@ -4802,38 +4794,27 @@ HandleInput:
     lda #0
     sta PlayerFrame
 @resetJustY:
-    ;jsr ResetOnlyPlayerY
-
-    ;jmp @contInput
-
-    jmp @storeXMovement
+    jmp @storeXMovement ; store just X
 
 @thirdcheck:
     lda DirectionX
-    beq @resetStuff
+    beq @finishInput
 
     ;let's check with oldX now
     jsr CanPlayerGoWithOldX
-    bne @resetStuff
+    bne @finishInput ; don't store neither X nor Y
 
     ;the obstacles are on X axis
-    ;jsr ResetPlayerXMovement
+    jsr StoreYMovement ; store just Y
+    jmp @generate
 
-    jmp @contInput
-
-@resetStuff:
-    ;obstacle ahead, restore previous position
-    ;jsr ResetPlayerXMovement
-    ;jsr ResetOnlyPlayerY
-
-    jmp @finishInput
 
 @contInput:
 
     jsr StoreYMovement
 @storeXMovement:
     jsr StoreXMovement
-
+@generate:
     jsr GenerateNpcsIfNeeded
 
 @finishInput:
@@ -4844,14 +4825,6 @@ HandleInput:
 
     lda #INPUT_DELAY
     sta InputUpdateDelay
-    rts
-;-------------------------------
-ResetOnlyPlayerY:
-    lda OldPlayerY
-    sta PlayerY
-    lda OldPlayerY + 1
-    sta PlayerY + 1
-
     rts
 
 ;--------------------------------
@@ -4878,6 +4851,10 @@ BackupMovement:
     lda CurrentMapSegmentIndex
     sta NewCurrentMapSegmentIndex
 
+    lda #0
+    sta NewCurrentScreenWasIncremented
+    sta NewCurrentScreenWasDecremented
+
     rts
 
 ;-------------------------------
@@ -4897,6 +4874,13 @@ StoreXMovement:
 
     lda NewCurrentMapSegmentIndex
     sta CurrentMapSegmentIndex
+
+    lda NewCurrentScreenWasIncremented
+    sta CurrentScreenWasIncremented
+
+    lda NewCurrentScreenWasDecremented
+    sta CurrentScreenWasDecremented
+
     rts
 ;-------------------------------
 StoreYMovement:
@@ -4949,27 +4933,6 @@ GenerateNpcsIfNeeded:
 
 @exit:
     rts
-;--------------------------------
-;ResetPlayerXMovement:
-;
-;    lda OldPlayerX
-;    sta PlayerX
-;    lda OldPlayerX + 1
-;    sta PlayerX + 1
-;    lda OldScrollX
-;    sta ScrollX
-;    lda OldScrollX + 1
-;    sta ScrollX + 1
-;    lda OldScrollDirection
-;    sta ScrollDirection
-;    lda OldCurrentMapSegmentIndex
-;    sta CurrentMapSegmentIndex
-;    lda #0
-;    sta CurrentScreenWasIncremented
-;    sta CurrentScreenWasDecremented
-;
-;    rts
-
 ;-----------------------------
 ;Calculates depending on ScrollX and ScrollDirection:
 
@@ -6574,7 +6537,7 @@ KnockedBackLeft:
     beq @firstScreen
     dec NewCurrentMapSegmentIndex
     lda #1
-    sta CurrentScreenWasDecremented
+    sta NewCurrentScreenWasDecremented
     jmp @end
 @firstScreen:
     lda #0
@@ -6633,7 +6596,7 @@ KnockedBackRight:
 
     inc NewCurrentMapSegmentIndex
     lda #1
-    sta CurrentScreenWasIncremented
+    sta NewCurrentScreenWasIncremented
 
     lda NewCurrentMapSegmentIndex
     clc
@@ -7692,7 +7655,7 @@ CheckLeft:
     sbc #1
     sta NewCurrentMapSegmentIndex
     lda #1
-    sta CurrentScreenWasDecremented
+    sta NewCurrentScreenWasDecremented
     jmp @exit
 @firstScreen:
     lda #0
@@ -7755,7 +7718,7 @@ CheckRight:
     adc #1
     sta NewCurrentMapSegmentIndex
     lda #1
-    sta CurrentScreenWasIncremented
+    sta NewCurrentScreenWasIncremented
 
     lda NewCurrentMapSegmentIndex
     clc
