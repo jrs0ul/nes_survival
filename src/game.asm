@@ -606,9 +606,9 @@ CurrentMapSegmentIndex: ;starting screen
 NewCurrentMapSegmentIndex:
     .res 1
 
-CurrentScreenWasIncremented:
+CurrentScreenChange: ; 0 - not changed, 1 - incremented, 255 - decremented
     .res 1
-CurrentScreenWasDecremented:
+PossibleCurrentScreenChange:
     .res 1
 
 WarmthDelay:
@@ -1299,14 +1299,8 @@ CutsceneIdx: ; what cutscene to display
     .res 1
 
 
-NewCurrentScreenWasIncremented:
-    .res 1
-NewCurrentScreenWasDecremented:
-    .res 1
-
-
-;BSS_Free_Bytes:
-;    .res 10
+BSS_Free_Bytes:
+    .res 10
 
 ;====================================================================================
 
@@ -4760,7 +4754,7 @@ HandleInput:
 @continueInput:
 
     ;save the movement before collision check
-    jsr BackupMovement
+    jsr CreateNewPlayerMovementVars
 
     ;gamepad button processing, the player could be moved here
     jsr ProcessButtons
@@ -4828,7 +4822,7 @@ HandleInput:
     rts
 
 ;--------------------------------
-BackupMovement:
+CreateNewPlayerMovementVars:
 
     lda PlayerX
     sta NewPlayerX
@@ -4852,8 +4846,7 @@ BackupMovement:
     sta NewCurrentMapSegmentIndex
 
     lda #0
-    sta NewCurrentScreenWasIncremented
-    sta NewCurrentScreenWasDecremented
+    sta PossibleCurrentScreenChange
 
     rts
 
@@ -4875,11 +4868,8 @@ StoreXMovement:
     lda NewCurrentMapSegmentIndex
     sta CurrentMapSegmentIndex
 
-    lda NewCurrentScreenWasIncremented
-    sta CurrentScreenWasIncremented
-
-    lda NewCurrentScreenWasDecremented
-    sta CurrentScreenWasDecremented
+    lda PossibleCurrentScreenChange
+    sta CurrentScreenChange
 
     rts
 ;-------------------------------
@@ -4896,12 +4886,13 @@ StoreYMovement:
 GenerateNpcsIfNeeded:
 
 
-    lda CurrentScreenWasIncremented
-    beq @checkdecrement
+    lda CurrentScreenChange
+    cmp #CURRENT_SCREEN_INCREMENTED
+    bne @checkdecrement
 
     jsr FlipStartingNametable
     lda #0
-    sta CurrentScreenWasIncremented
+    sta CurrentScreenChange
 
     lda CurrentMapSegmentIndex
     clc
@@ -4912,12 +4903,12 @@ GenerateNpcsIfNeeded:
 
 @checkdecrement:
 
-    lda CurrentScreenWasDecremented
-    beq @exit
+    cmp #CURRENT_SCREEN_DECREMENTED
+    bne @exit
 
     jsr FlipStartingNametable
     lda #0
-    sta CurrentScreenWasDecremented
+    sta CurrentScreenChange
 
     lda CurrentMapSegmentIndex
     cmp ScreenCount
@@ -5123,14 +5114,12 @@ CalcMapColumnToUpdate:
 ;--------------------------------
 CutsceneNametableAnimations:
 
-
     ldy #5
     jsr bankswitch_y
 
     jsr CutsceneNameTableUpdate
 
     rts
-
 
 ;--------------------------------
 UpdateTextBaloon:
@@ -6536,8 +6525,8 @@ KnockedBackLeft:
     lda NewCurrentMapSegmentIndex
     beq @firstScreen
     dec NewCurrentMapSegmentIndex
-    lda #1
-    sta NewCurrentScreenWasDecremented
+    lda #255
+    sta PossibleCurrentScreenChange
     jmp @end
 @firstScreen:
     lda #0
@@ -6596,7 +6585,7 @@ KnockedBackRight:
 
     inc NewCurrentMapSegmentIndex
     lda #1
-    sta NewCurrentScreenWasIncremented
+    sta PossibleCurrentScreenChange
 
     lda NewCurrentMapSegmentIndex
     clc
@@ -7654,8 +7643,8 @@ CheckLeft:
     sec
     sbc #1
     sta NewCurrentMapSegmentIndex
-    lda #1
-    sta NewCurrentScreenWasDecremented
+    lda #255
+    sta PossibleCurrentScreenChange
     jmp @exit
 @firstScreen:
     lda #0
@@ -7718,7 +7707,7 @@ CheckRight:
     adc #1
     sta NewCurrentMapSegmentIndex
     lda #1
-    sta NewCurrentScreenWasIncremented
+    sta PossibleCurrentScreenChange
 
     lda NewCurrentMapSegmentIndex
     clc
