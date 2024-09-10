@@ -4,14 +4,14 @@
 ;destructible idx in y register
 SwitchPlate:
 
-    lda Destructibles, y
+    lda ModifiedTiles, y
     beq @switchLockOn
     lda #0
     jmp @saveLock
 @switchLockOn:
     lda #1
 @saveLock:
-    sta Destructibles, y
+    sta ModifiedTiles, y
 
     rts
 
@@ -22,67 +22,67 @@ Switch1Logic:
     jsr SwitchPlate
 
     ldy #9
-    lda Destructibles, y
+    lda ModifiedTiles, y
     ldy #8
     clc
-    adc Destructibles, y
+    adc ModifiedTiles, y
     cmp #0
     beq @first_lock
 
-    lda Destructibles, y ;8
+    lda ModifiedTiles, y ;8
     bne @third_lock
     ;second lock
     ldy #7
-    lda Destructibles, y
+    lda ModifiedTiles, y
     ldy #5
-    sta Destructibles, y
+    sta ModifiedTiles, y
     jmp @done
 
 @third_lock:
     ldy #7
-    lda Destructibles, y
+    lda ModifiedTiles, y
     ldy #4
-    sta Destructibles, y
+    sta ModifiedTiles, y
     jmp @done
 
 @first_lock:
     ldy #7
-    lda Destructibles, y
+    lda ModifiedTiles, y
     ldy #6
-    sta Destructibles, y
+    sta ModifiedTiles, y
 
 @done:
     rts
 ;------------------------
 Switch2Logic:
     ldy #4
-    lda Destructibles, y
+    lda ModifiedTiles, y
     ldy #7
-    sta Destructibles, y
+    sta ModifiedTiles, y
 
     ldy #8
     jsr SwitchPlate
-    lda Destructibles, y
+    lda ModifiedTiles, y
     beq @done
     ldy #9
     lda #0
-    sta Destructibles, y
+    sta ModifiedTiles, y
 @done:
     rts
 ;------------------------
 Switch3Logic:
     ldy #5
-    lda Destructibles, y
+    lda ModifiedTiles, y
     ldy #7
-    sta Destructibles, y
+    sta ModifiedTiles, y
 
     ldy #9
     jsr SwitchPlate
-    lda Destructibles, y
+    lda ModifiedTiles, y
     beq @done
     ldy #8
     lda #0
-    sta Destructibles, y
+    sta ModifiedTiles, y
 
 @done:
     rts

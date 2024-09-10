@@ -309,7 +309,7 @@ IsCollidingWithAModifiedTile:
     tay
     lda (pointer2), y ; index of Destructibles
     tax
-    lda Destructibles, x
+    lda ModifiedTiles, x
     stx TempRegX ; store destructible index
 
     sta TempDigit ; store is destroyed or not
@@ -339,13 +339,17 @@ IsCollidingWithAModifiedTile:
     ;tile is not destroyed
     ldx TempRegX
     cpx #DESTRUCTIBLE_DOOR_IDX ; locked door
-    bne @nextTile
+    beq @colidesWithDoor
+    cpx #DESTRUCTIBLE_DOOR_IDX2
+    beq @colidesWithDoor
+    jmp @nextTile
+@colidesWithDoor:
     jsr IfCollidingWithLockedDoor
     cmp #0
     beq @cont ;it's not
     ldx TempRegX
     lda #1
-    sta Destructibles, x
+    sta ModifiedTiles, x
     sta MustUpdateDestructibles
     jmp @cont
     ;---------end of crutch

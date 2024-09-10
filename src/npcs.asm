@@ -531,8 +531,8 @@ OnBossDefeat:
     ldy #3
     lda #1
     sta VillagerKilled, y
-    sta Destructibles + 2
-    sta Destructibles + 3
+    sta ModifiedTiles + 2
+    sta ModifiedTiles + 3
     rts
 
 ;-------------------------------------

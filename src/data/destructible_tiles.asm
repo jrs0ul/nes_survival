@@ -16,7 +16,7 @@ mod_tiles_by_location:
     .byte <mod_tiles_secret_cave,    >mod_tiles_secret_cave    ;14
     .byte 0,                         0                         ;15
     .byte 0,                         0                         ;16
-    .byte 0,                         0                         ;17
+    .byte <mod_tiles_alien_lobby,    >mod_tiles_alien_lobby    ;17
     .byte 0,                         0                         ;18
     .byte <mod_tiles_alien_base_pre, >mod_tiles_alien_base_pre ;19 alien base pre
 
@@ -38,6 +38,6 @@ mod_tiles_count_by_location:
     .byte 4 ;14
     .byte 0 ;15
     .byte 0 ;16
-    .byte 0 ;17
+    .byte 4 ;17
     .byte 0 ;18
     .byte 18 ;19

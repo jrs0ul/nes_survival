@@ -21,6 +21,7 @@ location_map_pos: ;index where the pointer to the first screen of each location 
     .byte 35 ;17 alien base lobby
     .byte 36 ;18 path to crashsite
     .byte 37 ;19 pre alien base location
+    .byte 31 ;20 cave room
 
 map_list_low:
     .byte <field_bg            ; 0

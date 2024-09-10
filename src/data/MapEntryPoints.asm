@@ -127,18 +127,24 @@ entry_points_loc17:
     .byte 36, 0, 222, 255, 0, 255, 125, 140
     ;37. exit to dark cave 2
     .byte 37, 0, 32, 40, 0, 255, 119, 130
+    ;38. cave-room
+    .byte 38, 0, 128, 136, 0, 255, 56, 64
     ;--------------------------------------
 entry_points_loc18:
-    ;38. entrance to crashsite location
-    .byte 38, 0, 0, 255, 0, 255, 0, 50
-    ;39. entrance to location with mine
-    .byte 39, 0, 0, 255, 0, 255, 222, 255
+    ;39. entrance to crashsite location
+    .byte 39, 0, 0, 255, 0, 255, 0, 50
+    ;40. entrance to location with mine
+    .byte 40, 0, 0, 255, 0, 255, 222, 255
     ;----------------------
 entry_points_loc19:
-    ;40 exit to alien base lobby
-    .byte 40, 0, 0, 10, 0, 255, 119, 255
-    ;41 entrance to last alien base location
-    .byte 41, 0, 0, 255, 0, 255, 0, 32
+    ;41 exit to alien base lobby
+    .byte 41, 0, 0, 10, 0, 255, 119, 255
+    ;42 entrance to last alien base location
+    .byte 42, 0, 0, 255, 0, 255, 0, 32
+    ;----------------------
+entry_points_loc20:
+    ;43 cave-room exit
+    .byte 43, 0, 0, 255, 0, 255, 160, 255
 
 
 .segment "ROM0"
@@ -301,6 +307,9 @@ MapSpawnPoint:
     ;exit to dark cave 2
     .byte 96, 196, 16, 3, LOCATION_TYPE_DARK, SONG_OUTSIDE_NIGHT, 4, 0, 0
     .byte UNUSED, <main_palette, >main_palette, 3, 0, 0, 0
+    ;entrance of the cave-room
+    .byte 120, 152, 15, 1, LOCATION_TYPE_HOUSE, SONG_INDOORS, 0, 0, 0
+    .byte UNUSED, <house_palette, >house_palette, 0, <list_empty, >list_empty, 0
     ;--------------------
     ;entrance to the crashsite from the path
     .byte 57, 210, 7, OUTDOORS_LOC8_SCREEN_COUNT, LOCATION_TYPE_OUTDOORS, SONG_OUTSIDE_DAY, 2, 0, 0
@@ -310,11 +319,15 @@ MapSpawnPoint:
     .byte UNUSED, <main_palette, >main_palette, 2, 0, 0, 0
     ;------------------
     ;exit to lobby
-    .byte 190, 140, 17, 1, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 2, 0, 0
+    .byte 199, 140, 17, 1, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 2, 0, 0
     .byte UNUSED, <main_palette, >main_palette, 0, 0, 0, 0
     ;entrance to last alien base segment
     .byte 50, 210, 10, 2, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 4, 0, 0
     .byte UNUSED, <alien_palette, >alien_palette, 0, <alien_base_npcs, >alien_base_npcs, 0
+    ;------------------
+    ;exit to alien lobby
+    .byte 53, 129, 17, 1, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 2, 0, 0
+    .byte UNUSED, <main_palette, >main_palette, 0, 0, 0, 0
 
 
 
@@ -344,6 +357,7 @@ LocationScreenCountList:
     .byte 1                          ; 17 alien base lobby
     .byte 1                          ; 18 path to crashsite
     .byte 3                          ; 19 pre alien base location
+    .byte 1                          ; 20 house before alien base
 
 
 LocationEntryPointPtrs:
@@ -367,6 +381,7 @@ LocationEntryPointPtrs:
     .byte <entry_points_loc17, >entry_points_loc17
     .byte <entry_points_loc18, >entry_points_loc18
     .byte <entry_points_loc19, >entry_points_loc19
+    .byte <entry_points_loc20, >entry_points_loc20
 
 EntryPointCountForLocation:
     .byte 4 ;0
@@ -389,6 +404,7 @@ EntryPointCountForLocation:
     .byte 2 ;17
     .byte 2 ;18
     .byte 2 ;19
+    .byte 1 ;20
 
 
 ;which location in which bank
@@ -413,6 +429,7 @@ LocationBanks:
     .byte 2  ;17
     .byte 0  ;18
     .byte 2  ;19
+    .byte 3  ;15
 
 
 ;indexes in Item_Location1_Collection_times
@@ -444,6 +461,7 @@ LocationItemIndexes:
     .byte 0                                                                           ;17
     .byte 0                                                                           ;18
     .byte ITEM_IDX_LOC11 + ITEM_COUNT_LOC12 + ITEM_COUNT_LOC15 + ITEM_COUNT_LOC17     ;19
+    .byte 0                                                                           ;20
 
 LocationItemCounts:
     .byte ITEM_COUNT_LOC1  ; 0
@@ -466,6 +484,7 @@ LocationItemCounts:
     .byte 0                ; 17
     .byte 0                ; 18 path to crashsite
     .byte ITEM_COUNT_LOC19 ; 19 pre alien base
+    .byte 0                ; 20 cave-room
 
 LocationsWithRespawnableItems:
     .byte 1 ; 0
@@ -488,6 +507,7 @@ LocationsWithRespawnableItems:
     .byte 0 ; 17
     .byte 0 ; 18
     .byte 1 ; 19
+    .byte 0 ; 20
 
 list_empty:
     .byte 0
@@ -513,3 +533,4 @@ LocationItems:
     .byte  <list_empty,             >list_empty                  ; 17 alien base lobby
     .byte  <list_empty,             >list_empty                  ; 18 path to crashsite
     .byte  <item_list_alien_puzzle, >item_list_alien_puzzle      ; 19 pre alien base location
+    .byte  <list_empty,             >list_empty                  ; 20 cave-room

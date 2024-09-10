@@ -63,6 +63,7 @@ intro_tiles_chr   :  .incbin "intro.lz4"
 .include "data/maps/cropped/pre_alien_base1_crop.asm"
 .include "data/maps/cropped/pre_alien_base2_crop.asm"
 .include "data/mod_tiles_alien_base_pre.asm"
+.include "data/mod_tiles_alien_lobby.asm"
 .include "data/item_list_crashsite.asm"
 .include "data/item_list_alien_puzzle.asm"
 
@@ -1168,8 +1169,8 @@ ProjectileCount:
 ProjectileIdx:
     .res 1
 
-Destructibles:
-    .res DESTRUCTIBLE_OBJECTS_COUNT  ;1 means destroyed
+ModifiedTiles:
+    .res MODIFYABLE_OBJECTS_COUNT  ;1 means destroyed
 
 AttribHighAddress:
     .res 1
@@ -1300,7 +1301,7 @@ CutsceneIdx: ; what cutscene to display
 
 
 BSS_Free_Bytes:
-    .res 10
+    .res 9
 
 ;====================================================================================
 
@@ -2029,7 +2030,7 @@ UpdateModifiedTiles:
 
     lda (pointer2), y
     tax
-    lda Destructibles, x
+    lda ModifiedTiles, x
     sta TempNpcState ;store if the tile is modified
 
     lda ModifiedTilesToDraw
@@ -5905,10 +5906,10 @@ ResetVariables:
     sta EquipedClothing
     sta EquipedClothing + 1
 
-    ldy #DESTRUCTIBLE_OBJECTS_COUNT
+    ldy #MODIFYABLE_OBJECTS_COUNT
 
 @destructibleLoop:
-    sta Destructibles, y
+    sta ModifiedTiles, y
     dey
     bne @destructibleLoop
 
@@ -7084,7 +7085,7 @@ useHammerOnEnvironment:
     lda (pointer2), y
     tay
     lda #1
-    sta Destructibles, y
+    sta ModifiedTiles, y
 
     lda #1
     sta MustUpdateDestructibles
