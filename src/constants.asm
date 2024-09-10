@@ -87,6 +87,9 @@
     ROCK_TILE_3                = $EE
     ROCK_TILE_4                = $EF
 
+    CURRENT_SCREEN_INCREMENTED = 1
+    CURRENT_SCREEN_DECREMENTED = 255
+
 
     INTRO_SCENE_MAX            = 7
     OUTRO_SCENE_MAX            = 4

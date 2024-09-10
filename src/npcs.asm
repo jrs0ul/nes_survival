@@ -427,16 +427,16 @@ SingleNpcVSPlayerCollision:
     ;X1
     lda Npcs, y ; x
     sec
-    sbc ScrollX
+    sbc NewScrollX
     bcs @exit
     sta TempPointX
     jmp @calcY
 @NpcMatchesScreen:
     lda Npcs, y ; x
-    cmp ScrollX
+    cmp NewScrollX
     bcc @exit
     sec
-    sbc ScrollX
+    sbc NewScrollX
     sta TempPointX
 
 @calcY: ; Y1
@@ -480,24 +480,24 @@ PlayerNpcCollision:
     sta TempPointY2
 
 ;--
-    lda PlayerX
+    lda NewPlayerX
     clc
     adc #3
     cmp TempPointX2 ; Little bit more than just PlayerX
     bcs @exit
 
-    lda PlayerX
+    lda NewPlayerX
     clc
     adc #PLAYER_WIDTH - 3 ; and less than a full player width
     cmp TempPointX
     bcc @exit
     beq @exit
 
-    lda PlayerY
+    lda NewPlayerY
     cmp TempPointY2 
     bcs @exit
 
-    lda PlayerY
+    lda NewPlayerY
     clc
     adc #PLAYER_HEIGHT
     cmp TempPointY
