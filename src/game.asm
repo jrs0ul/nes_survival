@@ -3515,8 +3515,8 @@ RoutinesAfterFadeOut:
     lda #2
     sta ScrollDirection
 
-    lda #1
-    sta MustCopyMainChr
+    lda #0
+    sta FirstTime
     ;---------------------
     ;12. crashsite entrance from cave
 @next12:
@@ -3603,8 +3603,6 @@ RoutinesAfterFadeOut:
     cmp #16
     bne @next22
 
-    lda #0
-    sta FirstTime
     ;--------------------
     ;23.alien base exit top
 @next22:
@@ -3697,61 +3695,13 @@ RoutinesAfterFadeOut:
 @next28:
     lda ActiveMapEntryIndex
     cmp #21
-    bne @next29
+    bne @next35
 
     lda #1
     sta MustCopyMainChr
 
     jsr TurnDarkPaletteOn
     ;------------------------
-    ;32 secret cave exit
-@next29:
-    lda ActiveMapEntryIndex
-    cmp #32
-    bne @next30
-
-    lda #1
-    sta MustCopyMainChr
-    ;-----------------------
-    ;33 mine room exit
-@next30:
-    lda ActiveMapEntryIndex
-    cmp #33
-    bne @next31
-
-    lda #1
-    sta ScrollDirection
-    sta MustCopyMainChr
-
-    ;-----------------
-    ;38. entrance to crashsite from path
-@next31:
-    lda ActiveMapEntryIndex
-    cmp #38
-    bne @next32
-
-    lda #1
-    sta MustCopyMainChr
-
-    ;---------------------
-    ;39. entrance to location with mine
-@next32:
-    lda ActiveMapEntryIndex
-    cmp #39
-    bne @next34
-
-    lda #1
-    sta MustCopyMainChr
-    ;-------------------------
-    ;35. entrance to alien base lobby
-@next34:
-    lda ActiveMapEntryIndex
-    cmp #35
-    bne @next35
-
-    lda #1
-    sta MustCopyMainChr
-    ;---------------------------
     ;31 dark cave 2
 @next35:
 
@@ -7013,9 +6963,12 @@ useHammerOnEnvironment:
 
     lda LocationType
     cmp #LOCATION_TYPE_OUTDOORS
-    bne @abort
-
-    jmp @cont
+    beq @cont
+    cmp #LOCATION_TYPE_CAVE
+    beq @cont
+    cmp #LOCATION_TYPE_DARK
+    beq @cont
+    jmp @abort
 
 @abort:
     rts

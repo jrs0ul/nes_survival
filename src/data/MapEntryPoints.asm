@@ -124,11 +124,11 @@ entry_points_loc16:
     ; Lobby
 entry_points_loc17:
     ;36. pre-alien base entrance
-    .byte 36, 0, 222, 255, 0, 255, 125, 140
+    .byte 36, 0, 230, 255, 0, 255, 125, 140
     ;37. exit to dark cave 2
     .byte 37, 0, 32, 40, 0, 255, 119, 130
-    ;38. cave-room
-    .byte 38, 0, 128, 136, 0, 255, 56, 64
+    ;38. alien-lobby-room
+    .byte 38, 0, 120, 136, 0, 255, 40, 50
     ;--------------------------------------
 entry_points_loc18:
     ;39. entrance to crashsite location
@@ -308,7 +308,7 @@ MapSpawnPoint:
     .byte 96, 196, 16, 3, LOCATION_TYPE_DARK, SONG_OUTSIDE_NIGHT, 4, 0, 0
     .byte UNUSED, <main_palette, >main_palette, 3, 0, 0, 0
     ;entrance of the cave-room
-    .byte 120, 152, 15, 1, LOCATION_TYPE_HOUSE, SONG_INDOORS, 0, 0, 0
+    .byte 120, 152, 20, 1, LOCATION_TYPE_HOUSE, SONG_INDOORS, 3, 0, 0
     .byte UNUSED, <house_palette, >house_palette, 0, <list_empty, >list_empty, 0
     ;--------------------
     ;entrance to the crashsite from the path
@@ -319,14 +319,14 @@ MapSpawnPoint:
     .byte UNUSED, <main_palette, >main_palette, 2, 0, 0, 0
     ;------------------
     ;exit to lobby
-    .byte 199, 140, 17, 1, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 2, 0, 0
+    .byte 229, 134, 17, 1, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 2, 0, 0
     .byte UNUSED, <main_palette, >main_palette, 0, 0, 0, 0
     ;entrance to last alien base segment
     .byte 50, 210, 10, 2, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 4, 0, 0
     .byte UNUSED, <alien_palette, >alien_palette, 0, <alien_base_npcs, >alien_base_npcs, 0
     ;------------------
     ;exit to alien lobby
-    .byte 53, 129, 17, 1, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 2, 0, 0
+    .byte 126, 60, 17, 1, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 2, 0, 0
     .byte UNUSED, <main_palette, >main_palette, 0, 0, 0, 0
 
 
@@ -401,7 +401,7 @@ EntryPointCountForLocation:
     .byte 1 ;14
     .byte 1 ;15
     .byte 2 ;16 dark cave 2
-    .byte 2 ;17
+    .byte 3 ;17
     .byte 2 ;18
     .byte 2 ;19
     .byte 1 ;20
@@ -429,7 +429,7 @@ LocationBanks:
     .byte 2  ;17
     .byte 0  ;18
     .byte 2  ;19
-    .byte 3  ;15
+    .byte 3  ;20
 
 
 ;indexes in Item_Location1_Collection_times
