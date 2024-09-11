@@ -120,31 +120,41 @@ entry_points_loc16:
     .byte 34, 2, 189, 255, 0, 255, 0, 32
     ;35. alien base lobby entrance
     .byte 35, 0, 105, 118, 0, 255, 185, 203
+    ;36. entrance to the lonely cave
+    .byte 36, 0, 117, 122, 231, 235, 222, 255
     ;--------------------------------------
     ; Lobby
 entry_points_loc17:
-    ;36. pre-alien base entrance
-    .byte 36, 0, 230, 255, 0, 255, 125, 140
-    ;37. exit to dark cave 2
-    .byte 37, 0, 32, 40, 0, 255, 119, 130
-    ;38. alien-lobby-room
-    .byte 38, 0, 120, 136, 0, 255, 40, 50
+    ;37. pre-alien base entrance
+    .byte 37, 0, 230, 255, 0, 255, 125, 140
+    ;38. exit to dark cave 2
+    .byte 38, 0, 32, 40, 0, 255, 119, 130
+    ;39. alien-lobby-room
+    .byte 39, 0, 120, 136, 0, 255, 40, 50
     ;--------------------------------------
 entry_points_loc18:
-    ;39. entrance to crashsite location
-    .byte 39, 0, 0, 255, 0, 255, 0, 50
-    ;40. entrance to location with mine
-    .byte 40, 0, 0, 255, 0, 255, 222, 255
+    ;40. entrance to crashsite location
+    .byte 40, 0, 0, 255, 0, 255, 0, 50
+    ;41. entrance to location with mine
+    .byte 41, 0, 0, 255, 0, 255, 222, 255
     ;----------------------
 entry_points_loc19:
-    ;41 exit to alien base lobby
-    .byte 41, 0, 0, 10, 0, 255, 119, 255
-    ;42 entrance to last alien base location
-    .byte 42, 0, 0, 255, 0, 255, 0, 32
+    ;42 exit to alien base lobby
+    .byte 42, 0, 0, 10, 0, 255, 119, 255
+    ;43 entrance to last alien base location
+    .byte 43, 0, 0, 255, 0, 255, 0, 32
     ;----------------------
 entry_points_loc20:
-    ;43 cave-room exit
-    .byte 43, 0, 0, 255, 0, 255, 160, 255
+    ;44 cave-room exit
+    .byte 44, 0, 0, 255, 0, 255, 160, 255
+entry_points_loc21:
+    ;45 lonely cave exit to the dark cave 2
+    .byte 45, 0, 0, 255, 0, 255, 0, 40
+    ;46 entrance to wood location
+    .byte 46, 0, 0, 255, 0, 255, 222, 255
+entry_points_loc22:
+    ;47. exit to lonely cave
+    .byte 47, 0, 0, 255, 0, 255, 20, 40
 
 
 .segment "ROM0"
@@ -300,6 +310,9 @@ MapSpawnPoint:
     ;alien base lobby entrance
     .byte 53, 129, 17, 1, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 2, 0, 0
     .byte UNUSED, <main_palette, >main_palette, 0, 0, 0, 0
+    ;lonely cave entrance
+    .byte 130, 41, 21, 0, LOCATION_TYPE_CAVE, SONG_OUTSIDE_NIGHT, 3, 0, 0
+    .byte UNUSED, <main_palette, >main_palette, 0, 0, 0, 0
     ;------------
     ;alien base entrance bottom (pre)
     .byte 15, 170, 19, 3, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 2, 0, 0
@@ -327,6 +340,17 @@ MapSpawnPoint:
     ;------------------
     ;exit to alien lobby
     .byte 126, 60, 17, 1, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 2, 0, 0
+    .byte UNUSED, <main_palette, >main_palette, 0, 0, 0, 0
+    ;------------------
+    ;exit from lonely cave to the dark cave 2
+    .byte 120, 212, 16, 0, LOCATION_TYPE_DARK, SONG_OUTSIDE_NIGHT, 4, 234, 0
+    .byte UNUSED, <main_palette, >main_palette, 3, 0, 0, 0
+    ;entrance to wood location
+    .byte 100, 100, 22, 0, LOCATION_TYPE_OUTDOORS, SONG_OUTSIDE_DAY, 3, 0, 0
+    .byte UNUSED, <main_palette, >main_palette, 0, 0, 0, 0
+    ;---------------------
+    ;exit to lonely cave from wood location
+    .byte 100, 100, 21, 0, LOCATION_TYPE_CAVE, SONG_OUTSIDE_NIGHT, 3, 0, 0
     .byte UNUSED, <main_palette, >main_palette, 0, 0, 0, 0
 
 
@@ -358,6 +382,8 @@ LocationScreenCountList:
     .byte 1                          ; 18 path to crashsite
     .byte 3                          ; 19 pre alien base location
     .byte 1                          ; 20 house before alien base
+    .byte 1                          ; 21 lonely cave
+    .byte 2                          ; 22 wood location
 
 
 LocationEntryPointPtrs:
@@ -382,6 +408,8 @@ LocationEntryPointPtrs:
     .byte <entry_points_loc18, >entry_points_loc18
     .byte <entry_points_loc19, >entry_points_loc19
     .byte <entry_points_loc20, >entry_points_loc20
+    .byte <entry_points_loc21, >entry_points_loc21
+    .byte <entry_points_loc22, >entry_points_loc22
 
 EntryPointCountForLocation:
     .byte 4 ;0
@@ -400,11 +428,13 @@ EntryPointCountForLocation:
     .byte 2 ;13
     .byte 1 ;14
     .byte 1 ;15
-    .byte 2 ;16 dark cave 2
+    .byte 3 ;16 dark cave 2
     .byte 3 ;17
     .byte 2 ;18
     .byte 2 ;19
     .byte 1 ;20
+    .byte 2 ;21
+    .byte 1 ;22 wood location
 
 
 ;which location in which bank
@@ -430,6 +460,8 @@ LocationBanks:
     .byte 0  ;18
     .byte 2  ;19
     .byte 3  ;20
+    .byte 3  ;21
+    .byte 3  ;22
 
 
 ;indexes in Item_Location1_Collection_times
@@ -439,6 +471,7 @@ ITEM_IDX_LOC4  = ITEM_IDX_LOC3   + ITEM_COUNT_LOC3
 ITEM_IDX_LOC8  = ITEM_IDX_LOC4   + ITEM_COUNT_LOC7
 ITEM_IDX_LOC9  = ITEM_IDX_LOC8   + ITEM_COUNT_LOC8
 ITEM_IDX_LOC11 = ITEM_IDX_LOC9   + ITEM_COUNT_LOC9
+ITEM_IDX_LOC14 = ITEM_IDX_LOC11  + ITEM_COUNT_LOC12
 
 LocationItemIndexes:
     .byte 0                                                                           ;0
@@ -455,13 +488,15 @@ LocationItemIndexes:
     .byte ITEM_IDX_LOC11                                                              ;11
     .byte 0                                                                           ;12
     .byte 0                                                                           ;13
-    .byte ITEM_IDX_LOC11 + ITEM_COUNT_LOC12                                           ;14
+    .byte ITEM_IDX_LOC14                                                              ;14
     .byte 0                                                                           ;15
-    .byte ITEM_IDX_LOC11 + ITEM_COUNT_LOC12 + ITEM_COUNT_LOC15                        ;16
+    .byte ITEM_IDX_LOC14 + ITEM_COUNT_LOC15                                           ;16
     .byte 0                                                                           ;17
     .byte 0                                                                           ;18
-    .byte ITEM_IDX_LOC11 + ITEM_COUNT_LOC12 + ITEM_COUNT_LOC15 + ITEM_COUNT_LOC17     ;19
+    .byte ITEM_IDX_LOC14 + ITEM_COUNT_LOC15 + ITEM_COUNT_LOC17                        ;19
     .byte 0                                                                           ;20
+    .byte 0                                                                           ;21
+    .byte ITEM_IDX_LOC14 + ITEM_COUNT_LOC15 + ITEM_COUNT_LOC17 + ITEM_COUNT_LOC20     ;22
 
 LocationItemCounts:
     .byte ITEM_COUNT_LOC1  ; 0
@@ -483,8 +518,10 @@ LocationItemCounts:
     .byte ITEM_COUNT_LOC17 ; 16
     .byte 0                ; 17
     .byte 0                ; 18 path to crashsite
-    .byte ITEM_COUNT_LOC19 ; 19 pre alien base
+    .byte ITEM_COUNT_LOC20 ; 19 pre alien base
     .byte 0                ; 20 cave-room
+    .byte 0                ; 21 lonely cave
+    .byte ITEM_COUNT_LOC23 ; 22 wood location
 
 LocationsWithRespawnableItems:
     .byte 1 ; 0
@@ -508,6 +545,8 @@ LocationsWithRespawnableItems:
     .byte 0 ; 18
     .byte 1 ; 19
     .byte 0 ; 20
+    .byte 0 ; 21
+    .byte 1 ; 22
 
 list_empty:
     .byte 0
@@ -534,3 +573,5 @@ LocationItems:
     .byte  <list_empty,             >list_empty                  ; 18 path to crashsite
     .byte  <item_list_alien_puzzle, >item_list_alien_puzzle      ; 19 pre alien base location
     .byte  <list_empty,             >list_empty                  ; 20 cave-room
+    .byte  <list_empty,             >list_empty                  ; 21 lonely cave
+    .byte  <wood_location_items,    >wood_location_items         ; 22 wood location

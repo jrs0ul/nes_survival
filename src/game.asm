@@ -82,6 +82,10 @@ house_sprites_chr: .incbin "house_sprites.lz4"
 .include "data/npc_list_bjorn_house.asm"
 .include "data/npc_list_erikas_house.asm"
 .include "data/npc_list_grannys_house.asm"
+.include "data/maps/cropped/lonely_cave_crop.asm"
+.include "data/maps/cropped/wood_location_0_crop.asm"
+.include "data/maps/cropped/wood_location_1_crop.asm"
+.include "data/item_list_wood_location.asm"
 
 
 ;============================================================
@@ -1132,8 +1136,10 @@ Item_Location15_Collection_times:
     .res ITEM_COUNT_LOC15
 Item_Location17_Collection_times:
     .res ITEM_COUNT_LOC17
-Item_Location19_Collection_times:
-    .res ITEM_COUNT_LOC19
+Item_Location20_Collection_times:
+    .res ITEM_COUNT_LOC20
+Item_Location23_Collection_times:
+    .res ITEM_COUNT_LOC23
 
 
 Npcs:   ;animals and stuff
@@ -1301,7 +1307,7 @@ CutsceneIdx: ; what cutscene to display
 
 
 BSS_Free_Bytes:
-    .res 9
+    .res 7
 
 ;====================================================================================
 
@@ -3590,30 +3596,13 @@ RoutinesAfterFadeOut:
 @next18:
     lda ActiveMapEntryIndex
     cmp #22
-    bne @next21
+    bne @next24
 
     lda #2
     sta ScrollDirection
 
     jsr OnExitVillagerHut
     ;------------------------
-    ;16. mine room
-@next21:
-    lda ActiveMapEntryIndex
-    cmp #16
-    bne @next22
-
-    ;--------------------
-    ;23.alien base exit top
-@next22:
-
-    lda ActiveMapEntryIndex
-    cmp #23
-    bne @next24
-
-    lda #1
-    sta MustCopyMainChr
-    ;---------------------------
     ;25. Boss room entrance
 @next24:
 
@@ -3719,10 +3708,10 @@ RoutinesAfterFadeOut:
 
     jsr TurnDarkPaletteOn
     ;-------------------
-    ;37 exit from alien lobby to dark cave 2
+    ;38 exit from alien lobby to dark cave 2
 @next37:
     lda ActiveMapEntryIndex
-    cmp #37
+    cmp #38
     bne @next40
 
     lda #1
