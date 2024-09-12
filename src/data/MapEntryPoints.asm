@@ -121,7 +121,7 @@ entry_points_loc16:
     ;35. alien base lobby entrance
     .byte 35, 0, 105, 118, 0, 255, 185, 203
     ;36. entrance to the lonely cave
-    .byte 36, 0, 117, 122, 231, 235, 222, 255
+    .byte 36, 0, 117, 122, 230, 236, 222, 255
     ;--------------------------------------
     ; Lobby
 entry_points_loc17:

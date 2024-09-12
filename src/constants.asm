@@ -216,7 +216,7 @@
     LOCATION_PATH_TO_CRASHSITE = 18
     LOCATION_ALIEN_BASE_PRE    = 19
 
-    MAX_LOCATIONS              = 22
+    MAX_LOCATIONS              = 23
 
     MIN_SCREEN_COUNT_TO_UPDATE = 3
 
@@ -258,7 +258,7 @@
     SFX_INVENTORY_FULL         = 4
 
 
-    INVENTORY_SPRITE_X         = 32
+    INVENTORY_SPRITE_X         = 29
     INVENTORY_SPRITE_MIN_Y     = 68
     INVENTORY_SPRITE_MAX_Y     = 188
     INVENTORY_POINTER_X        = 14
@@ -333,7 +333,7 @@
     ITEM_COUNT_LOC15           = 5 ; secret cave
     ITEM_COUNT_LOC17           = 6 ; dark cave 2
     ITEM_COUNT_LOC20           = 3 ; Alien base + puzzle
-    ITEM_COUNT_LOC23           = 2 ; wood location
+    ITEM_COUNT_LOC23           = 4 ; wood location
 
     ONE_TIME_ITEM_COUNT        = ITEM_COUNT_LOC15 + ITEM_COUNT_LOC8 + ITEM_COUNT_LOC7
 

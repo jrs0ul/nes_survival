@@ -4097,25 +4097,48 @@ TwoTileLoop:
     sta FIRST_SPRITE, x ;set Y coordinate
 
     inc TempSpriteIdx
+
+    cpy #2
+    bcc @itemTiles
+    ;progress bar
+    lda #$6E
+    jmp @savetileValue
+
+@itemTiles:
     lda TempTileIndex
     sty TempTileIndexOffset
     clc
     adc TempTileIndexOffset
+@savetileValue:
     ldx TempSpriteIdx
     sta FIRST_SPRITE, x
-
     inc TempSpriteIdx
+
     ;attributes
     ldx TempSpriteIdx
     lda #0
+    cpy #2
+    bcs @progressBar
     clc
     adc TempPaletteIndex
+    jmp @saveAttributes
+@progressBar:
+    lda #1
+
+@saveAttributes:
     sta FIRST_SPRITE, x
     inc TempSpriteIdx
+
     ;x coordinate
     lda #INVENTORY_SPRITE_X
     cpy #1
-    bne @saveX
+    beq @secondItemTile
+    cpy #2
+    bcc @saveX
+
+    lda #INVENTORY_SPRITE_X + 17
+    jmp @saveX
+@secondItemTile:
     clc
     adc #8
 @saveX:
@@ -4124,7 +4147,7 @@ TwoTileLoop:
     inc TempSpriteIdx
     inc TempSpriteCount
     iny
-    cpy #2
+    cpy #4
     bcc @twoTileLoop
 
     rts

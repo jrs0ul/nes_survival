@@ -1307,7 +1307,7 @@ CutsceneIdx: ; what cutscene to display
 
 
 BSS_Free_Bytes:
-    .res 7
+    .res 5
 
 ;====================================================================================
 
