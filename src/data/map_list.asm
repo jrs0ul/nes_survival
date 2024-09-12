@@ -23,6 +23,7 @@ location_map_pos: ;index where the pointer to the first screen of each location 
     .byte 37 ;19 pre alien base location
     .byte 31 ;20 cave room
     .byte 40 ;21 lonely cave
+    .byte 41 ;22 wood location
 
 map_list_low:
     .byte <field_bg            ; 0
@@ -86,6 +87,9 @@ map_list_low:
     .byte <pre_alien_base2
 
     .byte <lonely_cave         ; 40
+
+    .byte <wood_location_0     ; 41
+    .byte <wood_location_1
 
 
 
@@ -151,3 +155,6 @@ map_list_high:
     .byte >pre_alien_base2
 
     .byte >lonely_cave
+
+    .byte >wood_location_0
+    .byte >wood_location_1

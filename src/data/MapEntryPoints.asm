@@ -343,14 +343,14 @@ MapSpawnPoint:
     .byte UNUSED, <main_palette, >main_palette, 0, 0, 0, 0
     ;------------------
     ;exit from lonely cave to the dark cave 2
-    .byte 120, 212, 16, 0, LOCATION_TYPE_DARK, SONG_OUTSIDE_NIGHT, 4, 234, 0
+    .byte 120, 212, 16, 3, LOCATION_TYPE_DARK, SONG_OUTSIDE_NIGHT, 4, 234, 0
     .byte UNUSED, <main_palette, >main_palette, 3, 0, 0, 0
     ;entrance to wood location
-    .byte 100, 100, 22, 0, LOCATION_TYPE_OUTDOORS, SONG_OUTSIDE_DAY, 3, 0, 0
+    .byte 120, 55, 22, 2, LOCATION_TYPE_OUTDOORS, SONG_OUTSIDE_DAY, 3, 111, 0
     .byte UNUSED, <main_palette, >main_palette, 0, 0, 0, 0
     ;---------------------
     ;exit to lonely cave from wood location
-    .byte 100, 100, 21, 0, LOCATION_TYPE_CAVE, SONG_OUTSIDE_NIGHT, 3, 0, 0
+    .byte 129, 209, 21, 1, LOCATION_TYPE_CAVE, SONG_OUTSIDE_NIGHT, 3, 0, 0
     .byte UNUSED, <main_palette, >main_palette, 0, 0, 0, 0
 
 
