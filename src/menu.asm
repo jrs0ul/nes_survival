@@ -3947,6 +3947,20 @@ UpdateInventorySprites:
     sta TaintedSprites
 
     rts
+;-------------------------------
+CollectItemData:
+    iny
+    lda item_data, y
+    sta TempPaletteIndex ; save palette
+    iny
+    lda item_data, y
+    tay
+    lda items_with_progressbars, y
+    sta TempSpearX
+
+
+    rts
+
 ;---------------------------------
 DrawMenuItems:
 @itemLoop:
@@ -3976,10 +3990,7 @@ DrawMenuItems:
     jmp @next
 @store_sprite_index:
     sta TempTileIndex ; save sprite index
-    iny
-    lda item_data, y
-    sta TempPaletteIndex ; save palette
-
+    jsr CollectItemData
 
 @incrementAndDraw:
     lda EquipmentActivated
@@ -4126,16 +4137,22 @@ UpdateArrowSprites:
 @exit:
 
     rts
-;----------------------------------
-ItemTileLoop:
-    ldy #0
-@tileLoop: ;item consists of two tiles
 
+;----------------------------
+SaveFirstSpriteByte:
     lda TempTileYPos
     ldx TempSpriteIdx
     sta FIRST_SPRITE, x ;set Y coordinate
 
     inc TempSpriteIdx
+    rts
+
+;----------------------------------
+ItemTileLoop:
+    ldy #0
+@tileLoop: ;item consists of two tiles
+
+    jsr SaveFirstSpriteByte
 
     cpy #2
     bcc @itemTiles
@@ -4201,7 +4218,13 @@ ItemTileLoop:
     inc TempSpriteIdx
     inc TempSpriteCount
     iny
+    lda TempSpearX
+    beq @noProgressBar
     cpy #4
+    jmp @branch
+@noProgressBar:
+    cpy #2
+@branch:
     bcc @tileLoop
 
     rts

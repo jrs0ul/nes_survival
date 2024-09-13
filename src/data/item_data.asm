@@ -42,6 +42,16 @@ item_data: ;          ---||---
     .byte $6A, 1, 4, 0          ; 29 key
     .byte $6C, 1, 1, %00110000  ; 30 mushroom
 
+items_with_progressbars:
+    .byte 0 ; 0
+    .byte 1 ; 1
+    .byte 0 ; 2
+    .byte 0 ; 3
+    .byte 0 ; 4
+    .byte 1 ; 5
+    .byte 1 ; 6
+    .byte 0 ; 7
+
 ;item id, width, address low, address high
 document_item_data:
     .byte 24, 15, <LetterFromTheCave, >LetterFromTheCave

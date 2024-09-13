@@ -388,8 +388,8 @@
 
     RECIPES_SIZE               = 39
 
-    ROT_AMOUNT_RAW_MEAT        = 50
-    ROT_AMOUNT_COOKED_MEAT     = 25
+    ROT_AMOUNT_RAW_MEAT        = 32
+    ROT_AMOUNT_COOKED_MEAT     = 16
 
     FISHING_CATCH_OFFSET_Y     = 18
     FISHING_BITE_TIMER_MAX     = 15
