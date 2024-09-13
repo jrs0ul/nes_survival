@@ -3890,7 +3890,7 @@ UpdateInventorySprites:
     sta TempTileYPos
 
     lda InventoryActivated
-    bne @itemLoop
+    bne @drawItems
 
     lda StashActivated
     clc
@@ -3907,65 +3907,16 @@ UpdateInventorySprites:
 
     ;if sleep submenu is active
     lda SubMenuActivated
-    beq @itemLoop
+    beq @drawItems
     lda SubMenuIndex
     cmp #SUBMENU_SLEEP
-    bne @itemLoop
+    bne @drawItems
 
     jmp @ThePointer ; then let's skip item drawing
 
-@itemLoop:
-    lda EquipmentActivated
-    beq @checkIfStash
-    lda EquipedItem, x
-    jmp @cnt
+@drawItems:
 
-@checkIfStash:
-    lda StashActivated
-    beq @useInventory
-    lda Storage, x
-    jmp @cnt
-@useInventory:
-    lda Inventory, x
-@cnt:
-    asl
-    asl ;inventory_index * 4
-    tay
-    lda item_data, y ;grab sprite index
-    bne @store_sprite_index
-    iny ;increment data index
-    lda TempTileYPos
-    clc
-    adc #INVENTORY_STEP_PIXELS
-    sta TempTileYPos
-    jmp @next
-@store_sprite_index:
-    sta TempTileIndex ; save sprite index
-    iny
-    lda item_data, y
-    sta TempPaletteIndex ; save palette
-
-    stx TempInventoryIndex ; save x index
-    lda TempTileYPos
-    clc
-    adc #INVENTORY_STEP_PIXELS
-    sta TempTileYPos
-
-    jsr TwoTileLoop
-    ldx TempInventoryIndex ;restore x index
-@next:
-    lda EquipmentActivated
-    beq @invenotryprobably
-    inx
-    inx
-    cpx #4 ;both EquipedItem and EquipedClothing plus their hps
-    bcc @itemLoop
-    jmp @ThePointer
-@invenotryprobably:
-    inx ;item hp
-    inx
-    cpx #INVENTORY_MAX_SIZE
-    bcc @itemLoop
+    jsr DrawMenuItems
 
 @ThePointer:
 
@@ -3997,6 +3948,94 @@ UpdateInventorySprites:
 
     rts
 ;---------------------------------
+DrawMenuItems:
+@itemLoop:
+    lda EquipmentActivated
+    beq @checkIfStash
+    lda EquipedItem, x
+    jmp @cnt
+
+@checkIfStash:
+    lda StashActivated
+    beq @useInventory
+    lda Storage, x
+    jmp @cnt
+@useInventory:
+    lda Inventory, x
+@cnt:
+    asl
+    asl ;inventory_index * 4
+    tay
+    lda item_data, y ;grab sprite index
+    bne @store_sprite_index
+    iny ;increment data index
+    lda TempTileYPos
+    clc
+    adc #INVENTORY_STEP_PIXELS
+    sta TempTileYPos
+    jmp @next
+@store_sprite_index:
+    sta TempTileIndex ; save sprite index
+    iny
+    lda item_data, y
+    sta TempPaletteIndex ; save palette
+
+
+@incrementAndDraw:
+    lda EquipmentActivated
+    beq @invenotryprobably
+    inx
+    lda EquipedItem, x
+    sta TempHp
+
+    jsr DrawSingleItem
+    jmp @nextEquipmentItem
+
+@invenotryprobably:
+    inx ;item hp
+    lda StashActivated
+    beq @inventoryHp
+    lda Storage, x
+    jmp @goHP
+@inventoryHp:
+    lda Inventory, x
+@goHP:
+    sta TempHp
+
+    jsr DrawSingleItem
+    jmp @nextInventoryItem
+
+@next: ; just increment to next item
+
+    lda EquipmentActivated
+    beq @inventory
+    inx
+@nextEquipmentItem:
+    inx
+    cpx #4
+    bcc @itemLoop
+    jmp @end
+@inventory:
+    inx
+@nextInventoryItem:
+    inx
+    cpx #INVENTORY_MAX_SIZE
+    bcc @itemLoop
+
+@end:
+    rts
+;----------------------
+DrawSingleItem:
+    stx TempInventoryIndex ; save x index
+    lda TempTileYPos
+    clc
+    adc #INVENTORY_STEP_PIXELS
+    sta TempTileYPos
+    jsr ItemTileLoop
+    ldx TempInventoryIndex ;restore x index
+
+    rts
+;----------------------
 UpdateArrowSprites:
     lda SubMenuActivated
     beq @singlePointer
@@ -4088,9 +4127,9 @@ UpdateArrowSprites:
 
     rts
 ;----------------------------------
-TwoTileLoop:
+ItemTileLoop:
     ldy #0
-@twoTileLoop: ;item consists of two tiles
+@tileLoop: ;item consists of two tiles
 
     lda TempTileYPos
     ldx TempSpriteIdx
@@ -4123,8 +4162,10 @@ TwoTileLoop:
     adc TempPaletteIndex
     jmp @saveAttributes
 @progressBar:
+    lda #2
+    cpy #3
+    bcc @saveAttributes
     lda #1
-
 @saveAttributes:
     sta FIRST_SPRITE, x
     inc TempSpriteIdx
@@ -4137,7 +4178,20 @@ TwoTileLoop:
     bcc @saveX
 
     lda #INVENTORY_SPRITE_X + 17
+    cpy #3
+    bcs @saveX
+
+    lda TempHp
+    lsr
+    lsr
+    lsr ;hp / 8
+    sta Temp
+
+    lda #INVENTORY_SPRITE_X + 17
+    sec
+    sbc Temp
     jmp @saveX
+
 @secondItemTile:
     clc
     adc #8
@@ -4148,7 +4202,7 @@ TwoTileLoop:
     inc TempSpriteCount
     iny
     cpy #4
-    bcc @twoTileLoop
+    bcc @tileLoop
 
     rts
 

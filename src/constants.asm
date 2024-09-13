@@ -341,7 +341,7 @@
 
     ITEM_RESPAWN_HOURS         = 90
 
-    ITEM_MAX_HP                = 100
+    ITEM_MAX_HP                = 64
 
     INVENTORY_MAX_ITEMS        = 10
     INVENTORY_MAX_SIZE         = INVENTORY_MAX_ITEMS * 2
@@ -351,7 +351,7 @@
     PROJECTILE_DIR_LEFT        = 3
     PROJECTILE_DIR_RIGHT       = 4
 
-    TOOL_WEAR                  = 10
+    TOOL_WEAR                  = 8
 
     NPC_STEPS_BEFORE_REDIRECT  = 16
 
