@@ -306,6 +306,7 @@
     ITEM_GRANNYS_HEAD          = 27
     ITEM_KEY                   = 29
     ITEM_MUSHROOM              = 30
+    ITEM_COOKED_MUSHROOM       = 31
 
     MAX_LETTER_OBJECT_COUNT    = 2
 

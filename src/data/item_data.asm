@@ -41,6 +41,7 @@ item_data: ;          ---||---
     .byte $48, 1, 7, 0          ; 28 letter about the rock
     .byte $6A, 1, 4, 0          ; 29 key
     .byte $6C, 1, 1, %00110000  ; 30 mushroom
+    .byte $6C, 0, 1, %01000000  ; 31 cooked mushroom
 
 items_with_progressbars:
     .byte 0 ; 0

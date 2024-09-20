@@ -37,8 +37,8 @@ main_bg_tiles       : .incbin "main_bg_tiles.lz4"
 .include "data/maps/cropped/LOC3_bg1_crop.asm"
 .include "data/maps/cropped/LOC3_bg0_crop.asm"
 .include "data/maps/cropped/path_to_crashsite_crop.asm"
-.include "data/Outside1_items.asm"
-.include "data/Outside3_items.asm"
+.include "data/item_list_Outside1.asm"
+.include "data/item_list_Outside3.asm"
 .include "data/mod_tiles_first.asm"
 
 
@@ -4235,6 +4235,8 @@ RotFood:
     beq @setRaw
     cmp #ITEM_RAW_FISH
     beq @setRaw
+    cmp #ITEM_MUSHROOM
+    beq @setRaw
     jmp @checkCooked
 
 @setRaw:
@@ -4248,6 +4250,8 @@ RotFood:
     cmp #ITEM_COOKED_JUMBO_MEAT
     beq @setCooked
     cmp #ITEM_COOKED_FISH
+    beq @setCooked
+    cmp #ITEM_COOKED_MUSHROOM
     beq @setCooked
 
     jmp @nextItem

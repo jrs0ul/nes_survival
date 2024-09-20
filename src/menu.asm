@@ -3597,6 +3597,8 @@ CookMeat:
     beq @startCooking
     cmp #ITEM_RAW_FISH
     beq @startCooking
+    cmp #ITEM_MUSHROOM
+    beq @startCooking
 
     jmp @cantcook
 
@@ -3624,7 +3626,12 @@ CookMeat:
     lda #ITEM_COOKED_JUMBO_MEAT
     jmp @storeResult
 @checkNextItem2:
+    cmp #ITEM_RAW_FISH
+    bne @checkNextItem3
     lda #ITEM_COOKED_FISH
+    jmp @storeResult
+@checkNextItem3:
+    lda #ITEM_COOKED_MUSHROOM
 
 @storeResult:
     sta Temp
