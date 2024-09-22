@@ -4201,7 +4201,7 @@ ItemTileLoop:
     cpy #2
     bcc @saveX
 
-    lda #INVENTORY_SPRITE_X + 17
+    lda #INVENTORY_SPRITE_X + INVENTORY_ITEM_HP_X_POS
     cpy #3
     bcs @saveX
 
@@ -4211,7 +4211,7 @@ ItemTileLoop:
     lsr ;hp / 8
     sta Temp
 
-    lda #INVENTORY_SPRITE_X + 17
+    lda #INVENTORY_SPRITE_X + INVENTORY_ITEM_HP_X_POS
     sec
     sbc Temp
     jmp @saveX
