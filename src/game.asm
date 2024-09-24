@@ -1305,9 +1305,13 @@ TempRegX:
 CutsceneIdx: ; what cutscene to display
     .res 1
 
+MustStopMusic:
+    .res 1
+MusicIsPlaying:
+    .res 1
 
 BSS_Free_Bytes:
-    .res 5
+    .res 3
 
 ;====================================================================================
 
@@ -1777,9 +1781,19 @@ famistudioupdate:
     ldy #6
     jsr bankswitch_y
 
-@checkNewSfx:
+    lda MustStopMusic
+    beq @continue
+
+    jsr famistudio_music_stop
+    lda #0
+    sta MustStopMusic
+    sta MusicIsPlaying
+    jmp @doSoundUpdate
+
+@continue:
     lda MustPlaySfx
     beq @checkNewSong
+
     lda SfxName
     ldx #FAMISTUDIO_SFX_CH1
     jsr famistudio_sfx_play
@@ -1792,6 +1806,7 @@ famistudioupdate:
     lda MustPlayNewSong
     beq @doSoundUpdate
 
+    sta MusicIsPlaying
     lda SongName
     jsr famistudio_music_play
     lda #0
@@ -1803,6 +1818,7 @@ famistudioupdate:
     ldy oldbank
     jsr bankswitch_y
 
+@exit:
     rts
 
 
@@ -3845,7 +3861,7 @@ CommonLocationRoutine:
     beq @sameLocationType
     sta LocationType
     lda #1
-    sta MustPlayNewSong
+    sta MustStopMusic
 @sameLocationType:
     iny
     lda (pointer2), y ; upper address to item data
@@ -6195,7 +6211,7 @@ StartGame:
     sta SongName
     sta InitiateCompleteItemRespawn
     lda #1
-    sta MustPlayNewSong
+    sta MustStopMusic
 
     rts
 

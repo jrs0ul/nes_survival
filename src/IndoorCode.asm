@@ -475,6 +475,13 @@ LoadIndoorMapData:
     sta MustLoadHouseInterior
     sta MustLoadSomething
 
+    lda MusicIsPlaying
+    bne @musicIsStillPlaying
+
+    lda #1
+    sta MustPlayNewSong
+
+@musicIsStillPlaying:
     lda MustSleepAfterFadeOut
     bne @nope
     lda #PALETTE_STATE_FADE_IN

@@ -430,6 +430,11 @@ LoadOutsideMap:
     lda #0
     sta MustLoadOutside
     sta MustLoadSomething
+    lda MusicIsPlaying
+    bne @musicWasPlaying
+    lda #1
+    sta MustPlayNewSong
+@musicWasPlaying:
 
     lda LocationIndex
     tay
