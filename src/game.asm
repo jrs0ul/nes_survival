@@ -49,6 +49,10 @@ main_bg_tiles       : .incbin "main_bg_tiles.lz4"
 .include "data/menu_data.asm"
 .include "data/recipes.asm"
 
+.include "data/maps/cropped/abase_hall_0_crop.asm"
+.include "data/maps/cropped/abase_hall_1_crop.asm"
+.include "data/maps/cropped/abase_hall_2_crop.asm"
+
 ;============================================================
 .segment "ROM2"
 
