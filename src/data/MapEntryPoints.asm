@@ -155,7 +155,11 @@ entry_points_loc21:
 entry_points_loc22:
     ;47. exit to lonely cave
     .byte 47, 0, 0, 255, 0, 255, 20, 40
-
+entry_points_loc23:
+    ;48. entrance to the main alien base
+    .byte 48, 1, 0, 255, 0, 255, 20, 40
+    ;49. exit to alien base puzzle room
+    .byte 49, 0, 0, 255, 0, 255, 222, 255
 
 .segment "ROM0"
 
@@ -265,8 +269,8 @@ MapSpawnPoint:
     ;alien base exit top
     .byte 200, 50, 6, OUTDOORS_LOC7_SCREEN_COUNT, LOCATION_TYPE_CAVE, SONG_OUTSIDE_NIGHT, 4, 0, 2
     .byte UNUSED, <main_palette, >main_palette, 0, <cave_npcs, >cave_npcs, 0
-    ;alien base exit to pre-alien base
-    .byte 45, 38, 19, 3, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 2, 0, 0
+    ;alien base exit to hallway
+    .byte 120, 47, 23, 3, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 1, 94, 1
     .byte UNUSED, <alien_palette, >alien_palette, 0, 0, 0, 0
     ;boss room entrance
     .byte 20, 120, 12, 1, LOCATION_TYPE_VILLAGER, SONG_BOSS, 3, 0, 0
@@ -334,9 +338,9 @@ MapSpawnPoint:
     ;exit to lobby
     .byte 229, 134, 17, 1, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 2, 0, 0
     .byte UNUSED, <main_palette, >main_palette, 0, 0, 0, 0
-    ;entrance to last alien base segment
-    .byte 50, 210, 10, 2, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 4, 0, 0
-    .byte UNUSED, <alien_palette, >alien_palette, 0, <alien_base_npcs, >alien_base_npcs, 0
+    ;entrance to alienbase hallway
+    .byte 120, 210, 23, 3, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 1, 184, 0
+    .byte UNUSED, <alien_palette, >alien_palette, 0, 0, 0, 0
     ;------------------
     ;exit to alien lobby
     .byte 126, 60, 17, 1, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 2, 0, 0
@@ -352,6 +356,16 @@ MapSpawnPoint:
     ;exit to lonely cave from wood location
     .byte 129, 209, 21, 1, LOCATION_TYPE_CAVE, SONG_OUTSIDE_NIGHT, 3, 0, 0
     .byte UNUSED, <main_palette, >main_palette, 0, 0, 0, 0
+    ;-----------------------
+    ;  alien base hallway
+    ;-----------------------
+    ;entrance to the main alien base
+    .byte 50, 210, 10, 2, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 4, 0, 0
+    .byte UNUSED, <alien_palette, >alien_palette, 0, <alien_base_npcs, >alien_base_npcs, 0
+    ;exit to the puzzle room
+    .byte 45, 38, 19, 3, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 2, 0, 0
+    .byte UNUSED, <alien_palette, >alien_palette, 0, 0, 0, 0
+
 
 
 
@@ -384,6 +398,7 @@ LocationScreenCountList:
     .byte 1                          ; 20 house before alien base
     .byte 1                          ; 21 lonely cave
     .byte 2                          ; 22 wood location
+    .byte 3                          ; 23 alien base hallway
 
 
 LocationEntryPointPtrs:
@@ -410,6 +425,7 @@ LocationEntryPointPtrs:
     .byte <entry_points_loc20, >entry_points_loc20
     .byte <entry_points_loc21, >entry_points_loc21
     .byte <entry_points_loc22, >entry_points_loc22
+    .byte <entry_points_loc23, >entry_points_loc23
 
 EntryPointCountForLocation:
     .byte 4 ;0
@@ -435,6 +451,7 @@ EntryPointCountForLocation:
     .byte 1 ;20
     .byte 2 ;21
     .byte 1 ;22 wood location
+    .byte 2 ;23 alien base hallway
 
 
 ;which location in which bank
@@ -462,6 +479,7 @@ LocationBanks:
     .byte 3  ;20
     .byte 3  ;21
     .byte 3  ;22
+    .byte 1  ;23
 
 
 ;indexes in Item_Location1_Collection_times
@@ -497,6 +515,7 @@ LocationItemIndexes:
     .byte 0                                                                           ;20
     .byte 0                                                                           ;21
     .byte ITEM_IDX_LOC14 + ITEM_COUNT_LOC15 + ITEM_COUNT_LOC17 + ITEM_COUNT_LOC20     ;22
+    .byte 0                                                                           ;23
 
 LocationItemCounts:
     .byte ITEM_COUNT_LOC1  ; 0
@@ -522,6 +541,7 @@ LocationItemCounts:
     .byte 0                ; 20 cave-room
     .byte 0                ; 21 lonely cave
     .byte ITEM_COUNT_LOC23 ; 22 wood location
+    .byte 0                ; 23
 
 LocationsWithRespawnableItems:
     .byte 1 ; 0
@@ -547,6 +567,7 @@ LocationsWithRespawnableItems:
     .byte 0 ; 20
     .byte 0 ; 21
     .byte 1 ; 22
+    .byte 0 ; 23
 
 list_empty:
     .byte 0
@@ -575,3 +596,4 @@ LocationItems:
     .byte  <list_empty,             >list_empty                  ; 20 cave-room
     .byte  <list_empty,             >list_empty                  ; 21 lonely cave
     .byte  <wood_location_items,    >wood_location_items         ; 22 wood location
+    .byte  <list_empty,             >list_empty                  ; 23 alien base hallway
