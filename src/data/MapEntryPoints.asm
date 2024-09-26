@@ -270,7 +270,7 @@ MapSpawnPoint:
     .byte 200, 50, 6, OUTDOORS_LOC7_SCREEN_COUNT, LOCATION_TYPE_CAVE, SONG_OUTSIDE_NIGHT, 4, 0, 2
     .byte UNUSED, <main_palette, >main_palette, 0, <cave_npcs, >cave_npcs, 0
     ;alien base exit to hallway
-    .byte 120, 47, 23, 3, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 1, 94, 1
+    .byte 120, 40, 23, 3, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 1, 0, 1
     .byte UNUSED, <alien_palette, >alien_palette, 0, 0, 0, 0
     ;boss room entrance
     .byte 20, 120, 12, 1, LOCATION_TYPE_VILLAGER, SONG_BOSS, 3, 0, 0
@@ -360,7 +360,7 @@ MapSpawnPoint:
     ;  alien base hallway
     ;-----------------------
     ;entrance to the main alien base
-    .byte 50, 210, 10, 2, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 4, 0, 0
+    .byte 119, 210, 10, 2, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 4, 0, 0
     .byte UNUSED, <alien_palette, >alien_palette, 0, <alien_base_npcs, >alien_base_npcs, 0
     ;exit to the puzzle room
     .byte 45, 38, 19, 3, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 2, 0, 0
