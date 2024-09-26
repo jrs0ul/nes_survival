@@ -19,6 +19,10 @@ mod_tiles_by_location:
     .byte <mod_tiles_alien_lobby,    >mod_tiles_alien_lobby    ;17
     .byte 0,                         0                         ;18
     .byte <mod_tiles_alien_base_pre, >mod_tiles_alien_base_pre ;19 alien base pre
+    .byte 0,                         0                         ;20 house before alien base
+    .byte 0,                         0                         ;21 lonly cave
+    .byte 0,                         0                         ;22 wood location
+    .byte 0,                         0                         ;23 alien base hallway
 
 mod_tiles_count_by_location:
     .byte 4 ;0
@@ -40,4 +44,8 @@ mod_tiles_count_by_location:
     .byte 0 ;16
     .byte 4 ;17
     .byte 0 ;18
-    .byte 18 ;19
+    .byte 18;19
+    .byte 0 ;20
+    .byte 0 ;21
+    .byte 0 ;22
+    .byte 0 ;23
