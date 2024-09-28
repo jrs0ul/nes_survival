@@ -10,6 +10,7 @@ frame_list_index_lookup:
     .byte 54 ; deadman
     .byte 62 ; boar
     .byte 70 ; boss
+    .byte 78 ; spider
 
 
 ;Bunny
@@ -303,6 +304,149 @@ npc_DOGMAN_frame_DOWN_ATK:
     .byte 8,  $85, %00000000, 8
     .byte 16, $94, %00000000, 0
     .byte 16, $95, %00000000, 8
+
+;===================================================
+npc_SPIDER_sprite_data:
+
+npc_SPIDER_frames:
+    .byte <npc_SPIDER_frame_LEFT,  >npc_SPIDER_frame_LEFT
+    .byte <npc_SPIDER_frame_RIGHT, >npc_SPIDER_frame_RIGHT
+    .byte <npc_SPIDER_frame_UP,    >npc_SPIDER_frame_UP
+    .byte <npc_SPIDER_frame_DOWN,  >npc_SPIDER_frame_DOWN
+
+npc_SPIDER_frame_LEFT:
+    .byte <npc_SPIDER_frame_LEFT_0,   >npc_SPIDER_frame_LEFT_0
+    .byte <npc_SPIDER_frame_LEFT_1,   >npc_SPIDER_frame_LEFT_1
+    .byte <npc_SPIDER_frame_LEFT_2,   >npc_SPIDER_frame_LEFT_2
+    .byte <npc_SPIDER_frame_LEFT_1,   >npc_SPIDER_frame_LEFT_1
+    .byte <npc_SPIDER_frame_LEFT_WARN,>npc_SPIDER_frame_LEFT_WARN
+    .byte <npc_SPIDER_frame_LEFT_1,   >npc_SPIDER_frame_LEFT_1
+    .byte <npc_BUNNY_frame_DTH,       >npc_BUNNY_frame_DTH
+
+npc_SPIDER_frame_LEFT_0:
+    .byte    0,$a4,0, 0
+    .byte    0,$a5,0, 8
+    .byte    8,$b4,0, 0
+    .byte    8,$b5,0, 8
+
+npc_SPIDER_frame_LEFT_1:
+    .byte    0,$aa,0, 0
+    .byte    0,$ab,0, 8
+    .byte    8,$ba,0, 0
+    .byte    8,$bb,0, 8
+
+npc_SPIDER_frame_LEFT_2:
+    .byte    0,$b6,0, 0
+    .byte    0,$b7,0, 8
+    .byte    8,$c6,0, 0
+    .byte    8,$c7,0, 8
+
+npc_SPIDER_frame_LEFT_WARN:
+    .byte    0,$ca,0, 0
+    .byte    0,$cb,0, 8
+    .byte    8,$da,0, 0
+    .byte    8,$db,0, 8
+
+npc_SPIDER_frame_RIGHT:
+    .byte <npc_SPIDER_frame_RIGHT_0,   >npc_SPIDER_frame_RIGHT_0
+    .byte <npc_SPIDER_frame_RIGHT_1,   >npc_SPIDER_frame_RIGHT_1
+    .byte <npc_SPIDER_frame_RIGHT_2,   >npc_SPIDER_frame_RIGHT_2
+    .byte <npc_SPIDER_frame_RIGHT_1,   >npc_SPIDER_frame_RIGHT_1
+    .byte <npc_SPIDER_frame_RIGHT_WARN,>npc_SPIDER_frame_RIGHT_WARN
+    .byte <npc_SPIDER_frame_RIGHT_1,   >npc_SPIDER_frame_RIGHT_1
+    .byte <npc_BUNNY_frame_DTH,        >npc_BUNNY_frame_DTH
+
+npc_SPIDER_frame_RIGHT_0:
+    .byte    0,$a4,%01000000, 8
+    .byte    0,$a5,%01000000, 0
+    .byte    8,$b4,%01000000, 8
+    .byte    8,$b5,%01000000, 0
+
+npc_SPIDER_frame_RIGHT_1:
+    .byte    0,$aa,%01000000, 8
+    .byte    0,$ab,%01000000, 0
+    .byte    8,$ba,%01000000, 8
+    .byte    8,$bb,%01000000, 0
+
+npc_SPIDER_frame_RIGHT_2:
+    .byte    0,$b6,%01000000, 8
+    .byte    0,$b7,%01000000, 0
+    .byte    8,$c6,%01000000, 8
+    .byte    8,$c7,%01000000, 0
+
+npc_SPIDER_frame_RIGHT_WARN:
+    .byte    0,$ca, %01000000, 8
+    .byte    0,$cb, %01000000, 0
+    .byte    8,$da, %01000000, 8
+    .byte    8,$db, %01000000, 0
+
+
+npc_SPIDER_frame_UP:
+    .byte <npc_SPIDER_frame_UP_0,   >npc_SPIDER_frame_UP_0
+    .byte <npc_SPIDER_frame_UP_1,   >npc_SPIDER_frame_UP_1
+    .byte <npc_SPIDER_frame_UP_2,   >npc_SPIDER_frame_UP_2
+    .byte <npc_SPIDER_frame_UP_1,   >npc_SPIDER_frame_UP_1
+    .byte <npc_SPIDER_frame_UP_WARN,>npc_SPIDER_frame_UP_WARN
+    .byte <npc_SPIDER_frame_UP_1,   >npc_SPIDER_frame_UP_1
+    .byte <npc_BUNNY_frame_DTH,     >npc_BUNNY_frame_DTH
+
+npc_SPIDER_frame_UP_0:
+    .byte   0,$b9,0, 8
+    .byte   0,$b8,0, 0
+    .byte   8,$c9,0, 8
+    .byte   8,$c8,0, 0
+
+npc_SPIDER_frame_UP_1:
+    .byte    0,$dc,0        , 8
+    .byte    0,$dd,0        , 0
+    .byte    8,$ed,%01000000, 8
+    .byte    8,$ed,0        , 0
+
+npc_SPIDER_frame_UP_2:
+    .byte    0,$bd,0, 8
+    .byte    0,$bc,0, 0
+    .byte    8,$cd,0, 8
+    .byte    8,$cc,0, 0
+
+npc_SPIDER_frame_UP_WARN:
+    .byte    0,$af,%01000000, 8
+    .byte    0,$af,0        , 0
+    .byte    8,$bf,%01000000, 8
+    .byte    8,$bf,0        , 0
+
+npc_SPIDER_frame_DOWN:
+    .byte <npc_SPIDER_frame_DOWN_0,   >npc_SPIDER_frame_DOWN_0
+    .byte <npc_SPIDER_frame_DOWN_1,   >npc_SPIDER_frame_DOWN_1
+    .byte <npc_SPIDER_frame_DOWN_2,   >npc_SPIDER_frame_DOWN_2
+    .byte <npc_SPIDER_frame_DOWN_1,   >npc_SPIDER_frame_DOWN_1
+    .byte <npc_SPIDER_frame_DOWN_WARN,>npc_SPIDER_frame_DOWN_WARN
+    .byte <npc_SPIDER_frame_DOWN_1,   >npc_SPIDER_frame_DOWN_1
+    .byte <npc_BUNNY_frame_DTH,       >npc_BUNNY_frame_DTH
+
+npc_SPIDER_frame_DOWN_0:
+    .byte    0,$ce,0        , 8
+    .byte    0,$a8,0        , 0
+    .byte    8,$de,0        , 8
+    .byte    8,$de,%01000000, 0
+
+npc_SPIDER_frame_DOWN_1:
+    .byte    0,$a3,0        , 8
+    .byte    0,$a2,0        , 0
+    .byte    8,$b3,0        , 8
+    .byte    8,$b3,%01000000, 0
+
+npc_SPIDER_frame_DOWN_2:
+    .byte    0,$ae,0        , 8
+    .byte    0,$a9,0        , 0
+    .byte    8,$be,0        , 8
+    .byte    8,$be,%01000000, 0
+
+npc_SPIDER_frame_DOWN_WARN:
+    .byte    0,$df,%01000000, 8
+    .byte    0,$df,0        , 0
+    .byte    8,$ef,%01000000, 8
+    .byte    8,$ef,0        , 0
+
 
 
 ;===================================================
