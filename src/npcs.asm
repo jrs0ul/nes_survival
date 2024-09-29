@@ -181,6 +181,8 @@ GenerateSingleNpc:
     and #3
     cmp #0
     beq @makeWolf
+    cmp #2
+    beq @makeSpider
     jmp @makeBunny
 
 @notInCave:
@@ -200,6 +202,16 @@ GenerateSingleNpc:
     sta TempHp
     lda #%00010001
     jmp @storeType
+@makeSpider:
+    ldy #72
+    lda npc_data, y
+    sta TempNpcRows
+    ldy #76
+    lda npc_data, y
+    sta TempHp
+    lda #%10010001
+    jmp @storeType
+
 @makeWolf:
     ldy #1
     lda npc_data, y
