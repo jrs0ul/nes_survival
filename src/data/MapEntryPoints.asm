@@ -312,7 +312,7 @@ MapSpawnPoint:
     .byte 200, 200, 13, 2, LOCATION_TYPE_DARK, SONG_OUTSIDE_NIGHT, 4, 0, 1
     .byte UNUSED, <main_palette, >main_palette, 3, <dark_cave_npcs, >dark_cave_npcs, 1
     ;alien base lobby entrance
-    .byte 53, 129, 17, 1, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 2, 0, 0
+    .byte 53, 129, 17, 1, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 0, 0, 0
     .byte UNUSED, <main_palette, >main_palette, 0, 0, 0, 0
     ;lonely cave entrance
     .byte 130, 41, 21, 0, LOCATION_TYPE_CAVE, SONG_OUTSIDE_NIGHT, 3, 0, 0
@@ -336,14 +336,14 @@ MapSpawnPoint:
     .byte UNUSED, <main_palette, >main_palette, 2, 0, 0, 0
     ;------------------
     ;exit to lobby
-    .byte 229, 134, 17, 1, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 2, 0, 0
+    .byte 229, 134, 17, 1, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 0, 0, 0
     .byte UNUSED, <main_palette, >main_palette, 0, 0, 0, 0
     ;entrance to alienbase hallway
     .byte 120, 210, 23, 3, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 1, 184, 0
     .byte UNUSED, <alien_palette, >alien_palette, 0, 0, 0, 0
     ;------------------
     ;exit to alien lobby
-    .byte 126, 60, 17, 1, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 2, 0, 0
+    .byte 126, 60, 17, 1, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 0, 0, 0
     .byte UNUSED, <main_palette, >main_palette, 0, 0, 0, 0
     ;------------------
     ;exit from lonely cave to the dark cave 2
@@ -473,7 +473,7 @@ LocationBanks:
     .byte 4  ;14
     .byte 3  ;15
     .byte 4  ;16
-    .byte 2  ;17
+    .byte 0  ;17
     .byte 0  ;18
     .byte 2  ;19
     .byte 3  ;20
