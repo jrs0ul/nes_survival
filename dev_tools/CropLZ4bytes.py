@@ -12,6 +12,7 @@ lz4_files = [
             "main_animal_sprites.lz4",
             "cave_sprites.lz4",
             "alien_sprites.lz4",
+            "boss_sprites.lz4",
             "house_sprites.lz4",
             "font.lz4",
             "UI.lz4",
@@ -29,11 +30,11 @@ def crop_lz4():
     for fileName in lz4_files:
 
         try:
-            fileIN = open("src/" + fileName, "rb")
+            fileIN = open("src/chr/" + fileName, "rb")
             data = fileIN.read()
             fileIN.close()
         except IOError:
-            print("********* a FAILURE while reading [src/" + fileName + "] ! ************")
+            print("********* a FAILURE while reading [src/chr/" + fileName + "] ! ************")
             return
 
         length = len(data)
@@ -44,7 +45,7 @@ def crop_lz4():
 
 
 
-        fileOut = open("src/" + fileName, "wb").write(finalCrop)
+        fileOut = open("src/chr/" + fileName, "wb").write(finalCrop)
 
 
 if __name__ == "__main__":

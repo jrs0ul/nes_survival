@@ -382,7 +382,30 @@ SpecialQuestReminder:
     jsr CopyTextToRam
 
     rts
+;---------------------------------------
+LoadBossGfx:
+    lda #ARGUMENT_STACK_HI
+    sta sp
+    lda #ARGUMENT_STACK_LO
+    sta sp + 1
 
+    lda #<boss_sprites_chr
+    ldy #2
+    sta (sp),y
+    iny
+    lda #>boss_sprites_chr
+    sta (sp),y
+
+    lda #0
+    ldy #0
+    sta (sp),y
+    lda #$0A
+    ldy #1
+    sta (sp),y
+    lda #0
+    ldx #6
+    jsr UnLZ4toVram
+    rts
 ;---------------------------------------
 ;indoor map loading routine
 LoadIndoorMapData:
@@ -392,6 +415,10 @@ LoadIndoorMapData:
 
     lda MustCopyMainChr
     beq @skipLoadingCHR
+
+    lda LocationIndex
+    cmp #LOCATION_BOSS_ROOM
+    beq @loadBossGfx
 
     lda #ARGUMENT_STACK_HI
     sta sp
@@ -446,6 +473,21 @@ LoadIndoorMapData:
     sta PalettePtr
     lda #>house_palette
     sta PalettePtr + 1
+    jmp @skipLoadingCHR
+
+@loadBossGfx:
+
+    jsr LoadBossGfx
+
+
+    lda #0
+    sta MustCopyMainChr
+    lda #<alien_palette
+    sta PalettePtr
+    lda #>alien_palette
+    sta PalettePtr + 1
+
+
 
 @skipLoadingCHR:
 

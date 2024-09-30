@@ -1,5 +1,5 @@
 #compressed gfx
-src/*.lz4
+src/chr/*.lz4
 
 #debug data and labels
 *.dbg

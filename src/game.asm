@@ -24,11 +24,11 @@
 
 .segment "ROM0"
 
-main_core_sprites   : .incbin "main_core_sprites.lz4"
-main_animal_sprites : .incbin "main_animal_sprites.lz4"
-font                : .incbin "font.lz4"
-UI_tiles            : .incbin "UI.lz4"
-main_bg_tiles       : .incbin "main_bg_tiles.lz4"
+main_core_sprites   : .incbin "chr/main_core_sprites.lz4"
+main_animal_sprites : .incbin "chr/main_animal_sprites.lz4"
+font                : .incbin "chr/font.lz4"
+UI_tiles            : .incbin "chr/UI.lz4"
+main_bg_tiles       : .incbin "chr/main_bg_tiles.lz4"
 
 .include "data/maps/cropped/field_bg_crop.asm"
 .include "data/maps/cropped/field_bg1_crop.asm"
@@ -56,9 +56,9 @@ main_bg_tiles       : .incbin "main_bg_tiles.lz4"
 ;============================================================
 .segment "ROM2"
 
-title_tiles_chr   :  .incbin "title_tiles.lz4"
-gameover_tiles_chr:  .incbin "gameover_tiles.lz4"
-intro_tiles_chr   :  .incbin "intro.lz4"
+title_tiles_chr   :  .incbin "chr/title_tiles.lz4"
+gameover_tiles_chr:  .incbin "chr/gameover_tiles.lz4"
+intro_tiles_chr   :  .incbin "chr/intro.lz4"
 .include "data/maps/cropped/alien_base_lobby_crop.asm"
 .include "data/maps/cropped/crashsite0_crop.asm"
 .include "data/maps/cropped/crashsite1_crop.asm"
@@ -74,8 +74,9 @@ intro_tiles_chr   :  .incbin "intro.lz4"
 ;============================================================
 .segment "ROM3" ; indoors
 
-house_tiles_chr: .incbin "house_bg_tiles.lz4"
-house_sprites_chr: .incbin "house_sprites.lz4"
+house_tiles_chr:   .incbin "chr/house_bg_tiles.lz4"
+house_sprites_chr: .incbin "chr/house_sprites.lz4"
+boss_sprites_chr:  .incbin "chr/boss_sprites.lz4"
 .include "data/maps/cropped/house_crop.asm"
 .include "data/maps/cropped/villager_hut_crop.asm"
 .include "data/maps/cropped/villager2_hut_crop.asm"
@@ -95,10 +96,10 @@ house_sprites_chr: .incbin "house_sprites.lz4"
 ;============================================================
 .segment "ROM4" ; other location
 
-cave_tiles_chr   : .incbin "cave_bg_tiles.lz4"
-alien_tiles_chr  : .incbin "alien_bg_tiles.lz4"
-cave_sprites_chr : .incbin "cave_sprites.lz4"
-alien_sprites_chr: .incbin "alien_sprites.lz4"
+cave_tiles_chr   : .incbin "chr/cave_bg_tiles.lz4"
+alien_tiles_chr  : .incbin "chr/alien_bg_tiles.lz4"
+cave_sprites_chr : .incbin "chr/cave_sprites.lz4"
+alien_sprites_chr: .incbin "chr/alien_sprites.lz4"
 
 .include "data/maps/cropped/alien_base1_crop.asm"
 .include "data/maps/cropped/alien_base2_crop.asm"
@@ -128,7 +129,7 @@ alien_sprites_chr: .incbin "alien_sprites.lz4"
 
 .include "data/game_over_comp.asm"
 .include "data/title_comp.asm"
-crashed_plane_tiles_chr: .incbin "crashed_plane_tiles.lz4"
+crashed_plane_tiles_chr: .incbin "chr/crashed_plane_tiles.lz4"
 
 title_palette:
     .byte $0F,$00,$11,$20, $0F,$01,$11,$07, $0F,$30,$11,$38, $0F,$07,$11,$35    ;background
@@ -3750,8 +3751,6 @@ RoutinesAfterFadeOut:
     sta MustUpdateDestructibles
 
     lda ActiveMapEntryIndex
-    cmp #29     ; CRUTCH for bossroom exit
-    beq @notcopy
     lda #1
     jmp @saveCopyFlag
 @notcopy:
@@ -3765,12 +3764,8 @@ RoutinesAfterFadeOut:
     sta MustLoadHouseInterior
 
     lda ActiveMapEntryIndex
-    cmp #25   ;ANOTHER CRUTCH for bossroom entrance
-    beq @BossRoom
     lda #1
     jmp @saveCHRloading
-@BossRoom:
-    lda #0
 @saveCHRloading:
     sta MustCopyMainChr
 
@@ -6106,6 +6101,7 @@ LoadCheckPoint:
     sta LocationBankNo
     lda #0
     sta hadKnockBack
+    sta NpcCount
     sta ModifiedTilesToDraw
     sta ProjectileCount ; reset projectiles
     sta SpearData       ; reset spear
