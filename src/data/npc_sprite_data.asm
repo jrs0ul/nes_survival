@@ -11,6 +11,9 @@ frame_list_index_lookup:
     .byte 62 ; boar
     .byte 70 ; boss
     .byte 78 ; spider
+    .byte 86 ; slimer
+    .byte 94 ; baraka
+
 
 
 ;Bunny
@@ -116,6 +119,80 @@ npc_BUNNY_frame_DOWN_1:
     .byte 0, $F1, %01000000, 8
     .byte 8, $F5, %00000000, 0
     .byte 8, $F5, %01000000, 8
+
+
+;=============================================
+npc_SLIMER_frames:
+    .byte <npc_SLIMER_frame_LEFT,  >npc_SLIMER_frame_LEFT
+    .byte <npc_SLIMER_frame_RIGHT, >npc_SLIMER_frame_RIGHT
+    .byte <npc_SLIMER_frame_UP,    >npc_SLIMER_frame_UP
+    .byte <npc_SLIMER_frame_DOWN,  >npc_SLIMER_frame_DOWN
+
+npc_SLIMER_frame_DTH:
+    .byte   0,$3a,0        ,  0
+    .byte   0,$3b,%01000000,  8
+    .byte   0,$3b,0        , 16
+    .byte   8,$3c,0        ,  0
+    .byte   8,$3d,0        ,  8
+    .byte   8,$3d,0        , 16
+
+
+npc_SLIMER_frame_LEFT:
+    .byte <npc_SLIMER_frame_LEFT_0,   >npc_SLIMER_frame_LEFT_0
+    .byte <npc_SLIMER_frame_LEFT_1,   >npc_SLIMER_frame_LEFT_1
+    .byte <npc_SLIMER_frame_LEFT_0,   >npc_SLIMER_frame_LEFT_0
+    .byte <npc_SLIMER_frame_LEFT_1,   >npc_SLIMER_frame_LEFT_1
+    .byte <npc_SLIMER_frame_LEFT_WRN, >npc_SLIMER_frame_LEFT_WRN ; warning
+    .byte <npc_SLIMER_frame_LEFT_1,   >npc_SLIMER_frame_LEFT_1
+    .byte <npc_SLIMER_frame_DTH,      >npc_SLIMER_frame_DTH
+
+npc_SLIMER_frame_LEFT_0:
+npc_SLIMER_frame_LEFT_1:
+npc_SLIMER_frame_LEFT_WRN:
+    .byte   0,$f3,0,  0
+    .byte   0,$f4,0,  8
+    .byte   0,$a2,0, 16
+    .byte   8,$f5,0,  0
+    .byte   8,$f6,0,  8
+    .byte   8,$b2,0, 16
+
+npc_SLIMER_frame_RIGHT:
+    .byte <npc_SLIMER_frame_RIGHT_0,   >npc_SLIMER_frame_RIGHT_0
+    .byte <npc_SLIMER_frame_RIGHT_1,   >npc_SLIMER_frame_RIGHT_1
+    .byte <npc_SLIMER_frame_RIGHT_0,   >npc_SLIMER_frame_RIGHT_0
+    .byte <npc_SLIMER_frame_RIGHT_1,   >npc_SLIMER_frame_RIGHT_1
+    .byte <npc_SLIMER_frame_RIGHT_WRN, >npc_SLIMER_frame_RIGHT_WRN ; warning
+    .byte <npc_SLIMER_frame_RIGHT_1,   >npc_SLIMER_frame_RIGHT_1
+    .byte <npc_SLIMER_frame_DTH,       >npc_SLIMER_frame_DTH
+
+npc_SLIMER_frame_RIGHT_0:
+npc_SLIMER_frame_RIGHT_1:
+npc_SLIMER_frame_RIGHT_WRN:
+    .byte   0,$a2,%01000000,  0
+    .byte   0,$f4,%01000000,  8
+    .byte   0,$f3,%01000000, 16
+    .byte   8,$b2,%01000000,  0
+    .byte   8,$f6,%01000000,  8
+    .byte   8,$f5,%01000000, 16
+
+npc_SLIMER_frame_UP:
+    .byte <npc_BARAKA_frame_LEFT_0,   >npc_BARAKA_frame_LEFT_0
+    .byte <npc_BARAKA_frame_LEFT_1,   >npc_BARAKA_frame_LEFT_1
+    .byte <npc_BARAKA_frame_LEFT_2,   >npc_BARAKA_frame_LEFT_2
+    .byte <npc_BARAKA_frame_LEFT_1,   >npc_BARAKA_frame_LEFT_1
+    .byte <npc_BARAKA_frame_LEFT_WRN, >npc_BARAKA_frame_LEFT_WRN ; warning
+    .byte <npc_BARAKA_frame_LEFT_ATK, >npc_BARAKA_frame_LEFT_ATK
+    .byte <npc_SLIMER_frame_DTH,      >npc_SLIMER_frame_DTH
+
+npc_SLIMER_frame_DOWN:
+    .byte <npc_BARAKA_frame_LEFT_0,   >npc_BARAKA_frame_LEFT_0
+    .byte <npc_BARAKA_frame_LEFT_1,   >npc_BARAKA_frame_LEFT_1
+    .byte <npc_BARAKA_frame_LEFT_2,   >npc_BARAKA_frame_LEFT_2
+    .byte <npc_BARAKA_frame_LEFT_1,   >npc_BARAKA_frame_LEFT_1
+    .byte <npc_BARAKA_frame_LEFT_WRN, >npc_BARAKA_frame_LEFT_WRN ; warning
+    .byte <npc_BARAKA_frame_LEFT_ATK, >npc_BARAKA_frame_LEFT_ATK
+    .byte <npc_SLIMER_frame_DTH,      >npc_SLIMER_frame_DTH
+
 
 
 ;=============================================
@@ -304,6 +381,58 @@ npc_DOGMAN_frame_DOWN_ATK:
     .byte 8,  $85, %00000000, 8
     .byte 16, $94, %00000000, 0
     .byte 16, $95, %00000000, 8
+
+
+;=============================================
+npc_BARAKA_frames:
+    .byte <npc_BARAKA_frame_LEFT,  >npc_BARAKA_frame_LEFT
+    .byte <npc_BARAKA_frame_RIGHT, >npc_BARAKA_frame_RIGHT
+    .byte <npc_BARAKA_frame_UP,    >npc_BARAKA_frame_UP
+    .byte <npc_BARAKA_frame_DOWN,  >npc_BARAKA_frame_DOWN
+
+npc_BARAKA_frame_LEFT:
+    .byte <npc_BARAKA_frame_LEFT_0,   >npc_BARAKA_frame_LEFT_0
+    .byte <npc_BARAKA_frame_LEFT_1,   >npc_BARAKA_frame_LEFT_1
+    .byte <npc_BARAKA_frame_LEFT_2,   >npc_BARAKA_frame_LEFT_2
+    .byte <npc_BARAKA_frame_LEFT_1,   >npc_BARAKA_frame_LEFT_1
+    .byte <npc_BARAKA_frame_LEFT_WRN, >npc_BARAKA_frame_LEFT_WRN ; warning
+    .byte <npc_BARAKA_frame_LEFT_ATK, >npc_BARAKA_frame_LEFT_ATK
+    .byte <npc_DOGMAN_frame_DTH,      >npc_DOGMAN_frame_DTH
+
+npc_BARAKA_frame_LEFT_0:
+npc_BARAKA_frame_LEFT_1:
+npc_BARAKA_frame_LEFT_2:
+npc_BARAKA_frame_LEFT_WRN:
+npc_BARAKA_frame_LEFT_ATK:
+    .byte 0, 0, 0, 0
+
+npc_BARAKA_frame_RIGHT:
+    .byte <npc_BARAKA_frame_LEFT_0,   >npc_BARAKA_frame_LEFT_0
+    .byte <npc_BARAKA_frame_LEFT_1,   >npc_BARAKA_frame_LEFT_1
+    .byte <npc_BARAKA_frame_LEFT_2,   >npc_BARAKA_frame_LEFT_2
+    .byte <npc_BARAKA_frame_LEFT_1,   >npc_BARAKA_frame_LEFT_1
+    .byte <npc_BARAKA_frame_LEFT_1,   >npc_BARAKA_frame_LEFT_1 ; warning
+    .byte <npc_BARAKA_frame_LEFT_ATK, >npc_BARAKA_frame_LEFT_ATK
+    .byte <npc_DOGMAN_frame_DTH,      >npc_DOGMAN_frame_DTH
+
+npc_BARAKA_frame_UP:
+    .byte <npc_BARAKA_frame_LEFT_0,   >npc_BARAKA_frame_LEFT_0
+    .byte <npc_BARAKA_frame_LEFT_1,   >npc_BARAKA_frame_LEFT_1
+    .byte <npc_BARAKA_frame_LEFT_2,   >npc_BARAKA_frame_LEFT_2
+    .byte <npc_BARAKA_frame_LEFT_1,   >npc_BARAKA_frame_LEFT_1
+    .byte <npc_BARAKA_frame_LEFT_1,   >npc_BARAKA_frame_LEFT_1 ; warning
+    .byte <npc_BARAKA_frame_LEFT_ATK, >npc_BARAKA_frame_LEFT_ATK
+    .byte <npc_DOGMAN_frame_DTH,      >npc_DOGMAN_frame_DTH
+
+npc_BARAKA_frame_DOWN:
+    .byte <npc_BARAKA_frame_LEFT_0,   >npc_BARAKA_frame_LEFT_0
+    .byte <npc_BARAKA_frame_LEFT_1,   >npc_BARAKA_frame_LEFT_1
+    .byte <npc_BARAKA_frame_LEFT_2,   >npc_BARAKA_frame_LEFT_2
+    .byte <npc_BARAKA_frame_LEFT_1,   >npc_BARAKA_frame_LEFT_1
+    .byte <npc_BARAKA_frame_LEFT_1,   >npc_BARAKA_frame_LEFT_1 ; warning
+    .byte <npc_BARAKA_frame_LEFT_ATK, >npc_BARAKA_frame_LEFT_ATK
+    .byte <npc_DOGMAN_frame_DTH,      >npc_DOGMAN_frame_DTH
+
 
 ;===================================================
 npc_SPIDER_sprite_data:
