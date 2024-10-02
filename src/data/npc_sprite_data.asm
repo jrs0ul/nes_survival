@@ -215,26 +215,26 @@ npc_SLIMER_frame_UP:
 npc_SLIMER_frame_UP_0:
     .byte   0,$d6,0        ,  0
     .byte   0,$d7,%01000000,  8
-    .byte   0,$d8,0        , 16
+    .byte   0,$d6,%01000000, 16
     .byte   8,$e6,0        ,  0
     .byte   8,$e7,%01000000,  8
-    .byte   8,$e8,0        , 16
+    .byte   8,$e6,%01000000, 16
 
 npc_SLIMER_frame_UP_1:
     .byte   0,$e0,0        ,  0
     .byte   0,$e1,%01000000,  8
-    .byte   0,$e2,0        , 16
+    .byte   0,$e0,%01000000, 16
     .byte   8,$f0,0        ,  0
     .byte   8,$f1,%01000000,  8
-    .byte   8,$f2,0        , 16
+    .byte   8,$f0,%01000000, 16
 
 npc_SLIMER_frame_UP_WRN:
     .byte   0,$d9,0,  0
     .byte   0,$da,0,  8
     .byte   0,$db,0, 16
     .byte   8,$f0,0,  0
-    .byte   8,$f6,0,  8
-    .byte   8,$f2,0, 16
+    .byte   8,$f1,0,  8
+    .byte   8,$f0,%01000000, 16
 
 npc_SLIMER_frame_DOWN:
     .byte <npc_SLIMER_frame_DOWN_0,   >npc_SLIMER_frame_DOWN_0
@@ -482,7 +482,7 @@ npc_BARAKA_frame_LEFT_WRN:
     .byte    0,$ae,0, 8
     .byte    8,$bd,0, 0
     .byte    8,$be,0, 8
-    .byte   16,$ff,0, 0
+    .byte   16,$6f,0, 0
     .byte   16,$af,0, 8
 
 npc_BARAKA_frame_LEFT_ATK:
@@ -500,7 +500,7 @@ npc_BARAKA_frame_RIGHT:
     .byte <npc_BARAKA_frame_RIGHT_1,   >npc_BARAKA_frame_RIGHT_1
     .byte <npc_BARAKA_frame_RIGHT_WRN, >npc_BARAKA_frame_RIGHT_WRN ; warning
     .byte <npc_BARAKA_frame_RIGHT_ATK, >npc_BARAKA_frame_RIGHT_ATK
-    .byte <npc_DOGMAN_frame_DTH,      >npc_DOGMAN_frame_DTH
+    .byte <npc_DOGMAN_frame_DTH,       >npc_DOGMAN_frame_DTH
 
 npc_BARAKA_frame_RIGHT_0:
 npc_BARAKA_frame_RIGHT_1:
@@ -511,7 +511,7 @@ npc_BARAKA_frame_RIGHT_WRN:
     .byte    8,$be,%01000000, 0
     .byte    8,$bd,%01000000, 8
     .byte   16,$af,%01000000, 0
-    .byte   16,$ff,%01000000, 8
+    .byte   16,$6f,%01000000, 8
 
 npc_BARAKA_frame_RIGHT_ATK:
     .byte    0,$de,%01000000, 0
@@ -522,23 +522,61 @@ npc_BARAKA_frame_RIGHT_ATK:
     .byte   16,$fd,%01000000, 8
 
 npc_BARAKA_frame_UP:
-    .byte <npc_BARAKA_frame_LEFT_0,   >npc_BARAKA_frame_LEFT_0
-    .byte <npc_BARAKA_frame_LEFT_1,   >npc_BARAKA_frame_LEFT_1
-    .byte <npc_BARAKA_frame_LEFT_2,   >npc_BARAKA_frame_LEFT_2
-    .byte <npc_BARAKA_frame_LEFT_1,   >npc_BARAKA_frame_LEFT_1
-    .byte <npc_BARAKA_frame_LEFT_WRN, >npc_BARAKA_frame_LEFT_WRN ; warning
-    .byte <npc_BARAKA_frame_LEFT_ATK, >npc_BARAKA_frame_LEFT_ATK
-    .byte <npc_DOGMAN_frame_DTH,      >npc_DOGMAN_frame_DTH
+    .byte <npc_BARAKA_frame_UP_0,   >npc_BARAKA_frame_UP_0
+    .byte <npc_BARAKA_frame_UP_1,   >npc_BARAKA_frame_UP_1
+    .byte <npc_BARAKA_frame_UP_2,   >npc_BARAKA_frame_UP_2
+    .byte <npc_BARAKA_frame_UP_1,   >npc_BARAKA_frame_UP_1
+    .byte <npc_BARAKA_frame_UP_WRN, >npc_BARAKA_frame_UP_WRN ; warning
+    .byte <npc_BARAKA_frame_UP_ATK, >npc_BARAKA_frame_UP_ATK
+    .byte <npc_DOGMAN_frame_DTH,    >npc_DOGMAN_frame_DTH
+
+npc_BARAKA_frame_UP_0:
+npc_BARAKA_frame_UP_1:
+npc_BARAKA_frame_UP_2:
+npc_BARAKA_frame_UP_WRN:
+    .byte    0,$ca,0        , 0
+    .byte    0,$ca,%01000000, 8
+    .byte    8,$cb,0        , 0
+    .byte    8,$cb,%01000000, 8
+    .byte   16,$ef,0        , 0
+    .byte   16,$ff,0        , 8
+
+npc_BARAKA_frame_UP_ATK:
+    .byte    0,$ce,0        , 0
+    .byte    0,$ce,%01000000, 8
+    .byte    8,$d8,0        , 0
+    .byte    8,$d8,%01000000, 8
+    .byte   16,$e8,0        , 0
+    .byte   16,$f2,0        , 8
+
 
 npc_BARAKA_frame_DOWN:
-    .byte <npc_BARAKA_frame_LEFT_0,   >npc_BARAKA_frame_LEFT_0
-    .byte <npc_BARAKA_frame_LEFT_1,   >npc_BARAKA_frame_LEFT_1
-    .byte <npc_BARAKA_frame_LEFT_2,   >npc_BARAKA_frame_LEFT_2
-    .byte <npc_BARAKA_frame_LEFT_1,   >npc_BARAKA_frame_LEFT_1
-    .byte <npc_BARAKA_frame_LEFT_WRN, >npc_BARAKA_frame_LEFT_WRN ; warning
-    .byte <npc_BARAKA_frame_LEFT_ATK, >npc_BARAKA_frame_LEFT_ATK
+    .byte <npc_BARAKA_frame_DOWN_0,   >npc_BARAKA_frame_DOWN_0
+    .byte <npc_BARAKA_frame_DOWN_1,   >npc_BARAKA_frame_DOWN_1
+    .byte <npc_BARAKA_frame_DOWN_2,   >npc_BARAKA_frame_DOWN_2
+    .byte <npc_BARAKA_frame_DOWN_1,   >npc_BARAKA_frame_DOWN_1
+    .byte <npc_BARAKA_frame_DOWN_WRN, >npc_BARAKA_frame_DOWN_WRN ; warning
+    .byte <npc_BARAKA_frame_DOWN_ATK, >npc_BARAKA_frame_DOWN_ATK
     .byte <npc_DOGMAN_frame_DTH,      >npc_DOGMAN_frame_DTH
 
+npc_BARAKA_frame_DOWN_0:
+npc_BARAKA_frame_DOWN_1:
+npc_BARAKA_frame_DOWN_2:
+npc_BARAKA_frame_DOWN_WRN:
+    .byte    0,$bf,0        , 0
+    .byte    0,$bf,%01000000, 8
+    .byte    8,$cf,0        , 0
+    .byte    8,$df,0        , 8
+    .byte   16,$ef,0        , 0
+    .byte   16,$ff,0        , 8
+
+npc_BARAKA_frame_DOWN_ATK:
+    .byte    0,$cc,0        , 0
+    .byte    0,$cc,%01000000, 8
+    .byte    8,$dc,0        , 0
+    .byte    8,$e2,0        , 8
+    .byte   16,$cd,0        , 0
+    .byte   16,$cd,%01000000, 8
 
 ;===================================================
 npc_SPIDER_sprite_data:
