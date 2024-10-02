@@ -54,6 +54,7 @@ main_bg_tiles       : .incbin "chr/main_bg_tiles.lz4"
 .include "data/maps/cropped/abase_hall_0_crop.asm"
 .include "data/maps/cropped/abase_hall_1_crop.asm"
 .include "data/maps/cropped/abase_hall_2_crop.asm"
+.include "data/npc_list_abase_hall.asm"
 
 ;============================================================
 .segment "ROM2"

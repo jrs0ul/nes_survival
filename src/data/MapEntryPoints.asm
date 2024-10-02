@@ -271,7 +271,7 @@ MapSpawnPoint:
     .byte UNUSED, <main_palette, >main_palette, 0, <cave_npcs, >cave_npcs, 0
     ;alien base exit to hallway
     .byte 120, 40, 23, 3, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 1, 0, 1
-    .byte UNUSED, <alien_palette, >alien_palette, 0, 0, 0, 0
+    .byte UNUSED, <alien_palette, >alien_palette, 0, <abase_hall_npcs, >abase_hall_npcs, 0
     ;boss room entrance
     .byte 20, 120, 12, 1, LOCATION_TYPE_VILLAGER, SONG_BOSS, 3, 0, 0
     .byte UNUSED, <alien_palette, >alien_palette, 0, 0, 0, 0
@@ -340,7 +340,7 @@ MapSpawnPoint:
     .byte UNUSED, <main_palette, >main_palette, 0, 0, 0, 0
     ;entrance to alienbase hallway
     .byte 120, 210, 23, 3, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 1, 184, 0
-    .byte UNUSED, <alien_palette, >alien_palette, 0, 0, 0, 0
+    .byte UNUSED, <alien_palette, >alien_palette, 0, <abase_hall_npcs, >abase_hall_npcs, 0
     ;------------------
     ;exit to alien lobby
     .byte 126, 60, 17, 1, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 0, 0, 0
