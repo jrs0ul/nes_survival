@@ -468,15 +468,28 @@ npc_BARAKA_frames:
 npc_BARAKA_frame_LEFT:
     .byte <npc_BARAKA_frame_LEFT_0,   >npc_BARAKA_frame_LEFT_0
     .byte <npc_BARAKA_frame_LEFT_1,   >npc_BARAKA_frame_LEFT_1
-    .byte <npc_BARAKA_frame_LEFT_2,   >npc_BARAKA_frame_LEFT_2
+    .byte <npc_BARAKA_frame_LEFT_0,   >npc_BARAKA_frame_LEFT_0
     .byte <npc_BARAKA_frame_LEFT_1,   >npc_BARAKA_frame_LEFT_1
     .byte <npc_BARAKA_frame_LEFT_WRN, >npc_BARAKA_frame_LEFT_WRN ; warning
     .byte <npc_BARAKA_frame_LEFT_ATK, >npc_BARAKA_frame_LEFT_ATK
     .byte <npc_DOGMAN_frame_DTH,      >npc_DOGMAN_frame_DTH
 
 npc_BARAKA_frame_LEFT_0:
+    .byte    0,$ab,0, 0
+    .byte    0,$ac,0, 8
+    .byte    8,$bb,0, 0
+    .byte    8,$bc,0, 8
+    .byte   16,$c8,0, 0
+    .byte   16,$c9,0, 8
+
 npc_BARAKA_frame_LEFT_1:
-npc_BARAKA_frame_LEFT_2:
+    .byte    0,$a3,0, 0
+    .byte    0,$a4,0, 8
+    .byte    8,$b3,0, 0
+    .byte    8,$b4,0, 8
+    .byte   16,$c2,0, 0
+    .byte   16,$c3,0, 8
+
 npc_BARAKA_frame_LEFT_WRN:
     .byte    0,$ad,0, 0
     .byte    0,$ae,0, 8
@@ -496,15 +509,28 @@ npc_BARAKA_frame_LEFT_ATK:
 npc_BARAKA_frame_RIGHT:
     .byte <npc_BARAKA_frame_RIGHT_0,   >npc_BARAKA_frame_RIGHT_0
     .byte <npc_BARAKA_frame_RIGHT_1,   >npc_BARAKA_frame_RIGHT_1
-    .byte <npc_BARAKA_frame_RIGHT_2,   >npc_BARAKA_frame_RIGHT_2
+    .byte <npc_BARAKA_frame_RIGHT_0,   >npc_BARAKA_frame_RIGHT_0
     .byte <npc_BARAKA_frame_RIGHT_1,   >npc_BARAKA_frame_RIGHT_1
     .byte <npc_BARAKA_frame_RIGHT_WRN, >npc_BARAKA_frame_RIGHT_WRN ; warning
     .byte <npc_BARAKA_frame_RIGHT_ATK, >npc_BARAKA_frame_RIGHT_ATK
     .byte <npc_DOGMAN_frame_DTH,       >npc_DOGMAN_frame_DTH
 
 npc_BARAKA_frame_RIGHT_0:
+    .byte    0,$ac,%01000000, 0
+    .byte    0,$ab,%01000000, 8
+    .byte    8,$bc,%01000000, 0
+    .byte    8,$bb,%01000000, 8
+    .byte   16,$c9,%01000000, 0
+    .byte   16,$c8,%01000000, 8
+
 npc_BARAKA_frame_RIGHT_1:
-npc_BARAKA_frame_RIGHT_2:
+    .byte    0,$a4,%01000000, 0
+    .byte    0,$a3,%01000000, 8
+    .byte    8,$b4,%01000000, 0
+    .byte    8,$b3,%01000000, 8
+    .byte   16,$c3,%01000000, 0
+    .byte   16,$c2,%01000000, 8
+
 npc_BARAKA_frame_RIGHT_WRN:
     .byte    0,$ae,%01000000, 0
     .byte    0,$ad,%01000000, 8
@@ -531,8 +557,29 @@ npc_BARAKA_frame_UP:
     .byte <npc_DOGMAN_frame_DTH,    >npc_DOGMAN_frame_DTH
 
 npc_BARAKA_frame_UP_0:
+    .byte     0,$aa,0        ,0
+    .byte     0,$aa,%01000000,8
+    .byte     8,$ba,0        ,0
+    .byte     8,$ba,%01000000,8
+    .byte    16,$b8,0        ,0
+    .byte    16,$b9,0        ,8
+
 npc_BARAKA_frame_UP_1:
+    .byte    0,$a6,0        , 0
+    .byte    0,$a6,%01000000, 8
+    .byte    8,$b7,0        , 0
+    .byte    8,$b7,%01000000, 8
+    .byte   16,$c5,0        , 0
+    .byte   16,$c5,%01000000, 8
+
 npc_BARAKA_frame_UP_2:
+    .byte    0,$aa,0        , 0
+    .byte    0,$aa,%01000000, 8
+    .byte    8,$ba,0        , 0
+    .byte    8,$ba,%01000000, 8
+    .byte   16,$b9,%01000000, 0
+    .byte   16,$b8,%01000000, 8
+
 npc_BARAKA_frame_UP_WRN:
     .byte    0,$ca,0        , 0
     .byte    0,$ca,%01000000, 8
@@ -560,8 +607,29 @@ npc_BARAKA_frame_DOWN:
     .byte <npc_DOGMAN_frame_DTH,      >npc_DOGMAN_frame_DTH
 
 npc_BARAKA_frame_DOWN_0:
+    .byte    0,$a7,0        , 0
+    .byte    0,$a7,%01000000, 8
+    .byte    8,$a8,0        , 0
+    .byte    8,$a9,0        , 8
+    .byte   16,$c6,0        , 0
+    .byte   16,$c7,0        , 8
+
 npc_BARAKA_frame_DOWN_1:
+    .byte   0,$a5,0        ,  0
+    .byte   0,$a5,%01000000,  8
+    .byte   8,$b5,0        ,  0
+    .byte   8,$b6,0        ,  8
+    .byte  16,$c4,0        ,  0
+    .byte  16,$c4,%01000000,  8
+
 npc_BARAKA_frame_DOWN_2:
+    .byte    0,$a7,0        , 0
+    .byte    0,$a7,%01000000, 8
+    .byte    8,$a8,0        , 0
+    .byte    8,$a9,0        , 8
+    .byte   16,$c7,%01000000, 0
+    .byte   16,$c6,%01000000, 8
+
 npc_BARAKA_frame_DOWN_WRN:
     .byte    0,$bf,0        , 0
     .byte    0,$bf,%01000000, 8

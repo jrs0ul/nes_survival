@@ -18,6 +18,11 @@ location_spawns_low:
     .byte <spawnpoints_loc_17       ; 16
     .byte 0                         ; 17
     .byte 0                         ; 18
+    .byte <spawnpoints_loc_20       ; 19
+    .byte 0                         ; 20
+    .byte 0                         ; 21
+    .byte 0                         ; 22
+    .byte <spawnpoints_loc_24       ; 23
 
 location_spawns_high:
     .byte >spawnpoints_base_loc_1   ;0
@@ -39,6 +44,11 @@ location_spawns_high:
     .byte >spawnpoints_loc_17       ;16
     .byte 0                         ;17
     .byte 0                         ;18
+    .byte >spawnpoints_loc_20       ;19
+    .byte 0                         ;20
+    .byte 0                         ;21
+    .byte 0                         ;22
+    .byte >spawnpoints_loc_24       ;23
 
 
 spawnpoints_base_loc_1:
@@ -149,6 +159,34 @@ spawnpoints_loc_17:
     .byte 208, 190
     .byte 8, 96
 
+spawnpoints_loc_20:
+    .byte 80, 56
+    .byte 176, 144
+    .byte 232, 86
+    .byte 232, 192
 
+    .byte 112, 112
+    .byte 215, 96
+    .byte 224, 192
+    .byte 24, 184
 
+    .byte 208, 64
+    .byte 136, 160
+    .byte 32, 56
+    .byte 24, 192
 
+spawnpoints_loc_24:
+    .byte 80, 88
+    .byte 56, 160
+    .byte 200, 88
+    .byte 184, 160
+
+    .byte 232, 192
+    .byte 176, 96
+    .byte 112, 120
+    .byte 240, 64
+
+    .byte 160, 80
+    .byte 136, 144
+    .byte 48, 80
+    .byte 40, 184

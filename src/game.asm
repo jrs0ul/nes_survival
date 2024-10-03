@@ -92,6 +92,7 @@ boss_sprites_chr:  .incbin "chr/boss_sprites.lz4"
 .include "data/maps/cropped/wood_location_0_crop.asm"
 .include "data/maps/cropped/wood_location_1_crop.asm"
 .include "data/item_list_wood_location.asm"
+.include "data/AnimalSpawnPositions.asm"
 
 
 ;============================================================
@@ -194,7 +195,6 @@ FAMISTUDIO_CFG_C_BINDINGS = 0
 .include "famistudio_ca65.s"
 
 .include "data/StatusBar.asm"
-.include "data/AnimalSpawnPositions.asm"
 
 .include "data/player_sprite_data.asm"
 .include "data/npc_sprite_data.asm"

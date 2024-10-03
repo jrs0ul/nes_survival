@@ -80,12 +80,12 @@ PlayDamageSfx:
 
 
 ;-----------------
-; Calls the routine from the BANK 6
+; Calls the routine from the BANK 3
 GenerateNpcs:
 
     ldy current_bank
     sty oldbank
-    ldy #6
+    ldy #3
     jsr bankswitch_y
 
     jsr GenNpcs
@@ -95,7 +95,7 @@ GenerateNpcs:
 
     rts
 
-.SEGMENT "ROM6"
+.SEGMENT "ROM3"
 ;-------------------------------------
 ;Parameters: TempNpcCnt - npc number
 ;            TempIndex  - location screen index
@@ -175,6 +175,8 @@ GenerateSingleNpc:
     beq @cave
     cmp #LOCATION_TYPE_DARK
     beq @cave
+    cmp #LOCATION_TYPE_ALIEN_BASE
+    beq @alien
     jmp @notInCave
 @cave:
     jsr UpdateRandomNumber
@@ -184,6 +186,13 @@ GenerateSingleNpc:
     cmp #2
     beq @makeSpider
     jmp @makeBunny
+
+@alien:
+    jsr UpdateRandomNumber
+    and #3
+    cmp #0
+    beq @makeSlimer
+    jmp @makeWolf
 
 @notInCave:
     lda TempFrame ; fade value for time of the day
@@ -237,6 +246,15 @@ GenerateSingleNpc:
     lda npc_data, y
     sta TempHp
     lda #%01110001
+    jmp @storeType
+@makeSlimer:
+    ldy #73
+    lda npc_data, y
+    sta TempNpcRows
+    ldy #76
+    lda npc_data, y
+    sta TempHp
+    lda #%10100001
     jmp @storeType
 
 @makeCanid:

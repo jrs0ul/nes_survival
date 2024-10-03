@@ -154,10 +154,10 @@ entry_points_loc21:
     .byte 46, 0, 0, 255, 0, 255, 222, 255
 entry_points_loc22:
     ;47. exit to lonely cave
-    .byte 47, 0, 0, 255, 0, 255, 20, 40
+    .byte 47, 0, 0, 255, 0, 255, 20, 32
 entry_points_loc23:
     ;48. entrance to the main alien base
-    .byte 48, 1, 0, 255, 0, 255, 20, 40
+    .byte 48, 1, 0, 255, 0, 255, 20, 32
     ;49. exit to alien base puzzle room
     .byte 49, 0, 0, 255, 0, 255, 222, 255
 
@@ -271,7 +271,7 @@ MapSpawnPoint:
     .byte UNUSED, <main_palette, >main_palette, 0, <cave_npcs, >cave_npcs, 0
     ;alien base exit to hallway
     .byte 120, 40, 23, 3, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 1, 0, 1
-    .byte UNUSED, <alien_palette, >alien_palette, 0, <abase_hall_npcs, >abase_hall_npcs, 0
+    .byte UNUSED, <alien_palette, >alien_palette, 3, <abase_hall_npcs, >abase_hall_npcs, 0
     ;boss room entrance
     .byte 20, 120, 12, 1, LOCATION_TYPE_VILLAGER, SONG_BOSS, 3, 0, 0
     .byte UNUSED, <alien_palette, >alien_palette, 0, 0, 0, 0
@@ -320,7 +320,7 @@ MapSpawnPoint:
     ;------------
     ;alien base entrance bottom (pre)
     .byte 15, 170, 19, 3, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 2, 0, 0
-    .byte UNUSED, <alien_palette, >alien_palette, 0, 0, 0, 0
+    .byte UNUSED, <alien_palette, >alien_palette, 2, 0, 0, 0
     ;exit to dark cave 2
     .byte 96, 196, 16, 3, LOCATION_TYPE_DARK, SONG_OUTSIDE_NIGHT, 4, 0, 0
     .byte UNUSED, <main_palette, >main_palette, 3, 0, 0, 0
@@ -340,7 +340,7 @@ MapSpawnPoint:
     .byte UNUSED, <main_palette, >main_palette, 0, 0, 0, 0
     ;entrance to alienbase hallway
     .byte 120, 210, 23, 3, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 1, 184, 0
-    .byte UNUSED, <alien_palette, >alien_palette, 0, <abase_hall_npcs, >abase_hall_npcs, 0
+    .byte UNUSED, <alien_palette, >alien_palette, 3, <abase_hall_npcs, >abase_hall_npcs, 0
     ;------------------
     ;exit to alien lobby
     .byte 126, 60, 17, 1, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 0, 0, 0
@@ -364,7 +364,7 @@ MapSpawnPoint:
     .byte UNUSED, <alien_palette, >alien_palette, 0, <alien_base_npcs, >alien_base_npcs, 0
     ;exit to the puzzle room
     .byte 45, 38, 19, 3, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 2, 0, 0
-    .byte UNUSED, <alien_palette, >alien_palette, 0, 0, 0, 0
+    .byte UNUSED, <alien_palette, >alien_palette, 2, 0, 0, 0
 
 
 
