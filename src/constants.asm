@@ -94,6 +94,7 @@
 
     INTRO_SCENE_MAX            = 7
     OUTRO_SCENE_MAX            = 4
+    OUTRO_ALIEN_SCENE_MAX      = 2
 
     IMPORTANT_ITEM_TIME        = 96
 

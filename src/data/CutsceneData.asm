@@ -14,14 +14,16 @@
 
 ;ALL cutscenes
 cutscenes:
-    .byte <cutscene_intro,      >cutscene_intro
-    .byte <cutscene_good_outro, >cutscene_good_outro
-    .byte <cutscene_bad_outro,  >cutscene_bad_outro
+    .byte <cutscene_intro,       >cutscene_intro
+    .byte <cutscene_good_outro,  >cutscene_good_outro
+    .byte <cutscene_bad_outro,   >cutscene_bad_outro
+    .byte <cutscene_alien_outro, >cutscene_alien_outro
 
 cutscene_len:
     .byte INTRO_SCENE_MAX
     .byte OUTRO_SCENE_MAX
     .byte OUTRO_SCENE_MAX + 1
+    .byte OUTRO_ALIEN_SCENE_MAX
 
 ;---------------------------------
 cutscene_intro:
@@ -85,6 +87,116 @@ cutscene_bad_outro:
     .byte <outro_bad_meta_sprite_count,   >outro_bad_meta_sprite_count    ; meta-sprite count
     .byte <outro_palette_changes,         >outro_palette_changes          ; palette animations
     .byte <outro_scenes_with_tile_anim,   >outro_scenes_with_tile_anim    ; scenes with tile animations
+
+cutscene_alien_outro:
+    .byte <outro_scenes_alien,            >outro_scenes_alien
+    .byte <outro_scenes_alien_delay,      >outro_scenes_alien_delay
+    .byte <outro_scenes_alien_duration    >outro_scenes_alien_duration
+    .byte <outro_alien_sprite_count,      >outro_alien_sprite_count
+    .byte <outro_alien_sprite_pos_y,      >outro_alien_sprite_pos_y
+    .byte <outro_alien_sprite_pos_x,      >outro_alien_sprite_pos_x
+    .byte <outro_alien_sprite_dir_x,      >outro_alien_sprite_dir_x
+    .byte <outro_alien_sprite_dir_y,      >outro_alien_sprite_dir_y
+    .byte <outro_alien_scroll_dir_x,      >outro_alien_scroll_dir_x
+    .byte <outro_alien_scroll_dir_y,      >outro_alien_scroll_dir_y
+    .byte <outro_alien_palette_scenes,    >outro_alien_palette_scenes
+    .byte <outro_alien_sprites_low,       >outro_alien_sprites_low
+    .byte <outro_alien_sprites_high,      >outro_alien_sprites_high
+    .byte <outro_alien_sprites_2_low,     >outro_alien_sprites_2_low
+    .byte <outro_alien_sprites_2_high,    >outro_alien_sprites_2_high
+    .byte <outro_alien_meta_sprite_count, >outro_alien_meta_sprite_count
+    .byte <outro_palette_changes,         >outro_palette_changes
+    .byte <outro_scenes_with_tile_anim,   >outro_scenes_with_tile_anim
+
+outro_scenes_alien:
+    .byte <outro_bg_beam_me_up, >outro_bg_beam_me_up
+    .byte <outro_bg_victory_comp, >outro_bg_victory_comp
+
+outro_scenes_alien_delay:
+    .byte 10
+    .byte 10
+
+outro_scenes_alien_duration:
+    .byte 50
+    .byte 63
+
+outro_alien_sprite_count:
+    .byte 0;4 * 12
+    .byte 0
+
+    .byte 0;4 * 28
+    .byte 0
+
+outro_alien_sprite_pos_y:
+    .byte 100
+    .byte 0
+
+    .byte 100
+    .byte 0
+outro_alien_sprite_pos_x:
+    .byte 100
+    .byte 0
+
+    .byte 10
+    .byte 0
+
+outro_alien_sprite_dir_x:
+    .byte 0
+    .byte 0
+
+    .byte 1
+    .byte 0
+
+outro_alien_sprite_dir_y:
+    .byte 255
+    .byte 0
+
+    .byte 255
+    .byte 0
+
+outro_alien_scroll_dir_x:
+    .byte 0
+    .byte 0
+
+outro_alien_scroll_dir_y:
+    .byte 0
+    .byte 0
+
+outro_alien_palette_scenes:
+    .byte 0
+    .byte 0
+
+outro_alien_sprites_low:
+    .byte <dude_climbs
+    .byte 0
+
+    .byte <saucer
+    .byte 0
+
+outro_alien_sprites_high:
+    .byte >dude_climbs
+    .byte 0
+
+    .byte >saucer
+    .byte 0
+
+outro_alien_sprites_2_low:
+    .byte 0
+    .byte 0
+
+    .byte 0
+    .byte 0
+
+outro_alien_sprites_2_high:
+    .byte 0
+    .byte 0
+
+    .byte 0
+    .byte 0
+
+outro_alien_meta_sprite_count:
+    .byte 1
+    .byte 1
 
 
 ;---------------------------------

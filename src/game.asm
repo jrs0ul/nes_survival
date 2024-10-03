@@ -1410,7 +1410,7 @@ vblankwait2:      ; Second wait for vblank, PPU is ready after this
     lda #%00011110   ; enable sprites
     sta $2001
 
-    lda #0
+    lda #3
     sta CutsceneIdx
 
     lda #INPUT_DELAY
