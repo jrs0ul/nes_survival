@@ -36,12 +36,14 @@ main_bg_tiles       : .incbin "chr/main_bg_tiles.lz4"
 .include "data/maps/cropped/field_bg4_crop.asm"
 .include "data/maps/cropped/LOC3_bg1_crop.asm"
 .include "data/maps/cropped/LOC3_bg0_crop.asm"
-.include "data/maps/cropped/path_to_crashsite_crop.asm"
 .include "data/maps/cropped/alien_base_lobby_crop.asm"
+.include "data/maps/cropped/field2_bg_crop.asm"
+.include "data/maps/cropped/field2_bg1_crop.asm"
 .include "data/item_list_Outside1.asm"
 .include "data/item_list_Outside3.asm"
 .include "data/mod_tiles_first.asm"
 .include "data/mod_tiles_alien_lobby.asm"
+.include "data/item_list_outside2.asm"
 
 
 ;===========================================================
@@ -175,16 +177,14 @@ game_over_sprites:
 .include "data/maps/cropped/babloc1_crop.asm"
 .include "data/maps/cropped/babloc2_crop.asm"
 .include "data/maps/cropped/babloc3_crop.asm"
-.include "data/maps/cropped/field2_bg_crop.asm"
-.include "data/maps/cropped/field2_bg1_crop.asm"
 .include "data/maps/cropped/location_with_cave0_crop.asm"
 .include "data/maps/cropped/location_with_cave1_crop.asm"
 .include "data/maps/cropped/location_with_cave2_crop.asm"
 .include "data/maps/cropped/location_with_cave3_crop.asm"
+.include "data/maps/cropped/path_to_crashsite_crop.asm"
 
 .include "data/item_list_mine_location.asm"
 .include "data/item_list_granny_location.asm"
-.include "data/item_list_outside2.asm"
 
 ;=============================================================
 .segment "ROM6"

@@ -10,6 +10,8 @@
 .include "data/outro_bg_busted_comp.asm"
 .include "data/outro_bg_victory_comp.asm"
 
+.include "data/outro_bg_beam_me_up.asm"
+
 ;ALL cutscenes
 cutscenes:
     .byte <cutscene_intro,      >cutscene_intro
@@ -445,12 +447,43 @@ busted:
     .byte   4,$d5,1,  8
     .byte   4,$d6,1, 16
     .byte   4,$d7,1, 24
-    .byte  12,$e1,0,232
-    .byte  12,$e2,0,240
-    .byte  12,$e3,0,248
-    .byte  12,$e5,1,  8
-    .byte  12,$e6,1, 16
-    .byte  12,$e7,1, 24
+    .byte  12,$e0,0,232
+    .byte  12,$e1,0,240
+    .byte  12,$e2,0,248
+    .byte  12,$e3,1,  8
+    .byte  12,$e4,1, 16
+    .byte  12,$e5,1, 24
+
+saucer:
+    .byte 232,240,$ca,0
+    .byte 240,240,$cb,0
+    .byte 248,240,$cc,0
+    .byte   0,240,$cc,%01000000
+    .byte   8,240,$cb,%01000000
+    .byte  16,240,$ca,%01000000
+    .byte 224,248,$d9,0
+    .byte 232,248,$da,0
+    .byte 240,248,$db,0
+    .byte 248,248,$dc,0
+    .byte   0,248,$dc,%01000000
+    .byte   8,248,$db,%01000000
+    .byte  16,248,$da,%01000000
+    .byte  24,248,$d9,%01000000
+    .byte 224,  0,$d9,%10000000
+    .byte 232,  0,$da,%10000000
+    .byte 240,  0,$db,%10000000
+    .byte 248,  0,$dc,%10000000
+    .byte   0,  0,$dc,%11000000
+    .byte   8,  0,$db,%11000000
+    .byte  16,  0,$da,%11000000
+    .byte  24,  0,$d9,%11000000
+    .byte 232,  8,$ca,%10000000
+    .byte 240,  8,$cb,%10000000
+    .byte 248,  8,$cc,%10000000
+    .byte   0,  8,$cc,%11000000
+    .byte   8,  8,$cb,%11000000
+    .byte  16,  8,$ca,%11000000
+
 
 
 

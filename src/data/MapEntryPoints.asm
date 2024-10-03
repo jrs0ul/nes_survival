@@ -189,7 +189,7 @@ MapSpawnPoint:
     .byte 128, 152, 4, 1, LOCATION_TYPE_HOUSE, SONG_INDOORS, 0, 0, 0
     .byte UNUSED, <house_palette, >house_palette, 0, <list_empty, >list_empty, 0
     ;Second location entry point
-    .byte 80, 208, 1, OUTDOORS_LOC2_SCREEN_COUNT, LOCATION_TYPE_OUTDOORS, SONG_OUTSIDE_DAY, 5, 0, 0
+    .byte 80, 208, 1, OUTDOORS_LOC2_SCREEN_COUNT, LOCATION_TYPE_OUTDOORS, SONG_OUTSIDE_DAY, 0, 0, 0
     .byte UNUSED, <main_palette, >main_palette, 3, 0, 0, 0
     ;Third location entry point
     .byte 100, 48, 2, OUTDOORS_LOC3_SCREEN_COUNT, LOCATION_TYPE_OUTDOORS, SONG_OUTSIDE_DAY, 0, 0, 0
@@ -216,8 +216,8 @@ MapSpawnPoint:
     .byte UNUSED, <house_palette, >house_palette, 0, <villager2_npcs, >villager2_npcs, 0
     ;------------------
     ;Bjorn's house exit
-    .byte $76, $80, 1, OUTDOORS_LOC2_SCREEN_COUNT, LOCATION_TYPE_OUTDOORS, SONG_INDOORS, 5, $B8, 0
-    .byte UNUSED, <main_palette, >house_palette, 3, 0, 0, 1
+    .byte $76, $80, 1, OUTDOORS_LOC2_SCREEN_COUNT, LOCATION_TYPE_OUTDOORS, SONG_INDOORS, 0, $B8, 0
+    .byte UNUSED, <main_palette, >main_palette, 3, 0, 0, 1
     ;-----------------
     ;Player's house exit
     .byte 72, 120, 0, OUTDOORS_LOC1_SCREEN_COUNT, LOCATION_TYPE_OUTDOORS, SONG_OUTSIDE_DAY, 0, 0, 0
@@ -249,7 +249,7 @@ MapSpawnPoint:
     .byte 120, 34, 6, OUTDOORS_LOC7_SCREEN_COUNT, LOCATION_TYPE_CAVE, SONG_OUTSIDE_NIGHT, 4, 192, 0
     .byte UNUSED, <main_palette, >main_palette, 0, <cave_npcs, >cave_npcs, 0
     ;crashsite exit to path
-    .byte 120, 50, 18, 1, LOCATION_TYPE_OUTDOORS, SONG_OUTSIDE_DAY, 0, 0, 0
+    .byte 120, 50, 18, 1, LOCATION_TYPE_OUTDOORS, SONG_OUTSIDE_DAY, 5, 0, 0
     .byte UNUSED, <main_palette, >main_palette, 0, 0, 0, 0
     ;---------------------
     ;exit from granny's location to main
@@ -285,7 +285,7 @@ MapSpawnPoint:
     .byte 120, 207, 6, OUTDOORS_LOC7_SCREEN_COUNT, LOCATION_TYPE_CAVE, SONG_OUTSIDE_NIGHT, 4, 222, 0
     .byte UNUSED, <main_palette, >main_palette, 0, <cave_npcs, >cave_npcs, 0
     ;entrance to the path to the crashsite
-    .byte 120, 180, 18, 1, LOCATION_TYPE_OUTDOORS, SONG_OUTSIDE_NIGHT, 0, 0, 0
+    .byte 120, 180, 18, 1, LOCATION_TYPE_OUTDOORS, SONG_OUTSIDE_NIGHT, 5, 0, 0
     .byte UNUSED, <main_palette, >main_palette, 0, 0, 0, 0
     ;---------------
     ;boss room exit
@@ -457,7 +457,7 @@ EntryPointCountForLocation:
 ;which location in which bank
 LocationBanks:
     .byte 0  ;0
-    .byte 5  ;1
+    .byte 0  ;1
     .byte 0  ;2
     .byte 0  ;3
     .byte 0  ;4
@@ -474,7 +474,7 @@ LocationBanks:
     .byte 3  ;15
     .byte 4  ;16
     .byte 0  ;17
-    .byte 0  ;18
+    .byte 5  ;18
     .byte 2  ;19
     .byte 3  ;20
     .byte 3  ;21

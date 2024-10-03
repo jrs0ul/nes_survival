@@ -167,6 +167,16 @@ GenNpcs:
 
 @exit:
     rts
+;---------------------------
+MakeBunny:
+    ldy #9
+    lda npc_data, y
+    sta TempNpcRows
+    ldy #12
+    lda npc_data, y
+    sta TempHp
+    lda #%00010001
+    rts
 ;---------------------------------
 GenerateSingleNpc:
 
@@ -192,6 +202,8 @@ GenerateSingleNpc:
     and #3
     cmp #0
     beq @makeSlimer
+    cmp #1
+    beq @makeBaraka
     jmp @makeWolf
 
 @notInCave:
@@ -203,13 +215,7 @@ GenerateSingleNpc:
     beq @decideWhatToMake
 
 @makeBunny:
-    ldy #9
-    lda npc_data, y
-    sta TempNpcRows
-    ldy #12
-    lda npc_data, y
-    sta TempHp
-    lda #%00010001
+    jsr MakeBunny
     jmp @storeType
 @makeSpider:
     ldy #72
@@ -247,6 +253,17 @@ GenerateSingleNpc:
     sta TempHp
     lda #%01110001
     jmp @storeType
+
+@makeBaraka:
+    ldy #81
+    lda npc_data, y
+    sta TempNpcRows
+    ldy #84
+    lda npc_data, y
+    sta TempHp
+    lda #%10110001
+    jmp @storeType
+
 @makeSlimer:
     ldy #73
     lda npc_data, y
@@ -256,6 +273,8 @@ GenerateSingleNpc:
     sta TempHp
     lda #%10100001
     jmp @storeType
+
+
 
 @makeCanid:
     lda #NUM_OF_BUNNIES_BEFORE_DOG
