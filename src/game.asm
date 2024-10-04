@@ -3341,10 +3341,18 @@ OnYouWin:
     sta CutsceneIdx
     jmp @activateNewSong
 @evilEnding:
-    lda #2
-    sta CutsceneIdx
+
     lda #SONG_ENDING_EVIL
     sta SongName
+
+    lda ItemIGave
+    cmp #ITEM_GRANNYS_HEAD
+    beq @alienEnding
+    lda #2
+    sta CutsceneIdx
+@alienEnding:
+    lda #3
+    sta CutsceneIdx
 
 @activateNewSong:
     lda #1
@@ -3660,6 +3668,13 @@ RoutinesAfterFadeOut:
     cmp #29
     bne @next27
 
+    lda ItemIGave
+    cmp #ITEM_GRANNYS_HEAD
+    bne @justExit
+    lda #1
+    sta PlayerWins
+
+@justExit:
     jsr FlipStartingNametable ; for the locked door, so the second screen would always be in adress $24**
 
     lda #0
