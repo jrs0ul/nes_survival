@@ -111,19 +111,25 @@ cutscene_alien_outro:
 
 outro_scenes_alien:
     .byte <outro_bg_beam_me_up, >outro_bg_beam_me_up
+    .byte <outro_bg_busted_comp, >outro_bg_busted_comp
     .byte <outro_bg_victory_comp, >outro_bg_victory_comp
 
 outro_scenes_alien_delay:
+    .byte 10
     .byte 10
     .byte 5
 
 outro_scenes_alien_duration:
     .byte 50
+    .byte 60
     .byte 63
 
 outro_alien_sprite_count:
     .byte 4 * 12
     .byte 0
+
+    .byte 4 * 28
+    .byte 4 * 6
 
     .byte 4 * 28
     .byte 0
@@ -132,16 +138,27 @@ outro_alien_sprite_pos_y:
     .byte 150
     .byte 0
 
+    .byte 90
+    .byte 115
+
     .byte 100
     .byte 0
 outro_alien_sprite_pos_x:
     .byte 130
     .byte 0
 
-    .byte 10
+    .byte 130
+    .byte 130
+
+    .byte 50
     .byte 0
 
 outro_alien_sprite_dir_x:
+    .byte 0
+    .byte 0
+    .byte 0
+    .byte 0
+
     .byte 0
     .byte 0
     .byte 0
@@ -160,24 +177,35 @@ outro_alien_sprite_dir_y:
 
     .byte 0
     .byte 0
+    .byte 0
+    .byte 0
+
+    .byte 0
+    .byte 0
     .byte 255
     .byte 0
 
 outro_alien_scroll_dir_x:
     .byte 0
     .byte 0
+    .byte 1
 
 outro_alien_scroll_dir_y:
+    .byte 0
     .byte 0
     .byte 0
 
 outro_alien_palette_scenes:
     .byte 0
     .byte 0
+    .byte 0
 
 outro_alien_sprites_low:
     .byte <dude_climbs
     .byte 0
+
+    .byte <saucer
+    .byte <beam
 
     .byte <saucer
     .byte 0
@@ -187,9 +215,15 @@ outro_alien_sprites_high:
     .byte 0
 
     .byte >saucer
+    .byte >beam
+
+    .byte >saucer
     .byte 0
 
 outro_alien_sprites_2_low:
+    .byte 0
+    .byte 0
+
     .byte 0
     .byte 0
 
@@ -203,8 +237,12 @@ outro_alien_sprites_2_high:
     .byte 0
     .byte 0
 
+    .byte 0
+    .byte 0
+
 outro_alien_meta_sprite_count:
     .byte 1
+    .byte 2
     .byte 1
 
 
@@ -576,34 +614,44 @@ busted:
     .byte  12,$e5,1, 24
 
 saucer:
-    .byte 240,$ca,0        ,232
-    .byte 240,$cb,0        ,240
-    .byte 240,$cc,0        ,248
-    .byte 240,$cc,%01000000,  0
-    .byte 240,$cb,%01000000,  8
-    .byte 240,$ca,%01000000, 16
-    .byte 248,$d9,0        ,224
-    .byte 248,$da,0        ,232
-    .byte 248,$db,0        ,240
-    .byte 248,$dc,0        ,248
-    .byte 248,$dc,%01000000,  0
-    .byte 248,$db,%01000000,  8
-    .byte 248,$da,%01000000, 16
-    .byte 248,$d9,%01000000, 24
-    .byte   0,$d9,%10000000,224
-    .byte   0,$da,%10000000,232
-    .byte   0,$db,%10000000,240
-    .byte   0,$dc,%10000000,248
-    .byte   0,$dc,%11000000,  0
-    .byte   0,$db,%11000000,  8
-    .byte   0,$da,%11000000, 16
-    .byte   0,$d9,%11000000, 24
-    .byte   8,$ca,%10000000,232
-    .byte   8,$cb,%10000000,240
-    .byte   8,$cc,%10000000,248
-    .byte   8,$cc,%11000000,  0
-    .byte   8,$cb,%11000000,  8
-    .byte   8,$ca,%11000000, 16
+    .byte 240,$ca,%00000011,232
+    .byte 240,$cb,%00000011,240
+    .byte 240,$cc,%00000011,248
+    .byte 240,$cc,%01000011,  0
+    .byte 240,$cb,%01000011,  8
+    .byte 240,$ca,%01000011, 16
+    .byte 248,$d9,%00000011,224
+    .byte 248,$da,%00000011,232
+    .byte 248,$db,%00000011,240
+    .byte 248,$dc,%00000011,248
+    .byte 248,$dc,%01000011,  0
+    .byte 248,$db,%01000011,  8
+    .byte 248,$da,%01000011, 16
+    .byte 248,$d9,%01000011, 24
+    .byte   0,$d9,%10000011,224
+    .byte   0,$da,%10000011,232
+    .byte   0,$db,%10000011,240
+    .byte   0,$dc,%10000011,248
+    .byte   0,$dc,%11000011,  0
+    .byte   0,$db,%11000011,  8
+    .byte   0,$da,%11000011, 16
+    .byte   0,$d9,%11000011, 24
+    .byte   8,$ca,%10000011,232
+    .byte   8,$cb,%10000011,240
+    .byte   8,$cc,%10000011,248
+    .byte   8,$cc,%11000011,  0
+    .byte   8,$cb,%11000011,  8
+    .byte   8,$ca,%11000011, 16
+
+beam:
+    .byte 244,$ce,0,248
+    .byte 244,$cf,0,  0
+    .byte 252,$de,0,248
+    .byte 252,$df,0,  0
+    .byte   4,$ee,0,248
+    .byte   4,$ef,0,  0
+
+
 
 
 
