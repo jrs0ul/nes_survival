@@ -928,6 +928,7 @@ ActiveDocument:
 
 StashActivated:
     .res 1
+
 CraftingActivated:
     .res 1
 EquipmentActivated:
@@ -6885,6 +6886,8 @@ CheckB:
 ;----------------------------------
 ;Activate a switch by punching it
 ActivateSwitch:
+    lda #0
+    sta TempYOffset
     jsr CalcTileAddressInFrontOfPlayer
 
     lda LocationIndex
@@ -6999,6 +7002,8 @@ useHammerOnEnvironment:
     rts
 
 @cont:
+    lda #4
+    sta TempYOffset
     jsr CalcTileAddressInFrontOfPlayer
 
     lda TempY
@@ -7265,6 +7270,7 @@ ActivateFishingRod:
 
 ;---------------------------------
 ;Set the map [pointer] and calculate the offset and put it in [y] register
+;TempYOffset - distance from player Y of protruding weapon
 CalcTileAddressInFrontOfPlayer:
 
     lda PlayerFrame
@@ -7335,14 +7341,16 @@ CalcTileAddressInFrontOfPlayer:
     ;up
     lda PlayerY
     sec
-    sbc #4
+    sbc TempYOffset
     jmp @divide
 
 @down:
 
     lda PlayerY
     clc
-    adc #20
+    adc #PLAYER_HEIGHT
+    clc
+    adc TempYOffset
 
 @divide:
     ; y / 8
@@ -7351,7 +7359,7 @@ CalcTileAddressInFrontOfPlayer:
     lsr
 
     sec
-    sbc #4 ; remove supposed HUD rows
+    sbc #HUD_TILE_ROW_COUNT ; remove supposed HUD rows
 
     sta TempY
 
@@ -7381,6 +7389,8 @@ CanCastRodHere:
     cmp #LOCATION_TYPE_OUTDOORS
     bne @exit
 
+    lda #4
+    sta TempYOffset
     jsr CalcTileAddressInFrontOfPlayer
 
     lda (pointer), y
