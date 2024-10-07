@@ -4100,7 +4100,7 @@ UpdateArrowSprites:
     sta FIRST_SPRITE, x
     inc TempSpriteIdx
     ldx TempSpriteIdx
-    lda #%00000001
+    lda #%00000011
     sta FIRST_SPRITE, x
     inc TempSpriteIdx
     ldx TempSpriteIdx
@@ -4132,7 +4132,7 @@ UpdateArrowSprites:
     sta FIRST_SPRITE, x
     inc TempSpriteIdx
     ldx TempSpriteIdx
-    lda #%01000001
+    lda #%01000000
     sta FIRST_SPRITE, x
     inc TempSpriteIdx
     ldx TempSpriteIdx
@@ -4186,7 +4186,7 @@ ItemTileLoop:
     adc TempPaletteIndex
     jmp @saveAttributes
 @progressBar:
-    lda #2
+    lda #3
     cpy #3
     bcc @saveAttributes
     lda #1
