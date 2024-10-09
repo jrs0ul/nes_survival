@@ -26,7 +26,7 @@ Switch1Logic:
     ldy #8
     clc
     adc ModifiedTiles, y
-    cmp #0
+    cmp #0 ; are second and third switches off ??
     beq @first_lock
 
     lda ModifiedTiles, y ;8
@@ -55,36 +55,51 @@ Switch1Logic:
     rts
 ;------------------------
 Switch2Logic:
+
+    ldy #8
+    jsr SwitchPlate
+    lda ModifiedTiles, y
+    beq @done
+    ;second is on. let's turn third off
+    ldy #9
+    lda #0
+    sta ModifiedTiles, y
+
     ldy #4
     lda ModifiedTiles, y
     ldy #7
     sta ModifiedTiles, y
-
-    ldy #8
-    jsr SwitchPlate
-    lda ModifiedTiles, y
-    beq @done
-    ldy #9
-    lda #0
-    sta ModifiedTiles, y
+    jmp @end
 @done:
+    ldy #6
+    lda ModifiedTiles, y
+    ldy #7
+    sta ModifiedTiles, y
+@end:
     rts
 ;------------------------
 Switch3Logic:
+
+    ldy #9
+    jsr SwitchPlate
+    lda ModifiedTiles, y
+    beq @done
+    ;third is on, let's make second off
+    ldy #8
+    lda #0
+    sta ModifiedTiles, y
+
     ldy #5
     lda ModifiedTiles, y
     ldy #7
     sta ModifiedTiles, y
-
-    ldy #9
-    jsr SwitchPlate
-    lda ModifiedTiles, y
-    beq @done
-    ldy #8
-    lda #0
-    sta ModifiedTiles, y
-
+    jmp @end
 @done:
+    ldy #6
+    lda ModifiedTiles, y
+    ldy #7
+    sta ModifiedTiles, y
+@end:
     rts
 
 ;------------------------
