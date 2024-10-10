@@ -13,9 +13,74 @@ frame_list_index_lookup:
     .byte 78 ; spider
     .byte 86 ; slimer
     .byte 94 ; baraka
+    .byte 102; cat
+
+;Cat
+npc_CAT_frames:
+    .byte <npc_CAT_frame_LEFT,  >npc_CAT_frame_LEFT
+    .byte <npc_CAT_frame_RIGHT, >npc_CAT_frame_RIGHT
+    .byte <npc_CAT_frame_UP,    >npc_CAT_frame_UP
+    .byte <npc_CAT_frame_DOWN,  >npc_CAT_frame_DOWN
+
+npc_CAT_frame_LEFT:
+    .byte <npc_CAT_frame_LEFT_0,   >npc_CAT_frame_LEFT_0
+    .byte <npc_CAT_frame_LEFT_1,   >npc_CAT_frame_LEFT_1
+    .byte <npc_CAT_frame_LEFT_2,   >npc_CAT_frame_LEFT_2
+    .byte <npc_CAT_frame_LEFT_1,   >npc_CAT_frame_LEFT_1
+    .byte                     0,   0
+    .byte                     0,   0
+    .byte                     0,   0
+
+npc_CAT_frame_LEFT_0:
+npc_CAT_frame_LEFT_1:
+npc_CAT_frame_LEFT_2:
+
+npc_CAT_frame_RIGHT:
+    .byte <npc_CAT_frame_RIGHT_0,   >npc_CAT_frame_RIGHT_0
+    .byte <npc_CAT_frame_RIGHT_1,   >npc_CAT_frame_RIGHT_1
+    .byte <npc_CAT_frame_RIGHT_2,   >npc_CAT_frame_RIGHT_2
+    .byte <npc_CAT_frame_RIGHT_1,   >npc_CAT_frame_RIGHT_1
+    .byte                     0,   0
+    .byte                     0,   0
+    .byte                     0,   0
+
+npc_CAT_frame_RIGHT_0:
+npc_CAT_frame_RIGHT_1:
+npc_CAT_frame_RIGHT_2:
 
 
+npc_CAT_frame_UP:
+    .byte <npc_CAT_frame_UP_0,   >npc_CAT_frame_UP_0
+    .byte <npc_CAT_frame_UP_1,   >npc_CAT_frame_UP_1
+    .byte <npc_CAT_frame_UP_2,   >npc_CAT_frame_UP_2
+    .byte <npc_CAT_frame_UP_1,   >npc_CAT_frame_UP_1
+    .byte                     0,   0
+    .byte                     0,   0
+    .byte                     0,   0
 
+npc_CAT_frame_UP_0:
+npc_CAT_frame_UP_1:
+npc_CAT_frame_UP_2:
+
+
+npc_CAT_frame_DOWN:
+    .byte <npc_CAT_frame_DOWN_0,   >npc_CAT_frame_DOWN_0
+    .byte <npc_CAT_frame_DOWN_1,   >npc_CAT_frame_DOWN_1
+    .byte <npc_CAT_frame_DOWN_2,   >npc_CAT_frame_DOWN_2
+    .byte <npc_CAT_frame_DOWN_1,   >npc_CAT_frame_DOWN_1
+    .byte                     0,   0
+    .byte                     0,   0
+    .byte                     0,   0
+
+npc_CAT_frame_DOWN_0:
+npc_CAT_frame_DOWN_1:
+npc_CAT_frame_DOWN_2:
+    .byte     0,$d0,0        ,0
+    .byte     0,$d0,%01000000,8
+    .byte     8,$e0,0        ,0
+    .byte     8,$e0,%01000000,8
+
+;===============================================
 ;Bunny
 
 npc_BUNNY_frames:

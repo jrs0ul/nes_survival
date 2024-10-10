@@ -461,7 +461,7 @@ LoadIndoorMapData:
     ldy #1
     sta (sp),y
     lda #0
-    ldx #3
+    ldx #5
     jsr UnLZ4toVram
 
 

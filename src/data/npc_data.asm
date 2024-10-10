@@ -22,5 +22,6 @@ npc_data:
     .byte 2, 2, 4,  1, 4,   3, <npc_SPIDER_frames,  >npc_SPIDER_frames      ;9  Spider
     .byte 3, 2, 4,  1, 4,   5, <npc_SLIMER_frames,  >npc_SLIMER_frames      ;10 Slimer
     .byte 2, 3, 17, 1, 7,   8, <npc_BARAKA_frames,  >npc_BARAKA_frames      ;11 Baraka
+    .byte 2, 2, 9,  0, 255, 0, <npc_CAT_frames,     >npc_CAT_frames         ;12 Cat
 
 
