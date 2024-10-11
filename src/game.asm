@@ -3874,16 +3874,16 @@ CommonLocationRoutine:
     sta ScreenCount
     iny
     lda (pointer2), y ; Location type
+    iny
     cmp LocationType
     beq @sameLocationType
     sta LocationType
     lda #1
     sta MustCopyMainChr
     sta MustStopMusic
-@sameLocationType:
-    iny
-    lda (pointer2), y ; upper address to item data
+    lda (pointer2), y ; song name
     sta SongName
+@sameLocationType:
 
     sty TempY
     lda LocationIndex
