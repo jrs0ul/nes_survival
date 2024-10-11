@@ -2403,6 +2403,9 @@ NpcMovement:
     lda TempNpcType
     cmp #NPC_TYPE_TIMID
     bne @continue_move
+    lda TempNpcIndex
+    cmp #NPC_IDX_BUNNY
+    bne @continue_move
     jsr CheckAgitationByPlayer
 
     dex; state (was at x coord)

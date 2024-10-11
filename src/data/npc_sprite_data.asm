@@ -32,8 +32,24 @@ npc_CAT_frame_LEFT:
     .byte                     0,   0
 
 npc_CAT_frame_LEFT_0:
+
+    .byte    0,$d6,0, 0
+    .byte    0,$da,0, 8
+    .byte    8,$e9,0, 0
+    .byte    8,$ea,0, 8
+
 npc_CAT_frame_LEFT_1:
+    .byte    0,$d1,0, 0
+    .byte    0,$d2,0, 8
+    .byte    8,$e1,0, 0
+    .byte    8,$e2,0, 8
+
 npc_CAT_frame_LEFT_2:
+    .byte    0,$d6,0, 0
+    .byte    0,$d7,0, 8
+    .byte    8,$e6,0, 0
+    .byte    8,$e7,0, 8
+
 
 npc_CAT_frame_RIGHT:
     .byte <npc_CAT_frame_RIGHT_0,   >npc_CAT_frame_RIGHT_0
@@ -45,8 +61,22 @@ npc_CAT_frame_RIGHT:
     .byte                     0,   0
 
 npc_CAT_frame_RIGHT_0:
+    .byte    0,$d7,%01000000, 0
+    .byte    0,$d1,%01000000, 8
+    .byte    8,$e7,%01000000, 0
+    .byte    8,$e6,%01000000, 8
+
 npc_CAT_frame_RIGHT_1:
+    .byte    0,$d2,%01000000, 0
+    .byte    0,$d1,%01000000, 8
+    .byte    8,$e2,%01000000, 0
+    .byte    8,$e1,%01000000, 8
+
 npc_CAT_frame_RIGHT_2:
+    .byte    0,$da,%01000000, 0
+    .byte    0,$d1,%01000000, 8
+    .byte    8,$ea,%01000000, 0
+    .byte    8,$e9,%01000000, 8
 
 
 npc_CAT_frame_UP:
@@ -59,8 +89,22 @@ npc_CAT_frame_UP:
     .byte                     0,   0
 
 npc_CAT_frame_UP_0:
+    .byte    0,$d8,0        , 0
+    .byte    0,$d9,0        , 8
+    .byte    8,$e8,0        , 0
+    .byte    8,$e3,%01000000, 8
+
 npc_CAT_frame_UP_1:
+    .byte    0,$d3,0        , 0
+    .byte    0,$d3,%01000000, 8
+    .byte    8,$e3,0        , 0
+    .byte    8,$e3,%01000000, 8
+
 npc_CAT_frame_UP_2:
+    .byte    0,$d9,%01000000, 0
+    .byte    0,$d8,%01000000, 8
+    .byte    8,$e3,0        , 0
+    .byte    8,$e8,%01000000, 8
 
 
 npc_CAT_frame_DOWN:
@@ -73,12 +117,24 @@ npc_CAT_frame_DOWN:
     .byte                     0,   0
 
 npc_CAT_frame_DOWN_0:
+    .byte    0,$d4,0, 0
+    .byte    0,$d5,0, 8
+    .byte    8,$e4,0, 0
+    .byte    8,$e5,0, 8
+
 npc_CAT_frame_DOWN_1:
-npc_CAT_frame_DOWN_2:
     .byte     0,$d0,0        ,0
     .byte     0,$d0,%01000000,8
     .byte     8,$e0,0        ,0
     .byte     8,$e0,%01000000,8
+
+npc_CAT_frame_DOWN_2:
+    .byte    0,$d5,%01000000, 0
+    .byte    0,$d4,%01000000, 8
+    .byte    8,$e5,%01000000, 0
+    .byte    8,$e4,%01000000, 8
+
+
 
 ;===============================================
 ;Bunny

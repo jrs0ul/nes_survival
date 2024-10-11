@@ -111,7 +111,7 @@
 
     INPUT_DELAY                = 100
     ITEM_DELAY                 = 220
-    NPC_AI_DELAY               = 133
+    NPC_AI_DELAY               = 190
     NPC_COLLISION_DELAY        = 255
     FISHING_DELAY              = 2
     STAMINA_DELAY              = 2
