@@ -279,7 +279,7 @@ MapSpawnPoint:
     ;A location with the mine entrance
     ;--------------
     ;exit from cave location to bjorn's location
-    .byte 135, 38, 1, OUTDOORS_LOC2_SCREEN_COUNT, LOCATION_TYPE_OUTDOORS, SONG_OUTSIDE_DAY, 5, 0, 0
+    .byte 135, 38, 1, OUTDOORS_LOC2_SCREEN_COUNT, LOCATION_TYPE_OUTDOORS, SONG_OUTSIDE_DAY, 0, 0, 0
     .byte UNUSED, <main_palette, >main_palette, 3, 0, 0, 0
     ;cave entrance
     .byte 120, 207, 6, OUTDOORS_LOC7_SCREEN_COUNT, LOCATION_TYPE_CAVE, SONG_OUTSIDE_NIGHT, 4, 222, 0

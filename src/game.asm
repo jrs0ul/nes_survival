@@ -3750,12 +3750,28 @@ RoutinesAfterFadeOut:
 @next37:
     lda ActiveMapEntryIndex
     cmp #38
-    bne @next40
+    bne @next38
 
     lda #1
     sta MustCopyMainChr
     jsr TurnDarkPaletteOn
+    ;---------------------
+    ;entrance to the crashsite from the path
+@next38:
+    lda ActiveMapEntryIndex
+    cmp #40
+    bne @next39
 
+    lda #1
+    sta MustCopyMainChr
+
+@next39:
+    lda ActiveMapEntryIndex
+    cmp #18
+    bne @next40
+
+    lda #1
+    sta MustCopyMainChr
     ;---------------------
 @next40:
     lda LocationType
@@ -3767,24 +3783,10 @@ RoutinesAfterFadeOut:
     sta MustLoadOutside
     sta MustUpdateDestructibles
 
-    lda ActiveMapEntryIndex
-    lda #1
-    jmp @saveCopyFlag
-@notcopy:
-    lda #0
-@saveCopyFlag:
-    sta MustCopyMainChr
-
     jmp @finish
 @itsAnIndoorMap:
     lda #1
     sta MustLoadHouseInterior
-
-    lda ActiveMapEntryIndex
-    lda #1
-    jmp @saveCHRloading
-@saveCHRloading:
-    sta MustCopyMainChr
 
 @finish:
     lda #1
@@ -3796,7 +3798,6 @@ RoutinesAfterFadeOut:
     sta OldAttribColumnIdxToUpdate
     sta TaintedSprites
     jsr CalcMapColumnToUpdate
-
 
     rts
 ;------------------------------
@@ -3877,6 +3878,7 @@ CommonLocationRoutine:
     beq @sameLocationType
     sta LocationType
     lda #1
+    sta MustCopyMainChr
     sta MustStopMusic
 @sameLocationType:
     iny
