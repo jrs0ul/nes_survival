@@ -786,28 +786,28 @@ npc_SPIDER_frame_LEFT:
     .byte <npc_BUNNY_frame_DTH,       >npc_BUNNY_frame_DTH
 
 npc_SPIDER_frame_LEFT_0:
-    .byte    0,$a4,0, 0
-    .byte    0,$a5,0, 8
-    .byte    8,$b4,0, 0
-    .byte    8,$b5,0, 8
+    .byte    0,$a4,%00000010, 0
+    .byte    0,$a5,%00000010, 8
+    .byte    8,$b4,%00000010, 0
+    .byte    8,$b5,%00000010, 8
 
 npc_SPIDER_frame_LEFT_1:
-    .byte    0,$aa,0, 0
-    .byte    0,$ab,0, 8
-    .byte    8,$ba,0, 0
-    .byte    8,$bb,0, 8
+    .byte    0,$aa,%00000010, 0
+    .byte    0,$ab,%00000010, 8
+    .byte    8,$ba,%00000010, 0
+    .byte    8,$bb,%00000010, 8
 
 npc_SPIDER_frame_LEFT_2:
-    .byte    0,$b6,0, 0
-    .byte    0,$b7,0, 8
-    .byte    8,$c6,0, 0
-    .byte    8,$c7,0, 8
+    .byte    0,$b6,%00000010, 0
+    .byte    0,$b7,%00000010, 8
+    .byte    8,$c6,%00000010, 0
+    .byte    8,$c7,%00000010, 8
 
 npc_SPIDER_frame_LEFT_WARN:
-    .byte    0,$ca,0, 0
-    .byte    0,$cb,0, 8
-    .byte    8,$da,0, 0
-    .byte    8,$db,0, 8
+    .byte    0,$ca,%00000010, 0
+    .byte    0,$cb,%00000010, 8
+    .byte    8,$da,%00000010, 0
+    .byte    8,$db,%00000010, 8
 
 npc_SPIDER_frame_RIGHT:
     .byte <npc_SPIDER_frame_RIGHT_0,   >npc_SPIDER_frame_RIGHT_0
@@ -819,28 +819,28 @@ npc_SPIDER_frame_RIGHT:
     .byte <npc_BUNNY_frame_DTH,        >npc_BUNNY_frame_DTH
 
 npc_SPIDER_frame_RIGHT_0:
-    .byte    0,$a4,%01000000, 8
-    .byte    0,$a5,%01000000, 0
-    .byte    8,$b4,%01000000, 8
-    .byte    8,$b5,%01000000, 0
+    .byte    0,$a4,%01000010, 8
+    .byte    0,$a5,%01000010, 0
+    .byte    8,$b4,%01000010, 8
+    .byte    8,$b5,%01000010, 0
 
 npc_SPIDER_frame_RIGHT_1:
-    .byte    0,$aa,%01000000, 8
-    .byte    0,$ab,%01000000, 0
-    .byte    8,$ba,%01000000, 8
-    .byte    8,$bb,%01000000, 0
+    .byte    0,$aa,%01000010, 8
+    .byte    0,$ab,%01000010, 0
+    .byte    8,$ba,%01000010, 8
+    .byte    8,$bb,%01000010, 0
 
 npc_SPIDER_frame_RIGHT_2:
-    .byte    0,$b6,%01000000, 8
-    .byte    0,$b7,%01000000, 0
-    .byte    8,$c6,%01000000, 8
-    .byte    8,$c7,%01000000, 0
+    .byte    0,$b6,%01000010, 8
+    .byte    0,$b7,%01000010, 0
+    .byte    8,$c6,%01000010, 8
+    .byte    8,$c7,%01000010, 0
 
 npc_SPIDER_frame_RIGHT_WARN:
-    .byte    0,$ca, %01000000, 8
-    .byte    0,$cb, %01000000, 0
-    .byte    8,$da, %01000000, 8
-    .byte    8,$db, %01000000, 0
+    .byte    0,$ca, %01000010, 8
+    .byte    0,$cb, %01000010, 0
+    .byte    8,$da, %01000010, 8
+    .byte    8,$db, %01000010, 0
 
 
 npc_SPIDER_frame_UP:
@@ -853,28 +853,28 @@ npc_SPIDER_frame_UP:
     .byte <npc_BUNNY_frame_DTH,     >npc_BUNNY_frame_DTH
 
 npc_SPIDER_frame_UP_0:
-    .byte   0,$b9,0, 8
-    .byte   0,$b8,0, 0
-    .byte   8,$c9,0, 8
-    .byte   8,$c8,0, 0
+    .byte   0,$b9,%00000010, 8
+    .byte   0,$b8,%00000010, 0
+    .byte   8,$c9,%00000010, 8
+    .byte   8,$c8,%00000010, 0
 
 npc_SPIDER_frame_UP_1:
-    .byte    0,$dc,0        , 8
-    .byte    0,$dd,0        , 0
-    .byte    8,$ed,%01000000, 8
-    .byte    8,$ed,0        , 0
+    .byte    0,$dc,%00000010, 8
+    .byte    0,$dd,%00000010, 0
+    .byte    8,$ed,%01000010, 8
+    .byte    8,$ed,%00000010, 0
 
 npc_SPIDER_frame_UP_2:
-    .byte    0,$bd,0, 8
-    .byte    0,$bc,0, 0
-    .byte    8,$cd,0, 8
-    .byte    8,$cc,0, 0
+    .byte    0,$bd,%00000010, 8
+    .byte    0,$bc,%00000010, 0
+    .byte    8,$cd,%00000010, 8
+    .byte    8,$cc,%00000010, 0
 
 npc_SPIDER_frame_UP_WARN:
-    .byte    0,$af,%01000000, 8
-    .byte    0,$af,0        , 0
-    .byte    8,$bf,%01000000, 8
-    .byte    8,$bf,0        , 0
+    .byte    0,$af,%01000010, 8
+    .byte    0,$af,%00000010, 0
+    .byte    8,$bf,%01000010, 8
+    .byte    8,$bf,%00000010, 0
 
 npc_SPIDER_frame_DOWN:
     .byte <npc_SPIDER_frame_DOWN_0,   >npc_SPIDER_frame_DOWN_0
@@ -886,28 +886,28 @@ npc_SPIDER_frame_DOWN:
     .byte <npc_BUNNY_frame_DTH,       >npc_BUNNY_frame_DTH
 
 npc_SPIDER_frame_DOWN_0:
-    .byte    0,$ce,0        , 8
-    .byte    0,$a8,0        , 0
-    .byte    8,$de,0        , 8
-    .byte    8,$de,%01000000, 0
+    .byte    0,$ce,%00000010, 8
+    .byte    0,$a8,%00000010, 0
+    .byte    8,$de,%00000010, 8
+    .byte    8,$de,%01000010, 0
 
 npc_SPIDER_frame_DOWN_1:
-    .byte    0,$a3,0        , 8
-    .byte    0,$a2,0        , 0
-    .byte    8,$b3,0        , 8
-    .byte    8,$b3,%01000000, 0
+    .byte    0,$a3,%00000010, 8
+    .byte    0,$a2,%00000010, 0
+    .byte    8,$b3,%00000010, 8
+    .byte    8,$b3,%01000010, 0
 
 npc_SPIDER_frame_DOWN_2:
-    .byte    0,$ae,0        , 8
-    .byte    0,$a9,0        , 0
-    .byte    8,$be,0        , 8
-    .byte    8,$be,%01000000, 0
+    .byte    0,$ae,%00000010, 8
+    .byte    0,$a9,%00000010, 0
+    .byte    8,$be,%00000010, 8
+    .byte    8,$be,%01000010, 0
 
 npc_SPIDER_frame_DOWN_WARN:
-    .byte    0,$df,%01000000, 8
-    .byte    0,$df,0        , 0
-    .byte    8,$ef,%01000000, 8
-    .byte    8,$ef,0        , 0
+    .byte    0,$df,%01000010, 8
+    .byte    0,$df,%00000010, 0
+    .byte    8,$ef,%01000010, 8
+    .byte    8,$ef,%00000010, 0
 
 
 

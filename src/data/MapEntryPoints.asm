@@ -316,7 +316,7 @@ MapSpawnPoint:
     .byte UNUSED, <main_palette, >main_palette, 0, 0, 0, 0
     ;lonely cave entrance
     .byte 130, 41, 21, 0, LOCATION_TYPE_CAVE, SONG_OUTSIDE_NIGHT, 3, 0, 0
-    .byte UNUSED, <main_palette, >main_palette, 0, 0, 0, 0
+    .byte UNUSED, <main_palette, >main_palette, 0, <lonely_cave_npcs, >lonely_cave_npcs, 0
     ;------------
     ;alien base entrance bottom (pre)
     .byte 15, 170, 19, 3, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 2, 0, 0
@@ -355,7 +355,7 @@ MapSpawnPoint:
     ;---------------------
     ;exit to lonely cave from wood location
     .byte 129, 209, 21, 1, LOCATION_TYPE_CAVE, SONG_OUTSIDE_NIGHT, 3, 0, 0
-    .byte UNUSED, <main_palette, >main_palette, 0, 0, 0, 0
+    .byte UNUSED, <main_palette, >main_palette, 0, <lonely_cave_npcs, >lonely_cave_npcs, 0
     ;-----------------------
     ;  alien base hallway
     ;-----------------------
