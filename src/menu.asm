@@ -375,7 +375,7 @@ DrawInventoryGrid:
 
     lda #10
     sta TempPointX
-    lda #16
+    lda #17
     sta TempPointY
 
     lda #<inventory_grid
@@ -1627,6 +1627,8 @@ SleepMenuInput:
     sta MenuMaxItem
     lda #16
     sta MenuStep
+    lda #0
+    sta MenuStepLast
     lda #80
     sta MenuUpperLimit
 
@@ -1672,6 +1674,8 @@ DocumentMenuInput:
 
     lda #16
     sta MenuStep
+    lda #0
+    sta MenuStepLast
     lda #96
     sta MenuUpperLimit
     lda #<ItemMenuIndex
@@ -1791,14 +1795,18 @@ CraftingInput:
     sta MenuStep
     lda #INVENTORY_SPRITE_MIN_Y
     sta MenuUpperLimit
-    lda #INVENTORY_SPRITE_MAX_Y - 12
+    lda #INVENTORY_SPRITE_MAX_Y + 3
     sta MenuLowerLimit
     lda #<InventoryItemIndex
     sta pointer
     lda #>InventoryItemIndex
     sta pointer + 1
     lda #INVENTORY_MAX_ITEMS
+    clc
+    adc #1
     sta MenuMaxItem
+    lda #15
+    sta MenuStepLast
     jsr MenuInputUpDownCheck
 
 
@@ -1938,6 +1946,8 @@ EquipmentInput:
 
     lda #12
     sta MenuStep
+    lda #0
+    sta MenuStepLast
     lda #INVENTORY_SPRITE_MIN_Y
     sta MenuUpperLimit
     lda #INVENTORY_SPRITE_MIN_Y + 12
@@ -2040,6 +2050,8 @@ InventoryInput:
 
     lda #12
     sta MenuStep
+    lda #0
+    sta MenuStepLast
     lda #INVENTORY_SPRITE_MIN_Y
     sta MenuUpperLimit
     lda #INVENTORY_SPRITE_MAX_Y - 12
@@ -2282,6 +2294,8 @@ ActivateSubmenu:
 FoodMenuInput:
     lda #16
     sta MenuStep
+    lda #0
+    sta MenuStepLast
 
     lda LocationType
     cmp #LOCATION_TYPE_VILLAGER
@@ -2569,6 +2583,8 @@ MaterialMenuInput:
 
     lda #16
     sta MenuStep
+    lda #0
+    sta MenuStepLast
 
     lda LocationType
     cmp #LOCATION_TYPE_VILLAGER
@@ -2646,6 +2662,8 @@ ToolInput:
 
     lda #16
     sta MenuStep
+    lda #0
+    sta MenuStepLast
     lda #96
     sta MenuUpperLimit
      lda #<ItemMenuIndex
@@ -3090,6 +3108,8 @@ ItemMenuInput:
 
     lda #16
     sta MenuStep
+    lda #0
+    sta MenuStepLast
     lda #96
     sta MenuUpperLimit
     lda #<ItemMenuIndex
@@ -3306,6 +3326,8 @@ DoRegularInput:
 
     lda #16
     sta MenuStep
+    lda #0
+    sta MenuStepLast
     lda #BASE_MENU_MIN_Y + 64
     sta MenuLowerLimit
     lda #BASE_MENU_MIN_Y
@@ -3381,12 +3403,13 @@ DoRegularInput:
 
     jsr OpenupSleep
 
-    
 
 @exit:
 
     rts
 ;------------------------------------
+;pointer - item index
+;MenuMaxItem - maximum item
 MenuInputUpDownCheck:
 
 @checkDown:
@@ -3394,12 +3417,38 @@ MenuInputUpDownCheck:
     and #BUTTON_DOWN_MASK
     beq @CheckUp
 
+    lda MenuMaxItem
+    sec
+    sbc #1
+    sta Temp
+    ldy #0
+    lda (pointer), y
+    cmp Temp
+
+    bcs @rewindUp; ; already at the last option
+
+    lda MenuMaxItem
+    sec
+    sbc #2
+    sta Temp
+    lda (pointer), y
+    cmp Temp
+    bne @regularStep
+
+    lda MenuStepLast
+    beq @regularStep ; last step is not used
     lda InventoryPointerY
-    cmp MenuLowerLimit
-    bcs @rewindUp;
+    clc
+    adc MenuStepLast
+    sta InventoryPointerY
+    jmp @incrementIndex
+
+@regularStep:
+    lda InventoryPointerY
     clc
     adc MenuStep
     sta InventoryPointerY
+@incrementIndex:
     ldy #0
     lda (pointer), y
     clc
@@ -3422,12 +3471,34 @@ MenuInputUpDownCheck:
     and #BUTTON_UP_MASK
     beq @exit
 
-    lda InventoryPointerY
-    cmp MenuUpperLimit
+
+    ldy #0
+    lda (pointer), y
     beq @rewindDown
+
+    lda MenuMaxItem
+    sec
+    sbc #1
+    sta Temp
+    lda (pointer), y
+    cmp Temp
+    bne @regularStepUp
+
+    lda MenuStepLast
+    beq @regularStepUp ; the last step is not used: all steps are the same
+
+    lda InventoryPointerY
+    sec
+    sbc MenuStepLast
+    sta InventoryPointerY
+    jmp @decrementIndex
+
+@regularStepUp:
+    lda InventoryPointerY
     sec
     sbc MenuStep
     sta InventoryPointerY
+@decrementIndex:
     ldy #0
     lda (pointer), y
     sec

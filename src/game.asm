@@ -712,6 +712,7 @@ CutsceneSpriteAnimFrame = DialogTextContainer + 9
 SnowDelay               = DialogTextContainer + 10
 DemoModeOn              = DialogTextContainer + 11 ; demo mode enabled, basically shows intro cutscene
 TitleScreenTimer        = DialogTextContainer + 12
+MenuStepLast            = DialogTextContainer + 13
 
 
 CurrentPaletteDecrementValue: ;a helper value to prevent doing too much of palette changing
