@@ -2001,6 +2001,9 @@ CraftFromSelectedComponents:
 
     sty TempY ; store the position of newly made item
 
+    lda #1
+    sta MustPlaySfx
+
    ;clear the ingredients
     ldx #0
 @ingredientsClearLoop:
