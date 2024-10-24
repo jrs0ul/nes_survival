@@ -184,6 +184,8 @@
     PALETTE_SIZE_MAX           = 32
     PALETTE_FADE_MAX_ITERATION = 5
 
+    MAX_CRAFTING_INDEX          = 4 ; Max items in a crafting recipe
+
 
     OUTDOORS_LOC1_SCREEN_COUNT  = 4
     OUTDOORS_LOC2_SCREEN_COUNT  = 2

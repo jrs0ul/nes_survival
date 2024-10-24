@@ -698,6 +698,8 @@ MustDrawMenu            = DialogTextContainer + 2
 MustDrawSleepMessage    = DialogTextContainer + 3
 MustDrawDocument        = DialogTextContainer + 4
 MustClearSubMenu        = DialogTextContainer + 5
+MenuStepLast            = DialogTextContainer + 6
+CraftingIndexes         = DialogTextContainer + 7 ; this one is 4 bytes
 ;--Cutscene vars
 CutsceneSceneIdx        = DialogTextContainer
 CutsceneTimer           = DialogTextContainer + 1
@@ -712,7 +714,6 @@ CutsceneSpriteAnimFrame = DialogTextContainer + 9
 SnowDelay               = DialogTextContainer + 10
 DemoModeOn              = DialogTextContainer + 11 ; demo mode enabled, basically shows intro cutscene
 TitleScreenTimer        = DialogTextContainer + 12
-MenuStepLast            = DialogTextContainer + 13
 
 
 CurrentPaletteDecrementValue: ;a helper value to prevent doing too much of palette changing
@@ -936,8 +937,6 @@ CraftingActivated:
 EquipmentActivated:
     .res 1
 
-CraftingIndexes:
-    .res 2; item index A + index B
 CurrentCraftingComponent:
     .res 1
 
@@ -1320,7 +1319,7 @@ MusicIsPlaying:
     .res 1
 
 BSS_Free_Bytes:
-    .res 3
+    .res 5
 
 ;====================================================================================
 

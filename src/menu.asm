@@ -213,7 +213,7 @@ ResetMenu:
 @secondPart:
     lda #1
     sta RepeatSameRowInTransfer
-    lda #7
+    lda #8
     sta TempPointY
     lda #13
     sta TempPointX
@@ -375,7 +375,13 @@ DrawInventoryGrid:
 
     lda #10
     sta TempPointX
+    lda CraftingActivated
+    beq @regularInventory
     lda #17
+    jmp @storeHeight
+@regularInventory:
+    lda #16
+@storeHeight:
     sta TempPointY
 
     lda #<inventory_grid
@@ -1815,6 +1821,13 @@ CraftingInput:
     and #BUTTON_B_MASK
     beq @CheckA
 
+    lda MenuMaxItem
+    sec
+    sbc #1
+    cmp InventoryItemIndex
+
+    beq @tryCrafting
+
     lda InventoryItemIndex
     asl ;item_index * 2
     tay
@@ -1822,27 +1835,38 @@ CraftingInput:
     beq @exit ;empty slot was picked
     tya
     ldx CurrentCraftingComponent
-    cpx #1
-    bne @storeIndex
+    cpx #0
+    beq @storeIndex ; first ingredient, just store it
     sty TempY
-    ldy #0
+
+    ldy CurrentCraftingComponent
+@compareLoop:
+    dey
+    bmi @store
     lda CraftingIndexes, y
     cmp TempY
-    beq @exit
+    beq @deselect
+    jmp @compareLoop
+@store:
     lda TempY
+    jmp @storeIndex
+@deselect:
+
+    jsr DeselectRecipe
+    jmp @exit
 
 @storeIndex:
     sta CraftingIndexes, x
-    inc CurrentCraftingComponent
     lda CurrentCraftingComponent
-    cmp #2
-    bcs @tryCrafting
+    cmp #MAX_CRAFTING_INDEX
+    bcs @exit
+    inc CurrentCraftingComponent
     jmp @exit
 @tryCrafting:
     jsr CraftFromSelectedComponents
 
     jmp @resetIndexes
-    
+
 @CheckA:
     lda Buttons
     and #BUTTON_A_MASK
@@ -1863,7 +1887,48 @@ CraftingInput:
 
 @exit:
     rts
-
+;--------------------------------------
+;TODO: optimize
+DeselectRecipe:
+    ;y is the recipe index
+    cpy #0
+    bne @checkOne
+    ldy #1
+    lda CraftingIndexes, y
+    ldy #0
+    sta CraftingIndexes, y
+    ldy #2
+    lda CraftingIndexes, y
+    ldy #1
+    sta CraftingIndexes, y
+    ldy #3
+    lda CraftingIndexes, y
+    ldy #2
+    sta CraftingIndexes, y
+    jmp @checkThree
+@checkOne:
+    cpy #1
+    bne @checkTwo
+    ldy #2
+    lda CraftingIndexes, y
+    ldy #1
+    sta CraftingIndexes, y
+    ldy #3
+    lda CraftingIndexes, y
+    ldy #2
+    sta CraftingIndexes, y
+    jmp @checkThree
+@checkTwo:
+    cpy #2
+    bne @checkThree
+    ldy #3
+    lda CraftingIndexes, y
+    ldy #2
+    sta CraftingIndexes, y
+    jmp @checkThree
+@checkThree:
+    dec CurrentCraftingComponent
+    rts
 ;--------------------------------------
 CraftFromSelectedComponents:
 
@@ -4184,12 +4249,24 @@ UpdateArrowSprites:
     inx
 
     lda CraftingActivated
-    beq @exit
+    beq @exit ; not in crafting screen
     lda CurrentCraftingComponent
-    beq @exit
+    beq @exit ; none of the ingredients selected
 
-    ldx #0
-    lda CraftingIndexes, x
+    jsr UpdateCraftingArrows
+@exit:
+    rts
+;---------------------------
+UpdateCraftingArrows:
+
+@craftingArrowLoop:
+    sec
+    sbc #1
+    bmi @exit
+
+    tay
+
+    lda CraftingIndexes, y
     lsr
     tax
     lda inventorypositions, x
@@ -4212,6 +4289,8 @@ UpdateArrowSprites:
     inc TempSpriteCount
     inc TempSpriteIdx
     inx
+    tya
+    jmp @craftingArrowLoop
 @exit:
 
     rts
