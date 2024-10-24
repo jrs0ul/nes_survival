@@ -5801,9 +5801,9 @@ ResetVariables:
     bpl @clearInventoryLoop
 
     ldx #0
-    lda #ITEM_WOOD_HAMMER
+    lda #0
     sta Storage, x
-    lda #ITEM_MAX_HP
+    lda #0
     ldx #1
     sta Storage,x
     ldx #2
@@ -6864,8 +6864,6 @@ CheckB:
     jmp @regularAttack
 @checkhammer:
     cmp #ITEM_HAMMER
-    beq @use_hammer
-    cmp #ITEM_WOOD_HAMMER
     bne @regularAttack
 @use_hammer:
     jsr useHammerOnEnvironment
@@ -6920,8 +6918,6 @@ PlayAttackSfx:
 
     lda EquipedItem
     cmp #ITEM_HAMMER
-    beq @hammer_sfx
-    cmp #ITEM_WOOD_HAMMER
     bne @generic_sfx
 @hammer_sfx:
     lda #3
@@ -7019,9 +7015,6 @@ useHammerOnEnvironment:
     jsr CanTileBeDestroyed
     beq @check_other_tiles
 
-    lda EquipedItem
-    cmp #ITEM_WOOD_HAMMER
-    beq @check_other_tiles
 
     ldx LocationIndex
     lda mod_tiles_count_by_location, x

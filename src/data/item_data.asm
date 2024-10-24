@@ -31,7 +31,7 @@ item_data: ;          ---||---
     .byte $4A, 0, 1, %00110010  ; 18 cooked fish
     .byte $54, 0, 3, 0          ; 19 radio
     .byte $40, 2, 5, 5          ; 20 hammer
-    .byte $40, 0, 5, 1          ; 21 wooden hammer
+    .byte $6C, 0, 1, %01000000  ; 21 cooked mushroom
     .byte $4C, 2, 5, 5          ; 22 slingshot
     .byte $5E, 0, 1, %01100000  ; 23 pie
     .byte $48, 2, 7, 0          ; 24 letter
@@ -41,7 +41,6 @@ item_data: ;          ---||---
     .byte $48, 1, 7, 0          ; 28 letter about the rock
     .byte $6A, 1, 4, 0          ; 29 key
     .byte $6C, 1, 1, %00110000  ; 30 mushroom
-    .byte $6C, 0, 1, %01000000  ; 31 cooked mushroom
 
 items_with_progressbars:
     .byte 0 ; 0

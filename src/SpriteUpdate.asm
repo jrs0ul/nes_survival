@@ -285,8 +285,6 @@ UpdateSprites:
     lda EquipedItem
     beq @equiped_item
     cmp #ITEM_HAMMER
-    beq @ok
-    cmp #ITEM_WOOD_HAMMER
     bne @equiped_item
 @ok:
     jsr UpdateHammerSprites

@@ -1884,6 +1884,10 @@ CraftingInput:
     sta CraftingIndexes, x
     inx
     sta CraftingIndexes, x
+    inx
+    sta CraftingIndexes, x
+    inx
+    sta CraftingIndexes, x
 
 @exit:
     rts
@@ -1938,17 +1942,27 @@ CraftFromSelectedComponents:
     ldx TempRegX
     inx
     cpx #RECIPES_SIZE
-    bcs @exit
+    bcc @cont
+    rts
+@cont:
+    lda recipes, x
+    sta TempY     ; ingredient A
+    inx
+    lda recipes, x
+    sta TempZ     ; ingredient B
+    inx
 
     lda recipes, x
-    sta TempY
+    sta TempDigit ; ingredient C
     inx
+
     lda recipes, x
-    sta TempZ
+    sta TempHp    ; ingredient D
     inx
+
     lda recipes, x
-    sta Temp
-    stx TempRegX
+    sta Temp      ; result
+    stx TempRegX  ; store recipe data index
 
 
     ldx #0
@@ -1965,19 +1979,51 @@ CraftFromSelectedComponents:
     cmp TempZ ;ingredient B
     bne @loop
 
-    lda Temp ;result
-    sta Inventory, y
-    iny
-    lda #ITEM_MAX_HP
-    sta Inventory, y
-
-    dex
+    inx
     lda CraftingIndexes, x
+    cmp #255
+    beq @justCompareWithC
+    tay
+    lda Inventory, y
+@justCompareWithC:
+    cmp TempDigit
+    bne @loop
+
+    inx
+    lda CraftingIndexes, x
+    cmp #255
+    beq @justCompareWithD
+    tay
+    lda Inventory, y
+@justCompareWithD:
+    cmp TempHp
+    bne @loop
+
+    sty TempY ; store the position of newly made item
+
+   ;clear the ingredients
+    ldx #0
+@ingredientsClearLoop:
+    lda CraftingIndexes, x
+    cmp #255
+    beq @nextIngredient
     tay
     lda #0
     sta Inventory, y
     iny
     sta Inventory, y ; reset item hp as well
+@nextIngredient:
+    inx
+    cpx #3
+    bcc @ingredientsClearLoop
+
+    ldy TempY ;restore item's position
+    lda Temp  ;result
+    sta Inventory, y
+    iny
+    lda #ITEM_MAX_HP
+    sta Inventory, y
+
 
     lda Fuel
     clc
@@ -3607,6 +3653,15 @@ OpenupCrafting:
     lda #0
     sta PlayerInteractedWithTooltable
     sta CurrentCraftingComponent
+    lda #255
+    ldy #0
+    sta CraftingIndexes, y
+    iny
+    sta CraftingIndexes, y
+    iny
+    sta CraftingIndexes, y
+    iny
+    sta CraftingIndexes, y
 @exit:
     rts
 ;------------------------------------

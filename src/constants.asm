@@ -304,7 +304,7 @@
     ITEM_COOKED_FISH           = 18
     ITEM_RADIO                 = 19
     ITEM_HAMMER                = 20
-    ITEM_WOOD_HAMMER           = 21
+    ITEM_COOKED_MUSHROOM       = 21
     ITEM_SLINGSHOT             = 22
     ITEM_PIE                   = 23
     ITEM_LETTER                = 24
@@ -312,7 +312,6 @@
     ITEM_GRANNYS_HEAD          = 27
     ITEM_KEY                   = 29
     ITEM_MUSHROOM              = 30
-    ITEM_COOKED_MUSHROOM       = 31
 
     MAX_LETTER_OBJECT_COUNT    = 2
 
@@ -393,7 +392,7 @@
 
     DIALOG_TEXT_LENGTH         = 96
 
-    RECIPES_SIZE               = 39
+    RECIPES_SIZE               = 95
 
     ROT_AMOUNT_RAW_MEAT        = 32
     ROT_AMOUNT_COOKED_MEAT     = 16
