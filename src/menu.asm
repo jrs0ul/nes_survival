@@ -1933,6 +1933,24 @@ DeselectRecipe:
 @checkThree:
     dec CurrentCraftingComponent
     rts
+
+;-------------------------------------
+TestAllIngredients:
+
+    ldx #0
+@ComponentLoop:
+    cmp Ingredients, x
+    beq @found
+    inx
+    cpx #4
+    bcc @ComponentLoop
+    jmp @exit
+@found:
+    lda #250 ; ingredient matches
+@exit:
+
+    rts
+
 ;--------------------------------------
 CraftFromSelectedComponents:
 
@@ -1944,63 +1962,77 @@ CraftFromSelectedComponents:
     cpx #RECIPES_SIZE
     bcc @cont
     rts
-@cont:
+@cont: ;store ingredients and the result into RAM
+    ldy #0
+@ingredientLoop:
     lda recipes, x
-    sta TempY     ; ingredient A
+    sta Ingredients, y
     inx
-    lda recipes, x
-    sta TempZ     ; ingredient B
-    inx
+    iny
+    cpy #4
+    bcc @ingredientLoop
 
     lda recipes, x
-    sta TempDigit ; ingredient C
-    inx
-
-    lda recipes, x
-    sta TempHp    ; ingredient D
-    inx
-
-    lda recipes, x
-    sta Temp      ; result
-    stx TempRegX  ; store recipe data index
+    sta Temp        ; Result
+    stx TempRegX    ; store recipe data index
 
 
+;--ingredientA
     ldx #0
     lda CraftingIndexes, x
     tay
     lda Inventory, y
-    cmp TempY ;ingredient A
-    bne @loop
 
-    inx
+    jsr TestAllIngredients
+    cmp #250
+    bne @loop ; no matches, next recipe
+    sta Ingredients, x
+
+;--ingredient B
+    ldx #1
     lda CraftingIndexes, x
     tay
     lda Inventory, y
-    cmp TempZ ;ingredient B
-    bne @loop
 
-    inx
+    jsr TestAllIngredients
+    cmp #250
+    bne @loop
+    sta Ingredients, x
+
+;--ingredient C
+    ldx #2
     lda CraftingIndexes, x
     cmp #255
     beq @justCompareWithC
     tay
     lda Inventory, y
-@justCompareWithC:
-    cmp TempDigit
-    bne @loop
 
-    inx
+@justCompareWithC:
+
+    jsr TestAllIngredients
+    cmp #250
+    bne @loop
+    sta Ingredients, x
+
+;--ingredient D
+    ldx #3
     lda CraftingIndexes, x
     cmp #255
     beq @justCompareWithD
     tay
     lda Inventory, y
 @justCompareWithD:
-    cmp TempHp
+
+    jsr TestAllIngredients
+    cmp #250
     bne @loop
+    sta Ingredients, x
 
-    sty TempY ; store the position of newly made item
+    sty TempY ; store the position of a newly made item
 
+    ;play sfx on success
+    lda #0
+    sta SfxName
     lda #1
     sta MustPlaySfx
 
@@ -2020,6 +2052,7 @@ CraftFromSelectedComponents:
     cpx #3
     bcc @ingredientsClearLoop
 
+    ;put the newly crafted item
     ldy TempY ;restore item's position
     lda Temp  ;result
     sta Inventory, y

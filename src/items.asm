@@ -312,8 +312,7 @@ AddAndDeactivateItems:
     sty Temp  ; store empty inventory slot
 
 
-    
-    lda #0
+    lda #SFX_ITEM_PICKUP
     sta SfxName
     lda #1
     sta MustPlaySfx
@@ -410,7 +409,7 @@ AddAndDeactivateItems:
     lda PlayerY
     sta FullInventoryPlayerY
 
-    lda #4
+    lda #SFX_INVENTORY_FULL
     sta SfxName
     lda #1
     sta MustPlaySfx

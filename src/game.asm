@@ -699,7 +699,8 @@ MustDrawSleepMessage    = DialogTextContainer + 3
 MustDrawDocument        = DialogTextContainer + 4
 MustClearSubMenu        = DialogTextContainer + 5
 MenuStepLast            = DialogTextContainer + 6
-CraftingIndexes         = DialogTextContainer + 7 ; this one is 4 bytes
+CraftingIndexes         = DialogTextContainer + 7  ; this one is 4 bytes
+Ingredients             = DialogTextContainer + 11 ; also 4 bytes
 ;--Cutscene vars
 CutsceneSceneIdx        = DialogTextContainer
 CutsceneTimer           = DialogTextContainer + 1

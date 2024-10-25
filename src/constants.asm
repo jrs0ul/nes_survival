@@ -259,6 +259,7 @@
     SONG_ENDING_GOOD           = 8
 
 
+    SFX_ITEM_PICKUP            = 0
     SFX_INVENTORY_FULL         = 4
 
 
@@ -392,7 +393,7 @@
 
     DIALOG_TEXT_LENGTH         = 96
 
-    RECIPES_SIZE               = 95
+    RECIPES_SIZE               = 45
 
     ROT_AMOUNT_RAW_MEAT        = 32
     ROT_AMOUNT_COOKED_MEAT     = 16
