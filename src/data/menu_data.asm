@@ -1,6 +1,6 @@
 menu_palette:
     .byte $3C,$0F,$17,$10, $3C,$01,$17,$27, $3C,$00,$28,$16, $3C,$10,$0f,$01    ;background
-    .byte $3C,$07,$17,$27, $3C,$06,$16,$37, $3C,$0f,$16,$39, $3C,$0f,$3C,$16    ;OAM sprites
+    .byte $3C,$07,$17,$27, $3C,$06,$16,$37, $3C,$0f,$16,$28, $3C,$0f,$3C,$16    ;OAM sprites
 
 document_attributes:
     .byte $3, $D4, 9

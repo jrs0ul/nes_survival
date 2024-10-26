@@ -7090,19 +7090,12 @@ useHammerOnEnvironment:
 
     jsr WearWeapon
 
-    jsr UpdateRandomNumber
-    and #1
-    bne @exit
-
     lda #%00001101
     sta TempItemIndex
     jsr SpawnItem
     jmp @exit
 @spawn_wood:
     jsr WearWeapon
-    jsr UpdateRandomNumber
-    and #1
-    bne @exit
 
     lda #%00000011
     sta TempItemIndex
