@@ -526,15 +526,12 @@ UpdateVillagerDialogSprites:
     sta TempFrame ;store sprite count
 
     tya
-    asl
-    asl
-    asl
-    asl
+    asl ;index * 2
     tay
 
-@spriteLoop:
-
     jsr PickSpriteData
+    ldy #0
+@spriteLoop:
     jsr SingleDialogSpriteUpdate
 
     inc TempSpriteCount
@@ -558,17 +555,19 @@ PickSpriteData:
     bne @reward
 
 
-    lda #<QuestSprites
+    lda QuestSprites, y
     sta pointer
-    lda #>QuestSprites
+    iny
+    lda QuestSprites, y
     sta pointer + 1
 
     jmp @done
 @reward:
 
-    lda #<RewardSprites
+    lda RewardSprites, y
     sta pointer
-    lda #>RewardSprites
+    iny
+    lda RewardSprites, y
     sta pointer + 1
 
 @done:

@@ -79,8 +79,8 @@ item_wear:
     .byte 0   ;fish
     .byte 0   ;cooked fish
     .byte 0   ;radio
-    .byte 25  ;hammer
-    .byte 15  ;wooden hammer
+    .byte 15  ;hammer
+    .byte 0   ;cooked mushroom
     .byte 5   ;slingshot
     .byte 0   ;pie
     .byte 0   ;letter
@@ -114,7 +114,7 @@ important_items:
     .byte 1   ;cooked fish
     .byte 1   ;radio
     .byte 1   ;hammer
-    .byte 1   ;wooden hammer
+    .byte 0   ;cooked mushroom
     .byte 1   ;slingshot
     .byte 1   ;pie
     .byte 0   ;letter

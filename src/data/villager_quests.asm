@@ -149,10 +149,10 @@ erika_thanks_0: ;thanks for the meat ---> berries
 erika_thanks_1: ;thanks for knife --> hammer
     .byte $00,$00,$00,$00,$1e,$12,$0b,$18,$15,$1d,$2c,$00,$11,$1c,$0b,$0c
     .byte $00,$1e,$12,$13,$1d,$00,$12,$0b,$17,$17,$0f,$1c,$2c,$00,$00,$00
-    .byte $00,$00,$00,$13,$1e,$00,$21,$13,$16,$16,$00,$1d,$17,$0b,$1d,$12
-    .byte $00,$0c,$19,$1f,$16,$0e,$0f,$1c,$1d,$00,$1e,$12,$0b,$1e,$00,$00
-    .byte $00,$00,$00,$00,$00,$00,$00,$00,$0c,$16,$19,$0d,$15,$00,$23,$19
-    .byte $1f,$1c,$00,$21,$0b,$23,$2c,$00,$00,$00,$00,$00,$00,$00,$00,$00
+    .byte $00,$23,$19,$1f,$00,$0d,$0b,$18,$00,$1d,$17,$0b,$1d,$12,$00,$0c
+    .byte $19,$1f,$16,$0e,$0f,$1c,$1d,$00,$21,$13,$1e,$12,$00,$13,$1e,$00
+    .byte $00,$00,$13,$1e,$2a,$1d,$00,$17,$0b,$0e,$0f,$00,$10,$1c,$19,$17
+    .byte $00,$00,$00,$2d,$00,$00,$2d,$00,$00,$2d,$00,$00,$00,$00,$00,$00
 
 erika_thanks_2: ;thanks for bringing the pie, here's another for you
     .byte $00,$00,$00,$1e,$12,$0b,$18,$15,$1d,$00,$10,$19,$1c,$00,$1e,$12
@@ -242,42 +242,70 @@ granny_thanks_special:
 
 .segment "ROM6"
 QuestSpritesCount:
-    .byte 0, 4, 4, 0,  0, 4, 0, 2,  2, 2, 0, 0, 0, 0, 0, 0
+    .byte 0, 4, 4, 0,  0, 4, 0, 2,  2, 2, 0, 0,  0, 0, 0, 0
 
 QuestSprites:
-    .byte 0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    .byte 0,  0
+    .byte <BjornQuestSprites_1, >BjornQuestSprites_1
+    .byte <BjornQuestSprites_2, >BjornQuestSprites_2
+    .byte 0,  0
+
+    .byte 0,  0
+    .byte <ErikaQuestSprites_1, >ErikaQuestSprites_1
+    .byte 0,  0
+    .byte <ErikaQuestSprites_3, >ErikaQuestSprites_3
+
+    .byte <GrannyQuestSprites_0, >GrannyQuestSprites_0
+    .byte <GrannyQuestSprites_1, >GrannyQuestSprites_1
+    .byte 0,  0
+    .byte 0,  0
+
+BjornQuestSprites_1:
     .byte 200,$42,0,128, 200,$43,0,136, 200,$68,3,168, 200,$69,3,176
+BjornQuestSprites_2:
     .byte 191,$44,0,168, 191,$45,0,176, 191,$44,0,208, 191,$45,0,216
-    .byte 0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 
-    .byte 0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+ErikaQuestSprites_1:
     .byte 200,$68,3,136, 200,$69,3,144, 200,$68,3,176, 200,$69,3,184
-    .byte 0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-    .byte 191,$62,0,176, 191,$63,0,184, 0,0,0,0, 0,0,0,0
+ErikaQuestSprites_3:
+    .byte 191,$62,0,176, 191,$63,0,184
 
-    .byte 200,  $42, 0, 176, 200, $43, 0, 184, 0, 0, 0, 0, 0, 0, 0, 0
-    .byte 200,  $42, 0, 216, 200, $43, 0, 224, 0, 0, 0, 0, 0, 0, 0, 0
-    .byte 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-    .byte 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+GrannyQuestSprites_0:
+    .byte 200,  $42, 0, 176, 200, $43, 0, 184
+GrannyQuestSprites_1:
+    .byte 200,  $42, 0, 216, 200, $43, 0, 224
+
 
 RewardSpriteCount:
-    .byte 0, 4, 0, 0,  0, 0, 4, 0,  0, 0, 4, 0,  0, 0, 0, 0
+    .byte 0, 4, 0, 0,  0, 8, 4, 0,  0, 0, 4, 0,  0, 0, 0, 0
 
 RewardSprites:
-    .byte 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    .byte 0, 0
+    .byte <BjornRewardSprites_1, >BjornRewardSprites_1
+    .byte 0, 0
+    .byte 0, 0
+
+    .byte 0, 0
+    .byte <ErikaRewardSprites_1, >ErikaRewardSprites_1
+    .byte <ErikaRewardSprites_2, >ErikaRewardSprites_2
+    .byte 0, 0
+
+    .byte 0, 0
+    .byte 0, 0
+    .byte <GrannyRewardSprites_2, >GrannyRewardSprites_2
+    .byte 0, 0
+
+BjornRewardSprites_1:
     .byte 191,$62,0,104, 191,$63,0,112, 191,$62,0,144, 191,$63,0,152
-    .byte 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-    .byte 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 
-    .byte 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-    .byte 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+ErikaRewardSprites_1:
+    .byte 200,$42,0,135, 200,$43,0,143, 200,$42,0,160, 200,$43,0,168
+    .byte 200,$68,3,184, 200,$69,3,192, 200,$52,0,210, 200,$53,0,218
+
+ErikaRewardSprites_2:
     .byte 200,$64,0,152, 200,$65,0,160, 200,$44,0,192, 200,$45,0,200
-    .byte 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-
-    .byte 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-    .byte 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+GrannyRewardSprites_2:
     .byte 200,$4E,3,96, 200,$4F,3,104, 200,$4E,3,136, 200,$4F,3,144
-    .byte 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 
 .segment "RODATA"
 ;items that are spawned by a villager for that quest
