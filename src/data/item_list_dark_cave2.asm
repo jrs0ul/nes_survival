@@ -4,7 +4,7 @@
 
 dark_cave_2_items:
     .byte ITEM_COUNT_LOC17
-    .byte %00001101, 1, 144, 56  ; rock
+    .byte %00001101, 1, 80,  100 ; rock
     .byte %00111101, 1, 72,  64  ; shroom
     .byte %00001101, 1, 64,  184 ; rock
     .byte %00111101, 0, 16,  96  ; shroom
