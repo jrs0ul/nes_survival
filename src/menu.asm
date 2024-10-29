@@ -86,6 +86,25 @@ ResetOverlayedMenuVars:
     sta MustDrawInventoryGrid
     sta MustDrawEquipmentGrid
     sta MustDrawMenu
+    sta MenuStepLast
+    ldx #0
+@craftingIndexesLoop:
+    sta CraftingIndexes, x
+    inx
+    cpx #4
+    bcc @craftingIndexesLoop
+
+    sta InventoryActivated
+    sta SubMenuIndex
+    sta SubMenuActivated
+    sta SleepMessageActivated
+    sta DocumentActivated
+    sta ActiveDocument
+    sta StashActivated
+
+    sta CraftingActivated
+    sta EquipmentActivated
+    sta CurrentCraftingComponent
 
 
     rts
@@ -3019,10 +3038,12 @@ ToolMenuInputVillager:
 ;-------------------------------------
 ;active quest index is in y register
 ;a register contains the quest item id
+;y - goal item index
+;a - is item id
 SpawnRewardItem:
 
-    sta ItemIGave
-    
+    sta Temp
+
     lda reward_items_list, y
     beq @no_item
     asl
@@ -3037,11 +3058,19 @@ SpawnRewardItem:
 
     lda #1
     sta ItemCount
-
+    jmp @done
 
 @no_item:
     lda #1
+    ldy VillagerIndex
+    sta QuestRewardsTaken, y
+@done:
+    lda #1
     sta MustExitMenuState
+
+    lda Temp
+    ldy VillagerIndex
+    sta ItemIGave, y
 
 
     rts
@@ -3184,7 +3213,7 @@ GiveItem:
     jmp @special_check
 
 @con:
-    lda ItemIGave
+    lda ItemIGave, y
     bne @exit ; already gave item
 
     ldx TempRegX

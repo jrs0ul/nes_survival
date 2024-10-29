@@ -384,10 +384,25 @@ AddAndDeactivateItems:
     ldy VillagerIndex
     jsr GetItemIdForTheQuest
     cmp TempItemIndex
-    bne @exit
+    bne @checkReward
 
     ldy VillagerIndex
     sta TakenQuestItems, y
+
+@checkReward:
+    lda VillagerIndex
+    asl
+    asl
+    clc
+    adc ActiveVillagerQuests, y
+    tay
+    lda reward_items_list, y
+    cmp TempItemIndex
+    bne @exit
+
+    ldy VillagerIndex
+    lda #1
+    sta QuestRewardsTaken, y
 
     jmp @exit
 

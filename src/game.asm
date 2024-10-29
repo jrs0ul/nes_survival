@@ -701,6 +701,26 @@ MustClearSubMenu        = DialogTextContainer + 5
 MenuStepLast            = DialogTextContainer + 6
 CraftingIndexes         = DialogTextContainer + 7  ; this one is 4 bytes
 Ingredients             = DialogTextContainer + 11 ; also 4 bytes
+
+MenuUpperLimit          = DialogTextContainer + 15
+MenuLowerLimit          = DialogTextContainer + 16
+MenuStep                = DialogTextContainer + 17
+MenuMaxItem             = DialogTextContainer + 18
+
+InventoryActivated      = DialogTextContainer + 19
+SubMenuIndex            = DialogTextContainer + 20
+SubMenuActivated        = DialogTextContainer + 21
+SleepMessageActivated   = DialogTextContainer + 22
+DocumentActivated       = DialogTextContainer + 23
+ActiveDocument          = DialogTextContainer + 24
+StashActivated          = DialogTextContainer + 25
+
+CraftingActivated       = DialogTextContainer + 26
+EquipmentActivated      = DialogTextContainer + 27
+
+CurrentCraftingComponent= DialogTextContainer + 28
+
+
 ;--Cutscene vars
 CutsceneSceneIdx        = DialogTextContainer
 CutsceneTimer           = DialogTextContainer + 1
@@ -818,7 +838,10 @@ EquipedClothing:
     .res 2
 
 ItemIGave:
-    .res 1  ;item index i gave to villager
+    .res MAX_VILLAGERS  ;item index i gave to villager
+QuestRewardsTaken:
+    .res MAX_VILLAGERS  ;player took a reward for a quest
+
 SpecialItemsDelivered:
     .res MAX_VILLAGERS
 
@@ -907,39 +930,6 @@ MustExitMenuState: ;if you want to exit the menu state when in bank1
     .res 1
 
 
-MenuUpperLimit:
-    .res 1
-MenuLowerLimit:
-    .res 1
-MenuStep:
-    .res 1
-MenuMaxItem:
-    .res 1
-
-
-InventoryActivated:
-    .res 1
-SubMenuIndex:
-    .res 1
-SubMenuActivated:
-    .res 1
-SleepMessageActivated:
-    .res 1
-DocumentActivated:
-    .res 1
-ActiveDocument:
-    .res 1
-
-StashActivated:
-    .res 1
-
-CraftingActivated:
-    .res 1
-EquipmentActivated:
-    .res 1
-
-CurrentCraftingComponent:
-    .res 1
 
 
 PaletteFadeAnimationState:
@@ -1320,7 +1310,7 @@ MusicIsPlaying:
     .res 1
 
 BSS_Free_Bytes:
-    .res 5
+    .res 12
 
 ;====================================================================================
 
@@ -3348,7 +3338,8 @@ OnYouWin:
     lda #SONG_ENDING_EVIL
     sta SongName
 
-    lda ItemIGave
+    ldy #3
+    lda ItemIGave, y
     cmp #ITEM_GRANNYS_HEAD
     beq @alienEnding
     lda #2
@@ -3671,7 +3662,8 @@ RoutinesAfterFadeOut:
     cmp #29
     bne @next27
 
-    lda ItemIGave
+    ldy #3
+    lda ItemIGave, y
     cmp #ITEM_GRANNYS_HEAD
     bne @justExit
     lda #1
@@ -4009,13 +4001,17 @@ IsItemXInInventory:
 
 ;-------------------------------
 OnExitVillagerHut:
-    lda ItemIGave
+    ldy VillagerIndex
+    lda ItemIGave, y
+    beq @regularExit
+
+    lda QuestRewardsTaken, y
     bne @cont ; increment quest only if the regular item was given
 
+@regularExit:
     lda #0
     sta DontIncrementQuestNumber
 
-    ldy VillagerIndex
     lda ActiveVillagerQuests, y
     sta Temp ; store villager quest number
 
@@ -4089,11 +4085,13 @@ OnExitVillagerHut:
     bne @exit
 
 
-@cont:
+@cont: ; let's increment the active quest for that villager
     lda #0
-    sta ItemIGave
-@incrementQuest:
     ldy VillagerIndex
+
+    sta ItemIGave, y
+    sta QuestRewardsTaken, y
+
     lda ActiveVillagerQuests, y
     clc
     adc #1
@@ -4202,7 +4200,35 @@ SpawnQuestItems:
     lda #1
     sta ItemCount
 
-@exit:
+@exit: ; let's spawn the reward I've missed
+
+    ldy VillagerIndex
+    lda ItemIGave, y
+    beq @done
+    tya
+    asl
+    asl
+    clc
+    adc ActiveVillagerQuests, y
+    tay
+
+    lda reward_items_list, y
+    beq @done
+    asl
+    ora #%00000001
+    sta Items
+    lda #0
+    sta Items + 1
+    lda #120
+    sta Items + 2
+    lda #108
+    sta Items + 3
+
+    lda #1
+    sta ItemCount
+
+
+@done:
     rts
 ;---------------------------------
 SpawnSpecialItemOwnerReward:
@@ -5859,7 +5885,6 @@ ResetVariables:
     sta ProjectileCount
     sta PlayerWins
     sta FoodToStamina
-    sta ItemIGave
 
     ldx #MAX_VILLAGERS - 1
 @villagerLoop:
@@ -5868,6 +5893,8 @@ ResetVariables:
     sta ActiveVillagerQuests, x
     sta TakenQuestItems, x
     sta VillagerKilled, x
+    sta ItemIGave, x
+    sta QuestRewardsTaken, x
     dex
     bpl @villagerLoop
 
