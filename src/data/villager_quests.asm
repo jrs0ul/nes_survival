@@ -469,11 +469,6 @@ special_goal_items:
     .byte ITEM_PIE          ;Grandma
     .byte 0
 
-special_reward_items:
-    .byte ITEM_SLINGSHOT
-    .byte 0
-    .byte ITEM_COOKED_JUMBO_MEAT
-    .byte 0
 
 
 
@@ -484,6 +479,15 @@ goal_items_list:
     .byte ITEM_GRANNYS_HEAD, 255, 255, 255
 
 .segment "RODATA"
+
+
+special_reward_items:
+    .byte ITEM_SLINGSHOT
+    .byte 0
+    .byte ITEM_COOKED_JUMBO_MEAT
+    .byte 0
+
+
 reward_items_list:
     .byte 0, ITEM_HIDE, ITEM_FISHING_ROD, ITEM_LAMP
     .byte ITEM_ROWAN_BERRIES, ITEM_HAMMER, ITEM_PIE, ITEM_COAT

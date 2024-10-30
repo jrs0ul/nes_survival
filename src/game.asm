@@ -713,12 +713,10 @@ SubMenuActivated        = DialogTextContainer + 21
 SleepMessageActivated   = DialogTextContainer + 22
 DocumentActivated       = DialogTextContainer + 23
 ActiveDocument          = DialogTextContainer + 24
-StashActivated          = DialogTextContainer + 25
+CraftingActivated       = DialogTextContainer + 25
+EquipmentActivated      = DialogTextContainer + 26
 
-CraftingActivated       = DialogTextContainer + 26
-EquipmentActivated      = DialogTextContainer + 27
-
-CurrentCraftingComponent= DialogTextContainer + 28
+CurrentCraftingComponent= DialogTextContainer + 27
 
 
 ;--Cutscene vars
@@ -740,6 +738,8 @@ TitleScreenTimer        = DialogTextContainer + 12
 CurrentPaletteDecrementValue: ;a helper value to prevent doing too much of palette changing
     .res 1
 
+StashActivated:
+    .res 1
 
 ScrollY:
     .res 1
@@ -843,6 +843,8 @@ QuestRewardsTaken:
     .res MAX_VILLAGERS  ;player took a reward for a quest
 
 SpecialItemsDelivered:
+    .res MAX_VILLAGERS
+SpecialQuestReceiverRewardTaken: ; did you take the item from special_goal_items ?
     .res MAX_VILLAGERS
 
 Inventory:
@@ -1310,7 +1312,7 @@ MusicIsPlaying:
     .res 1
 
 BSS_Free_Bytes:
-    .res 12
+    .res 7
 
 ;====================================================================================
 
@@ -5895,6 +5897,7 @@ ResetVariables:
     sta VillagerKilled, x
     sta ItemIGave, x
     sta QuestRewardsTaken, x
+    sta SpecialQuestReceiverRewardTaken, x
     dex
     bpl @villagerLoop
 

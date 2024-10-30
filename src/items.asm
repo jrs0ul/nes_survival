@@ -388,8 +388,21 @@ AddAndDeactivateItems:
 
     ldy VillagerIndex
     sta TakenQuestItems, y
+    jmp @exit
 
-@checkReward:
+@checkSpecialReward:
+    ldy MAX_VILLAGERS
+@villagerLoop:
+    dey
+    bmi @exit
+    lda special_receivers, y
+    cmp VillagerIndex
+    bne @villagerLoop
+    lda #1
+    sta SpecialQuestReceiverRewardTaken, y
+    jmp @exit
+
+@checkReward: ; check if it is a quest reward you've taken
     lda VillagerIndex
     asl
     asl
@@ -399,7 +412,7 @@ AddAndDeactivateItems:
     tay
     lda reward_items_list, y
     cmp TempItemIndex
-    bne @exit
+    bne @checkSpecialReward
 
     ldy VillagerIndex
     lda #1

@@ -100,7 +100,6 @@ ResetOverlayedMenuVars:
     sta SleepMessageActivated
     sta DocumentActivated
     sta ActiveDocument
-    sta StashActivated
 
     sta CraftingActivated
     sta EquipmentActivated
