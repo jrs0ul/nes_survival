@@ -508,10 +508,13 @@ UpdateVillagerDialogSprites:
     clc
     adc ActiveVillagerQuests, y
     tay
+    sty Temp
 
-    lda ItemIGave
+    ldy VillagerIndex
+    lda ItemIGave, y
     bne @checkRewardSpriteCount
 
+    ldy Temp
     lda TempDigit
     bne @checkRewardSpriteCount
 
@@ -519,6 +522,7 @@ UpdateVillagerDialogSprites:
     beq @exit ;no sprites
     jmp @storeSpriteCount
 @checkRewardSpriteCount:
+    ldy Temp
     lda RewardSpriteCount, y
     beq @exit ;no sprites
 
@@ -546,9 +550,11 @@ UpdateVillagerDialogSprites:
 
     rts
 ;-----------------------------------
-;TemDigit is the special item delivered
+;TempDigit is the special item delivered
 PickSpriteData:
-    lda ItemIGave
+    stx TempRegX
+    ldx VillagerIndex
+    lda ItemIGave, x
     bne @reward
 
     lda TempDigit
@@ -571,6 +577,7 @@ PickSpriteData:
     sta pointer + 1
 
 @done:
+    ldx TempRegX
     rts
 
 ;-----------------------------------

@@ -394,6 +394,7 @@ AddAndDeactivateItems:
     asl
     asl
     clc
+    ldy VillagerIndex
     adc ActiveVillagerQuests, y
     tay
     lda reward_items_list, y
