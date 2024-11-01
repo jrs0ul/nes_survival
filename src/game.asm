@@ -4049,7 +4049,6 @@ OnExitVillagerHut:
     lda SpecialItemsDelivered, y
     beq @exit ; nope, the quest was not completed
 
-   
     ldy #0
 
     ;does the active quest number match the number from the list ?
@@ -4072,8 +4071,9 @@ OnExitVillagerHut:
     bcs @exit
 
 @special:
-
     ldy VillagerIndex
+    lda QuestRewardsTaken, y
+    beq @exit ; can't complete until reward is not taken
     lda #0
     sta TakenQuestItems, y
     dex
@@ -4206,7 +4206,24 @@ SpawnQuestItems:
 
     ldy VillagerIndex
     lda ItemIGave, y
+    bne @justSpawnIt
+    ;check if it's a reward for a special quest
+
+    ldy VillagerIndex
+    lda CompletedSpecialQuests,y
+    bne @justSpawnIt ; the special quest is completed
+
+    ;how about a reward that special quest item receiver might give you ?
+    lda SpecialItemsDelivered, y
     beq @done
+
+    lda SpecialQuestReceiverRewardTaken, y
+    bne @done ; the reward is already taken
+
+    lda special_reward_items, y
+    bne @spawn_it
+
+@justSpawnIt:
     tya
     asl
     asl
@@ -4215,7 +4232,12 @@ SpawnQuestItems:
     tay
 
     lda reward_items_list, y
+
     beq @done
+
+    
+
+@spawn_it:
     asl
     ora #%00000001
     sta Items

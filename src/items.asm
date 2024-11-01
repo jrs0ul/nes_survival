@@ -382,6 +382,8 @@ AddAndDeactivateItems:
     bne @exit
 
     ldy VillagerIndex
+    lda TakenQuestItems, y
+    bne @checkSpecialReward ; quest item is already taken, so must be something else
     jsr GetItemIdForTheQuest
     cmp TempItemIndex
     bne @checkReward
@@ -391,14 +393,15 @@ AddAndDeactivateItems:
     jmp @exit
 
 @checkSpecialReward:
-    ldy MAX_VILLAGERS
+    ldy #MAX_VILLAGERS
 @villagerLoop:
     dey
-    bmi @exit
+    bmi @checkReward ; maybe it's a generic reward then ?
     lda special_receivers, y
     cmp VillagerIndex
     bne @villagerLoop
     lda #1
+    ldy VillagerIndex
     sta SpecialQuestReceiverRewardTaken, y
     jmp @exit
 
