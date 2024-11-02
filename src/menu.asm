@@ -3101,15 +3101,12 @@ SpawnSpecialReward:
     lda Temp
     sta SpecialItemsDelivered, y
 
-    
     tya
     asl
     tay
     lda special_quests, y
     cmp VillagerIndex
     beq @completed
-
-    
 
     jmp @exit
 

@@ -3462,6 +3462,7 @@ RoutinesAfterFadeOut:
 
 @skip_night:
 
+    jsr SpawnQuestItems
     lda #1
     sta EnteredBeforeNightfall
     ;------------------------------------
@@ -4292,8 +4293,8 @@ SpawnSpecialItemOwnerReward:
     sta ItemCount
 
     ldy VillagerIndex
-    lda special_receivers, y
-    tay
+    ;lda special_receivers, y
+    ;tay
     lda #1
     sta CompletedSpecialQuests, y
 

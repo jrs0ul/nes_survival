@@ -386,7 +386,7 @@ AddAndDeactivateItems:
     bne @checkSpecialReward ; quest item is already taken, so must be something else
     jsr GetItemIdForTheQuest
     cmp TempItemIndex
-    bne @checkReward
+    bne @checkSpecialReward
 
     ldy VillagerIndex
     sta TakenQuestItems, y
@@ -400,6 +400,10 @@ AddAndDeactivateItems:
     lda special_receivers, y
     cmp VillagerIndex
     bne @villagerLoop
+
+    lda CompletedSpecialQuests, y
+    bne @villagerLoop ; the quest already completed
+
     lda #1
     ldy VillagerIndex
     sta SpecialQuestReceiverRewardTaken, y
@@ -415,7 +419,7 @@ AddAndDeactivateItems:
     tay
     lda reward_items_list, y
     cmp TempItemIndex
-    bne @checkSpecialReward
+    bne @exit
 
     ldy VillagerIndex
     lda #1
