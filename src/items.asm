@@ -292,6 +292,25 @@ CheckYPoints:
 @exit:
 
     rts
+;-----------------------------------
+OnRegularQuestReward:
+    lda VillagerIndex
+    asl
+    asl
+    clc
+    ldy VillagerIndex
+    adc ActiveVillagerQuests, y
+    tay
+    lda reward_items_list, y
+    cmp TempItemIndex
+    bne @exit
+
+    ldy VillagerIndex
+    lda #1
+    sta QuestRewardsTaken, y
+@exit:
+    rts
+
 
 ;-----------------------------------
 AddAndDeactivateItems:
@@ -404,27 +423,21 @@ AddAndDeactivateItems:
     lda CompletedSpecialQuests, y
     bne @villagerLoop ; the quest already completed
 
+    sty Temp
+    lda special_receivers, y
+    tay
+    lda SpecialItemsDelivered, y
+    ldy Temp
+    cmp #0
+    beq @villagerLoop
+
     lda #1
     ldy VillagerIndex
     sta SpecialQuestReceiverRewardTaken, y
     jmp @exit
 
 @checkReward: ; check if it is a quest reward you've taken
-    lda VillagerIndex
-    asl
-    asl
-    clc
-    ldy VillagerIndex
-    adc ActiveVillagerQuests, y
-    tay
-    lda reward_items_list, y
-    cmp TempItemIndex
-    bne @exit
-
-    ldy VillagerIndex
-    lda #1
-    sta QuestRewardsTaken, y
-
+    jsr OnRegularQuestReward
     jmp @exit
 
 @playInventoryFull:

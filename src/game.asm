@@ -4000,10 +4000,24 @@ IsItemXInInventory:
 
 @end:
     rts
+;------------------------------
+endTheSpecialQuest:
+    lda #0
+    sta TakenQuestItems, y
+    dex
+    txa
+    lsr
+    tax
+    lda #0
+    sta SpecialItemsDelivered, x
 
+    rts
 
 ;-------------------------------
 OnExitVillagerHut:
+    lda #0
+    sta TempHp
+
     ldy VillagerIndex
     lda ItemIGave, y
     beq @regularExit
@@ -4063,8 +4077,12 @@ OnExitVillagerHut:
     inx
     lda special_quests, x
     cmp Temp ; compare with active villager quest
-    beq @special
-
+    beq @found
+    jmp @next
+@found:
+    lda #1
+    sta TempHp ; state that special quest has different receiver
+    jmp @special
 @next:
     iny
     cpy #MAX_VILLAGERS
@@ -4073,17 +4091,15 @@ OnExitVillagerHut:
 
 @special:
     ldy VillagerIndex
+    lda TempHp
+    bne @differentSpecialQuestItemReceiver
+    lda special_reward_items, y  ; quest giver is the receiver
+    beq @endSpecialQuest         ; there's no reward
+@differentSpecialQuestItemReceiver:
     lda QuestRewardsTaken, y
     beq @exit ; can't complete until reward is not taken
-    lda #0
-    sta TakenQuestItems, y
-    dex
-    txa
-    lsr
-    tax
-    lda #0
-    sta SpecialItemsDelivered, x
-
+@endSpecialQuest:
+    jsr endTheSpecialQuest
     lda DontIncrementQuestNumber
     bne @exit
 
@@ -4208,11 +4224,6 @@ SpawnQuestItems:
     ldy VillagerIndex
     lda ItemIGave, y
     bne @justSpawnIt
-    ;check if it's a reward for a special quest
-
-    ldy VillagerIndex
-    lda CompletedSpecialQuests,y
-    bne @justSpawnIt ; the special quest is completed
 
     ;how about a reward that special quest item receiver might give you ?
     lda SpecialItemsDelivered, y
@@ -4258,8 +4269,6 @@ SpawnQuestItems:
 ;---------------------------------
 SpawnSpecialItemOwnerReward:
 
-
-
     ldy VillagerIndex
     lda special_receivers, y
     tay
@@ -4293,8 +4302,8 @@ SpawnSpecialItemOwnerReward:
     sta ItemCount
 
     ldy VillagerIndex
-    ;lda special_receivers, y
-    ;tay
+    lda special_receivers, y
+    tay
     lda #1
     sta CompletedSpecialQuests, y
 
