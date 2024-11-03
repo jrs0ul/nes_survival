@@ -310,7 +310,32 @@ OnRegularQuestReward:
     sta QuestRewardsTaken, y
 @exit:
     rts
+;---------------------------------
+PlayInventoryFullSfx:
+    lda ScrollX
+    cmp FullInventoryScrollX
+    bne @play
+    lda PlayerX
+    cmp FullInventoryPlayerX
+    bne @play
+    lda PlayerY
+    cmp FullInventoryPlayerY
+    beq @exit
+@play:
+    lda ScrollX
+    sta FullInventoryScrollX
+    lda PlayerX
+    sta FullInventoryPlayerX
+    lda PlayerY
+    sta FullInventoryPlayerY
 
+    lda #SFX_INVENTORY_FULL
+    sta SfxName
+    lda #1
+    sta MustPlaySfx
+@exit:
+
+    rts
 
 ;-----------------------------------
 AddAndDeactivateItems:
@@ -409,6 +434,12 @@ AddAndDeactivateItems:
 
     ldy VillagerIndex
     sta TakenQuestItems, y
+    lda special_receivers, y
+    cmp #MAX_VILLAGERS
+    bcs @exit
+    tay
+    lda #0
+    sta CompletedSpecialQuests, y
     jmp @exit
 
 @checkSpecialReward:
@@ -420,7 +451,11 @@ AddAndDeactivateItems:
     cmp VillagerIndex
     bne @villagerLoop
 
+    sty Temp
+    ldy VillagerIndex
     lda CompletedSpecialQuests, y
+    ldy Temp
+    cmp #0
     bne @villagerLoop ; the quest already completed
 
     sty Temp
@@ -441,28 +476,8 @@ AddAndDeactivateItems:
     jmp @exit
 
 @playInventoryFull:
-    lda ScrollX
-    cmp FullInventoryScrollX
-    bne @play
-    lda PlayerX
-    cmp FullInventoryPlayerX
-    bne @play
-    lda PlayerY
-    cmp FullInventoryPlayerY
-    beq @exit
-@play:
-    lda ScrollX
-    sta FullInventoryScrollX
-    lda PlayerX
-    sta FullInventoryPlayerX
-    lda PlayerY
-    sta FullInventoryPlayerY
-
-    lda #SFX_INVENTORY_FULL
-    sta SfxName
-    lda #1
-    sta MustPlaySfx
-
+   
+    jsr PlayInventoryFullSfx
 
 @exit:
     ldy TempY

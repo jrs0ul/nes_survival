@@ -4011,6 +4011,10 @@ endTheSpecialQuest:
     lda #0
     sta SpecialItemsDelivered, x
 
+    ldx special_receivers, y
+    sta SpecialQuestReceiverRewardTaken, x
+
+
     rts
 
 ;-------------------------------
@@ -4060,6 +4064,8 @@ OnExitVillagerHut:
     ;check if an item was delivered to a receiver of this npc
     ldy VillagerIndex
     lda special_receivers, y
+    cmp #MAX_VILLAGERS
+    bcs @exit
     tay
     lda SpecialItemsDelivered, y
     beq @exit ; nope, the quest was not completed
