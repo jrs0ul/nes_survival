@@ -292,6 +292,50 @@ CheckYPoints:
 @exit:
 
     rts
+;-----------------------------------
+OnRegularQuestReward:
+    lda VillagerIndex
+    asl
+    asl
+    clc
+    ldy VillagerIndex
+    adc ActiveVillagerQuests, y
+    tay
+    lda reward_items_list, y
+    cmp TempItemIndex
+    bne @exit
+
+    ldy VillagerIndex
+    lda #1
+    sta QuestRewardsTaken, y
+@exit:
+    rts
+;---------------------------------
+PlayInventoryFullSfx:
+    lda ScrollX
+    cmp FullInventoryScrollX
+    bne @play
+    lda PlayerX
+    cmp FullInventoryPlayerX
+    bne @play
+    lda PlayerY
+    cmp FullInventoryPlayerY
+    beq @exit
+@play:
+    lda ScrollX
+    sta FullInventoryScrollX
+    lda PlayerX
+    sta FullInventoryPlayerX
+    lda PlayerY
+    sta FullInventoryPlayerY
+
+    lda #SFX_INVENTORY_FULL
+    sta SfxName
+    lda #1
+    sta MustPlaySfx
+@exit:
+
+    rts
 
 ;-----------------------------------
 AddAndDeactivateItems:
@@ -382,38 +426,58 @@ AddAndDeactivateItems:
     bne @exit
 
     ldy VillagerIndex
+    lda TakenQuestItems, y
+    bne @checkSpecialReward ; quest item is already taken, so must be something else
     jsr GetItemIdForTheQuest
     cmp TempItemIndex
-    bne @exit
+    bne @checkSpecialReward
 
     ldy VillagerIndex
     sta TakenQuestItems, y
+    lda special_receivers, y
+    cmp #MAX_VILLAGERS
+    bcs @exit
+    tay
+    lda #0
+    sta CompletedSpecialQuests, y
+    jmp @exit
 
+@checkSpecialReward:
+    ldy #MAX_VILLAGERS
+@villagerLoop:
+    dey
+    bmi @checkReward ; maybe it's a generic reward then ?
+    lda special_receivers, y
+    cmp VillagerIndex
+    bne @villagerLoop
+
+    sty Temp
+    ldy VillagerIndex
+    lda CompletedSpecialQuests, y
+    ldy Temp
+    cmp #0
+    bne @villagerLoop ; the quest already completed
+
+    sty Temp
+    lda special_receivers, y
+    tay
+    lda SpecialItemsDelivered, y
+    ldy Temp
+    cmp #0
+    beq @villagerLoop
+
+    lda #1
+    ldy VillagerIndex
+    sta SpecialQuestReceiverRewardTaken, y
+    jmp @exit
+
+@checkReward: ; check if it is a quest reward you've taken
+    jsr OnRegularQuestReward
     jmp @exit
 
 @playInventoryFull:
-    lda ScrollX
-    cmp FullInventoryScrollX
-    bne @play
-    lda PlayerX
-    cmp FullInventoryPlayerX
-    bne @play
-    lda PlayerY
-    cmp FullInventoryPlayerY
-    beq @exit
-@play:
-    lda ScrollX
-    sta FullInventoryScrollX
-    lda PlayerX
-    sta FullInventoryPlayerX
-    lda PlayerY
-    sta FullInventoryPlayerY
-
-    lda #SFX_INVENTORY_FULL
-    sta SfxName
-    lda #1
-    sta MustPlaySfx
-
+   
+    jsr PlayInventoryFullSfx
 
 @exit:
     ldy TempY

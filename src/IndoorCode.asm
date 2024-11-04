@@ -248,7 +248,7 @@ SetupVillagerText:
     lda #0
     sta TextBaloonIndex
 
-    lda ItemIGave
+    lda ItemIGave, y
     bne @thanks
 
 
