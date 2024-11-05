@@ -15,12 +15,12 @@ mod_tiles_by_location:
     .byte 0,                         0                         ;13
     .byte <mod_tiles_secret_cave,    >mod_tiles_secret_cave    ;14
     .byte 0,                         0                         ;15
-    .byte 0,                         0                         ;16
+    .byte <mod_tiles_dark_cave2,     >mod_tiles_dark_cave2     ;16 dark cave 2
     .byte <mod_tiles_alien_lobby,    >mod_tiles_alien_lobby    ;17
     .byte 0,                         0                         ;18
     .byte <mod_tiles_alien_base_pre, >mod_tiles_alien_base_pre ;19 alien base pre
     .byte 0,                         0                         ;20 house before alien base
-    .byte 0,                         0                         ;21 lonly cave
+    .byte 0,                         0                         ;21 lonely cave
     .byte 0,                         0                         ;22 wood location
     .byte 0,                         0                         ;23 alien base hallway
 
@@ -41,7 +41,7 @@ mod_tiles_count_by_location:
     .byte 0 ;13
     .byte 4 ;14
     .byte 0 ;15
-    .byte 0 ;16
+    .byte 4 ;16
     .byte 4 ;17
     .byte 0 ;18
     .byte 18;19
