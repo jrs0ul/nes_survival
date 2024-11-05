@@ -3466,10 +3466,10 @@ RoutinesAfterFadeOut:
     lda #1
     sta EnteredBeforeNightfall
     ;------------------------------------
-    ;9.Bjorn's house exit
+    ;10.Bjorn's house exit
 @next2:
     lda ActiveMapEntryIndex
-    cmp #9
+    cmp #10
     bne @next4
 
     jsr OnExitVillagerHut
@@ -3482,11 +3482,11 @@ RoutinesAfterFadeOut:
 
     jsr FlipStartingNametable ; for the breakable rock
     ;---------------------------------------------
-    ;10.Player's house exit
+    ;11.Player's house exit
 @next7:
 
     lda ActiveMapEntryIndex
-    cmp #10
+    cmp #11
     bne @next8
 
     lda #0
@@ -3495,22 +3495,22 @@ RoutinesAfterFadeOut:
     lda #1
     sta MustCopyMainChr
     ;-----------------------------------------
-    ;7.Exit point of third location
+    ;8.Exit point of third location
 @next8:
 
     lda ActiveMapEntryIndex
-    cmp #7
+    cmp #8
     bne @next9
 
     lda #2
     sta ScrollDirection
     jsr FlipStartingNametable ;for the rock
     ;------------------------------------------
-    ;8.Erika's house entrance
+    ;9.Erika's house entrance
 @next9:
 
     lda ActiveMapEntryIndex
-    cmp #8
+    cmp #9
     bne @next10
 
     lda #1
@@ -3527,11 +3527,11 @@ RoutinesAfterFadeOut:
     jsr SpawnSpecialItemOwnerReward
 
     ;------------------------------------------
-    ;11.Second villager house's exit
+    ;12.Second villager house's exit
 @next10:
 
     lda ActiveMapEntryIndex
-    cmp #11
+    cmp #12
     bne @next11
 
     lda #2
@@ -3539,10 +3539,10 @@ RoutinesAfterFadeOut:
 
     jsr OnExitVillagerHut
     ;----------------------------
-    ;27.cave entrance from location 11
+    ;28.cave entrance from location 11
 @next11:
     lda ActiveMapEntryIndex
-    cmp #27
+    cmp #28
     bne @next12
 
     lda #2
@@ -3551,21 +3551,21 @@ RoutinesAfterFadeOut:
     lda #0
     sta FirstTime
     ;---------------------
-    ;12. crashsite entrance from cave
+    ;13. crashsite entrance from cave
 @next12:
 
     lda ActiveMapEntryIndex
-    cmp #12
+    cmp #13
     bne @next13
 
     lda #1
     sta MustCopyMainChr
     ;------------------------------
-    ;17.crashsite exit to cave
+    ;18.crashsite exit to cave
 @next13:
 
     lda ActiveMapEntryIndex
-    cmp #17
+    cmp #18
     bne @next14
 
     lda #2
@@ -3575,10 +3575,10 @@ RoutinesAfterFadeOut:
     sta MustCopyMainChr
 
     ;-------------------------
-    ;13.cave exit to cave location
+    ;14.cave exit to cave location
 @next14:
     lda ActiveMapEntryIndex
-    cmp #13
+    cmp #14
     bne @next16
 
     lda #2
@@ -3589,18 +3589,18 @@ RoutinesAfterFadeOut:
     lda #0
     sta CheckpointSaved
     ;-------------------------
-    ;19. exit from the grannys location
+    ;20. exit from the grannys location
 @next16:
     lda ActiveMapEntryIndex
-    cmp #19
+    cmp #20
     bne @next17
 
     jsr FlipStartingNametable ; for the breakable rock
     ;----------------------------
-    ;20.granny's house
+    ;21.granny's house
 @next17:
     lda ActiveMapEntryIndex
-    cmp #20
+    cmp #21
     bne @next18
 
     lda #2
@@ -3619,10 +3619,10 @@ RoutinesAfterFadeOut:
     jsr SpawnSpecialItemOwnerReward
 
     ;-------------------------------
-    ;22.exit from grannys house
+    ;23.exit from grannys house
 @next18:
     lda ActiveMapEntryIndex
-    cmp #22
+    cmp #23
     bne @next24
 
     lda #2
@@ -3630,11 +3630,11 @@ RoutinesAfterFadeOut:
 
     jsr OnExitVillagerHut
     ;------------------------
-    ;25. Boss room entrance
+    ;26. Boss room entrance
 @next24:
 
     lda ActiveMapEntryIndex
-    cmp #25
+    cmp #26
     bne @next25
 
     lda #<alien_palette
@@ -3658,11 +3658,11 @@ RoutinesAfterFadeOut:
     lda #3
     sta VillagerIndex
     ;-------------------------
-    ;29 Boss room exit
+    ;30 Boss room exit
 @next25:
 
     lda ActiveMapEntryIndex
-    cmp #29
+    cmp #30
     bne @next27
 
     ldy #3
@@ -3678,10 +3678,10 @@ RoutinesAfterFadeOut:
     lda #0
     sta BossAgitated
     ;-----------------------
-    ;14 dark cave entrance
+    ;15 dark cave entrance
 @next27:
     lda ActiveMapEntryIndex
-    cmp #14
+    cmp #15
     bne @next28
 
     lda #ITEM_LAMP
@@ -3715,10 +3715,10 @@ RoutinesAfterFadeOut:
     ldy oldbank
     jsr bankswitch_y
     ;---------------------
-    ;21 secret cave entrance
+    ;22 secret cave entrance
 @next28:
     lda ActiveMapEntryIndex
-    cmp #21
+    cmp #22
     bne @next35
 
     lda #1
@@ -3726,45 +3726,46 @@ RoutinesAfterFadeOut:
 
     jsr TurnDarkPaletteOn
     ;------------------------
-    ;31 dark cave 2
+    ;32 dark cave 2
 @next35:
 
     lda ActiveMapEntryIndex
-    cmp #31
+    cmp #32
     bne @next36
 
     jsr TurnDarkPaletteOn
     ;---------------------------
-    ;34 from dark cave 2 to dark cave 1
+    ;35 from dark cave 2 to dark cave 1
 @next36:
     lda ActiveMapEntryIndex
-    cmp #34
+    cmp #35
     bne @next37
 
     jsr TurnDarkPaletteOn
     ;-------------------
-    ;38 exit from alien lobby to dark cave 2
+    ;39 exit from alien lobby to dark cave 2
 @next37:
     lda ActiveMapEntryIndex
-    cmp #38
+    cmp #39
     bne @next38
 
     lda #1
     sta MustCopyMainChr
     jsr TurnDarkPaletteOn
     ;---------------------
-    ;entrance to the crashsite from the path
+    ;41. entrance to the crashsite from the path
 @next38:
     lda ActiveMapEntryIndex
-    cmp #40
+    cmp #41
     bne @next39
 
     lda #1
     sta MustCopyMainChr
-
+    ;--------------------------
+    ;19 crashsite exit to path
 @next39:
     lda ActiveMapEntryIndex
-    cmp #18
+    cmp #19
     bne @next40
 
     lda #1
