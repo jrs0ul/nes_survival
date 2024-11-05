@@ -27,6 +27,7 @@ map_files = [
             "mine_2.asm",
             "dark_cave0.asm",
             "dark_cave1.asm",
+            "dark_cave2.asm",
             "dark_cave2_0.asm",
             "dark_cave2_1.asm",
             "dark_cave2_2.asm",

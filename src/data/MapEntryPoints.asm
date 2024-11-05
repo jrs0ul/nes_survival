@@ -26,7 +26,7 @@ entry_points_loc0:
     ;---------------------------------------
 entry_points_loc1:
     ;4.Bjorn's house entrance
-    .byte 4, 0, 118, 136, 168, 192, $68, $6F
+    .byte 4, 0, 117, 124, 85, 91, 112, 123
     ;5.Exit point of second location
     .byte 5, 0, 0, 255, 0, 255, 222, 255
     ;6.entrance to mine location (where path is)
@@ -98,70 +98,72 @@ entry_points_loc11:
     .byte 28, 2, 117, 122, 22, 28, 40, 50
     ;29. entrance to the path to the crashsite
     .byte 29, 0, 0, 255, 0, 255, 0, 22
+    ;30. entrance to the segment where Bjorn's house is
+    .byte 30, 1, 117, 122, 102, 124, 222, 255
     ;-------------------------------------
 entry_points_loc12:
-    ;30. Boss room exit
-    .byte 30, 0, 0, 4, 0, 255, 112, 127
+    ;31. Boss room exit
+    .byte 31, 0, 0, 4, 0, 255, 112, 127
     ;-------------------------------------
 entry_points_loc13:
-    ;31. Dark cave exit to light cave
-    .byte 31, 0, 0, 5, 0, 255, 32, 76
-    ;32. entrance to dark cave second segment
-    .byte 32, 1, 189, 240, 0, 255, 222, 255
+    ;32. Dark cave exit to light cave
+    .byte 32, 0, 0, 5, 0, 255, 32, 76
+    ;33. entrance to dark cave second segment
+    .byte 33, 2, 189, 240, 0, 255, 222, 255
     ;-------------------------------------
 entry_points_loc14:
-    ;33. Secret cave exit
-    .byte 33, 0, 0, 255, 0, 255, 222, 255
+    ;34. Secret cave exit
+    .byte 34, 0, 0, 255, 0, 255, 222, 255
     ;-------------------------------------
 entry_points_loc15:
-    ;34. Mine room exit
-    .byte 34, 0, 0, 255, 0, 255, 160, 255
+    ;35. Mine room exit
+    .byte 35, 0, 0, 255, 0, 255, 160, 255
     ;--------------------------------------
 entry_points_loc16:
-    ;35. Dark cave2 exit to dark cave 1
-    .byte 35, 2, 189, 255, 0, 255, 0, 32
-    ;36. alien base lobby entrance
-    .byte 36, 0, 105, 118, 0, 255, 185, 203
-    ;37. entrance to the lonely cave
-    .byte 37, 0, 117, 122, 230, 236, 222, 255
+    ;36. Dark cave2 exit to dark cave 1
+    .byte 36, 2, 189, 255, 0, 255, 0, 32
+    ;37. alien base lobby entrance
+    .byte 37, 0, 105, 118, 0, 255, 185, 203
+    ;38. entrance to the lonely cave
+    .byte 38, 0, 117, 122, 230, 236, 222, 255
     ;--------------------------------------
     ; Lobby
 entry_points_loc17:
-    ;38. pre-alien base entrance
-    .byte 38, 0, 230, 255, 0, 255, 125, 140
-    ;39. exit to dark cave 2
-    .byte 39, 0, 32, 40, 0, 255, 119, 130
-    ;40. alien-lobby-room
-    .byte 40, 0, 120, 136, 0, 255, 40, 50
+    ;39. pre-alien base entrance
+    .byte 39, 0, 230, 255, 0, 255, 125, 140
+    ;40. exit to dark cave 2
+    .byte 40, 0, 32, 40, 0, 255, 119, 130
+    ;41. alien-lobby-room
+    .byte 41, 0, 120, 136, 0, 255, 40, 50
     ;--------------------------------------
 entry_points_loc18:
-    ;41. entrance to crashsite location
-    .byte 41, 0, 0, 255, 0, 255, 0, 50
-    ;42. entrance to location with mine
-    .byte 42, 0, 0, 255, 0, 255, 222, 255
+    ;42. entrance to crashsite location
+    .byte 42, 0, 0, 255, 0, 255, 0, 50
+    ;43. entrance to location with mine
+    .byte 43, 0, 0, 255, 0, 255, 222, 255
     ;----------------------
 entry_points_loc19:
-    ;43. exit to alien base lobby
-    .byte 43, 0, 0, 10, 0, 255, 119, 255
-    ;44. entrance to last alien base location
-    .byte 44, 0, 0, 255, 0, 255, 0, 32
+    ;44. exit to alien base lobby
+    .byte 44, 0, 0, 10, 0, 255, 119, 255
+    ;45. entrance to last alien base location
+    .byte 45, 0, 0, 255, 0, 255, 0, 32
     ;----------------------
 entry_points_loc20:
-    ;45. cave-room exit
-    .byte 45, 0, 0, 255, 0, 255, 160, 255
+    ;46. cave-room exit
+    .byte 46, 0, 0, 255, 0, 255, 160, 255
 entry_points_loc21:
-    ;46. lonely cave exit to the dark cave 2
-    .byte 46, 0, 0, 255, 0, 255, 0, 40
-    ;47. entrance to wood location
-    .byte 47, 0, 0, 255, 0, 255, 222, 255
+    ;47. lonely cave exit to the dark cave 2
+    .byte 47, 0, 0, 255, 0, 255, 0, 40
+    ;48. entrance to wood location
+    .byte 48, 0, 0, 255, 0, 255, 222, 255
 entry_points_loc22:
-    ;48. exit to lonely cave
-    .byte 48, 0, 0, 255, 0, 255, 20, 32
+    ;49. exit to lonely cave
+    .byte 49, 0, 0, 255, 0, 255, 20, 32
 entry_points_loc23:
-    ;49. entrance to the main alien base
-    .byte 49, 1, 0, 255, 0, 255, 20, 32
-    ;50. exit to alien base puzzle room
-    .byte 50, 0, 0, 255, 0, 255, 222, 255
+    ;50. entrance to the main alien base
+    .byte 50, 1, 0, 255, 0, 255, 20, 32
+    ;51. exit to alien base puzzle room
+    .byte 51, 0, 0, 255, 0, 255, 222, 255
 
 .segment "ROM0"
 
@@ -221,8 +223,8 @@ MapSpawnPoint:
     .byte UNUSED, <house_palette, >house_palette, 0, <villager2_npcs, >villager2_npcs, 0
     ;------------------
     ;Bjorn's house exit
-    .byte $76, $80, 1, OUTDOORS_LOC2_SCREEN_COUNT, LOCATION_TYPE_OUTDOORS, SONG_INDOORS, 0, $B8, 0
-    .byte UNUSED, <main_palette, >main_palette, 3, 0, 0, 1
+    .byte 120, $80, 1, OUTDOORS_LOC2_SCREEN_COUNT, LOCATION_TYPE_OUTDOORS, SONG_INDOORS, 0, 88, 0
+    .byte UNUSED, <main_palette, >main_palette, 3, 0, 0, 0
     ;-----------------
     ;Player's house exit
     .byte 72, 120, 0, OUTDOORS_LOC1_SCREEN_COUNT, LOCATION_TYPE_OUTDOORS, SONG_OUTSIDE_DAY, 0, 0, 0
@@ -283,15 +285,19 @@ MapSpawnPoint:
     ;--------------
     ;A location with the mine entrance
     ;--------------
-    ;exit from cave location to bjorn's location
+    ;exit from cave location to bjorn's location (path)
     .byte 135, 38, 1, OUTDOORS_LOC2_SCREEN_COUNT, LOCATION_TYPE_OUTDOORS, SONG_OUTSIDE_DAY, 0, 0, 1
-    .byte UNUSED, <main_palette, >main_palette, 3, 0, 0, 0
+    .byte UNUSED, <main_palette, >main_palette, 3, 0, 0, 1
     ;cave entrance
     .byte 120, 207, 6, OUTDOORS_LOC7_SCREEN_COUNT, LOCATION_TYPE_CAVE, SONG_OUTSIDE_NIGHT, 4, 222, 0
     .byte UNUSED, <main_palette, >main_palette, 0, <cave_npcs, >cave_npcs, 0
     ;entrance to the path to the crashsite
     .byte 120, 180, 18, 1, LOCATION_TYPE_OUTDOORS, SONG_OUTSIDE_NIGHT, 5, 0, 0
     .byte UNUSED, <main_palette, >main_palette, 0, 0, 0, 0
+    ;entrance to the segment where Bjorn's house is
+    .byte 88, 37, 1, OUTDOORS_LOC2_SCREEN_COUNT, LOCATION_TYPE_OUTDOORS, SONG_OUTSIDE_DAY, 0, 0, 0
+    .byte UNUSED, <main_palette, >main_palette, 3, 0, 0, 0
+
     ;---------------
     ;boss room exit
     .byte 223, 120, 10, 2, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 4, 0, 1
@@ -393,7 +399,7 @@ LocationScreenCountList:
     .byte 2                          ; 10 alien base
     .byte OUTDOORS_LOC12_SCREEN_COUNT; 11 location where the mine entrance is
     .byte 1                          ; 12 boss room
-    .byte 2                          ; 13 dark cave
+    .byte 3                          ; 13 dark cave
     .byte 1                          ; 14 secret cave
     .byte 1                          ; 15 mine room
     .byte 3                          ; 16 dark cave extension
@@ -444,7 +450,7 @@ EntryPointCountForLocation:
     .byte 3 ;8
     .byte 1 ;9
     .byte 3 ;10 alien base
-    .byte 3 ;11 location with the mine
+    .byte 4 ;11 location with the mine
     .byte 1 ;12
     .byte 2 ;13
     .byte 1 ;14

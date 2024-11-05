@@ -15,16 +15,16 @@ location_map_pos: ;index where the pointer to the first screen of each location 
     .byte 23 ;11 location with mine entrance
     .byte 27 ;12 bossroom
     .byte 28 ;13 dark cave
-    .byte 30 ;14 secret cave
-    .byte 31 ;15 mine room
-    .byte 32 ;16 dark cave 2
-    .byte 35 ;17 alien base lobby
-    .byte 36 ;18 path to crashsite
-    .byte 37 ;19 pre alien base location
-    .byte 31 ;20 cave room
-    .byte 40 ;21 lonely cave
-    .byte 41 ;22 wood location
-    .byte 43 ;23 alien base hallway
+    .byte 31 ;14 secret cave
+    .byte 32 ;15 mine room
+    .byte 33 ;16 dark cave 2
+    .byte 36 ;17 alien base lobby
+    .byte 37 ;18 path to crashsite
+    .byte 38 ;19 pre alien base location
+    .byte 32 ;20 cave room
+    .byte 41 ;21 lonely cave
+    .byte 42 ;22 wood location
+    .byte 44 ;23 alien base hallway
 
 map_list_low:
     .byte <field_bg            ; 0
@@ -70,29 +70,30 @@ map_list_low:
 
     .byte <dark_cave0          ; 28
     .byte <dark_cave1
+    .byte <dark_cave2
 
-    .byte <secret_cave0        ; 30
+    .byte <secret_cave0        ; 31
 
-    .byte <mine_room           ; 31
+    .byte <mine_room           ; 32
 
-    .byte <dark_cave2_0        ; 32
+    .byte <dark_cave2_0        ; 33
     .byte <dark_cave2_1
     .byte <dark_cave2_2
 
-    .byte <alien_base_lobby    ; 35
+    .byte <alien_base_lobby    ; 36
 
-    .byte <path_to_crashsite   ; 36
+    .byte <path_to_crashsite   ; 37
 
-    .byte <pre_alien_base0     ; 37
+    .byte <pre_alien_base0     ; 38
     .byte <pre_alien_base1
     .byte <pre_alien_base2
 
-    .byte <lonely_cave         ; 40
+    .byte <lonely_cave         ; 41
 
-    .byte <wood_location_0     ; 41
+    .byte <wood_location_0     ; 42
     .byte <wood_location_1
 
-    .byte <abase_hall_0        ;43
+    .byte <abase_hall_0        ;44
     .byte <abase_hall_1
     .byte <abase_hall_2
 
@@ -142,6 +143,7 @@ map_list_high:
 
     .byte >dark_cave0
     .byte >dark_cave1
+    .byte >dark_cave2
 
     .byte >secret_cave0
 

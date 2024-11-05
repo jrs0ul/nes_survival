@@ -113,6 +113,7 @@ alien_sprites_chr: .incbin "chr/alien_sprites.lz4"
 .include "data/maps/cropped/mine_2_crop.asm"
 .include "data/maps/cropped/dark_cave0_crop.asm"
 .include "data/maps/cropped/dark_cave1_crop.asm"
+.include "data/maps/cropped/dark_cave2_crop.asm"
 .include "data/maps/cropped/dark_cave2_0_crop.asm"
 .include "data/maps/cropped/dark_cave2_1_crop.asm"
 .include "data/maps/cropped/dark_cave2_2_crop.asm"
@@ -3658,11 +3659,11 @@ RoutinesAfterFadeOut:
     lda #3
     sta VillagerIndex
     ;-------------------------
-    ;30 Boss room exit
+    ;31 Boss room exit
 @next25:
 
     lda ActiveMapEntryIndex
-    cmp #30
+    cmp #31
     bne @next27
 
     ldy #3
@@ -3726,37 +3727,37 @@ RoutinesAfterFadeOut:
 
     jsr TurnDarkPaletteOn
     ;------------------------
-    ;32 dark cave 2
+    ;33 dark cave 2
 @next35:
 
     lda ActiveMapEntryIndex
-    cmp #32
+    cmp #33
     bne @next36
 
     jsr TurnDarkPaletteOn
     ;---------------------------
-    ;35 from dark cave 2 to dark cave 1
+    ;36 from dark cave 2 to dark cave 1
 @next36:
     lda ActiveMapEntryIndex
-    cmp #35
+    cmp #36
     bne @next37
 
     jsr TurnDarkPaletteOn
     ;-------------------
-    ;39 exit from alien lobby to dark cave 2
+    ;40 exit from alien lobby to dark cave 2
 @next37:
     lda ActiveMapEntryIndex
-    cmp #39
+    cmp #40
     bne @next38
 
     lda #1
     sta MustCopyMainChr
     jsr TurnDarkPaletteOn
     ;---------------------
-    ;41. entrance to the crashsite from the path
+    ;42. entrance to the crashsite from the path
 @next38:
     lda ActiveMapEntryIndex
-    cmp #41
+    cmp #42
     bne @next39
 
     lda #1
