@@ -73,15 +73,15 @@ spawnpoints_base_loc_1:
     .byte 216, 152
 
 spawnpoints_loc_2:
-    .byte 56, 136
-    .byte 176, 180
-    .byte 232, 56
-    .byte 160, 144
+    .byte 40, 48
+    .byte 88, 184
+    .byte 152, 184
+    .byte 128, 64
 
-    .byte 56, 56
-    .byte 32, 192
-    .byte 184, 192
-    .byte 216, 96
+    .byte 88, 64
+    .byte 192, 96
+    .byte 144, 192
+    .byte 64, 168
 
 spawnpoints_loc_3:
     .byte 64, 180
@@ -137,10 +137,15 @@ spawnpoints_loc_13:
     .byte 56 , 192
     .byte 144, 128
 
-    .byte 0  , 48
-    .byte 184, 48
-    .byte 200, 128
-    .byte 48 , 184
+    .byte 32 , 80
+    .byte 200, 120
+    .byte 64 , 176
+    .byte 200, 192
+
+    .byte 24 , 72
+    .byte 56 , 152
+    .byte 200, 48
+    .byte 200, 192
 
 
 spawnpoints_loc_17:

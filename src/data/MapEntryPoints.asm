@@ -54,7 +54,7 @@ entry_points_loc5:
     ;------------------------
 entry_points_loc6:
     ;13.crashsite entrance from cave
-    .byte 13, 0, 119, 125, 182, 204, 0, 22
+    .byte 13, 0, 0, 255, 0, 255, 0, 22
     ;14.cave exit to cave location
     .byte 14, 0, 119, 125, 220, 230, 222, 255
     ;15.dark cave entrance bottom
@@ -158,7 +158,7 @@ entry_points_loc21:
     .byte 48, 0, 0, 255, 0, 255, 222, 255
 entry_points_loc22:
     ;49. exit to lonely cave
-    .byte 49, 0, 0, 255, 0, 255, 20, 32
+    .byte 49, 0, 52, 60, 0, 255, 72, 88
 entry_points_loc23:
     ;50. entrance to the main alien base
     .byte 50, 1, 0, 255, 0, 255, 20, 32
@@ -253,7 +253,7 @@ MapSpawnPoint:
     .byte UNUSED, <house_palette, >house_palette, 0, <list_empty, >list_empty, 0
     ;---------------------
     ;crashsite exit to cave
-    .byte 120, 34, 6, OUTDOORS_LOC7_SCREEN_COUNT, LOCATION_TYPE_CAVE, SONG_OUTSIDE_NIGHT, 4, 192, 0
+    .byte 120, 34, 6, OUTDOORS_LOC7_SCREEN_COUNT, LOCATION_TYPE_CAVE, SONG_OUTSIDE_NIGHT, 4, 128, 0
     .byte UNUSED, <main_palette, >main_palette, 0, <cave_npcs, >cave_npcs, 0
     ;crashsite exit to path
     .byte 120, 50, 18, 1, LOCATION_TYPE_OUTDOORS, SONG_OUTSIDE_DAY, 5, 0, 0
@@ -360,12 +360,12 @@ MapSpawnPoint:
     ;exit from lonely cave to the dark cave 2
     .byte 120, 212, 16, 3, LOCATION_TYPE_DARK, SONG_OUTSIDE_NIGHT, 4, 234, 0
     .byte UNUSED, <main_palette, >main_palette, 3, 0, 0, 0
-    ;entrance to wood location
-    .byte 120, 55, 22, 2, LOCATION_TYPE_OUTDOORS, SONG_OUTSIDE_DAY, 3, 111, 0
+    ;entrance to the wood location
+    .byte 56, 112, 22, 2, LOCATION_TYPE_OUTDOORS, SONG_OUTSIDE_DAY, 3, 0, 0
     .byte UNUSED, <main_palette, >main_palette, 0, 0, 0, 0
     ;---------------------
     ;exit to lonely cave from wood location
-    .byte 129, 209, 21, 1, LOCATION_TYPE_CAVE, SONG_OUTSIDE_NIGHT, 3, 0, 0
+    .byte 192, 219, 21, 1, LOCATION_TYPE_CAVE, SONG_OUTSIDE_NIGHT, 3, 0, 0
     .byte UNUSED, <main_palette, >main_palette, 0, <lonely_cave_npcs, >lonely_cave_npcs, 0
     ;-----------------------
     ;  alien base hallway
