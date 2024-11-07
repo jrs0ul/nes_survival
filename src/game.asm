@@ -3504,8 +3504,6 @@ RoutinesAfterFadeOut:
     cmp #8
     bne @next9
 
-    lda #2
-    sta ScrollDirection
     jsr FlipStartingNametable ;for the rock
     ;------------------------------------------
     ;9.Erika's house entrance
@@ -3536,9 +3534,6 @@ RoutinesAfterFadeOut:
     cmp #12
     bne @next11
 
-    lda #2
-    sta ScrollDirection
-
     jsr OnExitVillagerHut
     ;----------------------------
     ;28.cave entrance from location 11
@@ -3546,9 +3541,6 @@ RoutinesAfterFadeOut:
     lda ActiveMapEntryIndex
     cmp #28
     bne @next12
-
-    lda #2
-    sta ScrollDirection
 
     lda #0
     sta FirstTime
@@ -3570,9 +3562,6 @@ RoutinesAfterFadeOut:
     cmp #18
     bne @next14
 
-    lda #2
-    sta ScrollDirection
-
     lda #1
     sta MustCopyMainChr
 
@@ -3582,9 +3571,6 @@ RoutinesAfterFadeOut:
     lda ActiveMapEntryIndex
     cmp #14
     bne @next16
-
-    lda #2
-    sta ScrollDirection
 
     lda #1
     sta MustCopyMainChr
@@ -3626,9 +3612,6 @@ RoutinesAfterFadeOut:
     lda ActiveMapEntryIndex
     cmp #23
     bne @next24
-
-    lda #2
-    sta ScrollDirection
 
     jsr OnExitVillagerHut
     ;------------------------
@@ -3908,8 +3891,8 @@ CommonLocationRoutine:
     lda (pointer2), y ; active screen
     sta CurrentMapSegmentIndex
     iny
-    lda (pointer2), y ; is the location indoors or outdoors
-    ;sta DetectedMapType
+    lda (pointer2), y ; ScrollDirection
+    sta ScrollDirection
 
     iny
     lda (pointer2), y ;indoor map address (lower byte)
@@ -3971,8 +3954,6 @@ CommonLocationRoutine:
 
     jsr LoadItems
 
-    lda #0
-    sta ScrollDirection
 
     jsr BuildRowTable
     jsr ResetNameTableAddresses
@@ -5959,10 +5940,12 @@ ResetVariables:
     ldy #MODIFYABLE_OBJECTS_COUNT
 
 @destructibleLoop:
-    sta ModifiedTiles, y
     dey
-    bne @destructibleLoop
+    bmi @doneResetingModTiles
+    sta ModifiedTiles, y
+    jmp @destructibleLoop
 
+@doneResetingModTiles:
     lda #PLAYER_START_X
     sta PlayerX
     lda #PLAYER_START_Y
