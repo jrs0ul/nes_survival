@@ -420,7 +420,7 @@ InputUpdateDelay:
 ItemUpdateDelay:
     .res 1
 
-CutsceneDelay = ItemUpdateDelay
+CutsceneDelay = ItemUpdateDelay ; 2 bytes
 
 NpcAIUpdateDelay:
     .res 1
@@ -1499,7 +1499,7 @@ nextIteration:
     jmp runrandom
 checkMenuState:
     cmp #STATE_MENU
-    bne checkIntro ; intro?
+    bne checkCutscene ; a cutscene?
 
     lda MustExitMenuState
     beq updateInventory
@@ -1512,11 +1512,18 @@ updateInventory:
     jsr UpdateInventorySprites
     jmp runrandom
 
-checkIntro:
+checkCutscene:
     cmp #STATE_CUTSCENE
     bne checkTitle
-    dec CutsceneDelay
-    bne runrandom
+
+    lda CutsceneDelay + 1
+    sec
+    sbc #CUTSCENE_DELAY_DECREMENT_FRACTION
+    sta CutsceneDelay + 1
+    lda CutsceneDelay
+    sbc #CUTSCENE_DELAY_DECREMENT
+    sta CutsceneDelay
+    bpl runrandom
 
     jsr doCutscene
     jmp runrandom
@@ -1872,6 +1879,8 @@ doCutscene:
     ldy CutsceneSceneIdx
     lda (pointer), y
     sta CutsceneDelay
+    lda #0
+    sta CutsceneDelay + 1
 
     ldy current_bank
     sty oldbank

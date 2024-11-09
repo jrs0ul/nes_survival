@@ -858,6 +858,8 @@ InitCutscene:
     ldy CutsceneSceneIdx
     lda (pointer), y
     sta CutsceneDelay
+    lda #0
+    sta CutsceneDelay + 1
 
     lda #STATE_CUTSCENE
     sta GameState
