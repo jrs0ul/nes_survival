@@ -454,7 +454,35 @@ UpdateVillagerDialogSprites:
 @notKilled:
     lda SpecialItemsDelivered, y
     beq @notSpecialItemReceiver
-    rts
+
+    ;this villager got a special quest item
+
+    cpy #0 ;is it Bjorn?
+    bne @continueUpdate
+
+    lda EnteredBeforeNightfall
+    bne @continueUpdate
+
+    rts ; it's night time
+
+@continueUpdate:
+    lda SpecialQuestItemReceiverSpriteCount, y
+    bne @continueRewardSpriteUpdate
+    rts ; no sprites, exiting
+@continueRewardSpriteUpdate:
+
+    sta TempFrame; sprite count
+    lda VillagerIndex
+    asl
+    tay
+    lda SpecialQuestItemReceiverSprites, y
+    sta pointer
+    iny
+    lda SpecialQuestItemReceiverSprites, y
+    sta pointer + 1
+    jmp @doSpriteUpdate
+
+    ;not a special item receiver --------------------------------------
 @notSpecialItemReceiver:
     lda special_receivers, y
     cmp #MAX_VILLAGERS
@@ -467,7 +495,6 @@ UpdateVillagerDialogSprites:
 @no_special_reward:
     sta TempDigit ; is special item delivered
 
-    
     stx TempRegX
 
     lda EnteredBeforeNightfall
@@ -477,7 +504,7 @@ UpdateVillagerDialogSprites:
     cmp #DAYTIME_NIGHT
     bne @continue
 
-    lda VillagerIndex  ;don't show sprites if bear
+    lda VillagerIndex  ;don't show sprites if Bjorn
     beq @restoreXAndExit
 
 @continue:
@@ -499,7 +526,6 @@ UpdateVillagerDialogSprites:
     jmp @exit
 
 @continue_update:
-
 
     lda VillagerIndex
     tay
@@ -534,6 +560,7 @@ UpdateVillagerDialogSprites:
     tay
 
     jsr PickSpriteData
+@doSpriteUpdate:
     ldy #0
 @spriteLoop:
     jsr SingleDialogSpriteUpdate

@@ -215,11 +215,11 @@ boss_thanks_0:
 
 
 bjorn_thanks_special:
-    .byte $00,$00,$00,$00,$00,$00,$00,$23,$1f,$17,$2c,$00,$13,$00,$16,$19
-    .byte $20,$0f,$00,$1e,$12,$0f,$00,$14,$0b,$17,$00,$00,$00,$00,$00,$00
-    .byte $00,$00,$17,$23,$00,$11,$1c,$0b,$18,$18,$23,$00,$17,$0b,$15,$0f
-    .byte $1d,$2c,$00,$11,$1c,$0b,$0c,$00,$1e,$12,$13,$1d,$00,$00,$00,$00
-    .byte $00,$00,$00,$00,$0b,$18,$0e,$00,$11,$19,$00,$0c,$0b,$0d,$15,$00
+    .byte $00,$00,$00,$00,$00,$00,$1e,$12,$0b,$18,$15,$1d,$2c,$00,$21,$0b
+    .byte $18,$18,$0b,$00,$17,$0b,$15,$0f,$00,$0b,$00,$00,$00,$00,$00,$00
+    .byte $00,$00,$1d,$16,$13,$18,$11,$1d,$12,$19,$1e,$2f,$00,$0d,$19,$17
+    .byte $0c,$13,$18,$0f,$00,$00,$00,$00,$2d,$00,$00,$00,$2d,$00,$00,$00
+    .byte $00,$00,$00,$00,$18,$19,$21,$00,$11,$19,$00,$0c,$0b,$0d,$15,$00
     .byte $1e,$19,$00,$17,$23,$00,$11,$1c,$0b,$18,$2c,$00,$00,$00,$00,$00
 
 
@@ -280,6 +280,15 @@ GrannyQuestSprites_1:
 RewardSpriteCount:
     .byte 0, 4, 4, 0,  0, 8, 4, 0,  0, 0, 4, 0,  0, 0, 0, 0
 
+SpecialQuestItemReceiverSpriteCount:
+    .byte 6, 0, 0, 0
+
+SpecialQuestItemReceiverSprites:
+    .byte <BjornSpecialItemReceivedSprites, >BjornSpecialItemReceivedSprites
+    .byte 0, 0
+    .byte 0, 0
+    .byte 0, 0
+
 RewardSprites:
     .byte 0, 0
     .byte <BjornRewardSprites_1, >BjornRewardSprites_1
@@ -295,6 +304,10 @@ RewardSprites:
     .byte 0, 0
     .byte <GrannyRewardSprites_2, >GrannyRewardSprites_2
     .byte 0, 0
+
+BjornSpecialItemReceivedSprites:
+    .byte 191,$62,0,170, 191,$63,0,178, 191,$42,0,204, 191,$43,0,212, 191,$52,0,234, 191,$53,0,242
+
 
 BjornRewardSprites_1:
     .byte 191,$62,0,104, 191,$63,0,112, 191,$62,0,144, 191,$63,0,152
@@ -487,7 +500,7 @@ goal_items_list:
 
 
 special_reward_items:
-    .byte ITEM_SLINGSHOT
+    .byte 0
     .byte 0
     .byte ITEM_COOKED_JUMBO_MEAT
     .byte 0
