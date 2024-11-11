@@ -959,6 +959,25 @@ UpdateGameOverSprites:
     sta SongName
     lda #1
     sta MustPlayNewSong
+    sta MustUpdateTextBaloon
+    lda #0
+    sta TextBaloonIndex
+
+    jsr UpdateRandomNumber
+    and #%00000111
+
+    cmp #6
+    bcs @clamp
+    jmp @storeHintId
+@clamp:
+    lda #0
+@storeHintId:
+    asl
+    asl
+    asl
+    asl
+    asl
+    sta TempSpearX ; start of hint
 
 @cont2:
 
@@ -995,7 +1014,6 @@ UpdateGameOverSprites:
     cmp #0
     beq @hide
 
-   
     lda SnowDelay
     cmp #2
 
@@ -1033,7 +1051,7 @@ UpdateGameOverSprites:
     ldx #0
 @daysLoop:
 
-    lda #200
+    lda #GAME_OVER_DAYS_Y
     sta ZERO_SPRITE, y
     iny
 
@@ -1077,6 +1095,50 @@ UpdateGameOverSprites:
     jsr HideCutsceneSprites
 
     rts
+;-----------------------------------
+GameOverHintUpdate:
+
+
+    lda #$23
+    sta TempTextAddress
+
+    lda #$60
+    clc
+    adc TextBaloonIndex
+    bcc @continue
+
+    inc TempTextAddress
+
+@continue:
+    sta TempTextAddressLow
+    lda $2002
+    lda TempTextAddress
+    sta $2006
+    lda TempTextAddressLow
+    sta $2006
+
+    lda TextBaloonIndex
+    clc
+    adc TempSpearX ; add the start of a specific hint
+    tay
+
+    lda game_over_hints, y
+    sta $2007
+
+    inc TextBaloonIndex
+    lda TextBaloonIndex
+    cmp #32
+    bcs @done
+    jmp @exit
+
+
+@done:
+    lda #0
+    sta MustUpdateTextBaloon
+
+@exit:
+    rts
+
 
 
 

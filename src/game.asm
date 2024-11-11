@@ -161,19 +161,38 @@ game_over_sprites:
     .byte 152, $0f, 0, 152  ; E
     .byte 152, $1c, 0, 160  ; R
 
-    .byte 184, $1d, 1, 96   ; S
-    .byte 184, $1f, 1, 104  ; U
-    .byte 184, $1c, 1, 112  ; R
-    .byte 184, $20, 1, 120  ; V
-    .byte 184, $13, 1, 128  ; I
-    .byte 184, $20, 1, 136  ; V
-    .byte 184, $0f, 1, 144  ; E
-    .byte 184, $0e, 1, 152  ; D
+    .byte GAME_OVER_SURVIVED_Y, $1d, 1, 96   ; S
+    .byte GAME_OVER_SURVIVED_Y, $1f, 1, 104  ; U
+    .byte GAME_OVER_SURVIVED_Y, $1c, 1, 112  ; R
+    .byte GAME_OVER_SURVIVED_Y, $20, 1, 120  ; V
+    .byte GAME_OVER_SURVIVED_Y, $13, 1, 128  ; I
+    .byte GAME_OVER_SURVIVED_Y, $20, 1, 136  ; V
+    .byte GAME_OVER_SURVIVED_Y, $0f, 1, 144  ; E
+    .byte GAME_OVER_SURVIVED_Y, $0e, 1, 152  ; D
 
-    .byte 200, $0e, 1, 128  ; D
-    .byte 200, $0b, 1, 136  ; A
-    .byte 200, $23, 1, 144  ; Y
-    .byte 200, $1d, 1, 152  ; S
+    .byte GAME_OVER_DAYS_Y, $0e, 1, 128  ; D
+    .byte GAME_OVER_DAYS_Y, $0b, 1, 136  ; A
+    .byte GAME_OVER_DAYS_Y, $23, 1, 144  ; Y
+    .byte GAME_OVER_DAYS_Y, $1d, 1, 152  ; S
+
+game_over_hints:
+    .byte $00,$00,$00,$12,$1f,$18,$1e,$00,$0b,$18,$13,$17,$0b,$16,$1d,$00
+    .byte $1e,$19,$00,$11,$0f,$1e,$00,$17,$0f,$0b,$1e,$00,$2c,$00,$00,$00
+
+    .byte $00,$1d,$1e,$0b,$23,$00,$13,$18,$0e,$19,$19,$1c,$1d,$00,$0e,$1f
+    .byte $1c,$13,$18,$11,$00,$1e,$12,$0f,$00,$18,$13,$11,$12,$1e,$2c,$00
+
+    .byte $00,$00,$00,$00,$1f,$1d,$0f,$00,$23,$19,$1f,$1c,$00,$0d,$1c,$0b
+    .byte $10,$1e,$13,$18,$11,$00,$1e,$0b,$0c,$16,$0f,$00,$2c,$00,$00,$00
+
+    .byte $00,$00,$0e,$19,$18,$2a,$1e,$00,$0f,$0b,$1e,$00,$1c,$0b,$21,$00
+    .byte $17,$0f,$0b,$1e,$2c,$00,$0d,$19,$19,$15,$00,$13,$1e,$2c,$00,$00
+
+    .byte $00,$00,$1f,$1d,$0f,$00,$1d,$1e,$13,$0d,$15,$1d,$00,$1e,$19,$00
+    .byte $17,$0b,$13,$18,$1e,$0b,$13,$18,$00,$10,$13,$1c,$0f,$2c,$00,$00
+
+    .byte $00,$00,$11,$0b,$1e,$12,$0f,$1c,$00,$1d,$1f,$1a,$1a,$16,$13,$0f
+    .byte $1d,$00,$0c,$0f,$10,$19,$1c,$0f,$00,$0e,$0b,$1c,$15,$2c,$00,$00
 
 .include "data/CutsceneData.asm"
 ;--------- maps
@@ -261,7 +280,7 @@ knockBackValuesFractions:
 .include "data/destructible_tiles.asm"
 
 game_over_palette:
-    .byte $0f,$0c,$11,$16,$0f,$0c,$35,$31,$0f,$0c,$16,$31,$0f,$0c,$11,$31
+    .byte $0f,$11,$0C,$16,$0f,$0c,$35,$31,$0f,$0c,$16,$31,$0f,$0c,$11,$31
     .byte $0f,$30,$30,$30,$0f,$10,$10,$10,$0f,$30,$30,$30,$0f,$30,$30,$30
 
 
@@ -1644,7 +1663,7 @@ checkTitleState:
     jsr AnimateTitleTiles
 checkMenuStateUpdate:
     cmp #STATE_MENU
-    bne UpdatePalette
+    bne UpdateGameOver
 
 
     lda MustUpdateSunMoon
@@ -1658,7 +1677,11 @@ checkMenuStateUpdate:
     sta $2006
 
     jsr UpdateSunMoonTiles
+UpdateGameOver:
+    cmp #STATE_GAME_OVER
+    bne UpdatePalette
 
+    jsr UpdateGameOverHint
 
 UpdatePalette:
     lda MustUpdatePalette
@@ -5201,6 +5224,26 @@ UpdateTextBaloon:
     lda #0
     sta MustUpdateTextBaloon
 
+
+@exit:
+    rts
+
+;---------------------------------
+UpdateGameOverHint:
+
+    lda MustUpdateTextBaloon
+    beq @exit
+
+
+    ldy current_bank
+    sty oldbank
+    ldy #5
+    jsr bankswitch_y
+
+    jsr GameOverHintUpdate
+
+    ldy oldbank
+    jsr bankswitch_y
 
 @exit:
     rts

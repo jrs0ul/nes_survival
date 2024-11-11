@@ -15,7 +15,6 @@ endif
 define prepare_content
 	python dev_tools/CropMaps.py
 	$(Compress) src/chr/intro.chr src/chr/intro.lz4
-	$(Compress) src/chr/title.chr src/chr/title.lz4
 	$(Compress) src/chr/cave_bg_tiles.chr src/chr/cave_bg_tiles.lz4
 	$(Compress) src/chr/alien_bg_tiles.chr src/chr/alien_bg_tiles.lz4
 	$(Compress) src/chr/house_bg_tiles.chr src/chr/house_bg_tiles.lz4

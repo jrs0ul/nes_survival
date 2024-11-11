@@ -409,6 +409,11 @@
 
     CLOTHING_DAMAGE_BY_NPC     = 10
 
+
+
+    GAME_OVER_DAYS_Y           = 186
+    GAME_OVER_SURVIVED_Y       = 176
+
     FADE_DELAY_GAME_OVER       = 3
     FADE_DELAY_GENERIC         = 2
     FADE_DELAY_SLEEP           = 10
