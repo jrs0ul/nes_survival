@@ -5663,6 +5663,7 @@ LoadGameOver:
 
     lda #0
     sta MustLoadGameOver
+    sta DemoModeOn
     sta MustLoadSomething
     lda #255
     sta TaintedSprites
@@ -6408,7 +6409,7 @@ CheckStartButton:
     beq @onIntro ; intro
     jmp @onOutro
 @onIntro:
-    
+
     lda DemoModeOn
     beq @startGame
 
