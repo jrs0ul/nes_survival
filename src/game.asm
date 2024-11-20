@@ -3380,6 +3380,7 @@ OnYouWin:
     beq @alienEnding
     lda #2
     sta CutsceneIdx
+    jmp @activateNewSong
 @alienEnding:
     lda #3
     sta CutsceneIdx

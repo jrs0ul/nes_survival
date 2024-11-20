@@ -78,7 +78,7 @@
     ROW_TABLE_SIZE             = 240 ;4 screens * 32 rows * 2
 
     DESTRUCTIBLE_DOOR_IDX       = 3
-    DESTRUCTIBLE_DOOR_IDX2      = 10
+    DESTRUCTIBLE_DOOR_IDX2      = 11
 
     MODIFYABLE_OBJECTS_COUNT   = 12
 
