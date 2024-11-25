@@ -1332,8 +1332,13 @@ MustStopMusic:
 MusicIsPlaying:
     .res 1
 
+MenuConfirmMask:
+    .res 1
+MenuCancelMask:
+    .res 1
+
 BSS_Free_Bytes:
-    .res 6
+    .res 4
 
 ;====================================================================================
 
@@ -1446,6 +1451,10 @@ vblankwait2:      ; Second wait for vblank, PPU is ready after this
     lda #$24
     sta SecondNametableAddr
 
+    lda #BUTTON_A_MASK
+    sta MenuConfirmMask
+    lda #BUTTON_B_MASK
+    sta MenuCancelMask
 
     lda #128
     sta RandomNumber

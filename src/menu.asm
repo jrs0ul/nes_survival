@@ -1612,7 +1612,7 @@ ActivatedDocumentInput:
 
 @Cancel_pressed:
     lda Buttons
-    and #BUTTON_B_MASK
+    and MenuCancelMask
     beq @exit
 
     jsr HideDocument
@@ -1624,7 +1624,7 @@ SleepMessageInput:
 
 @Cancel_pressed:
     lda Buttons
-    and #BUTTON_B_MASK
+    and MenuCancelMask
     beq @exit
 
     lda #0
@@ -1663,7 +1663,7 @@ SleepMenuInput:
 
 @Confirm_pressed:
     lda Buttons
-    and #BUTTON_A_MASK
+    and MenuConfirmMask
     beq @Cancel_pressed
 
     lda ItemMenuIndex
@@ -1673,7 +1673,7 @@ SleepMenuInput:
 
 @Cancel_pressed:
     lda Buttons
-    and #BUTTON_B_MASK
+    and MenuCancelMask
     beq @exit
 
 @hidemenu:
@@ -1730,7 +1730,7 @@ DocumentMenuInput:
 
 @Confirm_pressed:
     lda Buttons
-    and #BUTTON_A_MASK
+    and MenuConfirmMask
     beq @Cancel_pressed
 
     jsr LoadSelectedItemInfo
@@ -1800,7 +1800,7 @@ DocumentMenuInput:
 
 @Cancel_pressed:
     lda Buttons
-    and #BUTTON_B_MASK
+    and MenuCancelMask
     beq @exit
 
 @hidemenu:
@@ -1833,7 +1833,7 @@ CraftingInput:
 
 @Confirm_pressed:
     lda Buttons
-    and #BUTTON_A_MASK
+    and MenuConfirmMask
     beq @Cancel_pressed
 
     lda MenuMaxItem
@@ -1884,7 +1884,7 @@ CraftingInput:
 
 @Cancel_pressed:
     lda Buttons
-    and #BUTTON_B_MASK
+    and MenuCancelMask
     beq @exit
 @revert:
     lda #1
@@ -2125,7 +2125,7 @@ EquipmentInput:
 
 @Confirm_pressed:
     lda Buttons
-    and #BUTTON_A_MASK
+    and MenuConfirmMask
     beq @Cancel_pressed
 
     lda InventoryItemIndex
@@ -2160,7 +2160,7 @@ EquipmentInput:
 
 @Cancel_pressed:
     lda Buttons
-    and #BUTTON_B_MASK
+    and MenuCancelMask
     beq @exit
 
     lda #0
@@ -2229,7 +2229,7 @@ InventoryInput:
 
 @Confirm_pressed:
     lda Buttons
-    and #BUTTON_A_MASK
+    and MenuConfirmMask
     beq @Cancel_pressed
 
     jsr OnItemClicked
@@ -2237,7 +2237,7 @@ InventoryInput:
 
 @Cancel_pressed:
     lda Buttons
-    and #BUTTON_B_MASK
+    and MenuCancelMask
     beq @exit
 
     lda #1
@@ -2511,7 +2511,7 @@ FoodMenuInput:
 
 @Confirm_pressed:
     lda Buttons
-    and #BUTTON_A_MASK
+    and MenuConfirmMask
     beq @Cancel_pressed
 
     jsr LoadSelectedItemInfo
@@ -2553,7 +2553,7 @@ FoodMenuInput:
 
 @Cancel_pressed:
     lda Buttons
-    and #BUTTON_B_MASK
+    and MenuCancelMask
     beq @exit
 
     lda #0
@@ -2770,7 +2770,7 @@ MaterialMenuInput:
 
 @Confirm_pressed:
     lda Buttons
-    and #BUTTON_A_MASK
+    and MenuConfirmMask
     beq @Cancel_pressed
 
     jsr LoadSelectedItemInfo
@@ -2814,7 +2814,7 @@ MaterialMenuInput:
 
 @Cancel_pressed:
     lda Buttons
-    and #BUTTON_B_MASK
+    and MenuCancelMask
     beq @exit
 
     jsr HideSubMenu
@@ -2856,7 +2856,7 @@ ToolInput:
 
 @Confirm_pressed:
     lda Buttons
-    and #BUTTON_A_MASK
+    and MenuConfirmMask
     beq @Cancel_pressed
 
     lda SpearData
@@ -2890,7 +2890,7 @@ ToolInput:
 
 @Cancel_pressed:
     lda Buttons
-    and #BUTTON_B_MASK
+    and MenuCancelMask
     beq @exit
 
 @hidemenu:
@@ -3313,7 +3313,7 @@ ItemMenuInput:
 
 @Confirm_pressed:
     lda Buttons
-    and #BUTTON_A_MASK
+    and MenuConfirmMask
     beq @Cancel_pressed
 
     jsr LoadSelectedItemInfo
@@ -3388,7 +3388,7 @@ ItemMenuInput:
 
 @Cancel_pressed:
     lda Buttons
-    and #BUTTON_B_MASK
+    and MenuCancelMask
     beq @exit
 
     jsr HideSubMenu
@@ -3482,18 +3482,8 @@ StoreItemInStash:
     lda #1
 @exit:
     rts
-
-;-------------------------------------
-DoRegularInput:
-
-    lda PlayerInteractedWithStorage
-    bne @stashList
-    lda PlayerInteractedWithFireplace
-    bne @activateInventory
-    lda PlayerInteractedWithBed
-    bne @setPointerToSleep
-    lda PlayerInteractedWithTooltable
-    bne @crafting
+;------------------------------------
+InitRegularInput:
 
     lda #16
     sta MenuStep
@@ -3509,15 +3499,31 @@ DoRegularInput:
     sta pointer + 1
     lda #5
     sta MenuMaxItem
+    rts
+
+
+;-------------------------------------
+DoRegularInput:
+
+    lda PlayerInteractedWithStorage
+    bne @stashList
+    lda PlayerInteractedWithFireplace
+    bne @activateInventory
+    lda PlayerInteractedWithBed
+    bne @setPointerToSleep
+    lda PlayerInteractedWithTooltable
+    bne @crafting
+
+    jsr InitRegularInput
     jsr MenuInputUpDownCheck
 
 @Confirm_pressed:
     lda Buttons
-    and #BUTTON_A_MASK
+    and MenuConfirmMask
     beq @Cancel_pressed
 
     lda OldButtons
-    and #BUTTON_A_MASK
+    and MenuConfirmMask
     bne @Cancel_pressed
 
 
@@ -3544,7 +3550,7 @@ DoRegularInput:
 
 @Cancel_pressed:
     lda Buttons
-    and #BUTTON_B_MASK
+    and MenuCancelMask
     beq @exit
 
     lda #1
