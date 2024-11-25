@@ -1610,9 +1610,9 @@ MenuInput:
 ;--------------------------------------
 ActivatedDocumentInput:
 
-@CheckA:
+@Cancel_pressed:
     lda Buttons
-    and #BUTTON_A_MASK
+    and #BUTTON_B_MASK
     beq @exit
 
     jsr HideDocument
@@ -1622,9 +1622,9 @@ ActivatedDocumentInput:
 ;-------------------------------------
 SleepMessageInput:
 
-@CheckA:
+@Cancel_pressed:
     lda Buttons
-    and #BUTTON_A_MASK
+    and #BUTTON_B_MASK
     beq @exit
 
     lda #0
@@ -1636,10 +1636,7 @@ SleepMessageInput:
     sta MustLoadSomething
     sta MustResetMenu
 
-
 @exit:
-
-
     rts
 
 ;--------------------------------------
@@ -1664,19 +1661,19 @@ SleepMenuInput:
 
     jsr MenuInputUpDownCheck
 
-@CheckB:
+@Confirm_pressed:
     lda Buttons
-    and #BUTTON_B_MASK
-    beq @CheckA
+    and #BUTTON_A_MASK
+    beq @Cancel_pressed
 
     lda ItemMenuIndex
     cmp #1 ; yes
     bne @hidemenu
     jsr StartSleep
 
-@CheckA: 
+@Cancel_pressed:
     lda Buttons
-    and #BUTTON_A_MASK
+    and #BUTTON_B_MASK
     beq @exit
 
 @hidemenu:
@@ -1731,10 +1728,10 @@ DocumentMenuInput:
 @doInput:
     jsr MenuInputUpDownCheck
 
-@CheckB:
+@Confirm_pressed:
     lda Buttons
-    and #BUTTON_B_MASK
-    beq @CheckA
+    and #BUTTON_A_MASK
+    beq @Cancel_pressed
 
     jsr LoadSelectedItemInfo
     beq @exit
@@ -1750,7 +1747,7 @@ DocumentMenuInput:
     lda TempItemIndex
     sta ActiveDocument
 
-    jmp @CheckA
+    jmp @Cancel_pressed
 
 @otherOptions:
     lda LocationType
@@ -1801,9 +1798,9 @@ DocumentMenuInput:
     jsr HideSubMenu
 
 
-@CheckA:
+@Cancel_pressed:
     lda Buttons
-    and #BUTTON_A_MASK
+    and #BUTTON_B_MASK
     beq @exit
 
 @hidemenu:
@@ -1834,10 +1831,10 @@ CraftingInput:
     jsr MenuInputUpDownCheck
 
 
-@CheckB:
+@Confirm_pressed:
     lda Buttons
-    and #BUTTON_B_MASK
-    beq @CheckA
+    and #BUTTON_A_MASK
+    beq @Cancel_pressed
 
     lda MenuMaxItem
     sec
@@ -1885,9 +1882,9 @@ CraftingInput:
 
     jmp @resetIndexes
 
-@CheckA:
+@Cancel_pressed:
     lda Buttons
-    and #BUTTON_A_MASK
+    and #BUTTON_B_MASK
     beq @exit
 @revert:
     lda #1
@@ -2126,10 +2123,10 @@ EquipmentInput:
     jsr MenuInputUpDownCheck
 
 
-@CheckB:
+@Confirm_pressed:
     lda Buttons
-    and #BUTTON_B_MASK
-    beq @CheckA
+    and #BUTTON_A_MASK
+    beq @Cancel_pressed
 
     lda InventoryItemIndex
     bne @unequipCloth
@@ -2161,9 +2158,9 @@ EquipmentInput:
     jsr UnequipItem
     jmp @exit
 
-@CheckA:
+@Cancel_pressed:
     lda Buttons
-    and #BUTTON_A_MASK
+    and #BUTTON_B_MASK
     beq @exit
 
     lda #0
@@ -2230,17 +2227,17 @@ InventoryInput:
     jsr MenuInputUpDownCheck
 
 
-@CheckB:
+@Confirm_pressed:
     lda Buttons
-    and #BUTTON_B_MASK
-    beq @CheckA
+    and #BUTTON_A_MASK
+    beq @Cancel_pressed
 
     jsr OnItemClicked
     jmp @exit
-    
-@CheckA:
+
+@Cancel_pressed:
     lda Buttons
-    and #BUTTON_A_MASK
+    and #BUTTON_B_MASK
     beq @exit
 
     lda #1
@@ -2512,10 +2509,10 @@ FoodMenuInput:
 
     jsr MenuInputUpDownCheck
 
-@CheckB:
+@Confirm_pressed:
     lda Buttons
-    and #BUTTON_B_MASK
-    beq @CheckA
+    and #BUTTON_A_MASK
+    beq @Cancel_pressed
 
     jsr LoadSelectedItemInfo
     beq @exit
@@ -2554,9 +2551,9 @@ FoodMenuInput:
     jsr ExitSubmenu
     jmp @exit
 
-@CheckA:
+@Cancel_pressed:
     lda Buttons
-    and #BUTTON_A_MASK
+    and #BUTTON_B_MASK
     beq @exit
 
     lda #0
@@ -2755,7 +2752,7 @@ MaterialMenuInput:
     cmp #LOCATION_TYPE_VILLAGER
     beq @normal
     cmp #LOCATION_TYPE_HOUSE
-    bne @CheckB
+    bne @Confirm_pressed
 
 @normal:
     lda #112
@@ -2771,10 +2768,10 @@ MaterialMenuInput:
     jsr MenuInputUpDownCheck
 
 
-@CheckB:
+@Confirm_pressed:
     lda Buttons
-    and #BUTTON_B_MASK
-    beq @CheckA
+    and #BUTTON_A_MASK
+    beq @Cancel_pressed
 
     jsr LoadSelectedItemInfo
     beq @exit
@@ -2814,9 +2811,10 @@ MaterialMenuInput:
     jsr ClearThatItem
 @hidemenu:
     jsr HideSubMenu
-@CheckA:
+
+@Cancel_pressed:
     lda Buttons
-    and #BUTTON_A_MASK
+    and #BUTTON_B_MASK
     beq @exit
 
     jsr HideSubMenu
@@ -2856,10 +2854,10 @@ ToolInput:
 @doInput:
     jsr MenuInputUpDownCheck
 
-@CheckB:
+@Confirm_pressed:
     lda Buttons
-    and #BUTTON_B_MASK
-    beq @CheckA
+    and #BUTTON_A_MASK
+    beq @Cancel_pressed
 
     lda SpearData
     lsr
@@ -2890,9 +2888,9 @@ ToolInput:
     jsr ToolMenuInputAtHome
     jmp @exit
 
-@CheckA:
+@Cancel_pressed:
     lda Buttons
-    and #BUTTON_A_MASK
+    and #BUTTON_B_MASK
     beq @exit
 
 @hidemenu:
@@ -3296,7 +3294,7 @@ ItemMenuInput:
     beq @house ;same amount of items
 
     jsr CanItemBeUsedOutdoors
-    beq @CheckB
+    beq @Confirm_pressed
 
     lda #112
     sta MenuLowerLimit
@@ -3313,10 +3311,10 @@ ItemMenuInput:
 @updown:
     jsr MenuInputUpDownCheck
 
-@CheckB:
+@Confirm_pressed:
     lda Buttons
-    and #BUTTON_B_MASK
-    beq @CheckA
+    and #BUTTON_A_MASK
+    beq @Cancel_pressed
 
     jsr LoadSelectedItemInfo
     beq @exit
@@ -3387,9 +3385,10 @@ ItemMenuInput:
     jsr ClearThatItem
 @hidemenu:
     jsr HideSubMenu
-@CheckA:
+
+@Cancel_pressed:
     lda Buttons
-    and #BUTTON_A_MASK
+    and #BUTTON_B_MASK
     beq @exit
 
     jsr HideSubMenu
@@ -3512,14 +3511,14 @@ DoRegularInput:
     sta MenuMaxItem
     jsr MenuInputUpDownCheck
 
-@CheckB:
+@Confirm_pressed:
     lda Buttons
-    and #BUTTON_B_MASK
-    beq @CheckA
+    and #BUTTON_A_MASK
+    beq @Cancel_pressed
 
     lda OldButtons
-    and #BUTTON_B_MASK
-    bne @CheckA
+    and #BUTTON_A_MASK
+    bne @Cancel_pressed
 
 
     lda BaseMenuIndex
@@ -3543,9 +3542,9 @@ DoRegularInput:
     jsr OpenupSleep
     jmp @exit
 
-@CheckA:
+@Cancel_pressed:
     lda Buttons
-    and #BUTTON_A_MASK
+    and #BUTTON_B_MASK
     beq @exit
 
     lda #1
