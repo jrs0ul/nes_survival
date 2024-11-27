@@ -7,12 +7,67 @@ snow_palette_frames_1: ; white and blue
     .byte $20, $11
     .byte $11, $20
 
+GameLogoSprites:
+    .byte    0,$ed,0, 0
+    .byte    0,$e1,0,16
+    .byte    0,$e2,0,24
+    .byte    8,$f4,0, 0
+    .byte    8,$f5,0, 8
+    .byte    8,$f6,0,16
+    .byte    8,$f7,0,24
+    .byte   16,$e6,0, 0
+    .byte   16,$e5,0, 8
+    .byte   16,$e7,0,24
+    .byte   16,$e8,0,32
+    .byte   16,$e3,0,40
+    .byte   24,$ee,0, 0
+    .byte   24,$ef,0, 8
+    .byte   24,$e4,0,16
+    .byte   24,$e9,0,24
+    .byte   24,$ea,0,32
+    .byte   24,$eb,0,40
+    .byte   24,$ec,0,48
+    .byte   24,$f3,0,56
+    .byte   32,$fa,0, 0
+    .byte   32,$fb,0, 8
+    .byte   32,$f0,0,16
+    .byte   32,$f1,0,24
+    .byte   32,$f2,0,32
+    .byte   32,$fd,0,40
+    .byte   32,$fe,0,48
+    .byte   32,$ff,0,56
+    .byte   40,$f8,0,40
+    .byte   40,$f9,0,48
+    .byte   40,$fc,0,56
+
+;-----------------------------
+UpdateLogoSprites:
+
+
+    ldy #255
+@spriteLoop:
+    iny
+    cpy #124
+    bcs @done
+
+    lda GameLogoSprites, y
+    sta FIRST_SPRITE, y
+
+    jmp @spriteLoop
+
+@done:
+
+    lda #31
+    sta TempSpriteCount
+
+    rts
+
+
 
 ;-----------------------------
 TitleLogics:
 
-    lda #0
-    sta TempSpriteCount
+    jsr UpdateLogoSprites
     jsr HideCutsceneSprites
 
 

@@ -35,7 +35,7 @@ UpdateSprites:
 
     lda EquipedClothing
     beq @noClothing
-     lda #<player_sprites_coat
+    lda #<player_sprites_coat
     sta character_sprite_data_ptr
     lda #>player_sprites_coat
     sta character_sprite_data_ptr + 1

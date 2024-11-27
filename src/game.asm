@@ -5542,6 +5542,29 @@ LoadTitleGfx:
     lda #0
     jsr UnLZ4toVram
 
+    lda #ARGUMENT_STACK_HI
+    sta sp
+    lda #ARGUMENT_STACK_LO
+    sta sp + 1
+
+
+    lda #<game_logo_chr
+    ldy #$02
+    sta (sp),y
+    iny
+    lda #>game_logo_chr
+    sta (sp),y
+    lda #$00
+    tay
+    sta (sp),y
+    iny
+    lda #14
+    sta (sp),y
+    ldx #2
+    lda #0
+    jsr UnLZ4toVram
+
+
 
     rts
 
