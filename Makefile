@@ -30,6 +30,7 @@ define prepare_content
 	$(Compress) src/chr/crashed_plane_tiles.chr src/chr/crashed_plane_tiles.lz4
 	$(Compress) src/chr/title_tiles.chr src/chr/title_tiles.lz4
 	$(Compress) src/chr/gameover_tiles.chr src/chr/gameover_tiles.lz4
+	$(Compress) src/chr/game_logo_tiles.chr src/chr/game_logo_tiles.lz4
 	python dev_tools/CropLZ4bytes.py
 endef
 

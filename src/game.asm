@@ -64,6 +64,7 @@ main_bg_tiles       : .incbin "chr/main_bg_tiles.lz4"
 title_tiles_chr   :  .incbin "chr/title_tiles.lz4"
 gameover_tiles_chr:  .incbin "chr/gameover_tiles.lz4"
 intro_tiles_chr   :  .incbin "chr/intro.lz4"
+game_logo_chr     :  .incbin "chr/game_logo_tiles.lz4"
 .include "data/maps/cropped/crashsite0_crop.asm"
 .include "data/maps/cropped/crashsite1_crop.asm"
 .include "data/maps/cropped/crashsite2_crop.asm"
@@ -5655,7 +5656,7 @@ LoadGameOver:
     iny
     lda #03
     sta (sp),y
-    ldx #13
+    ldx #11
     lda #0
     jsr UnLZ4toVram
 

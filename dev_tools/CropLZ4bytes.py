@@ -3,7 +3,6 @@ import sys
 assert sys.version_info[0] >= 3, "Python 3 required."
 
 lz4_files = [
-            "title.lz4",
             "intro.lz4",
             "house_bg_tiles.lz4",
             "cave_bg_tiles.lz4",
@@ -20,6 +19,7 @@ lz4_files = [
             "crashed_plane_tiles.lz4",
             "title_tiles.lz4",
             "gameover_tiles.lz4",
+            "game_logo_tiles.lz4",
                         ]
 
 
