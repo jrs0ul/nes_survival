@@ -1002,6 +1002,7 @@ LoadTitleData:
     sta SnowFrame
     sta LogoY
     sta LogoMovementDelay
+    sta TitleScreenTimer
     lda #50
     sta SnowDelay
 

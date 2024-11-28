@@ -1904,6 +1904,9 @@ doGameOver:
 ;---------------------------------
 doCutscene:
 
+    ldy #5
+    jsr bankswitch_y
+
     ldy #CUTSCENE_SCENE_DELAY_POS
     lda (CutsceneDataPtr), y
     sta pointer
@@ -1917,11 +1920,6 @@ doCutscene:
     lda #0
     sta CutsceneDelay + 1
 
-    ldy current_bank
-    sty oldbank
-    ldy #5
-    ;bankswitch
-    jsr bankswitch_y
 
     jsr CutsceneLogics
     beq @SpriteUpdate
@@ -1951,9 +1949,6 @@ doCutscene:
 @SpriteUpdate:
     jsr UpdateCutsceneSprites
 
-    ldy oldbank
-    ;bankswitch
-    jsr bankswitch_y
 @exit:
     rts
 ;---------------------------------
