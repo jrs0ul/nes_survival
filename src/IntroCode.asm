@@ -40,18 +40,71 @@ GameLogoSprites:
     .byte   40,$f9,0,48
     .byte   40,$fc,0,56
 
+LogoDelays:
+    .byte 0
+    .byte 0
+    .byte 0
+    .byte 0
+    .byte 0
+    .byte 1
+    .byte 1
+    .byte 1
+    .byte 1
+    .byte 1
+    .byte 1
+    .byte 1
+    .byte 3
+    .byte 3
+    .byte 3
+    .byte 3
+    .byte 6
+    .byte 7
+    .byte 7
+    .byte 7
+    .byte 8
+    .byte 8
+    .byte 8
+    .byte 10
+    .byte 10
+    .byte 10
+    .byte 10
+    .byte 13
+    .byte 15
+    .byte 18
+    .byte 19
+
 ;-----------------------------
 UpdateLogoSprites:
 
 
-    ldy #255
+    ldx #255
 @spriteLoop:
-    iny
-    cpy #124
+    inx
+    cpx #31
     bcs @done
 
+    txa
+    asl
+    asl ; x * 4
+
+    tay
+
     lda GameLogoSprites, y
-    sta FIRST_SPRITE, y
+    clc
+    adc LogoY
+    sta ZERO_SPRITE, y
+    iny
+    lda GameLogoSprites, y
+    sta ZERO_SPRITE, y
+    iny
+    lda GameLogoSprites, y
+    sta ZERO_SPRITE, y
+    iny
+    lda GameLogoSprites, y
+    clc
+    adc #56
+    sta ZERO_SPRITE, y
+
 
     jmp @spriteLoop
 
@@ -69,6 +122,27 @@ TitleLogics:
 
     jsr UpdateLogoSprites
     jsr HideCutsceneSprites
+
+
+    lda LogoMovementDelay
+    beq @moveLogo
+    sec
+    sbc #1
+    sta LogoMovementDelay
+    bne @doOtherStuff
+
+@moveLogo:
+    lda LogoY
+    clc
+    adc #1
+    cmp #30
+    bcs @doOtherStuff
+    sta LogoY
+    tay
+    lda LogoDelays, y
+    sta LogoMovementDelay
+
+@doOtherStuff:
 
 
     inc SnowDelay
@@ -926,6 +1000,8 @@ LoadTitleData:
 
     lda #0
     sta SnowFrame
+    sta LogoY
+    sta LogoMovementDelay
     lda #50
     sta SnowDelay
 
