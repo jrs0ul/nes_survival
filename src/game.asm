@@ -6249,7 +6249,9 @@ LoadCheckPoint:
     sta PlayerAlive
 
     jsr ResetNameTableAddresses
-    
+    lda SecondNametableAddr
+    sta DestScreenAddr
+
     lda #6
     sta LocationIndex
     lda #3
@@ -6260,7 +6262,8 @@ LoadCheckPoint:
     sta LocationBankNo
     lda #0
     sta hadKnockBack
-    sta NpcCount
+    sta NpcCount ; do not generate anything
+    sta TempNpcCnt
     sta ModifiedTilesToDraw
     sta ProjectileCount ; reset projectiles
     sta SpearData       ; reset spear
