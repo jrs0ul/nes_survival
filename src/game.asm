@@ -6263,7 +6263,7 @@ LoadCheckPoint:
     lda #0
     sta hadKnockBack
     sta NpcCount ; do not generate anything
-    sta TempNpcCnt
+    sta TempScreenNpcCount
     sta ModifiedTilesToDraw
     sta ProjectileCount ; reset projectiles
     sta SpearData       ; reset spear
