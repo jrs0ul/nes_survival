@@ -3669,8 +3669,9 @@ RoutinesAfterFadeOut:
 
 
     ldy #3
+    sty VillagerIndex
     lda VillagerKilled, y
-    bne @next25
+    bne @bossKilled
     lda #<boss_npcs
     sta pointer
     lda #>boss_npcs
@@ -3680,8 +3681,11 @@ RoutinesAfterFadeOut:
     jsr LoadNpcs
 
 
-    lda #3
-    sta VillagerIndex
+    jmp @next25
+@bossKilled:
+    lda #SONG_OUTSIDE_NIGHT
+    sta SongName
+
     ;-------------------------
     ;31 Boss room exit
 @next25:

@@ -233,9 +233,6 @@ SetupVillagerText:
 
 @skipNightCheck:
 
-    ldy VillagerIndex
-    cmp #3 ; boss ?
-    beq @cont ; I wan to see text when the boss is defeated
 
     lda VillagerKilled, y
     beq @cont
