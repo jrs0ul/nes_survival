@@ -132,8 +132,8 @@ music_data_untitled:
 	.byte $00,$ca,$ca,$c8,$c7,$c6,$c5,$00,$06
 
 @samples:
-	.byte $00+.lobyte(FAMISTUDIO_DPCM_PTR),$18,$07,$40 ; 00 game (Pitch:7)
-	.byte $06+.lobyte(FAMISTUDIO_DPCM_PTR),$29,$0a,$40 ; 01 over (Pitch:10)
+	.byte $0a+.lobyte(FAMISTUDIO_DPCM_PTR),$1a,$0a,$40 ; 00 game 1 (Pitch:10)
+	.byte $00+.lobyte(FAMISTUDIO_DPCM_PTR),$26,$0a,$40 ; 01 over 1 (Pitch:10)
 
 @tempo_env_1_mid:
 	.byte $03,$05,$80
@@ -500,7 +500,7 @@ music_data_untitled:
 	.word @song3ch3loop
 @song3ch4:
 @song3ch4loop:
-	.byte $91, $01, $c9, $00, $85, $02, $ef, $00, $e5, $42
+	.byte $a7, $01, $b9, $00, $91, $02, $e1, $00, $e1, $42
 	.word @song3ch4loop
 @song4ch0:
 @song4ch0loop:
