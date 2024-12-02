@@ -3256,7 +3256,8 @@ GiveItem:
     cmp #3
     bne @cont
 
-    jsr OnBossDefeat
+    lda #1
+    sta BossDefeated
 
 @cont:
     lda #1

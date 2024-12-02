@@ -577,11 +577,14 @@ PlayerHitsNpcs:
     rts
 ;------------------------------------
 OnBossDefeat:
+    lda BossDefeated
+    beq @exit ; it's not defeated
     ldy #3
     lda #1
     sta VillagerKilled, y
     sta ModifiedTiles + 2
     sta ModifiedTiles + 3
+@exit:
     rts
 
 ;-------------------------------------
@@ -994,7 +997,8 @@ OnCollisionWithAttackRect:
     lda TempNpcIndex
     cmp #NPC_IDX_BOSS
     bne @dropStuff
-    jsr OnBossDefeat
+    lda #1
+    sta BossDefeated
     jmp @wearWeapon ; boss not dropping anything
 
 @dropStuff:

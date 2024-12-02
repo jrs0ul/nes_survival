@@ -234,6 +234,7 @@ SetupVillagerText:
 @skipNightCheck:
 
 
+    ldy VillagerIndex
     lda VillagerKilled, y
     beq @cont
 

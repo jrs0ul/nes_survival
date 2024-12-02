@@ -1339,9 +1339,11 @@ MenuConfirmMask:
     .res 1
 MenuCancelMask:
     .res 1
+BossDefeated:
+    .res 1
 
 BSS_Free_Bytes:
-    .res 4
+    .res 3
 
 ;====================================================================================
 
@@ -3363,6 +3365,9 @@ OnYouWin:
     sta PaletteFadeAnimationState
     sta MustShowOutroAfterFadeout
 
+    lda #255
+    sta TaintedSprites
+
 
     lda VillagerKilled
     clc
@@ -3693,6 +3698,8 @@ RoutinesAfterFadeOut:
     lda ActiveMapEntryIndex
     cmp #31
     bne @next27
+
+    jsr OnBossDefeat
 
     ldy #3
     lda ItemIGave, y
@@ -5986,6 +5993,7 @@ ResetVariables:
     sta SkipLastTileRowsInIndoorMaps
     sta NametableOffsetInBytes
     sta BossAgitated
+    sta BossDefeated
     sta hadKnockBack
     sta CheckpointSaved
     sta menuTileTransferRowIdx
