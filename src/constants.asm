@@ -267,6 +267,8 @@
 
     SFX_ITEM_PICKUP            = 0
     SFX_INVENTORY_FULL         = 4
+    SFX_QUEST_COMPLETE         = 5
+    SFX_WEAPON_BREAKS          = 6
 
 
     INVENTORY_ITEM_HP_X_POS    = 17

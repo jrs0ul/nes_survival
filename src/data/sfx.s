@@ -7,19 +7,30 @@
 
 sounds:
 	.word @ntsc
-	.word @ntsc
+	.word @pal
 @ntsc:
 	.word @sfx_ntsc_pickup
 	.word @sfx_ntsc_knife
 	.word @sfx_ntsc_damage
 	.word @sfx_ntsc_hammer
 	.word @sfx_ntsc_inventory_full
+	.word @sfx_ntsc_quest_complete
+	.word @sfx_ntsc_weapon_breaks
+
+@pal:
+	.word @sfx_pal_pickup
+	.word @sfx_pal_knife
+	.word @sfx_pal_damage
+	.word @sfx_pal_hammer
+	.word @sfx_pal_inventory_full
+	.word @sfx_pal_quest_complete
+	.word @sfx_pal_weapon_breaks
 
 @sfx_ntsc_pickup:
-	.byte $82,$01,$81,$a2,$80,$3f,$89,$f0,$01,$81,$80,$01,$81,$5e,$01,$81
-	.byte $3c,$01,$81,$1a,$01,$82,$00,$81,$f8,$01,$81,$d6,$01,$81,$b4,$01
+	.byte $81,$a2,$82,$01,$80,$3f,$89,$f0,$01,$81,$80,$01,$81,$5e,$01,$81
+	.byte $3c,$01,$81,$1a,$01,$81,$f8,$82,$00,$01,$81,$d6,$01,$81,$b4,$01
 	.byte $81,$92,$01,$81,$70,$01,$80,$30,$0a,$81,$92,$80,$3f,$01,$81,$b4
-	.byte $01,$81,$d6,$01,$81,$f8,$01,$82,$01,$81,$1a,$01,$81,$3c,$01,$81
+	.byte $01,$81,$d6,$01,$81,$f8,$01,$81,$1a,$82,$01,$01,$81,$3c,$01,$81
 	.byte $5e,$01,$81,$80,$01,$81,$a2,$01,$81,$c4,$01,$00
 @sfx_ntsc_knife:
 	.byte $8a,$0a,$89,$3f,$01,$8a,$09,$01,$8a,$08,$01,$8a,$07,$01,$8a,$06
@@ -31,5 +42,37 @@ sounds:
 @sfx_ntsc_inventory_full:
 	.byte $87,$3a,$88,$02,$86,$8f,$89,$f0,$05,$86,$80,$05,$87,$80,$86,$8f
 	.byte $0a,$00
+@sfx_ntsc_quest_complete:
+	.byte $81,$fd,$82,$00,$80,$3f,$84,$fd,$85,$00,$83,$3f,$89,$f0,$05,$81
+	.byte $e1,$84,$e1,$05,$81,$fd,$84,$fd,$05,$81,$e1,$84,$e1,$05,$81,$fd
+	.byte $84,$fd,$05,$81,$e1,$84,$e1,$05,$81,$fd,$84,$fd,$05,$81,$e1,$84
+	.byte $e1,$05,$80,$30,$00
+@sfx_ntsc_weapon_breaks:
+	.byte $8a,$0b,$89,$3f,$03,$8a,$0c,$03,$8a,$0d,$03,$8a,$0e,$03,$8a,$0f
+	.byte $04,$8a,$00,$03,$8a,$01,$03,$8a,$02,$08,$00
+@sfx_pal_pickup:
+	.byte $81,$84,$82,$01,$80,$3f,$89,$f0,$01,$81,$64,$01,$81,$44,$01,$81
+	.byte $24,$81,$04,$01,$81,$e4,$82,$00,$01,$81,$c4,$01,$81,$a4,$01,$81
+	.byte $84,$81,$68,$01,$80,$30,$09,$81,$88,$80,$3f,$01,$81,$a8,$81,$c8
+	.byte $01,$81,$e8,$01,$81,$08,$82,$01,$01,$81,$28,$01,$81,$48,$01,$81
+	.byte $68,$81,$88,$01,$81,$a4,$01,$00
+@sfx_pal_knife:
+	.byte $8a,$0a,$89,$3f,$01,$8a,$09,$01,$8a,$08,$01,$8a,$07,$8a,$06,$01
+	.byte $00
+@sfx_pal_damage:
+	.byte $8a,$0d,$89,$3f,$01,$8a,$0e,$02,$8a,$0f,$01,$00
+@sfx_pal_hammer:
+	.byte $89,$f0,$04,$8a,$0e,$89,$3f,$02,$8a,$0d,$01,$8a,$0c,$01,$00
+@sfx_pal_inventory_full:
+	.byte $87,$11,$88,$02,$86,$8f,$89,$f0,$04,$86,$80,$04,$87,$52,$86,$8f
+	.byte $09,$00
+@sfx_pal_quest_complete:
+	.byte $81,$eb,$82,$00,$80,$3f,$84,$eb,$85,$00,$83,$3f,$89,$f0,$04,$81
+	.byte $d1,$84,$d1,$04,$81,$eb,$84,$eb,$05,$81,$d1,$84,$d1,$04,$81,$eb
+	.byte $84,$eb,$04,$81,$d1,$84,$d1,$04,$81,$eb,$84,$eb,$04,$81,$d1,$84
+	.byte $d1,$04,$80,$30,$00
+@sfx_pal_weapon_breaks:
+	.byte $8a,$0b,$89,$3f,$03,$8a,$0c,$02,$8a,$0d,$02,$8a,$0e,$03,$8a,$0f
+	.byte $03,$8a,$00,$03,$8a,$01,$02,$8a,$02,$07,$00
 
 .export sounds

@@ -2046,7 +2046,7 @@ CraftFromSelectedComponents:
     sty TempY ; store the position of a newly made item
 
     ;play sfx on success
-    lda #0
+    lda #SFX_ITEM_PICKUP
     sta SfxName
     lda #1
     sta MustPlaySfx
@@ -3174,6 +3174,13 @@ EquipItem:
     lda #0
 @exit:
     rts
+;------------------------------------
+PlayQuestCompleteSfx:
+    lda #SFX_QUEST_COMPLETE
+    sta SfxName
+    lda #1
+    sta MustPlaySfx
+    rts
 
 ;-------------------------------------
 GiveItem:
@@ -3251,7 +3258,7 @@ GiveItem:
 
 @reward:
     jsr SpawnRewardItem
-
+    jsr PlayQuestCompleteSfx
     lda VillagerIndex
     cmp #3
     bne @cont
@@ -3264,6 +3271,7 @@ GiveItem:
     jmp @done
 
 @special_reward:
+    jsr PlayQuestCompleteSfx
     jsr SpawnSpecialReward
     lda #1
     jmp @done
