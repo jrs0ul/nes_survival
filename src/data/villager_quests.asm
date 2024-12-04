@@ -330,7 +330,7 @@ GrannyRewardSprites_2:
 quest_items:
     .byte 0, 0, 0, 0
     .byte 0, 0, ITEM_PIE, 0
-    .byte 0, 0, 0, ITEM_JAM
+    .byte 0, 0, 0, ITEM_POTION
     .byte 0, 0, 0, 0
 
 
@@ -482,7 +482,7 @@ first_time_text: ;when player enters the hut for the first time
 .segment "ROM1" ; menu
 
 special_goal_items:
-    .byte ITEM_JAM          ;Bjorn
+    .byte ITEM_POTION       ;Bjorn
     .byte ITEM_LETTER       ;Erika
     .byte ITEM_PIE          ;Grandma
     .byte 0
@@ -491,7 +491,7 @@ special_goal_items:
 
 
 goal_items_list:
-    .byte ITEM_COOKED_MEAT, ITEM_SPEAR, ITEM_JAM, ITEM_COAT
+    .byte ITEM_COOKED_MEAT, ITEM_SPEAR, ITEM_POTION, ITEM_COAT
     .byte ITEM_RAW_MEAT, ITEM_KNIFE, 255, ITEM_HIDE
     .byte ITEM_STICK, ITEM_STICK, ITEM_COOKED_FISH, 255
     .byte ITEM_GRANNYS_HEAD, 255, 255, 255
@@ -509,7 +509,7 @@ special_reward_items:
 reward_items_list:
     .byte 0, ITEM_HIDE, ITEM_FISHING_ROD, ITEM_LAMP
     .byte ITEM_ROWAN_BERRIES, ITEM_HAMMER, ITEM_PIE, ITEM_COAT
-    .byte 0, ITEM_JAM, 0, ITEM_PIE
+    .byte 0, ITEM_POTION, 0, ITEM_PIE
     .byte 0, 0, 0, 0
 
 

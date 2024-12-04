@@ -299,7 +299,7 @@
     ITEM_RAW_MEAT              = 2
     ITEM_COOKED_MEAT           = 3
     ITEM_ROWAN_BERRIES         = 4
-    ITEM_JAM                   = 5
+    ITEM_POTION                = 5
     ITEM_ROCK                  = 6
     ITEM_SPEAR                 = 7
     ITEM_KNIFE                 = 8
@@ -321,6 +321,7 @@
     ITEM_GRANNYS_HEAD          = 27
     ITEM_KEY                   = 29
     ITEM_MUSHROOM              = 30
+    ITEM_MEDICINAL_SHROOM      = 31
 
     MAX_LETTER_OBJECT_COUNT    = 2
 
@@ -401,7 +402,7 @@
 
     DIALOG_TEXT_LENGTH         = 96
 
-    RECIPES_SIZE               = 45
+    RECIPES_SIZE               = 55
 
     ROT_AMOUNT_RAW_MEAT        = 32
     ROT_AMOUNT_COOKED_MEAT     = 16

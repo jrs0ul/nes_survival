@@ -74,7 +74,7 @@ entry_points_loc8:
     ;20.exit from granny's location to the main one
     .byte 20, 0, 0, 255, 0, 255, 0, 32
     ;21.granny's house
-    .byte 21, 0, 118, 122, 150, 155, 104, 111
+    .byte 21, 0, 118, 122, 149, 155, 104, 111
     ;22.secret cave
     .byte 22, 2, 156, 167,   0,   255, 130, 135
     ;-------------------

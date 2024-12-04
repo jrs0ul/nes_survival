@@ -1061,6 +1061,10 @@ CanItemBeUsedOutdoors:
     beq @yes
     cmp #ITEM_RADIO
     beq @yes
+    cmp #ITEM_MEDICINAL_SHROOM
+    beq @yes
+    cmp #ITEM_POTION
+    beq @yes
 
 
     jmp @no
@@ -3963,7 +3967,7 @@ IsFoodCooked:
     beq @yes
     cmp #ITEM_COOKED_FISH
     beq @yes
-    cmp #ITEM_JAM
+    cmp #ITEM_COOKED_MUSHROOM
     beq @yes
     cmp #ITEM_PIE
     beq @yes

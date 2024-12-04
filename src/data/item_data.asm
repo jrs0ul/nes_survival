@@ -15,7 +15,7 @@ item_data: ;          ---||---
     .byte $64, 1, 1, %00000101  ; 2  raw meat
     .byte $64, 0, 1, %01000000  ; 3  cooked meat
     .byte $44, 2, 3, %00100101  ; 4  rowan berries
-    .byte $5A, 2, 1, %01000000  ; 5  jam
+    .byte $5A, 2, 3, %01000000  ; 5  potion
     .byte $68, 3, 4, 0          ; 6  rock
     .byte $3E, 2, 5, 9          ; 7  spear
     .byte $56, 2, 5, 2          ; 8  knife
@@ -30,7 +30,7 @@ item_data: ;          ---||---
     .byte $4A, 1, 1, %00001000  ; 17 fish
     .byte $4A, 0, 1, %00110010  ; 18 cooked fish
     .byte $54, 0, 3, 0          ; 19 radio
-    .byte $40, 2, 5, 5          ; 20 hammer
+    .byte $2F, 2, 5, 5          ; 20 hammer
     .byte $6C, 0, 1, %01000000  ; 21 cooked mushroom
     .byte $4C, 2, 5, 5          ; 22 slingshot
     .byte $5E, 0, 1, %01100000  ; 23 pie
@@ -41,8 +41,9 @@ item_data: ;          ---||---
     .byte $48, 1, 7, 0          ; 28 letter about the rock
     .byte $6A, 1, 4, 0          ; 29 key
     .byte $6C, 1, 1, %00110000  ; 30 mushroom
+    .byte $40, 2, 3, %00100101  ; 31 medicinal shroom
 
-items_with_progressbars:
+items_with_progressbars: ;item type is index here
     .byte 0 ; 0
     .byte 1 ; 1
     .byte 0 ; 2
@@ -90,6 +91,7 @@ item_wear:
     .byte 0   ;letter2
     .byte 0   ;key
     .byte 0   ;mushroom
+    .byte 0   ;medicinal shroom
 
 ;items the player character should display above its head
 important_items:
@@ -124,4 +126,5 @@ important_items:
     .byte 0   ;letter2
     .byte 1   ;key
     .byte 0   ;mushroom
+    .byte 0   ;medicinal shroom
 

@@ -4275,6 +4275,7 @@ SpawnQuestItems:
 
     lda special_reward_items, y
     bne @spawn_it
+    jmp @done
 
 @justSpawnIt:
     tya
@@ -4287,8 +4288,6 @@ SpawnQuestItems:
     lda reward_items_list, y
 
     beq @done
-
-    
 
 @spawn_it:
     asl

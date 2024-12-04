@@ -1,6 +1,6 @@
 ;item A, item B, item C, item D, result
 recipes:
-    .byte 4 ,  4, 255, 255, 5   ;  berries + berries = jam
+    .byte 4 ,  4, 255, 255, 5   ;  berries + berries = potion
     .byte 6 ,  1, 255, 255, 7   ;  rock + stick = spear
     .byte 6 ,  6, 255, 255, 8   ;  rock + rock = knife
     .byte 10, 10, 255, 255, 11  ;  hide + hide = coat
@@ -12,3 +12,5 @@ recipes:
     .byte 10, 1 , 14,  255, 22  ;  hide + stick + rope  = slingshot
 
     .byte 3 , 4 , 255, 255, 23  ;  cooked meat + berries = pie
+    .byte 31 , 31 , 255, 255, 5 ;  medicine shroom + medicine shroom = potion
+    .byte 21 , 4 , 255, 255, 23 ;  cooked meat + cooked mushroom = pie

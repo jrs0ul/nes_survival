@@ -9,6 +9,6 @@ dark_cave_2_items:
     .byte %00001101, 1, 64,  184 ; rock
     .byte %00111101, 0, 16,  96  ; shroom
     .byte %00111101, 0, 120, 48  ; shroom
-    .byte %00111101, 0, 176, 112 ; shroom
+    .byte %00111111, 0, 176, 112 ; shroom
 
 

@@ -6,5 +6,5 @@ item_list_alien_puzzle:
     .byte ITEM_COUNT_LOC20
     .byte %00111101, 2, 200, 190
     .byte %00111101, 2, 220, 180
-    .byte %00111101, 2, 215, 203
+    .byte %00111111, 2, 215, 203
 
