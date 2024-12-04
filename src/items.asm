@@ -27,6 +27,7 @@ LoadItems:
     beq @loadIt
 
 
+    ldy LocationIndex
     lda LocationsWithRespawnableItems, y
     beq @deactivatedItem
 
@@ -64,7 +65,7 @@ LoadItems:
     bne @deactivatedItem
 
 @notDocument:
-   ldy TempPointY
+    ldy TempPointY
 
     iny
     iny

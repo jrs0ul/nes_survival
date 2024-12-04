@@ -58,9 +58,9 @@ spawnpoints_base_loc_1:
     .byte 224, 192
 
     .byte 120, 72
-    .byte 168, 176
+    .byte 168, 168
     .byte 48, 128
-    .byte 98, 200
+    .byte 98, 190
 
     .byte 48, 144
     .byte 136, 80
@@ -126,8 +126,8 @@ spawnpoints_loc_12:
     .byte 48, 128
     .byte 98, 160
 
-    .byte 120, 115
-    .byte 168, 184
+    .byte 88, 115
+    .byte 168, 168
     .byte 48, 128
     .byte 98, 160
 
@@ -155,7 +155,7 @@ spawnpoints_loc_17:
     .byte 88, 128
 
     .byte 72, 72
-    .byte 56, 184
+    .byte 56, 176
     .byte 208, 185
     .byte 8, 96
 
