@@ -1520,7 +1520,16 @@ nextIteration:
 
     jsr DoPaletteFades
 
-    jsr famistudioupdate
+    ldy current_bank
+    sty oldbank
+
+    ldy #6
+    jsr bankswitch_y
+
+    jsr SoundUpdate
+
+    ldy oldbank
+    jsr bankswitch_y
 
     lda GameState
     cmp #STATE_GAME
@@ -1819,14 +1828,8 @@ AnimateTitleTiles:
 
     rts
 ;-----------------------------------
-famistudioupdate:
-
-    ;famistudio update
-    ldy current_bank
-    sty oldbank
-
-    ldy #6
-    jsr bankswitch_y
+.segment "ROM6"
+SoundUpdate:
 
     lda MustStopMusic
     beq @continue
@@ -1862,12 +1865,8 @@ famistudioupdate:
 @doSoundUpdate:
     jsr famistudio_update
 
-    ldy oldbank
-    jsr bankswitch_y
-
-@exit:
     rts
-
+.segment "CODE"
 
 ;---------------------------------
 RunSpriteUpdate:

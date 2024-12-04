@@ -269,6 +269,8 @@
     SFX_INVENTORY_FULL         = 4
     SFX_QUEST_COMPLETE         = 5
     SFX_WEAPON_BREAKS          = 6
+    SFX_HP_UP                  = 7
+    SFX_EAT                    = 8
 
 
     INVENTORY_ITEM_HP_X_POS    = 17

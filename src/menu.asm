@@ -4034,6 +4034,11 @@ UseMedicine:
     sta DigitPtr + 1
     jsr IncreaseDigits
 
+    lda #SFX_HP_UP
+    sta SfxName
+    lda #1
+    sta MustPlaySfx
+
     ;now the middle digit
     lda SelectedItemPower
     lsr
@@ -4123,6 +4128,10 @@ UseFood:
     sta DigitPtr + 1
     jsr IncreaseDigits
 
+    lda #SFX_EAT
+    sta SfxName
+    lda #1
+    sta MustPlaySfx
 
     lda SelectedItemPower
     lsr
