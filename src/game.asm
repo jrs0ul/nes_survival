@@ -7106,6 +7106,10 @@ WearWeapon:
     lda #0
     sta EquipedItem
     sta EquipedItem + 1
+    lda #SFX_WEAPON_BREAKS
+    sta SfxName
+    lda #1
+    sta MustPlaySfx
 @exit:
     rts
 ;----------------------------------

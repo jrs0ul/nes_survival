@@ -3332,6 +3332,11 @@ DamagePlayer:
 @removeClothing:
     lda #0
     sta EquipedClothing
+    lda #SFX_WEAPON_BREAKS
+    sta SfxName
+    lda #1
+    sta MustPlaySfx
+    jmp @exit
 
 
 @noclothing:
