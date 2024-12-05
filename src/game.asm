@@ -52,6 +52,7 @@ main_bg_tiles       : .incbin "chr/main_bg_tiles.lz4"
 .include "data/menu_screen_comp.asm"
 .include "data/menu_data.asm"
 .include "data/recipes.asm"
+.include "data/StatusBar.asm"
 
 .include "data/maps/cropped/abase_hall_0_crop.asm"
 .include "data/maps/cropped/abase_hall_1_crop.asm"
@@ -217,7 +218,6 @@ FAMISTUDIO_CFG_C_BINDINGS = 0
 .include "data/sfx.s"
 .include "famistudio_ca65.s"
 
-.include "data/StatusBar.asm"
 
 .include "data/player_sprite_data.asm"
 .include "data/npc_sprite_data.asm"
@@ -5440,12 +5440,11 @@ UpdateSunMoonTiles:
 
 
     rts
-
 ;-----------------------------------
 LoadStatusBar:
     lda current_bank
     sta bankBeforeStatusBarLoad
-    ldy #6 ; bank 6 where the status bar data is
+    ldy #1 ; bank 1 where the status bar data is
     jsr bankswitch_y
     ldy #$00
     ldx #128 ;tiles
@@ -5473,7 +5472,6 @@ InitializeStatusBarLoop:     ; copy status bar to first nametable
     ldy bankBeforeStatusBarLoad
     jsr bankswitch_y
     rts
-
 ;--------------------------------------------
 
 HideSprites:

@@ -76,6 +76,7 @@ inventorypositions:
     .byte MENU_ITEM_SPRITE_MIN_Y + INVENTORY_STEP_PIXELS * 9
     .byte MENU_ITEM_SPRITE_MIN_Y + INVENTORY_STEP_PIXELS * 10
 
+
 ;------------------------------------------
 ResetOverlayedMenuVars:
 
