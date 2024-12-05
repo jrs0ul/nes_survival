@@ -207,6 +207,7 @@ game_over_hints:
 .include "data/maps/cropped/location_with_cave3_crop.asm"
 .include "data/maps/cropped/path_to_crashsite_crop.asm"
 
+.include "data/item_list_path_to_crashsite.asm"
 .include "data/item_list_mine_location.asm"
 .include "data/item_list_granny_location.asm"
 
@@ -1161,6 +1162,8 @@ Item_Location15_Collection_times:
     .res ITEM_COUNT_LOC15
 Item_Location17_Collection_times:
     .res ITEM_COUNT_LOC17
+Item_Location19_Collection_times:
+    .res ITEM_COUNT_LOC19
 Item_Location20_Collection_times:
     .res ITEM_COUNT_LOC20
 Item_Location23_Collection_times:
@@ -1343,7 +1346,7 @@ BossDefeated:
     .res 1
 
 BSS_Free_Bytes:
-    .res 3
+    .res 2
 
 ;====================================================================================
 

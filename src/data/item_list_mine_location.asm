@@ -5,5 +5,5 @@ mine_location_items:
     .byte %00001101, 2, 100, 80  ; rock
     .byte %00000011, 3, 176, 96  ; stick
     .byte %00000011, 2, 48,  200 ; stick
-    .byte %00000011, 1, 152, 128 ; stick
+    .byte %00100001, 0, 80,  160 ; reeds
 

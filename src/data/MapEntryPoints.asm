@@ -501,6 +501,8 @@ ITEM_IDX_LOC8  = ITEM_IDX_LOC4   + ITEM_COUNT_LOC7
 ITEM_IDX_LOC9  = ITEM_IDX_LOC8   + ITEM_COUNT_LOC8
 ITEM_IDX_LOC11 = ITEM_IDX_LOC9   + ITEM_COUNT_LOC9
 ITEM_IDX_LOC14 = ITEM_IDX_LOC11  + ITEM_COUNT_LOC12
+ITEM_IDX_LOC18 = ITEM_IDX_LOC14  + ITEM_COUNT_LOC15 + ITEM_COUNT_LOC17
+
 
 LocationItemIndexes:
     .byte 0                                                                           ;0
@@ -521,11 +523,11 @@ LocationItemIndexes:
     .byte 0                                                                           ;15
     .byte ITEM_IDX_LOC14 + ITEM_COUNT_LOC15                                           ;16
     .byte 0                                                                           ;17
-    .byte 0                                                                           ;18
-    .byte ITEM_IDX_LOC14 + ITEM_COUNT_LOC15 + ITEM_COUNT_LOC17                        ;19
+    .byte ITEM_IDX_LOC18                                                              ;18
+    .byte ITEM_IDX_LOC18 + ITEM_COUNT_LOC19                                           ;19
     .byte 0                                                                           ;20
     .byte 0                                                                           ;21
-    .byte ITEM_IDX_LOC14 + ITEM_COUNT_LOC15 + ITEM_COUNT_LOC17 + ITEM_COUNT_LOC20     ;22
+    .byte ITEM_IDX_LOC18 + ITEM_COUNT_LOC19 + ITEM_COUNT_LOC20                        ;22
     .byte 0                                                                           ;23
 
 LocationItemCounts:
@@ -547,7 +549,7 @@ LocationItemCounts:
     .byte 0                ; 15
     .byte ITEM_COUNT_LOC17 ; 16
     .byte 0                ; 17
-    .byte 0                ; 18 path to crashsite
+    .byte ITEM_COUNT_LOC19 ; 18 path to crashsite
     .byte ITEM_COUNT_LOC20 ; 19 pre alien base
     .byte 0                ; 20 cave-room
     .byte 0                ; 21 lonely cave
@@ -573,7 +575,7 @@ LocationsWithRespawnableItems:
     .byte 0 ; 15
     .byte 1 ; 16
     .byte 0 ; 17
-    .byte 0 ; 18
+    .byte 1 ; 18 ;path to crashsite
     .byte 1 ; 19
     .byte 0 ; 20
     .byte 0 ; 21
@@ -602,7 +604,7 @@ LocationItems:
     .byte  <list_empty,             >list_empty                  ; 15 mine room
     .byte  <dark_cave_2_items,      >dark_cave_2_items           ; 16 dark cave extension
     .byte  <list_empty,             >list_empty                  ; 17 alien base lobby
-    .byte  <list_empty,             >list_empty                  ; 18 path to crashsite
+    .byte  <crashsite_path_items,   >crashsite_path_items        ; 18 path to crashsite
     .byte  <item_list_alien_puzzle, >item_list_alien_puzzle      ; 19 pre alien base location
     .byte  <list_empty,             >list_empty                  ; 20 cave-room
     .byte  <list_empty,             >list_empty                  ; 21 lonely cave

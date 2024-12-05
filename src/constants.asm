@@ -61,7 +61,7 @@
     NPC_SPEED_DIAG_FRACTION          = 177
     NPC_SPEED_AGITATED_DIAG          = 1
     NPC_SPEED_AGITATED_DIAG_FRACTION = 16
-    
+
     CUTSCENE_DELAY_DECREMENT = 1
     CUTSCENE_DELAY_DECREMENT_FRACTION = 0
 .endif
@@ -350,10 +350,9 @@
     ITEM_COUNT_LOC12           = 6 ; location where the mine entrance is
     ITEM_COUNT_LOC15           = 5 ; secret cave
     ITEM_COUNT_LOC17           = 6 ; dark cave 2
+    ITEM_COUNT_LOC19           = 1 ; path to crashsite
     ITEM_COUNT_LOC20           = 3 ; Alien base + puzzle
     ITEM_COUNT_LOC23           = 4 ; wood location
-
-    ONE_TIME_ITEM_COUNT        = ITEM_COUNT_LOC15 + ITEM_COUNT_LOC8 + ITEM_COUNT_LOC7
 
     ITEM_NEVER_BEEN_PICKED     = 255
 
