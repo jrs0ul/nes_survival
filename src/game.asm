@@ -5441,38 +5441,18 @@ UpdateSunMoonTiles:
 
     rts
 ;-----------------------------------
-LoadStatusBar:
+StatusBarLoad:
     lda current_bank
     sta bankBeforeStatusBarLoad
     ldy #1 ; bank 1 where the status bar data is
     jsr bankswitch_y
-    ldy #$00
-    ldx #128 ;tiles
-    lda $2002
-    lda #$20
-    sta $2006
-    lda #$00
-    sta $2006
-InitializeStatusBarLoop:     ; copy status bar to first nametable
-    lda StatusBar, y
-    sta $2007
-    iny
-    dex
-    bne InitializeStatusBarLoop 
 
-    lda #$00
-    sta $2006
-    sta $2006
-    sta $2005
-    sta $2005
-    lda #1
-    sta HpUpdated
-    sta FoodUpdated
-    sta WarmthUpdated
+    jsr LoadStatusBar
     ldy bankBeforeStatusBarLoad
     jsr bankswitch_y
+
     rts
-;--------------------------------------------
+;-------------------------
 
 HideSprites:
 

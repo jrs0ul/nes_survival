@@ -509,9 +509,7 @@ LoadIndoorMapData:
     sta NametableOffsetInBytes
     sta SkipLastTileRowsInIndoorMaps
 
-    jsr LoadStatusBar
-
-
+    jsr StatusBarLoad
 
     lda #0
     sta MustLoadHouseInterior

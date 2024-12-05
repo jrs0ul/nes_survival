@@ -405,8 +405,7 @@ LoadOutsideMap:
 
 @loadRest:
 
-    jsr LoadStatusBar
-
+    jsr StatusBarLoad
     ;copy outside map palette to ram
     ldy #0
 @paletteCopy:

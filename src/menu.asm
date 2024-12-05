@@ -75,7 +75,32 @@ inventorypositions:
     .byte MENU_ITEM_SPRITE_MIN_Y + INVENTORY_STEP_PIXELS * 8
     .byte MENU_ITEM_SPRITE_MIN_Y + INVENTORY_STEP_PIXELS * 9
     .byte MENU_ITEM_SPRITE_MIN_Y + INVENTORY_STEP_PIXELS * 10
+;---------------------------------------
+LoadStatusBar:
+    ldy #$00
+    ldx #128 ;tiles
+    lda $2002
+    lda #$20
+    sta $2006
+    lda #$00
+    sta $2006
+InitializeStatusBarLoop:     ; copy status bar to first nametable
+    lda StatusBar, y
+    sta $2007
+    iny
+    dex
+    bne InitializeStatusBarLoop 
 
+    lda #$00
+    sta $2006
+    sta $2006
+    sta $2005
+    sta $2005
+    lda #1
+    sta HpUpdated
+    sta FoodUpdated
+    sta WarmthUpdated
+    rts
 
 ;------------------------------------------
 ResetOverlayedMenuVars:
