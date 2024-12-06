@@ -423,6 +423,8 @@
     FADE_DELAY_SLEEP           = 10
     MAX_VILLAGERS              = 4
 
+    VILLAGER_IDX_ERIKA         = 1
+
 
     SUBMENU_FOOD               = 1
     SUBMENU_STASH_FOOD         = 2

@@ -4053,6 +4053,17 @@ endTheSpecialQuest:
 
 
     rts
+;-------------------------------
+PrepareSpecialQuestCompletion:
+    lda VillagerIndex
+    asl
+    tax
+    inx
+    lda #1
+    sta DontIncrementQuestNumber
+    ldy VillagerIndex
+
+    rts
 
 ;-------------------------------
 OnExitVillagerHut:
@@ -4081,18 +4092,14 @@ OnExitVillagerHut:
     lda special_quests, y
     cmp VillagerIndex
     bne @checkIfDifferentReceiver
-    iny
-    lda special_quests, y ; quest number
-    cmp Temp
-    bne @checkIfDifferentReceiver
 
-    lda VillagerIndex
-    asl
-    tax
-    inx
-    lda #1
-    sta DontIncrementQuestNumber
+
     ldy VillagerIndex
+    lda SpecialItemsDelivered, y
+    beq @checkIfDifferentReceiver ; you have something deliverd, it's good enough
+
+@tryToComplete:
+    jsr PrepareSpecialQuestCompletion
     lda SpecialItemsDelivered, y
     bne @special
 

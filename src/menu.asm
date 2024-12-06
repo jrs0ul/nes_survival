@@ -3232,8 +3232,11 @@ GiveItem:
     ldy VillagerIndex
 
     lda VillagerKilled, y
-    bne @exit
+    beq @notKilled
 
+    rts
+
+@notKilled:
     lda ActiveVillagerQuests, y
     cmp #MAX_QUEST - 1
     bcc @con
@@ -3274,11 +3277,16 @@ GiveItem:
     iny
     lda special_quests, y ;the quest index of that person
     sta TempFrame
+
+    lda VillagerIndex
+    cmp #VILLAGER_IDX_ERIKA
+    beq @ignoreActiveQuestIndex
+
     ldy TempSpearX ; that person index
     lda ActiveVillagerQuests, y
     cmp TempFrame
     bne @exit
-
+@ignoreActiveQuestIndex:
     ldy VillagerIndex
     lda Inventory, x
     cmp special_goal_items, y

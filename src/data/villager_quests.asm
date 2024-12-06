@@ -514,12 +514,12 @@ reward_items_list:
     .byte 0, 0, 0, 0
 
 
-;Villager Id, quest Id
+;Villager Id who is the item originator, active quest Id
 special_quests:
-    .byte 2, 3
-    .byte 1, 3
-    .byte 1, 2
-    .byte 255, 255
+    .byte 2, 3       ;Bjorn
+    .byte 1, 255     ;Erika
+    .byte 1, 2       ;Granny
+    .byte 255, 255   ;Boss
 
 special_receivers:
     .byte 255
