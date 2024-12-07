@@ -19,6 +19,31 @@ bg_attributes_after_clear:
     .byte $3, $EC, $51
 
 
+blink_fuel_OFF_attributes:
+    .byte $3, $DD, $F5
+    .byte $3, $DE, $F5
+    .byte $3, $DF, $75
+
+blink_fuel_ON_attributes:
+    .byte $3, $DD, $05
+    .byte $3, $DE, $05
+    .byte $3, $DF, $45
+
+FuelBlinkPosition:
+    .byte 0
+    .byte 0
+    .byte 9
+    .byte 9
+    .byte 0
+    .byte 0
+    .byte 9
+    .byte 9
+    .byte 0
+    .byte 0
+    .byte 9
+    .byte 9
+
+
 sleep_msg_background: 
     .byte $38,$3A,$3A,$3A,$3A,$3A,$3A,$3A,$3A,$3A,$3A,$39
     .byte $4B,$1e,$19,$19,$00,$00,$00,$00,$00,$00,$00,$4C

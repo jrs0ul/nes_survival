@@ -740,6 +740,8 @@ CraftingActivated       = DialogTextContainer + 25
 EquipmentActivated      = DialogTextContainer + 26
 
 CurrentCraftingComponent= DialogTextContainer + 27
+MustBlinkFuel           = DialogTextContainer + 28
+FuelBlinkIteration      = DialogTextContainer + 29
 
 
 ;--Cutscene vars

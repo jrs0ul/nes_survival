@@ -106,6 +106,8 @@ InitializeStatusBarLoop:     ; copy status bar to first nametable
 ResetOverlayedMenuVars:
 
     lda #0
+    sta MustBlinkFuel
+    sta FuelBlinkIteration
     sta MustClearSubMenu
     sta MustDrawDocument
     sta MustDrawSleepMessage
@@ -161,6 +163,7 @@ ResetMenuVars:
 ;------------------------------------------
 UpdateMenuGfx:
 
+    jsr BlinkFuel
     jsr ResetMenu
     jsr DrawMenuTitle
     jsr DrawInventoryGrid
@@ -180,9 +183,13 @@ UpdateMenuGfx:
     jsr DrawSleepMessage
     jsr ClearSubMenu
 
-    
+
     lda menuTileTransferRowIdx
     bne @exit ; not finished updating gfx
+
+    lda MustBlinkFuel
+    bne @exit ; keep blinking
+
     lda #0
     sta MustLoadSomething
 
@@ -202,6 +209,52 @@ UpdateMenuGfx:
 @stash:
     lda #SUBMENU_STASH_DOCUMENT
     sta MustDrawMenu
+
+@exit:
+    rts
+
+;----------------------------------
+BlinkFuel:
+
+    lda MustBlinkFuel
+    beq @exit
+
+    ldy FuelBlinkIteration
+    lda FuelBlinkPosition, y
+    tay
+
+    ldx #0
+
+@attrLoop:
+    lda $2002
+    lda FirstNametableAddr
+    clc
+    adc blink_fuel_OFF_attributes, y
+    sta $2006
+    inx
+    iny
+    lda blink_fuel_OFF_attributes, y
+    sta $2006
+
+    iny
+    inx
+    lda blink_fuel_OFF_attributes, y
+    sta $2007
+
+    iny
+    inx
+    cpx #MENU_FUEL_BLINK_ATTR_SIZE
+    bcc @attrLoop
+
+    inc FuelBlinkIteration
+    lda FuelBlinkIteration
+    cmp #MENU_FUEL_BLINK_IT_COUNT ; is this max iteration ?
+    bcc @exit
+
+    lda #0
+    sta MustBlinkFuel
+    sta FuelBlinkIteration
+
 
 @exit:
     rts
@@ -2645,7 +2698,6 @@ FoodMenuInputAtHome:
     cmp #1
     bne @clearItem
     jsr UseFood
-    
 
 @clearItem:
     jsr ClearThatItem
@@ -3915,7 +3967,15 @@ CookMeat:
 
     lda Fuel + 2
     cmp #COOKING_FUEL_COST
-    bcc @cantcook
+    bcs @cook
+
+    lda #SFX_INVENTORY_FULL
+    sta SfxName
+    lda #1
+    sta MustPlaySfx
+    sta MustBlinkFuel
+    sta MustLoadSomething
+    jmp @cantcook
 
 @cook:
     jsr DoCooking
