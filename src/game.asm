@@ -4828,7 +4828,7 @@ HandleInput:
     lda InputProcessed
     bne @finishInput
 
-    jsr CheckB
+    jsr CheckActionButton
 
     lda hadKnockBack
     bne @continueInput
@@ -6477,7 +6477,8 @@ CheckStartButton:
     beq @enterMenuScreen
     ;exit menu screen
 
-    jsr ExitMenuState
+    lda #1
+    sta MustExitMenuState
     jmp @exit
 @enterMenuScreen:
 
@@ -6857,7 +6858,7 @@ ProcessButtons:
     sta PlayerSpeed
     lda #PLAYER_SPEED_DIAG_WALK_FRACTION
     sta PlayerSpeed + 1
-    jmp @checkA
+    jmp @checkRunButton
 
 @normalSpeed:
     lda #PLAYER_SPEED_WALK_BASE
@@ -6865,8 +6866,8 @@ ProcessButtons:
     lda #PLAYER_SPEED_WALK_FRACTION
     sta PlayerSpeed + 1
 
-@checkA:
-    jsr CheckA ; speed up only active if dpad is used
+@checkRunButton:
+    jsr CheckRunButton ; speed up only active if dpad is used
 
 ;Check if LEFT is pressed
     jsr CheckLeft
@@ -6921,9 +6922,9 @@ ProcessButtons:
 
     rts
 ;----------------------------------
-CheckA:
+CheckRunButton:
     lda Buttons
-    and #BUTTON_A_MASK
+    and #BUTTON_B_MASK
     beq @exit
 
     lda Stamina
@@ -6950,14 +6951,14 @@ CheckA:
     rts
 
 ;----------------------------------
-CheckB:
+CheckActionButton:
     lda Buttons
-    and #BUTTON_B_MASK
-    bne @checkOldB
+    and #BUTTON_A_MASK
+    bne @checkOldAction
     jmp @exit
-@checkOldB:
+@checkOldAction:
     lda OldButtons
-    and #BUTTON_B_MASK
+    and #BUTTON_A_MASK
     bne @exit
 
     lda LocationType
