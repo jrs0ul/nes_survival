@@ -7,7 +7,6 @@
 ;TempPointX - column count
 ;TempPointY - row count
 
-
 ;stores 1 in A when the transfer is done
 TransferTiles:
     lda #0  ;turn off ppu

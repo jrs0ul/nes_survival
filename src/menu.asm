@@ -855,9 +855,6 @@ DrawDocumentMenu:
     lda #9
     sta TempPointY
 
-
-
-
 @startTransfer:
     jsr TransferTiles
     beq @exit ; not done
@@ -1714,6 +1711,8 @@ SleepMessageInput:
     sta SubMenuActivated
     sta SubMenuIndex
     sta SleepMessageActivated
+    sta menuTileTransferRowIdx
+    sta menuTileTransferDataIdx
     jsr UpdateMenuStats
     lda #1
     sta MustLoadSomething
@@ -1761,8 +1760,14 @@ SleepMenuInput:
 
 @hidemenu:
     lda #0
+    sta menuTileTransferRowIdx
     sta SubMenuActivated
     sta SubMenuIndex
+    sta SleepMessageActivated
+    sta MustDrawSleepMessage
+    sta TransferingSecondMenuPart
+    sta menuTileTransferDataIdx
+    sta MustDrawMenu
     jsr UpdateMenuStats
     lda #1
     sta MustLoadSomething
@@ -2248,10 +2253,13 @@ EquipmentInput:
 
     lda #0
     sta EquipmentActivated
+    sta TransferingSecondMenuPart
+    sta RepeatSameRowInTransfer
+    sta menuTileTransferRowIdx
+
     lda #1
     sta MustLoadSomething
     sta MustResetMenu
-
 
 @exit:
     rts
@@ -2323,6 +2331,9 @@ InventoryInput:
     and MenuCancelMask
     beq @exit
 
+
+    lda #0
+    sta menuTileTransferRowIdx
     lda #1
     sta MustLoadSomething
     sta MustResetMenu
@@ -3498,6 +3509,9 @@ HideDocument:
     lda #1
     sta MustLoadSomething
     sta MustClearSubMenu
+    lda #0
+    sta menuTileTransferDataIdx
+    sta TransferingSecondMenuPart
 
     rts
 
@@ -3506,6 +3520,7 @@ HideDocument:
 HideSubMenu:
     lda #0
     sta SubMenuActivated
+    sta menuTileTransferRowIdx
     sta SubMenuIndex
     jsr UpdateMenuStats
     lda StashActivated
