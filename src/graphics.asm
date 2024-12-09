@@ -67,7 +67,7 @@ TransferTiles:
     ldy TempY
     iny
     cpy TempPointY
-    beq @finished
+    bcs @finished
 
     sty menuTileTransferRowIdx
     lda #0

@@ -114,6 +114,7 @@ ResetOverlayedMenuVars:
     sta MustDrawInventoryGrid
     sta MustDrawEquipmentGrid
     sta MustDrawMenu
+    sta MustResetMenu
     sta MenuStepLast
     ldx #0
 @craftingIndexesLoop:
@@ -148,7 +149,6 @@ ResetMenuVars:
     sta EquipmentActivated
     sta BaseMenuIndex
     sta SubMenuIndex
-    
 
     lda #INVENTORY_POINTER_X
     sta InventoryPointerX
@@ -2331,9 +2331,10 @@ InventoryInput:
     and MenuCancelMask
     beq @exit
 
-
     lda #0
     sta menuTileTransferRowIdx
+    sta menuTileTransferDataIdx
+    sta MustDrawInventoryGrid
     lda #1
     sta MustLoadSomething
     sta MustResetMenu
@@ -3667,6 +3668,9 @@ DoRegularInput:
     and MenuCancelMask
     beq @exit
 
+    lda #0
+    sta menuTileTransferRowIdx
+    sta MustClearSubMenu
     lda #1
     sta MustExitMenuState
     jmp @exit

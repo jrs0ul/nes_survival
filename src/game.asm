@@ -7905,6 +7905,10 @@ CheckBed:
     cmp #128
     bcs @nope
 
+    ldy #1
+    jsr bankswitch_y
+    jsr ResetOverlayedMenuVars
+    jsr ResetMenuVars
     lda #0
     sta FirstTime
     sta MustUpdateTextBaloon
@@ -7912,9 +7916,6 @@ CheckBed:
     sta MustLoadSomething
     sta MustLoadMenu
     sta PlayerInteractedWithBed
-    ldy #1
-    jsr bankswitch_y
-    jsr ResetOverlayedMenuVars
     lda #STATE_MENU
     sta GameState
 
@@ -7937,6 +7938,10 @@ CheckFireplace:
     cmp #80
     bcs @nope
 
+    ldy #1
+    jsr bankswitch_y
+    jsr ResetOverlayedMenuVars
+    jsr ResetMenuVars
     lda #0
     sta FirstTime
     sta MustUpdateTextBaloon
@@ -7944,12 +7949,9 @@ CheckFireplace:
     sta MustLoadSomething
     sta MustLoadMenu
     sta PlayerInteractedWithFireplace
-    ldy #1
-    jsr bankswitch_y
-    jsr ResetOverlayedMenuVars
+
     lda #STATE_MENU
     sta GameState
-
 
     jmp @exit
 
@@ -7969,6 +7971,10 @@ CheckStashBox:
     cmp #80
     bcs @nope
 
+    ldy #1
+    jsr bankswitch_y
+    jsr ResetOverlayedMenuVars
+    jsr ResetMenuVars
     lda #0
     sta FirstTime
     sta MustUpdateTextBaloon
@@ -7976,9 +7982,6 @@ CheckStashBox:
     sta MustLoadSomething
     sta MustLoadMenu
     sta PlayerInteractedWithStorage
-    ldy #1
-    jsr bankswitch_y
-    jsr ResetOverlayedMenuVars
     lda #STATE_MENU
     sta GameState
 
@@ -8002,6 +8005,10 @@ CheckToolTable:
     cmp #112
     bcc @nope
 
+    ldy #1
+    jsr bankswitch_y
+    jsr ResetOverlayedMenuVars
+    jsr ResetMenuVars
     lda #0
     sta FirstTime
     sta MustUpdateTextBaloon
@@ -8009,9 +8016,7 @@ CheckToolTable:
     sta MustLoadSomething
     sta MustLoadMenu
     sta PlayerInteractedWithTooltable
-    ldy #1
-    jsr bankswitch_y
-    jsr ResetOverlayedMenuVars
+
     lda #STATE_MENU
     sta GameState
 
