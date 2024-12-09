@@ -3993,6 +3993,10 @@ CookMeat:
     jmp @cantcook
 
 @cook:
+    lda #1
+    sta MustPlaySfx
+    lda #SFX_FRY
+    sta SfxName
     jsr DoCooking
     lda TempItemIndex
     cmp #ITEM_RAW_MEAT
@@ -4182,6 +4186,11 @@ UseFuel:
     lda #MAX_FUEL_DELAY
     sta FuelDelay
 
+    lda #1
+    sta MustPlaySfx
+    lda #SFX_BURN
+    sta SfxName
+
     ;let's add lowest value digit
     lda SelectedItemPower
     and #%00001111
@@ -4191,7 +4200,6 @@ UseFuel:
     lda #>Fuel
     sta DigitPtr + 1
     jsr IncreaseDigits
-
 
     ;middle digit
 

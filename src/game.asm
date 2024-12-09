@@ -216,8 +216,14 @@ game_over_hints:
 FAMISTUDIO_DPCM_OFF = $FBBA
 FAMISTUDIO_CFG_C_BINDINGS = 0
 .include "data/music.s"
-.include "data/sfx.s"
+
 .include "famistudio_ca65.s"
+
+.if FAMISTUDIO_CFG_PAL_SUPPORT
+.include "data/sfx_PAL.s"
+.else
+.include "data/sfx_NTSC.s"
+.endif
 
 
 .include "data/player_sprite_data.asm"
@@ -3801,6 +3807,7 @@ RoutinesAfterFadeOut:
 
     lda #1
     sta MustCopyMainChr
+    sta MustStopMusic
     ;--------------------------
     ;19 crashsite exit to path
 @next39:
@@ -3810,6 +3817,7 @@ RoutinesAfterFadeOut:
 
     lda #1
     sta MustCopyMainChr
+    sta MustStopMusic
     ;---------------------
 @next40:
     lda LocationType

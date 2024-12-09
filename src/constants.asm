@@ -265,12 +265,18 @@
     SONG_ENDING_GOOD           = 8
 
 
+
     SFX_ITEM_PICKUP            = 0
+    SFX_KNIFE                  = 1
+    SFX_DAMAGE                 = 2
+    SFX_HAMMER                 = 3
     SFX_INVENTORY_FULL         = 4
     SFX_QUEST_COMPLETE         = 5
     SFX_WEAPON_BREAKS          = 6
     SFX_HP_UP                  = 7
     SFX_EAT                    = 8
+    SFX_BURN                   = 9
+    SFX_FRY                    = 10
 
 
     INVENTORY_ITEM_HP_X_POS    = 17
