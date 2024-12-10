@@ -1353,8 +1353,11 @@ MenuCancelMask:
 BossDefeated:
     .res 1
 
+StaminaToWarmthCounter:
+    .res 1
+
 BSS_Free_Bytes:
-    .res 2
+    .res 1
 
 ;====================================================================================
 
@@ -2592,9 +2595,10 @@ RestoreStamina:
     dec StaminaDelay
     bne @exit
 
+
     lda #STAMINA_DELAY
     sta StaminaDelay
-    
+
     lda Stamina
     cmp #PLAYER_STAMINA_SIZE
     bcs @exit
@@ -5986,6 +5990,7 @@ ResetVariables:
     sta StaminaDelay
 
     lda #0
+    sta StaminaToWarmthCounter
     sta SkipLastTileRowsInIndoorMaps
     sta NametableOffsetInBytes
     sta BossAgitated
@@ -6269,6 +6274,7 @@ LoadCheckPoint:
     lda #4
     sta LocationBankNo
     lda #0
+    sta StaminaToWarmthCounter
     sta hadKnockBack
     sta NpcCount ; do not generate anything
     sta TempScreenNpcCount
@@ -6939,6 +6945,20 @@ CheckRunButton:
     beq @exit ; no stamina
 
     dec Stamina
+
+    ;produce warmth
+    lda StaminaToWarmthCounter
+    clc
+    adc #1
+    cmp #MAX_STAMINA_TO_WARMTH_CNT
+    bcc @saveCounter
+
+    jsr IncreaseWarmth
+    lda #0
+
+@saveCounter:
+    sta StaminaToWarmthCounter
+
     lda PlayerMovesDiagonaly
     beq @notdiagonal
 

@@ -134,6 +134,9 @@
     PLAYER_HEIGHT              = 16
     PLAYER_STAMINA_SIZE        = 128
 
+    MAX_STAMINA_TO_WARMTH_CNT  = 50
+
+
     PLAYER_DAMAGED_DELAY       = 25 ; how long player remains red when damaged
     PLAYER_OUTLINE_COLOR_POS   = 29 ; black outline postion in sprite palette
 
