@@ -161,9 +161,11 @@ entry_points_loc22:
     .byte 49, 0, 52, 60, 0, 255, 72, 88
 entry_points_loc23:
     ;50. entrance to the main alien base
-    .byte 50, 1, 0, 255, 0, 255, 20, 32
+    .byte 50, 1, 0, 255, 0, 255, 10, 31
     ;51. exit to alien base puzzle room
     .byte 51, 0, 0, 255, 0, 255, 222, 255
+    ;52. entrance to the main alien base
+    .byte 50, 0, 0, 255, 0, 255, 10, 31
 
 .segment "ROM0"
 
@@ -376,6 +378,10 @@ MapSpawnPoint:
     ;exit to the puzzle room
     .byte 45, 38, 19, 3, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 2, 0, 0
     .byte 0, <alien_palette, >alien_palette, 2, 0, 0, 0
+    ;entrance to the main alien base
+    .byte 119, 210, 10, 2, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 4, 0, 0
+    .byte 0, <alien_palette, >alien_palette, 0, <alien_base_npcs, >alien_base_npcs, 0
+
 
 
 
@@ -462,7 +468,7 @@ EntryPointCountForLocation:
     .byte 1 ;20
     .byte 2 ;21
     .byte 1 ;22 wood location
-    .byte 2 ;23 alien base hallway
+    .byte 3 ;23 alien base hallway
 
 
 ;which location in which bank
