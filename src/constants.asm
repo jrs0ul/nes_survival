@@ -321,6 +321,7 @@
     ITEM_COAT                  = 11
     ITEM_RAW_JUMBO_MEAT        = 12
     ITEM_COOKED_JUMBO_MEAT     = 13
+    ITEM_ROPE                  = 14
     ITEM_FISHING_ROD           = 15
     ITEM_RAW_FISH              = 17
     ITEM_COOKED_FISH           = 18
@@ -411,6 +412,9 @@
     NPC_IDX_DEADMAN            = 6
     NPC_IDX_BOAR               = 7
     NPC_IDX_BOSS               = 8
+    NPC_IDX_SPIDER             = 9
+    NPC_IDX_SLIME              = 10
+    NPC_IDX_BARAKA             = 11
 
     DIALOG_TEXT_LENGTH         = 96
 

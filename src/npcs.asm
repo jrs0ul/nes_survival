@@ -1075,9 +1075,35 @@ ClearTextBaloon:
     sta TextBaloonIndex
 
     rts
+;----------------------------------
+PrepareKeyRewardSpawn:
+    lda #ITEM_KEY
+    sta TempItemIndex
+    lda #<Inventory
+    sta pointer2
+    lda #>Inventory
+    sta pointer2 + 1
+    jsr IsItemXInInventory
+    bne @exit
+    lda #<Storage
+    sta pointer2
+    lda #>Storage
+    sta pointer2 + 1
+    jsr IsItemXInInventory
+    bne @exit ; I already have the key
+    lda #ITEM_KEY
+    jmp @done
+@exit:
+    lda #0
+@done:
+    rts
 
-
-
+;-------------------------------------
+ItemGenRandom:
+    jsr UpdateRandomNumber
+    and #3
+    cmp #2
+    rts
 ;-------------------------------------
 DropItemAfterDeath:
 
@@ -1089,9 +1115,7 @@ DropItemAfterDeath:
     lda TempNpcIndex
     cmp #NPC_IDX_HOUND
     bne @test_Boar
-    jsr UpdateRandomNumber
-    and #3
-    cmp #2
+    jsr ItemGenRandom
     bcs @hide
 
     rts
@@ -1111,6 +1135,14 @@ DropItemAfterDeath:
     beq @superHammer
     cmp #NPC_IDX_DEADMAN
     beq @key
+    cmp #NPC_IDX_SPIDER
+    beq @randomSilk
+    cmp #NPC_IDX_BARAKA
+    bne @checkSlime
+    rts
+@checkSlime:
+    cmp #NPC_IDX_SLIME
+    beq @randompotion
 
     ;everything else
     lda #ITEM_RAW_MEAT
@@ -1118,22 +1150,24 @@ DropItemAfterDeath:
 @lamp:
     lda #ITEM_LAMP
     jmp @storeItem
+
+@randomSilk:
+    jsr ItemGenRandom
+    bcs @spidersilk
+    rts
+@spidersilk:
+    lda #ITEM_ROPE
+    jmp @storeItem
+@randompotion:
+    jsr ItemGenRandom
+    bcs @potion
+    rts
+@potion:
+    lda #ITEM_POTION
+    jmp @storeItem
 @key:
-    lda #ITEM_KEY
-    sta TempItemIndex
-    lda #<Inventory
-    sta pointer2
-    lda #>Inventory
-    sta pointer2 + 1
-    jsr IsItemXInInventory
-    bne @exit
-    lda #<Storage
-    sta pointer2
-    lda #>Storage
-    sta pointer2 + 1
-    jsr IsItemXInInventory
-    bne @exit ; I already have the key
-    lda #ITEM_KEY
+    jsr PrepareKeyRewardSpawn
+    beq @exit
     jmp @storeItem
 @grannysHead:
     lda #ITEM_GRANNYS_HEAD
@@ -1147,18 +1181,24 @@ DropItemAfterDeath:
     lda TempNpcIndex
     cmp #NPC_IDX_DOGMAN
     bne @continueSpecial
-
-    jsr UpdateRandomNumber
-    and #3
-    cmp #2
+@berriesOrRock:
+    jsr ItemGenRandom
     bcs @berries
     jmp @rock
 
 @continueSpecial:
-    jsr UpdateRandomNumber
-    and #3
-    cmp #2
+    cmp #NPC_IDX_SPIDER
+    beq @spidersilk
+    cmp #NPC_IDX_BARAKA
+    beq @berriesOrRock
+    cmp #NPC_IDX_SLIME
+    beq @potion
+
+    jsr ItemGenRandom
     bcs @hide
+@hide:
+    lda #ITEM_HIDE
+    jmp @storeItem
 @jumbo:
     lda #ITEM_RAW_JUMBO_MEAT
     jmp @storeItem
@@ -1167,9 +1207,6 @@ DropItemAfterDeath:
     jmp @storeItem
 @rock:
     lda #ITEM_ROCK
-    jmp @storeItem
-@hide:
-    lda #ITEM_HIDE
 @storeItem:
 
     asl
@@ -1188,6 +1225,11 @@ DropItemAfterDeath:
     lda #1
     sta TempItemScreen
 @continueSpawningItem:
+    jsr FinishSpawningItem
+@exit:
+    rts
+;-------------------------------------
+FinishSpawningItem:
     iny ; at item x
     sta Items, y
     dey ;screen index
@@ -1201,9 +1243,8 @@ DropItemAfterDeath:
     clc
     adc #8
     sta Items, y
-
-@exit:
     rts
+
 ;-------------------------------------
 CalcPlayerDmg:
     lda ShotWithProjectile
