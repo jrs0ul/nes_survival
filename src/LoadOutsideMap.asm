@@ -404,6 +404,9 @@ LoadOutsideMap:
 ;*****************************************
 
 @loadRest:
+    
+    lda #255
+    sta OldStamina
 
     jsr StatusBarLoad
     ;copy outside map palette to ram
