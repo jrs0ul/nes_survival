@@ -500,10 +500,6 @@ UpdateVillagerDialogSprites:
     lda EnteredBeforeNightfall
     bne @continue
 
-    jsr GetPaletteFadeValueForHour
-    cmp #DAYTIME_NIGHT
-    bne @continue
-
     lda VillagerIndex  ;don't show sprites if Bjorn
     beq @restoreXAndExit
 

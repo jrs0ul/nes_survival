@@ -748,7 +748,9 @@ EquipmentActivated      = DialogTextContainer + 26
 CurrentCraftingComponent= DialogTextContainer + 27
 MustBlinkFuel           = DialogTextContainer + 28
 FuelBlinkIteration      = DialogTextContainer + 29
-
+DocumentJustClosed      = DialogTextContainer + 30
+FoodMenuIndex           = DialogTextContainer + 31
+ItemMenuIndex           = DialogTextContainer + 32
 
 ;--Cutscene vars
 CutsceneSceneIdx        = DialogTextContainer
@@ -891,10 +893,6 @@ InventoryPointerY:
 InventoryPointerX:
     .res 1
 OldInventoryPointerY:
-    .res 1
-FoodMenuIndex: ; COOK OR EAT ?
-    .res 1
-ItemMenuIndex: ; USE or STORE ?
     .res 1
 InventoryItemIndex:
     .res 1
@@ -1252,9 +1250,6 @@ SelectedItemPower:
 TempNpcDataIdxForCollision:
     .res 1
 
-DocumentJustClosed:
-    .res 1
-
 PreviouslyEquipedItemIdx:
     .res 1
 EquipNextResetCount:
@@ -1357,7 +1352,7 @@ StaminaToWarmthCounter:
     .res 1
 
 BSS_Free_Bytes:
-    .res 1
+    .res 4
 
 ;====================================================================================
 

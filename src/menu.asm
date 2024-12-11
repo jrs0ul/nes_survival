@@ -116,6 +116,9 @@ ResetOverlayedMenuVars:
     sta MustDrawMenu
     sta MustResetMenu
     sta MenuStepLast
+    sta DocumentJustClosed
+    sta FoodMenuIndex
+    sta ItemMenuIndex
     ldx #0
 @craftingIndexesLoop:
     sta CraftingIndexes, x
@@ -3283,12 +3286,8 @@ GiveItem:
     lda EnteredBeforeNightfall
     bne @continue
 
-    jsr GetPaletteFadeValueForHour
-    cmp #DAYTIME_NIGHT
-    bne @continue
-
     lda VillagerIndex
-    bne @continue  ; no giving at night to bear
+    bne @continue  ; no giving at night to Bjorn
 
     rts
 

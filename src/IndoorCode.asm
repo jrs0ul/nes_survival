@@ -225,10 +225,6 @@ SetupVillagerText:
     lda EnteredBeforeNightfall
     bne @skipNightCheck
 
-    jsr GetPaletteFadeValueForHour
-    cmp #DAYTIME_NIGHT
-    bne @skipNightCheck
-
     rts
 
 @skipNightCheck:
