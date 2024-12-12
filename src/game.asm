@@ -285,6 +285,7 @@ knockBackValuesFractions:
 .include "data/main_palette.asm"
 .include "data/alien_palette.asm"
 .include "data/dark_cave_palette.asm"
+.include "data/normal_cave_palette.asm"
 .include "data/destructible_tiles.asm"
 
 game_over_palette:
@@ -4480,9 +4481,7 @@ AdaptBackgroundPaletteByTime:
     cmp #LOCATION_TYPE_OUTDOORS
     beq @calc ; if not in cave, we need to use lookup table to get certain fade level
 
-    ldx #5 ; evening time index
-    lda palette_fade_for_periods, x
-    jmp @cont
+    rts
 
 @dark_cave:
 

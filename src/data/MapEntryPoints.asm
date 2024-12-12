@@ -238,7 +238,7 @@ MapSpawnPoint:
     ;---------------
     ;The abandoned mine
     ;---------------
-    ;entrance to place where the plane is
+    ;entrance to crashsite
     .byte 120, 210, 7, OUTDOORS_LOC8_SCREEN_COUNT, LOCATION_TYPE_OUTDOORS, SONG_OUTSIDE_DAY, 2, 121, 1
     .byte 0, <main_palette, >main_palette, 0, 0, 0, 0
     ;exit to mine entrance location
@@ -246,7 +246,7 @@ MapSpawnPoint:
     .byte 1, <main_palette, >main_palette, 2, 0, 0, 2
     ;dark cave entrance
     .byte 15, 50, 13, 2, LOCATION_TYPE_DARK, SONG_OUTSIDE_NIGHT, 4, 0, 0
-    .byte 0, <main_palette, >main_palette, 3, <dark_cave_npcs, >dark_cave_npcs, 0
+    .byte 0, <cave_palette, >cave_palette, 3, <dark_cave_npcs, >dark_cave_npcs, 0
     ;alien base entrance top
     .byte 15, 90, 10, 2, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 4, 0, 0
     .byte 0, <alien_palette, >alien_palette, 0, <alien_base_npcs, >alien_base_npcs, 0
@@ -256,7 +256,7 @@ MapSpawnPoint:
     ;---------------------
     ;crashsite exit to cave
     .byte 120, 34, 6, OUTDOORS_LOC7_SCREEN_COUNT, LOCATION_TYPE_CAVE, SONG_OUTSIDE_NIGHT, 4, 128, 0
-    .byte 2, <main_palette, >main_palette, 0, <cave_npcs, >cave_npcs, 0
+    .byte 2, <cave_palette, >cave_palette, 0, <cave_npcs, >cave_npcs, 0
     ;crashsite exit to path
     .byte 94, 35, 18, 1, LOCATION_TYPE_OUTDOORS, SONG_OUTSIDE_DAY, 5, 0, 0
     .byte 0, <main_palette, >main_palette, 0, 0, 0, 0
@@ -269,7 +269,7 @@ MapSpawnPoint:
     .byte 0, <house_palette, >house_palette, 0, <villager3_npcs, >villager3_npcs, 0
     ;secret cave
     .byte 127, 209, 14, 1, LOCATION_TYPE_DARK, SONG_OUTSIDE_NIGHT, 4, 0, 0
-    .byte 0, <main_palette, >main_palette, 0, 0, 0, 0
+    .byte 0, <cave_palette, >cave_palette, 0, 0, 0, 0
     ;--------------------
     ;granny's house exit to the location 8
     .byte 119, 126, 8, OUTDOORS_LOC9_SCREEN_COUNT, LOCATION_TYPE_OUTDOORS, SONG_OUTSIDE_NIGHT, 5, 154, 0
@@ -277,7 +277,7 @@ MapSpawnPoint:
     ;------------
     ;alien base exit top
     .byte 200, 50, 6, OUTDOORS_LOC7_SCREEN_COUNT, LOCATION_TYPE_CAVE, SONG_OUTSIDE_NIGHT, 4, 0, 2
-    .byte 0, <main_palette, >main_palette, 0, <cave_npcs, >cave_npcs, 0
+    .byte 0, <cave_palette, >cave_palette, 0, <cave_npcs, >cave_npcs, 0
     ;alien base exit to hallway
     .byte 120, 40, 23, 3, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 1, 0, 1
     .byte 0, <alien_palette, >alien_palette, 3, <abase_hall_npcs, >abase_hall_npcs, 0
@@ -292,7 +292,7 @@ MapSpawnPoint:
     .byte 0, <main_palette, >main_palette, 3, 0, 0, 1
     ;cave entrance
     .byte 120, 207, 6, OUTDOORS_LOC7_SCREEN_COUNT, LOCATION_TYPE_CAVE, SONG_OUTSIDE_NIGHT, 4, 222, 0
-    .byte 2, <main_palette, >main_palette, 0, <cave_npcs, >cave_npcs, 0
+    .byte 2, <cave_palette, >cave_palette, 0, <cave_npcs, >cave_npcs, 0
     ;entrance to the path to the crashsite
     .byte 95, 215, 18, 1, LOCATION_TYPE_OUTDOORS, SONG_OUTSIDE_NIGHT, 5, 0, 0
     .byte 0, <main_palette, >main_palette, 0, 0, 0, 0
@@ -307,11 +307,11 @@ MapSpawnPoint:
     ;----------------
     ;Dark cave exit to light cave
     .byte 230, 180, 6, OUTDOORS_LOC7_SCREEN_COUNT, LOCATION_TYPE_CAVE, SONG_OUTSIDE_NIGHT, 4, 0, 2
-    .byte 0, <main_palette, >main_palette, 0, <cave_npcs, >cave_npcs, 0
+    .byte 0, <cave_palette, >cave_palette, 0, <cave_npcs, >cave_npcs, 0
 
     ;entrance to a second dark cave segment
     .byte 200, 60, 16, 3, LOCATION_TYPE_DARK, SONG_OUTSIDE_NIGHT, 4, 0, 2
-    .byte 0, <main_palette, >main_palette, 3, 0, 0, 2
+    .byte 0, <cave_palette, >cave_palette, 3, 0, 0, 2
     ;---------------------
     ;secret cave exit to location 8
     .byte 156, 140, 8, OUTDOORS_LOC9_SCREEN_COUNT, LOCATION_TYPE_OUTDOORS, SONG_OUTSIDE_DAY, 5, 0 ,2
@@ -319,24 +319,24 @@ MapSpawnPoint:
     ;-----------------------
     ;exit of mine room
     .byte 120, 145, 6, OUTDOORS_LOC7_SCREEN_COUNT, LOCATION_TYPE_CAVE, SONG_OUTSIDE_NIGHT, 4, 24, 0
-    .byte 0, <main_palette, >main_palette, 0, <cave_npcs, >cave_npcs, 0
+    .byte 0, <cave_palette, >cave_palette, 0, <cave_npcs, >cave_npcs, 0
     ;-----------------------
     ;exit to first dark cave
     .byte 200, 200, 13, 2, LOCATION_TYPE_DARK, SONG_OUTSIDE_NIGHT, 4, 0, 1
-    .byte 0, <main_palette, >main_palette, 3, <dark_cave_npcs, >dark_cave_npcs, 1
+    .byte 0, <cave_palette, >cave_palette, 3, <dark_cave_npcs, >dark_cave_npcs, 1
     ;alien base lobby entrance
     .byte 53, 129, 17, 1, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 0, 0, 0
-    .byte 0, <main_palette, >main_palette, 0, 0, 0, 0
+    .byte 0, <alien_palette, >alien_palette, 0, 0, 0, 0
     ;lonely cave entrance
     .byte 130, 41, 21, 0, LOCATION_TYPE_CAVE, SONG_OUTSIDE_NIGHT, 3, 0, 0
-    .byte 0, <main_palette, >main_palette, 0, <lonely_cave_npcs, >lonely_cave_npcs, 0
+    .byte 0, <cave_palette, >cave_palette, 0, <lonely_cave_npcs, >lonely_cave_npcs, 0
     ;------------
     ;alien base entrance bottom (pre)
     .byte 15, 170, 19, 3, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 2, 0, 0
     .byte 0, <alien_palette, >alien_palette, 2, 0, 0, 0
     ;exit to dark cave 2
     .byte 96, 196, 16, 3, LOCATION_TYPE_DARK, SONG_OUTSIDE_NIGHT, 4, 0, 0
-    .byte 0, <main_palette, >main_palette, 3, 0, 0, 0
+    .byte 0, <cave_palette, >cave_palette, 3, 0, 0, 0
     ;entrance of the cave-room
     .byte 120, 152, 20, 1, LOCATION_TYPE_HOUSE, SONG_INDOORS, 3, 0, 0
     .byte 0, <house_palette, >house_palette, 0, <list_empty, >list_empty, 0
@@ -350,7 +350,7 @@ MapSpawnPoint:
     ;------------------
     ;exit to lobby
     .byte 229, 134, 17, 1, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 0, 0, 0
-    .byte 0, <main_palette, >main_palette, 0, 0, 0, 0
+    .byte 0, <alien_palette, >alien_palette, 0, 0, 0, 0
     ;entrance to alienbase hallway
     .byte 120, 210, 23, 3, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 1, 184, 0
     .byte 0, <alien_palette, >alien_palette, 3, <abase_hall_npcs, >abase_hall_npcs, 0
@@ -361,14 +361,14 @@ MapSpawnPoint:
     ;------------------
     ;exit from lonely cave to the dark cave 2
     .byte 120, 212, 16, 3, LOCATION_TYPE_DARK, SONG_OUTSIDE_NIGHT, 4, 234, 0
-    .byte 0, <main_palette, >main_palette, 3, 0, 0, 0
+    .byte 0, <cave_palette, >cave_palette, 3, 0, 0, 0
     ;entrance to the wood location
     .byte 56, 112, 22, 2, LOCATION_TYPE_OUTDOORS, SONG_OUTSIDE_DAY, 3, 0, 0
     .byte 0, <main_palette, >main_palette, 0, 0, 0, 0
     ;---------------------
     ;exit to lonely cave from wood location
     .byte 192, 219, 21, 1, LOCATION_TYPE_CAVE, SONG_OUTSIDE_NIGHT, 3, 0, 0
-    .byte 0, <main_palette, >main_palette, 0, <lonely_cave_npcs, >lonely_cave_npcs, 0
+    .byte 0, <cave_palette, >cave_palette, 0, <lonely_cave_npcs, >lonely_cave_npcs, 0
     ;-----------------------
     ;  alien base hallway
     ;-----------------------
