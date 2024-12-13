@@ -6290,10 +6290,10 @@ LoadCheckPoint:
     sta ItemListPtr + 1
     jsr LoadItems
 
-    lda #<alien_palette
+    lda #<cave_palette
     sta CurrentMapPalettePtr
     sta PalettePtr
-    lda #>alien_palette
+    lda #>cave_palette
     sta CurrentMapPalettePtr + 1
     sta PalettePtr + 1
 

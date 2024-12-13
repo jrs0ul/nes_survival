@@ -322,7 +322,7 @@ MapSpawnPoint:
     .byte 0, <cave_palette, >cave_palette, 0, <cave_npcs, >cave_npcs, 0
     ;-----------------------
     ;exit to first dark cave
-    .byte 200, 200, 13, 2, LOCATION_TYPE_DARK, SONG_OUTSIDE_NIGHT, 4, 0, 1
+    .byte 200, 200, 13, 3, LOCATION_TYPE_DARK, SONG_OUTSIDE_NIGHT, 4, 0, 2
     .byte 0, <cave_palette, >cave_palette, 3, <dark_cave_npcs, >dark_cave_npcs, 1
     ;alien base lobby entrance
     .byte 53, 129, 17, 1, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 0, 0, 0
