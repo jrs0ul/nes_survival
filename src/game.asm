@@ -5173,11 +5173,13 @@ CalcMapColumnToUpdate:
     adc #$3
     sta pointer + 1
 
-
     lda pointer
     clc
     adc AttribColumnIdxToUpdate
     sta pointer
+    lda pointer + 1 ; what if carry overflows ? let's add it to higher byte
+    adc #0
+    sta pointer + 1
 
     ldx #0 ;
     lda #$40
@@ -5191,11 +5193,11 @@ CalcMapColumnToUpdate:
     ldy #0
 @attribLoop:
 
-
     lda (pointer), y
     sta MapColumnAttributes, x
 
     tya
+    clc
     adc #8
     tay
 
