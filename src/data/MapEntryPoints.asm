@@ -357,7 +357,7 @@ MapSpawnPoint:
     ;------------------
     ;exit to alien lobby
     .byte 126, 60, 17, 1, LOCATION_TYPE_ALIEN_BASE, SONG_OUTSIDE_NIGHT, 0, 0, 0
-    .byte 0, <main_palette, >main_palette, 0, 0, 0, 0
+    .byte 0, <alien_palette, >alien_palette, 0, 0, 0, 0
     ;------------------
     ;exit from lonely cave to the dark cave 2
     .byte 120, 212, 16, 3, LOCATION_TYPE_DARK, SONG_OUTSIDE_NIGHT, 4, 234, 0
