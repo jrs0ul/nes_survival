@@ -14,8 +14,8 @@ item_data: ;          ---||---
     .byte $42, 0, 2, %00100001  ; 1  stick
     .byte $64, 1, 1, %00000101  ; 2  raw meat
     .byte $64, 0, 1, %01000000  ; 3  cooked meat
-    .byte $44, 2, 3, %00100101  ; 4  rowan berries
-    .byte $5A, 2, 3, %01000000  ; 5  potion
+    .byte $44, 2, 3, %00010001  ; 4  rowan berries
+    .byte $5A, 2, 3, %01000010  ; 5  potion
     .byte $68, 3, 4, 0          ; 6  rock
     .byte $3E, 2, 5, 9          ; 7  spear
     .byte $56, 2, 5, 2          ; 8  knife
@@ -40,7 +40,7 @@ item_data: ;          ---||---
     .byte $5C, 2, 4, 0          ; 27 granny's head
     .byte $48, 1, 7, 0          ; 28 letter about the rock
     .byte $6A, 1, 4, 0          ; 29 key
-    .byte $6C, 1, 1, %00110000  ; 30 mushroom
+    .byte $6C, 1, 1, %00010101  ; 30 mushroom
     .byte $40, 2, 3, %00100101  ; 31 medicinal shroom
 
 items_with_progressbars: ;item type is index here
