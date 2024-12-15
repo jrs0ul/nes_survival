@@ -24,9 +24,21 @@ npc_data:
     .byte 2, 3, 17, 1, 7,   8, <npc_BARAKA_frames,  >npc_BARAKA_frames      ;11 Baraka
     .byte 2, 2, 9,  0, 255, 0, <npc_CAT_frames,     >npc_CAT_frames         ;12 Cat
 
-npc_speeds:
-    .byte 0, 0, 0, 0, 0, 0, 0, 0 ;0
-    .byte 0, 0, 0, 0, 0, 0, 0, 0 ;1
+
+;0 reg. speed int
+;1 reg. speed fraction,
+;2 agitated speed int,
+;3 agitated speed fraction,
+;4 diagonal reg. speed int
+;5 diagonal reg. speed fraction,
+;6 diagonal agitated speed int,
+;7 diagonal agitated speed fraction,
+
+.if FAMISTUDIO_CFG_PAL_SUPPORT
+
+npc_velocities:
+    .byte   0,  0, 0,   0, 0,   0, 0,  0 ;0
+    .byte   1, 44, 1, 154, 0, 212, 1, 34 ;1
     .byte 0, 0, 0, 0, 0, 0, 0, 0 ;2
     .byte 0, 0, 0, 0, 0, 0, 0, 0 ;3
     .byte 0, 0, 0, 0, 0, 0, 0, 0 ;4
@@ -38,3 +50,38 @@ npc_speeds:
     .byte 0, 0, 0, 0, 0, 0, 0, 0 ;10
     .byte 0, 0, 0, 0, 0, 0, 0, 0 ;11
     .byte 0, 0, 0, 0, 0, 0, 0, 0 ;12
+
+.else ; NTSC speeds
+
+npc_velocities:
+    .byte 0,   0, 0,   0, 0,   0, 0,  0 ;0
+    .byte 0, 250, 1, 128, 0, 177, 1, 16 ;1
+    .byte 0, 0, 0, 0, 0, 0, 0, 0 ;2
+    .byte 0, 0, 0, 0, 0, 0, 0, 0 ;3
+    .byte 0, 0, 0, 0, 0, 0, 0, 0 ;4
+    .byte 0, 0, 0, 0, 0, 0, 0, 0 ;5
+    .byte 0, 0, 0, 0, 0, 0, 0, 0 ;6
+    .byte 0, 0, 0, 0, 0, 0, 0, 0 ;7
+    .byte 0, 0, 0, 0, 0, 0, 0, 0 ;8
+    .byte 0, 0, 0, 0, 0, 0, 0, 0 ;9
+    .byte 0, 0, 0, 0, 0, 0, 0, 0 ;10
+    .byte 0, 0, 0, 0, 0, 0, 0, 0 ;11
+    .byte 0, 0, 0, 0, 0, 0, 0, 0 ;12
+
+.endif
+
+npc_vel_lookup:
+    .byte 0 ;0
+    .byte 8 ;1
+    .byte 16 ;2
+    .byte 24 ;3
+    .byte 32 ;4
+    .byte 40 ;5
+    .byte 48 ;6
+    .byte 56 ;7
+    .byte 64 ;8
+    .byte 72 ;9
+    .byte 80 ;10
+    .byte 88 ;11
+    .byte 96 ;12
+

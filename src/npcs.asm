@@ -2434,14 +2434,24 @@ NpcMovement:
 
     lda TempNpcMovesDiagonaly
     beq @movesNormaly
-    lda #NPC_SPEED_DIAG
+    ldy TempNpcIndex
+    lda npc_vel_lookup, y
+    clc
+    adc #4
+    tay ; diag norm speed int
+    lda npc_velocities, y
     sta TempNpcSpeed
-    lda #NPC_SPEED_DIAG_FRACTION
+    iny ; diag norm speed fraction
+    lda npc_velocities, y
     sta TempNpcSpeed + 1
 @movesNormaly:
-    lda #NPC_SPEED
+    ldy TempNpcIndex
+    lda npc_vel_lookup, y
+    tay ; norm speed int
+    lda npc_velocities, y
     sta TempNpcSpeed
-    lda #NPC_SPEED_FRACTION
+    iny ; norm speed fraction
+    lda npc_velocities, y
     sta TempNpcSpeed + 1
 
 
@@ -2460,14 +2470,28 @@ NpcMovement:
 
     lda TempNpcMovesDiagonaly
     beq @movesnormalyagitated
-    lda #NPC_SPEED_AGITATED_DIAG ; if agitated, go realy fast
+
+    ldy TempNpcIndex
+    lda npc_vel_lookup, y
+    clc
+    adc #6
+    tay; agitated diagonal int
+    lda npc_velocities, y ; if agitated, go realy fast
     sta TempNpcSpeed
-    lda #NPC_SPEED_AGITATED_DIAG_FRACTION
+    iny ; agitated digonal fraction
+    lda npc_velocities, y
     sta TempNpcSpeed + 1
 @movesnormalyagitated:
-    lda #NPC_SPEED_AGITATED ; if agitated, go realy fast
+
+    ldy TempNpcIndex
+    lda npc_vel_lookup, y
+    clc
+    adc #2
+    tay ; agitated speed int
+    lda npc_velocities, y ; if agitated, go realy fast
     sta TempNpcSpeed
-    lda #NPC_SPEED_AGITATED_FRACTION
+    iny ; agitated speed fraction
+    lda npc_velocities, y
     sta TempNpcSpeed + 1
 @done_timid:
     inx
