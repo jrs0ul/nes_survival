@@ -18,7 +18,7 @@ location_spawns_low:
     .byte <spawnpoints_loc_17       ; 16
     .byte 0                         ; 17
     .byte 0                         ; 18
-    .byte <spawnpoints_loc_20       ; 19
+    .byte <spawnpoints_loc_20       ; 19 puzzle room
     .byte 0                         ; 20
     .byte 0                         ; 21
     .byte 0                         ; 22
@@ -165,10 +165,10 @@ spawnpoints_loc_17:
     .byte 8, 96
 
 spawnpoints_loc_20:
-    .byte 80, 56
-    .byte 176, 144
-    .byte 232, 86
-    .byte 232, 192
+    .byte 80, 56    ;10 7
+    .byte 145, 144  ;18
+    .byte 232, 86   ;29 11
+    .byte 232, 192  ;29 24
 
     .byte 112, 112
     .byte 215, 96
