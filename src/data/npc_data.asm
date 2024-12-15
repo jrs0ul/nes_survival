@@ -24,4 +24,17 @@ npc_data:
     .byte 2, 3, 17, 1, 7,   8, <npc_BARAKA_frames,  >npc_BARAKA_frames      ;11 Baraka
     .byte 2, 2, 9,  0, 255, 0, <npc_CAT_frames,     >npc_CAT_frames         ;12 Cat
 
-
+npc_speeds:
+    .byte 0, 0, 0, 0, 0, 0, 0, 0 ;0
+    .byte 0, 0, 0, 0, 0, 0, 0, 0 ;1
+    .byte 0, 0, 0, 0, 0, 0, 0, 0 ;2
+    .byte 0, 0, 0, 0, 0, 0, 0, 0 ;3
+    .byte 0, 0, 0, 0, 0, 0, 0, 0 ;4
+    .byte 0, 0, 0, 0, 0, 0, 0, 0 ;5
+    .byte 0, 0, 0, 0, 0, 0, 0, 0 ;6
+    .byte 0, 0, 0, 0, 0, 0, 0, 0 ;7
+    .byte 0, 0, 0, 0, 0, 0, 0, 0 ;8
+    .byte 0, 0, 0, 0, 0, 0, 0, 0 ;9
+    .byte 0, 0, 0, 0, 0, 0, 0, 0 ;10
+    .byte 0, 0, 0, 0, 0, 0, 0, 0 ;11
+    .byte 0, 0, 0, 0, 0, 0, 0, 0 ;12

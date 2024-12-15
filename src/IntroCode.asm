@@ -382,6 +382,53 @@ DoScrolling:
     rts
 
 ;-----------------------------
+CutsceneMain:
+
+    ldy #CUTSCENE_SCENE_DELAY_POS
+    lda (CutsceneDataPtr), y
+    sta pointer
+    iny
+    lda (CutsceneDataPtr), y
+    sta pointer + 1
+
+    ldy CutsceneSceneIdx
+    lda (pointer), y
+    sta CutsceneDelay
+    lda #0
+    sta CutsceneDelay + 1
+
+
+    jsr CutsceneLogics
+    beq @SpriteUpdate
+
+    lda CutsceneIdx
+    bne @SpriteUpdate ; don't start the game if idx is 1 or 2
+
+    lda DemoModeOn
+    beq @startGame
+
+    lda #0
+    sta DemoModeOn
+    sta TitleScreenTimer
+
+    lda #1
+    sta MustLoadTitleCHR
+    lda #1
+    sta MustLoadSomething
+    sta MustLoadTitle
+
+    lda #%10010000
+    sta PPUCTRL
+    jmp @exit
+
+@startGame:
+    jsr FadeOutToStartGame
+@SpriteUpdate:
+    jsr UpdateCutsceneSprites
+
+@exit:
+    rts
+;-----------------------------
 ;x register is CutsceneSceneIdx
 CutsceneLogics:
 
@@ -1271,7 +1318,55 @@ GameOverHintUpdate:
 @exit:
     rts
 
+.segment "ROM2"
+;-------------------------
+LoadTitleGraphics:
+    lda #ARGUMENT_STACK_HI
+    sta sp
+    lda #ARGUMENT_STACK_LO
+    sta sp + 1
 
+
+    lda #<title_tiles_chr
+    ldy #$02
+    sta (sp),y
+    iny
+    lda #>title_tiles_chr
+    sta (sp),y
+    lda #$00
+    tay
+    sta (sp),y
+    iny
+    lda #19
+    sta (sp),y
+    ldx #13
+    lda #0
+    jsr UnLZ4toVram
+
+    lda #ARGUMENT_STACK_HI
+    sta sp
+    lda #ARGUMENT_STACK_LO
+    sta sp + 1
+
+
+    lda #<game_logo_chr
+    ldy #$02
+    sta (sp),y
+    iny
+    lda #>game_logo_chr
+    sta (sp),y
+    lda #$00
+    tay
+    sta (sp),y
+    iny
+    lda #14
+    sta (sp),y
+    ldx #2
+    lda #0
+    jsr UnLZ4toVram
+
+
+rts
 
 
 .segment "CODE"

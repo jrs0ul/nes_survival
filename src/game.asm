@@ -1412,21 +1412,10 @@ clrmem:
     lda #0
     sta NMINotFinished
     sta FlickerFrame
-    
 
     ldy #6
     jsr bankswitch_y
-    ldx #<sounds
-    ldy #>sounds
-    jsr famistudio_sfx_init
-
-    ldx #<music_data_untitled
-    ldy #>music_data_untitled
-    lda #1
-    jsr famistudio_init
-    lda #2
-    jsr famistudio_music_play
-
+    jsr SoundInit
 
 vblankwait2:      ; Second wait for vblank, PPU is ready after this
     bit $2002
@@ -1442,7 +1431,7 @@ vblankwait2:      ; Second wait for vblank, PPU is ready after this
     lda #%10010000   ; enable NMI, sprites from Pattern Table 0
     sta PPUCTRL
     sta $2000
-    
+
     lda #%00011110   ; enable sprites
     sta $2001
 
@@ -1545,7 +1534,6 @@ nextIteration:
     cmp #STATE_GAME
     bne checkMenuState
 
-
     jsr RunSpriteUpdate
 
     jmp runrandom
@@ -1576,8 +1564,10 @@ checkCutscene:
     sbc #CUTSCENE_DELAY_DECREMENT
     sta CutsceneDelay
     bpl runrandom
-
-    jsr doCutscene
+    ; cutscene time !
+    ldy #5
+    jsr bankswitch_y
+    jsr CutsceneMain ; from BANK 5
     jmp runrandom
 
 checkTitle:
@@ -1599,7 +1589,6 @@ hide_sprites:
 
 runrandom:
     jsr UpdateRandomNumber
-
 
     lda #0
     sta NMIActive
@@ -1839,6 +1828,22 @@ AnimateTitleTiles:
     rts
 ;-----------------------------------
 .segment "ROM6"
+SoundInit:
+    ldx #<sounds
+    ldy #>sounds
+    jsr famistudio_sfx_init
+
+    ldx #<music_data_untitled
+    ldy #>music_data_untitled
+    lda #1
+    jsr famistudio_init
+    lda #2
+    jsr famistudio_music_play
+
+
+    rts
+
+;------------------------
 SoundUpdate:
 
     lda MustStopMusic
@@ -1912,56 +1917,6 @@ doGameOver:
 
     rts
 
-;---------------------------------
-doCutscene:
-
-    ldy #5
-    jsr bankswitch_y
-
-    ldy #CUTSCENE_SCENE_DELAY_POS
-    lda (CutsceneDataPtr), y
-    sta pointer
-    iny
-    lda (CutsceneDataPtr), y
-    sta pointer + 1
-
-    ldy CutsceneSceneIdx
-    lda (pointer), y
-    sta CutsceneDelay
-    lda #0
-    sta CutsceneDelay + 1
-
-
-    jsr CutsceneLogics
-    beq @SpriteUpdate
-
-    lda CutsceneIdx
-    bne @SpriteUpdate ; don't start the game if idx is 1 or 2
-
-    lda DemoModeOn
-    beq @startGame
-
-    lda #0
-    sta DemoModeOn
-    sta TitleScreenTimer
-
-    lda #1
-    sta MustLoadTitleCHR
-    lda #1
-    sta MustLoadSomething
-    sta MustLoadTitle
-
-    lda #%10010000
-    sta PPUCTRL
-    jmp @exit
-
-@startGame:
-    jsr FadeOutToStartGame
-@SpriteUpdate:
-    jsr UpdateCutsceneSprites
-
-@exit:
-    rts
 ;---------------------------------
 doTitle:
 
@@ -5498,77 +5453,14 @@ HideSprites:
 ;--------------------------------------------
 LoadTitleGfx:
     ldy #0
-    jsr bankswitch_y ;switching to Title/Game Over bank
+    jsr bankswitch_y ;switching to font bank
 
-    lda #ARGUMENT_STACK_HI
-    sta sp
-    lda #ARGUMENT_STACK_LO
-    sta sp + 1
-
-    lda #<font
-    ldy #2
-    sta (sp), y
-    iny
-    lda #>font
-    sta (sp), y
-    lda #0
-    ldy #0
-    sta (sp), y
-    iny
-    lda #16
-    sta (sp), y
-    ldx #$03
-    lda #0
-    jsr UnLZ4toVram
+    jsr LoadFontChr
 
     ldy #2
     jsr bankswitch_y ;switching to Title/Game Over bank
 
-    lda #ARGUMENT_STACK_HI
-    sta sp
-    lda #ARGUMENT_STACK_LO
-    sta sp + 1
-
-
-    lda #<title_tiles_chr
-    ldy #$02
-    sta (sp),y
-    iny
-    lda #>title_tiles_chr
-    sta (sp),y
-    lda #$00
-    tay
-    sta (sp),y
-    iny
-    lda #19
-    sta (sp),y
-    ldx #13
-    lda #0
-    jsr UnLZ4toVram
-
-    lda #ARGUMENT_STACK_HI
-    sta sp
-    lda #ARGUMENT_STACK_LO
-    sta sp + 1
-
-
-    lda #<game_logo_chr
-    ldy #$02
-    sta (sp),y
-    iny
-    lda #>game_logo_chr
-    sta (sp),y
-    lda #$00
-    tay
-    sta (sp),y
-    iny
-    lda #14
-    sta (sp),y
-    ldx #2
-    lda #0
-    jsr UnLZ4toVram
-
-
+    jsr LoadTitleGraphics
 
     rts
 
@@ -5711,6 +5603,31 @@ LoadGameOver:
 
 .segment "ROM0"
 ;-------------------------------------
+LoadFontChr:
+    lda #ARGUMENT_STACK_HI
+    sta sp
+    lda #ARGUMENT_STACK_LO
+    sta sp + 1
+
+    lda #<font
+    ldy #2
+    sta (sp), y
+    iny
+    lda #>font
+    sta (sp), y
+    lda #0
+    ldy #0
+    sta (sp), y
+    iny
+    lda #16
+    sta (sp), y
+    ldx #$03
+    lda #0
+    jsr UnLZ4toVram
+
+rts
+;--------------------------------------
+
 SaveGame:
 
     ldy #0
