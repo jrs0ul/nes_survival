@@ -99,7 +99,7 @@
 
     INPUT_DELAY                = 100
     ITEM_DELAY                 = 220
-    NPC_AI_DELAY               = 190
+    NPC_AI_DELAY               = 150
     NPC_COLLISION_DELAY        = 255
     FISHING_DELAY              = 2
     STAMINA_DELAY              = 2
@@ -262,6 +262,9 @@
     SFX_EAT                    = 8
     SFX_BURN                   = 9
     SFX_FRY                    = 10
+    SFX_UNLOCK                 = 11
+    SFX_EQUIP                  = 12
+    SFX_STORE                  = 13
 
 
     INVENTORY_ITEM_HP_X_POS    = 17

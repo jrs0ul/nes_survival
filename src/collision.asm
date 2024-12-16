@@ -351,6 +351,9 @@ IsCollidingWithAModifiedTile:
     lda #1
     sta ModifiedTiles, x
     sta MustUpdateDestructibles
+    sta MustPlaySfx
+    lda #SFX_UNLOCK
+    sta SfxName
     jmp @cont
     ;---------end of crutch
 

@@ -20,6 +20,9 @@ sounds:
 	.word @sfx_ntsc_eat
 	.word @sfx_ntsc_burn
 	.word @sfx_ntsc_cook
+	.word @sfx_ntsc_unlock
+	.word @sfx_ntsc_equip
+	.word @sfx_ntsc_store
 
 @sfx_ntsc_pickup:
 	.byte $81,$a2,$82,$01,$80,$3f,$89,$f0,$01,$81,$80,$01,$81,$5e,$01,$81
@@ -55,6 +58,16 @@ sounds:
 @sfx_ntsc_burn:
 	.byte $8a,$05,$89,$3f,$03,$8a,$03,$04,$8a,$01,$09,$00
 @sfx_ntsc_cook:
-	.byte $8a,$03,$89,$3f,$03,$8a,$04,$07,$8a,$03,$14,$00
+	.byte $89,$f0,$05,$8a,$03,$89,$3f,$05,$8a,$02,$05,$8a,$01,$05,$8a,$00
+	.byte $05,$00
+@sfx_ntsc_unlock:
+	.byte $8a,$0d,$89,$3f,$03,$8a,$0c,$04,$8a,$0b,$03,$89,$f0,$0a,$8a,$0f
+	.byte $89,$3f,$0a,$00
+@sfx_ntsc_equip:
+	.byte $81,$ab,$82,$01,$80,$3f,$89,$f0,$05,$81,$7c,$05,$81,$52,$05,$81
+	.byte $3f,$05,$00
+@sfx_ntsc_store:
+	.byte $89,$f0,$05,$8a,$02,$89,$3f,$02,$8a,$01,$03,$8a,$00,$02,$8a,$0f
+	.byte $03,$8a,$0e,$03,$8a,$0d,$02,$00
 
 .export sounds

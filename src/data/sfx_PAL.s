@@ -20,6 +20,9 @@ sounds:
 	.word @sfx_pal_eat
 	.word @sfx_pal_burn
 	.word @sfx_pal_cook
+	.word @sfx_pal_unlock
+	.word @sfx_pal_equip
+	.word @sfx_pal_store
 
 @sfx_pal_pickup:
 	.byte $81,$84,$82,$01,$80,$3f,$89,$f0,$01,$81,$64,$01,$81,$44,$01,$81
@@ -55,6 +58,16 @@ sounds:
 @sfx_pal_burn:
 	.byte $8a,$05,$89,$3f,$03,$8a,$03,$03,$8a,$01,$07,$00
 @sfx_pal_cook:
-	.byte $8a,$03,$89,$3f,$03,$8a,$04,$05,$8a,$03,$11,$00
+	.byte $89,$f0,$04,$8a,$03,$89,$3f,$04,$8a,$02,$05,$8a,$01,$04,$8a,$00
+	.byte $04,$00
+@sfx_pal_unlock:
+	.byte $8a,$0d,$89,$3f,$03,$8a,$0c,$03,$8a,$0b,$02,$89,$f0,$09,$8a,$0f
+	.byte $89,$3f,$08,$00
+@sfx_pal_equip:
+	.byte $81,$8c,$82,$01,$80,$3f,$89,$f0,$04,$81,$61,$04,$81,$3a,$05,$81
+	.byte $29,$04,$00
+@sfx_pal_store:
+	.byte $89,$f0,$04,$8a,$02,$89,$3f,$02,$8a,$01,$02,$8a,$00,$02,$8a,$0f
+	.byte $03,$8a,$0e,$02,$8a,$0d,$02,$00
 
 .export sounds

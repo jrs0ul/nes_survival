@@ -1780,6 +1780,21 @@ SleepMenuInput:
 
 @exit:
     rts
+;--------------------------------------
+PlaySfx_InvenotryFull:
+    lda #1
+    sta MustPlaySfx
+    lda #SFX_INVENTORY_FULL
+    sta SfxName
+    rts
+;--------------------------------------
+PlaySfx_ItemBreaks:
+    lda #1
+    sta MustPlaySfx
+    lda #SFX_WEAPON_BREAKS
+    sta SfxName
+
+    rts
 
 ;--------------------------------------
 DocumentMenuInput:
@@ -1825,8 +1840,10 @@ DocumentMenuInput:
     beq @Cancel_pressed
 
     jsr LoadSelectedItemInfo
-    beq @exit
+    bne @goON
+    rts
 
+@goON:
     lda ItemMenuIndex
     bne @otherOptions
 
@@ -1852,37 +1869,55 @@ DocumentMenuInput:
 
     lda ItemMenuIndex
     cmp #1
-    bne @justDropIt
+    bne @discard
     ;store
 
     jsr StoreItemInStash
-    bne @exit
+    bne @OutOfRoom ; can't store
+
+    lda #1
+    sta MustPlaySfx
+    lda #SFX_STORE
+    sta SfxName
+
     jmp @justDropIt
 @stashActive: ; take or drop
 
     lda ItemMenuIndex
     cmp #1
-    bne @justDropIt
+    bne @discard
 
     ;take
     jsr TakeItemFromStash
-    bne @exit
+    bne @OutOfRoom
+    lda #1
+    sta MustPlaySfx
+    lda #SFX_ITEM_PICKUP
+    sta SfxName
+
     jmp @justDropIt
 
 @notAtHome: ;give, drop
 
     lda LocationType
     cmp #LOCATION_TYPE_VILLAGER
-    bne @justDropIt
+    bne @discard
 
     ;give or drop
     lda ItemMenuIndex
     cmp #1
-    bne @justDropIt
+    bne @discard
 
     jsr GiveItem
     beq @hidemenu
+    jmp @justDropIt
 
+@OutOfRoom:
+    jsr PlaySfx_InvenotryFull
+    jmp @exit
+
+@discard:
+    jsr PlaySfx_ItemBreaks
 
 @justDropIt:
     jsr ClearThatItem
@@ -3427,8 +3462,9 @@ ItemMenuInput:
     beq @Cancel_pressed
 
     jsr LoadSelectedItemInfo
-    beq @exit
-
+    bne @goOn
+    rts
+@goOn:
     lda LocationType
     cmp #LOCATION_TYPE_HOUSE
     beq @inHouse
@@ -3467,7 +3503,7 @@ ItemMenuInput:
 ;-
 @checkIfStash:
     cmp #1
-    bne @clearItem ; go to DROP
+    bne @discard; go to DROP
 
     lda LocationType
     cmp #LOCATION_TYPE_HOUSE
@@ -3490,6 +3526,13 @@ ItemMenuInput:
 @take_from_stash:
     jsr TakeItemFromStash
     bne @exit ;failed to retrieve
+    jmp @clearItem
+
+@discard:
+    lda #1
+    sta MustPlaySfx
+    lda #SFX_WEAPON_BREAKS
+    sta SfxName
 
 @clearItem:
     jsr ClearThatItem
