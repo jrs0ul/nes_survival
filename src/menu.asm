@@ -1795,6 +1795,27 @@ PlaySfx_ItemBreaks:
     sta SfxName
 
     rts
+;--------------------------------------
+PlaySfx_Pickup:
+    lda #1
+    sta MustPlaySfx
+    lda #SFX_ITEM_PICKUP
+    sta SfxName
+    rts
+;--------------------------------------
+PlaySfx_Store:
+    lda #1
+    sta MustPlaySfx
+    lda #SFX_STORE
+    sta SfxName
+    rts
+;--------------------------------------
+PlaySfx_Equip:
+    lda #1
+    sta MustPlaySfx
+    lda #SFX_EQUIP
+    sta SfxName
+    rts
 
 ;--------------------------------------
 DocumentMenuInput:
@@ -1874,11 +1895,7 @@ DocumentMenuInput:
 
     jsr StoreItemInStash
     bne @OutOfRoom ; can't store
-
-    lda #1
-    sta MustPlaySfx
-    lda #SFX_STORE
-    sta SfxName
+    jsr PlaySfx_Store
 
     jmp @justDropIt
 @stashActive: ; take or drop
@@ -1890,10 +1907,7 @@ DocumentMenuInput:
     ;take
     jsr TakeItemFromStash
     bne @OutOfRoom
-    lda #1
-    sta MustPlaySfx
-    lda #SFX_ITEM_PICKUP
-    sta SfxName
+    jsr PlaySfx_Pickup
 
     jmp @justDropIt
 
@@ -3045,6 +3059,7 @@ ToolMenuInputAtHome:
     sta pointer + 1
     jsr EquipItem
     beq @hidemenu ;return 0
+    jsr PlaySfx_Equip
     jmp @clearItem ;return 1
 
 @equipClothes:
@@ -3054,24 +3069,34 @@ ToolMenuInputAtHome:
     sta pointer + 1
     jsr EquipItem
     beq @hidemenu ;return 0
+    jsr PlaySfx_Equip
     jmp @clearItem ;return 1
 
 
 @checkIfStash:
     cmp #1
-    bne @clearItem ; DROP
+    bne @discard ; DROP
     lda StashActivated
     bne @take_from_stash
     jsr StoreItemInStash
-    bne @exit ;failed to add to stash
+    bne @OutOfRoom ;failed to add to stash
+    jsr PlaySfx_Store
     jmp @clearItem
 @take_from_stash:
     jsr TakeItemFromStash
-    bne @exit ;failed to retrieve
+    bne @OutOfRoom ;failed to retrieve
+    jsr PlaySfx_Pickup
+    jmp @clearItem
+
+@OutOfRoom:
+    jsr PlaySfx_InvenotryFull
+    jmp @exit
+
+@discard:
+    jsr PlaySfx_ItemBreaks
 
 @clearItem:
     jsr ClearThatItem
-
 
 @hidemenu:
     jsr HideSubMenu
@@ -3083,7 +3108,7 @@ ToolMenuInputAtHome:
 ToolMenuInputOutdoors:
 
     lda ItemMenuIndex
-    bne @clearItem
+    bne @discard
 
     lda TempIndex
     cmp #ITEM_TYPE_CLOTHING
@@ -3095,6 +3120,7 @@ ToolMenuInputOutdoors:
     sta pointer + 1
     jsr EquipItem
     beq @hidemenu ;return 0
+    jsr PlaySfx_Equip
     jmp @clearItem ;return 1
 
 @equipClothes:
@@ -3104,7 +3130,11 @@ ToolMenuInputOutdoors:
     sta pointer + 1
     jsr EquipItem
     beq @hidemenu ;return 0
+    jsr PlaySfx_Equip
     jmp @clearItem ;return 1
+
+@discard:
+    jsr PlaySfx_ItemBreaks
 
 @clearItem:
     jsr ClearThatItem
@@ -3135,6 +3165,7 @@ ToolMenuInputVillager:
     sta pointer + 1
     jsr EquipItem
     beq @hidemenu ;return 0
+    jsr PlaySfx_Equip
     jmp @clearItem ;return 1
 
 @equipClothes:
@@ -3144,15 +3175,24 @@ ToolMenuInputVillager:
     sta pointer + 1
     jsr EquipItem
     beq @hidemenu ;return 0
+    jsr PlaySfx_Equip
     jmp @clearItem ;return 1
 
 
 @checkIfGive:
     cmp #1
-    bne @clearItem ; DROP
+    bne @discard; DROP
 
     jsr GiveItem
     beq @hidemenu
+    jmp @clearItem
+
+@OutOfRoom:
+    jsr PlaySfx_InvenotryFull
+    jmp @exit
+
+@discard:
+    jsr PlaySfx_ItemBreaks
 
 @clearItem:
     jsr ClearThatItem
@@ -3417,7 +3457,24 @@ GiveItem:
 @done:
 
     rts
-
+;-------------------------------------
+UseThatItem:
+    lda TempItemIndex
+    cmp #ITEM_RADIO
+    bne @checktype
+    lda #1
+    sta PlayerWins
+    sta MustExitMenuState
+@checktype:
+    lda TempIndex
+    cmp #ITEM_TYPE_FUEL
+    bne @medicine
+    jsr UseFuel
+    jmp @exit
+@medicine:
+    jsr UseMedicine
+@exit:
+    rts
 ;-------------------------------------
 ItemMenuInput:
 
@@ -3474,31 +3531,20 @@ ItemMenuInput:
 
     lda LocationType
     cmp #LOCATION_TYPE_VILLAGER
-    bne @inHouse
+    bne @outdoors_not_used
 
     lda ItemMenuIndex
-    bne @clearItem
+    bne @discard
     jmp @give_item
+
+@outdoors_not_used:
+    jmp @discard
 
 @inHouse:
     lda ItemMenuIndex
     bne @checkIfStash
     ;use
-
-    lda TempItemIndex
-    cmp #ITEM_RADIO
-    bne @checktype
-    lda #1
-    sta PlayerWins
-    sta MustExitMenuState
-@checktype:
-    lda TempIndex
-    cmp #ITEM_TYPE_FUEL
-    bne @medicine
-    jsr UseFuel
-    jmp @clearItem
-@medicine:
-    jsr UseMedicine
+    jsr UseThatItem
     jmp @clearItem
 ;-
 @checkIfStash:
@@ -3509,7 +3555,7 @@ ItemMenuInput:
     cmp #LOCATION_TYPE_HOUSE
     beq @stashStuff
     cmp #LOCATION_TYPE_VILLAGER
-    bne @clearItem ; not at home and not at villager, must be 'drop'
+    bne @discard ; not at home and not at villager, must be 'drop'
 @give_item:
     ;'give'
     jsr GiveItem
@@ -3521,22 +3567,24 @@ ItemMenuInput:
     lda StashActivated
     bne @take_from_stash
     jsr StoreItemInStash
-    bne @exit ;failed to add to stash
+    bne @OutOfRoom ;failed to add to stash
+    jsr PlaySfx_Store
     jmp @clearItem
 @take_from_stash:
     jsr TakeItemFromStash
-    bne @exit ;failed to retrieve
+    bne @OutOfRoom ;failed to retrieve
+    jsr PlaySfx_Pickup
     jmp @clearItem
 
+@OutOfRoom:
+    jsr PlaySfx_InvenotryFull
+    jmp @exit
+
 @discard:
-    lda #1
-    sta MustPlaySfx
-    lda #SFX_WEAPON_BREAKS
-    sta SfxName
+    jsr PlaySfx_ItemBreaks
 
 @clearItem:
     jsr ClearThatItem
-@hidemenu:
     jsr HideSubMenu
 
 @Cancel_pressed:
@@ -3544,6 +3592,7 @@ ItemMenuInput:
     and MenuCancelMask
     beq @exit
 
+@hidemenu:
     jsr HideSubMenu
 @exit:
     rts
