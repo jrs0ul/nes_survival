@@ -2288,6 +2288,7 @@ EquipmentInput:
     lda #>EquipedItem
     sta pointer + 1
     jsr UnequipItem
+    jsr PlaySfx_Store
     jmp @exit
 
 @unequipCloth:
@@ -2296,6 +2297,7 @@ EquipmentInput:
     lda #>EquipedClothing
     sta pointer + 1
     jsr UnequipItem
+    jsr PlaySfx_Store
     jmp @exit
 
 @Cancel_pressed:
@@ -2713,16 +2715,17 @@ FoodMenuInput:
 FoodMenuInputOutdoors:
 
     lda FoodMenuIndex
-    bne @otherOptions
+    bne @discard ; drop
     ;eat
 
     jsr UseFood
     jmp @clear
 
-@otherOptions:
+@discard:
+    jsr PlaySfx_ItemBreaks
+
 @clear:
     jsr ClearThatItem
-
 
     lda #1
     jmp @end
@@ -2731,8 +2734,6 @@ FoodMenuInputOutdoors:
     lda #0
 
 @end:
-
-
     rts
 
 ;------------------------------
@@ -2752,16 +2753,26 @@ FoodMenuInputAtHome:
     lda StashActivated
     beq @storeItem
     jsr TakeItemFromStash
-    bne @exit
+    bne @OutOfRoom
+    jsr PlaySfx_Pickup
     jmp @clearItem
 @storeItem:
     jsr StoreItemInStash
-    bne @exit
+    bne @OutOfRoom
+    jsr PlaySfx_Store
     jmp @clearItem
 @checkEat:
     cmp #1
-    bne @clearItem
+    bne @discard ;drop
     jsr UseFood
+    jmp @clearItem
+
+@OutOfRoom:
+    jsr PlaySfx_InvenotryFull
+    jmp @exit
+
+@discard:
+    jsr PlaySfx_ItemBreaks
 
 @clearItem:
     jsr ClearThatItem
@@ -2783,20 +2794,29 @@ CookedFoodMenuInputAtHome:
     beq @Eat
 
     cmp #1
-    bne @clearItem
+    bne @discard ; drop
 
     lda StashActivated
     beq @storeItem
     jsr TakeItemFromStash
-    bne @exit
+    bne @OutOfRoom
+    jsr PlaySfx_Pickup
     jmp @clearItem
 @storeItem:
     jsr StoreItemInStash
     bne @exit
+    jsr PlaySfx_Store
     jmp @clearItem
 @Eat:
     jsr UseFood
+    jmp @clearItem
 
+@OutOfRoom:
+    jsr PlaySfx_InvenotryFull
+    jmp @exit
+
+@discard:
+    jsr PlaySfx_ItemBreaks
 
 @clearItem:
     jsr ClearThatItem
@@ -2804,14 +2824,11 @@ CookedFoodMenuInputAtHome:
     lda #1
     jmp @end
 
-
 @exit:
     lda #0
 
-
 @end:
     rts
-
 
 ;------------------------------------
 ;food menu while visiting a villager
@@ -2828,16 +2845,20 @@ FoodMenuInputVillager:
 @otherOptions:
 
     cmp #1
-    bne @clear ; drop
+    bne @discard ; drop
 
     ;give item
 
     jsr GiveItem
     beq @exit
+    jmp @clear
+
+
+@discard:
+    jsr PlaySfx_ItemBreaks
 
 @clear:
     jsr ClearThatItem
-
 
     lda #1
     jmp @end
@@ -2926,11 +2947,11 @@ MaterialMenuInput:
     cmp #LOCATION_TYPE_HOUSE
     beq @cont
     cmp #LOCATION_TYPE_VILLAGER
-    bne @outdoor
+    bne @discard ; drop if outdoors
 
 @cont:
     lda ItemMenuIndex
-    bne @clearItem ; DROP
+    bne @discard ; DROP
 
     lda LocationType
     cmp #LOCATION_TYPE_VILLAGER
@@ -2939,19 +2960,26 @@ MaterialMenuInput:
     lda StashActivated
     bne @take_from_stash
     jsr StoreItemInStash
-    bne @exit ;failed to add to stash
+    bne @OutOfRoom ;failed to add to stash
+    jsr PlaySfx_Store
     jmp @clearItem
 @take_from_stash:
     jsr TakeItemFromStash
-    bne @exit ;failed to retrieve
+    bne @OutOfRoom ;failed to retrieve
+    jsr PlaySfx_Pickup
     jmp @clearItem
 
 @giveItem:
     jsr GiveItem
     beq @hidemenu
+    jmp @clearItem
 
-@outdoor:
+@OutOfRoom:
+    jsr PlaySfx_InvenotryFull
+    jmp @exit
 
+@discard:
+    jsr PlaySfx_ItemBreaks
 
 @clearItem:
     jsr ClearThatItem
@@ -3144,11 +3172,7 @@ ToolMenuInputOutdoors:
     jsr HideSubMenu
 
 @exit:
-
-
     rts
-
-
 ;-------------------------------------
 ToolMenuInputVillager:
 
@@ -3187,16 +3211,11 @@ ToolMenuInputVillager:
     beq @hidemenu
     jmp @clearItem
 
-@OutOfRoom:
-    jsr PlaySfx_InvenotryFull
-    jmp @exit
-
 @discard:
     jsr PlaySfx_ItemBreaks
 
 @clearItem:
     jsr ClearThatItem
-
 
 @hidemenu:
     jsr HideSubMenu
@@ -3535,10 +3554,10 @@ ItemMenuInput:
 
     lda ItemMenuIndex
     bne @discard
-    jmp @give_item
+    jmp @give_item ; give in villager hut
 
 @outdoors_not_used:
-    jmp @discard
+    jmp @discard ; drop outdoors
 
 @inHouse:
     lda ItemMenuIndex
