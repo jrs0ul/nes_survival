@@ -2860,14 +2860,15 @@ FoodMenuInputVillager:
 @clear:
     jsr ClearThatItem
 
+    ldx TempRegX
     lda #1
     jmp @end
 
 @exit:
+    ldx TempRegX
     lda #0
 
 @end:
-    ldx TempRegX
     rts
 
 
