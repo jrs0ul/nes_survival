@@ -635,6 +635,11 @@ CheckSingleNpcAgainstPlayerHit:
     asl
     asl
     tay
+    lda npc_data, y ; tiles in a row
+    asl
+    asl
+    asl ; rows * 8
+    sta TempNpcWidth
     iny
     lda npc_data, y ; tile rows
     sta TempNpcRows ; save row count

@@ -19,8 +19,8 @@ npc_data:
     .byte 2, 3, 17, 3, 8,   0, <npc_DEADMAN_frames, >npc_DEADMAN_frames     ;6  dead-villager
     .byte 2, 2, 4,  4, 16,  8, <npc_BOAR_frames,    >npc_BOAR_frames        ;7  wild-boar
     .byte 4, 5, 32, 1, 6,   9, <npc_BOSS_frames,    >npc_BOSS_frames        ;8  Boss
-    .byte 2, 2, 4,  1, 4,   3, <npc_SPIDER_frames,  >npc_SPIDER_frames      ;9  Spider
-    .byte 3, 2, 4,  1, 4,   5, <npc_SLIMER_frames,  >npc_SLIMER_frames      ;10 Slimer
+    .byte 2, 2, 9,  1, 4,   3, <npc_SPIDER_frames,  >npc_SPIDER_frames      ;9  Spider
+    .byte 3, 2, 9,  1, 4,   5, <npc_SLIMER_frames,  >npc_SLIMER_frames      ;10 Slimer
     .byte 2, 3, 17, 1, 7,   8, <npc_BARAKA_frames,  >npc_BARAKA_frames      ;11 Baraka
     .byte 2, 2, 9,  0, 255, 0, <npc_CAT_frames,     >npc_CAT_frames         ;12 Cat
 
