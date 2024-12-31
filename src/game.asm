@@ -3201,7 +3201,7 @@ DoPaletteFades:
     sta PlayerDamagedCounter
     bne @checkRed
 
-    ldy #29
+    ldy #PLAYER_OUTLINE_COLOR_POS
     lda #$0F
     sta RamPalette, y
     lda #32

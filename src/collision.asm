@@ -222,7 +222,7 @@ TestPointAgainstCollisionMap:
     bne @collides ;already colliding
 
     lda (pointer), y
-@compare:
+    beq @collides
     cmp #128
     bcc @not_Colliding
 @collides:
