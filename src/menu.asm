@@ -4793,12 +4793,14 @@ ExitMenuState:
     lda #0
     sta StashActivated
 
+    lda #1
+    sta MustUpdateSunMoon
+
     lda MustSleepAfterFadeOut ;little hack
     bne @loadHousePalette
     jsr ClearPalette
     jmp @cont
 @loadHousePalette:
-
     ldy #0
 @paletteCopy:
     lda house_palette, y

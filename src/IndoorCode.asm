@@ -20,6 +20,7 @@ DoSleep:
     sta HpUpdated
     sta WarmthUpdated
     sta FoodUpdated
+    sta MustUpdateSunMoon
 
 @decreaseHp:
 
