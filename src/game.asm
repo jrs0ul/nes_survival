@@ -141,8 +141,12 @@ alien_sprites_chr: .incbin "chr/alien_sprites.lz4"
 crashed_plane_tiles_chr: .incbin "chr/crashed_plane_tiles.lz4"
 
 title_palette:
-    .byte $0F,$00,$11,$20, $0F,$01,$11,$07, $0F,$30,$11,$38, $0F,$07,$11,$35    ;background
+    .byte $0F,$00,$11,$20, $0F,$01,$11,$07, $0F,$20,$11,$38, $0F,$07,$11,$35    ;background
     .byte $0F,$0f,$17,$20, $0F,$06,$26,$39, $0F,$17,$21,$31, $0F,$0f,$37,$26    ;OAM sprites
+
+game_over_palette:
+    .byte $0f,$11,$0C,$16,$0f,$0c,$35,$31,$0f,$0c,$16,$31,$0f,$0c,$11,$31
+    .byte $0f,$30,$30,$30,$0f,$10,$10,$10,$0f,$30,$30,$30,$0f,$30,$30,$30
 
 intro_palette:
     .byte $0C,$00,$31,$30, $0C,$01,$31,$30, $0C,$16,$31,$36, $0C,$18,$07,$30 ; background
@@ -287,11 +291,6 @@ knockBackValuesFractions:
 .include "data/dark_cave_palette.asm"
 .include "data/normal_cave_palette.asm"
 .include "data/destructible_tiles.asm"
-
-game_over_palette:
-    .byte $0f,$11,$0C,$16,$0f,$0c,$35,$31,$0f,$0c,$16,$31,$0f,$0c,$11,$31
-    .byte $0f,$30,$30,$30,$0f,$10,$10,$10,$0f,$30,$30,$30,$0f,$30,$30,$30
-
 
 zero_sprite:
     .byte $16, $00, %00000011, $FA  ; sprite 0 
@@ -1420,6 +1419,14 @@ clrmem:
 vblankwait2:      ; Second wait for vblank, PPU is ready after this
     bit $2002
     bpl vblankwait2
+    jsr ClearPalette
+    lda #<RamPalette
+    sta pointer
+    lda #>RamPalette
+    sta pointer + 1
+    lda #32
+    sta Temp
+    jsr LoadPalette
 
     jsr LoadTitleGfx
 
@@ -2412,7 +2419,7 @@ FadingOutForGameOver:
     bne @abort
     lda PaletteFadeAnimationState
     bne @exit
-    lda #1
+    lda #PALETTE_STATE_FADE_OUT
     sta PaletteFadeAnimationState
 
     lda CheckpointSaved
@@ -2454,7 +2461,7 @@ ActivateYouWin:
     beq @exit
     lda PaletteFadeAnimationState
     bne @exit
-    lda #1
+    lda #PALETTE_STATE_FADE_OUT
     sta PaletteFadeAnimationState
     sta MustShowOutroAfterFadeout
     lda #0
@@ -2613,7 +2620,7 @@ CheckEntryPoints:
 
 
     ldy #0
-    lda #1
+    lda #PALETTE_STATE_FADE_OUT
     sta PaletteFadeAnimationState
     sta IsLocationRoutine
 
@@ -3382,6 +3389,8 @@ RoutinesAfterFadeOut:
     lda #1
     sta MustLoadSomething
     sta MustLoadGameOver
+    ldy #5
+    jsr bankswitch_y
     lda #0
     sta PaletteFadeAnimationState
     sta MustLoadGameOverAfterFadeOut

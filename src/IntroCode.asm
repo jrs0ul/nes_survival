@@ -123,6 +123,12 @@ TitleLogics:
     jsr UpdateLogoSprites
     jsr HideCutsceneSprites
 
+    lda PaletteFadeAnimationState
+    beq @doLogics
+
+    rts
+
+@doLogics:
 
     lda LogoMovementDelay
     beq @moveLogo
@@ -218,7 +224,7 @@ TitleLogics:
 
     lda #1
     sta MustUpdatePalette
-    lda #16
+    lda #32
     sta PaletteUpdateSize
 
 
@@ -1060,16 +1066,6 @@ LoadTitleData:
     lda #50
     sta SnowDelay
 
-
-    lda #<title_palette
-    sta pointer
-    lda #>title_palette
-    sta pointer + 1
-    lda #32
-    sta Temp
-    jsr LoadPalette
-
-
     lda #<title_screen
     sta pointer
     lda #>title_screen
@@ -1083,6 +1079,20 @@ LoadTitleData:
 
     lda #MAX_SPRITE_COUNT
     sta TaintedSprites
+
+    lda #<title_palette
+    sta PalettePtr
+    lda #>title_palette
+    sta PalettePtr + 1
+
+    lda #PALETTE_STATE_FADE_IN
+    sta PaletteFadeAnimationState
+    lda #PALETTE_FADE_MAX_ITERATION
+    sta FadeIdx
+    lda #FADE_DELAY_SLEEP
+    sta PaletteAnimDelay
+    lda #0
+    sta PaletteFadeTimer
 
 
     rts
