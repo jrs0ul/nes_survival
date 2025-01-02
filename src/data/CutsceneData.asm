@@ -652,10 +652,6 @@ beam:
     .byte   4,$ef,0,  0
 
 
-
-
-
-
 intro_sprite_count:
     .byte 22 * 4
     .byte 0

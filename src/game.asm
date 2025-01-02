@@ -1556,14 +1556,6 @@ checkCutscene:
     cmp #STATE_CUTSCENE
     bne checkTitle
 
-    lda CutsceneDelay + 1
-    sec
-    sbc #CUTSCENE_DELAY_DECREMENT_FRACTION
-    sta CutsceneDelay + 1
-    lda CutsceneDelay
-    sbc #CUTSCENE_DELAY_DECREMENT
-    sta CutsceneDelay
-    bpl runrandom
     ; cutscene time !
     ldy #5
     jsr bankswitch_y
@@ -6305,7 +6297,7 @@ StartGame:
     rts
 
 ;------------------------------
-FadeOutToStartGame:
+ActivateFadeOut:
     lda #PALETTE_STATE_FADE_OUT
     sta PaletteFadeAnimationState
     lda #0
@@ -6315,21 +6307,6 @@ FadeOutToStartGame:
     lda #FADE_DELAY_GENERIC
     sta PaletteAnimDelay
     rts
-;--------------------------------
-FadeOutToGoToTitle:
-    lda #PALETTE_STATE_FADE_OUT
-    sta PaletteFadeAnimationState
-    lda #1
-    sta MustShowTitleAfterFadeout
-    lda #0
-    sta PaletteFadeTimer
-    sta FadeIdx
-    sta IsLocationRoutine
-    lda #FADE_DELAY_GENERIC
-    sta PaletteAnimDelay
-    rts
-
-
 
 ;-------------------------------------
 CheckStartButton:
@@ -6366,8 +6343,7 @@ CheckStartButton:
     bne @checkGameOver
 
     lda CutsceneIdx
-    beq @onIntro ; intro
-    jmp @onOutro
+    bne @goToTitle ; this is one of the outros, that means go to title
 @onIntro:
 
     lda DemoModeOn
@@ -6379,11 +6355,9 @@ CheckStartButton:
     jmp @onOutro
 
 @startGame:
-    jsr FadeOutToStartGame
+    jsr ActivateFadeOut
     jmp @exit
 @onOutro:
-    lda #1
-    sta MustLoadTitleCHR
     jmp @goToTitle
 
 @checkGameOver:
@@ -6391,11 +6365,8 @@ CheckStartButton:
     bne @CheckOnGame
 @goToTitle:
     lda #1
-    sta MustLoadSomething
-    sta MustLoadTitle
-
-    lda #%10010000
-    sta PPUCTRL
+    sta MustShowTitleAfterFadeout
+    jsr ActivateFadeOut
 
     jmp @exit
 

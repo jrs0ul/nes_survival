@@ -384,6 +384,16 @@ DoScrolling:
 ;-----------------------------
 CutsceneMain:
 
+    lda CutsceneDelay + 1
+    sec
+    sbc #CUTSCENE_DELAY_DECREMENT_FRACTION
+    sta CutsceneDelay + 1
+    lda CutsceneDelay
+    sbc #CUTSCENE_DELAY_DECREMENT
+    sta CutsceneDelay
+    bpl @exit
+
+
     ldy #CUTSCENE_SCENE_DELAY_POS
     lda (CutsceneDataPtr), y
     sta pointer
@@ -399,30 +409,26 @@ CutsceneMain:
 
 
     jsr CutsceneLogics
-    beq @SpriteUpdate
+    beq @SpriteUpdate ; if A=0 then cutscene is not finishe, just update sprites
 
+    ;cutscene sequence is finished, let's wrap up
     lda CutsceneIdx
-    bne @SpriteUpdate ; don't start the game if idx is 1 or 2
+    bne @SpriteUpdate ; don't start the game if idx is >0 (0 is intro)
 
     lda DemoModeOn
-    beq @startGame
+    beq @startGame ; no, it wasn't demo mode
 
     lda #0
     sta DemoModeOn
     sta TitleScreenTimer
 
     lda #1
-    sta MustLoadTitleCHR
-    lda #1
-    sta MustLoadSomething
-    sta MustLoadTitle
-
-    lda #%10010000
-    sta PPUCTRL
+    sta MustShowTitleAfterFadeout
+    jsr ActivateFadeOut
     jmp @exit
 
 @startGame:
-    jsr FadeOutToStartGame
+    jsr ActivateFadeOut
 @SpriteUpdate:
     jsr UpdateCutsceneSprites
 
@@ -430,6 +436,7 @@ CutsceneMain:
     rts
 ;-----------------------------
 ;x register is CutsceneSceneIdx
+;puts 1 into register A if the cutscene sequence is finihed
 CutsceneLogics:
 
     lda CutsceneIdx
