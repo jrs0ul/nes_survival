@@ -690,6 +690,9 @@ CopyAttributes:
 
     rts
 ;-----------------------------------
+;TempY - low screen address
+;Temp - high adress
+;pointer - source data
 CopyTilesToScreen:
 
 @rowLoop:
@@ -698,11 +701,9 @@ CopyTilesToScreen:
     clc
     adc TempPreRowLoopValue
     sta pointer
-    bcs @inc_high_Src_Addr
-    jmp @screen_addr
-
-@inc_high_Src_Addr:
-    inc pointer + 1
+    lda pointer + 1
+    adc #0 ; add stuff from carry
+    sta pointer + 1
 
 @screen_addr:
 
@@ -710,10 +711,9 @@ CopyTilesToScreen:
     clc
     adc TempPreRowLoopValue
     sta TempY
-    bcs @increase
-    jmp @continue
-@increase:
-    inc Temp ; increese screen high adr
+    lda Temp
+    adc #0 ; carry flag
+    sta Temp
 
 @continue:
     lda $2002
@@ -736,20 +736,18 @@ CopyTilesToScreen:
     clc
     adc TempZ
     sta pointer
-    bcs @incrementHighPtr
-    jmp @incrementDest
-@incrementHighPtr:
-    inc pointer + 1
+    lda pointer + 1
+    adc #0 ;add stuff from carry flag
+    sta pointer + 1
 
 @incrementDest:
     lda TempY
     clc
     adc TempZ
     sta TempY
-    cmp #0
-    bne @done
-    inc Temp
-@done:
+    lda Temp
+    adc #0 ; add from carry
+    sta Temp
 
     dex
     bne @rowLoop
