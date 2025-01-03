@@ -4340,39 +4340,21 @@ RotFood:
     lda (pointer), y
     beq @nextItem       ;if empty
 
-    cmp #ITEM_RAW_MEAT
-    beq @setRaw
-    cmp #ITEM_RAW_JUMBO_MEAT
-    beq @setRaw
-    cmp #ITEM_RAW_FISH
-    beq @setRaw
-    cmp #ITEM_MUSHROOM
-    beq @setRaw
-    jmp @checkCooked
+    asl
+    asl
+    tax
+    inx
+    lda item_data, x
+    cmp #ITEM_TYPE_FOOD
+    bne @nextItem
 
-@setRaw:
-    lda #ROT_AMOUNT_RAW_MEAT
+    lda (pointer), y ; load item index again
+    tax
+    lda item_wear, x
     sta RotAmount
-    jmp @rot
 
-@checkCooked:
-    cmp #ITEM_COOKED_MEAT
-    beq @setCooked
-    cmp #ITEM_COOKED_JUMBO_MEAT
-    beq @setCooked
-    cmp #ITEM_COOKED_FISH
-    beq @setCooked
-    cmp #ITEM_COOKED_MUSHROOM
-    beq @setCooked
-
-    jmp @nextItem
-
-@setCooked:
-    lda #ROT_AMOUNT_COOKED_MEAT
-    sta RotAmount
-@rot:
     iny
-    lda (pointer), y
+    lda (pointer), y ; load item hp
     cmp RotAmount
     bcc @turnToPoop
     beq @turnToPoop
@@ -4388,7 +4370,6 @@ RotFood:
     lda #ITEM_POOP
     sta (pointer), y
 
-    
 @nextItem:
     ldy TempInventoryItemIndex ; stored item index
     iny
@@ -4528,7 +4509,6 @@ RunTime:
     sta Hours
     sta TempPointX2
     jsr ResetTimesWhenItemsWerePicked
-    jsr DoFoodSpoilage
     jsr IncreaseDays
 
 @adaptPalette:
@@ -4539,6 +4519,7 @@ RunTime:
     lda #>RamPalette
     sta PalettePtr + 1
     jsr AdaptBackgroundPaletteByTime
+    jsr DoFoodSpoilage
 
 @exit:
     rts
