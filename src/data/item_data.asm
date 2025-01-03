@@ -62,8 +62,8 @@ document_item_data:
 item_wear:
     .byte 0   ;empty
     .byte 0   ;stick
-    .byte 4   ;raw meat
-    .byte 2   ;cooked meat
+    .byte 6   ;raw meat
+    .byte 3   ;cooked meat
     .byte 0   ;rowan berries
     .byte 0   ;jam
     .byte 0   ;rock
@@ -72,25 +72,25 @@ item_wear:
     .byte 0   ;poop
     .byte 0   ;hide
     .byte 5   ;coat
-    .byte 4   ;jumbo meat
-    .byte 2   ;cooked jumbo meat
+    .byte 6   ;jumbo meat
+    .byte 3   ;cooked jumbo meat
     .byte 0   ;rope
     .byte 15  ;fishing rod
     .byte 0   ;reeds
-    .byte 5   ;fish
-    .byte 3   ;cooked fish
+    .byte 7   ;fish
+    .byte 4   ;cooked fish
     .byte 0   ;radio
     .byte 15  ;hammer
-    .byte 2   ;cooked mushroom
+    .byte 4   ;cooked mushroom
     .byte 5   ;slingshot
-    .byte 1   ;pie
+    .byte 2   ;pie
     .byte 0   ;letter
     .byte 0   ;letter1
     .byte 0   ;lamp
     .byte 0   ;granny's head
     .byte 0   ;letter2
     .byte 0   ;key
-    .byte 3   ;mushroom
+    .byte 8   ;mushroom
     .byte 0   ;medicinal shroom
 
 ;items the player character should display above its head

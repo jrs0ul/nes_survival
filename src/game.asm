@@ -1351,8 +1351,11 @@ BossDefeated:
 StaminaToWarmthCounter:
     .res 1
 
+RotFoodCounter:
+    .res 1
+
 BSS_Free_Bytes:
-    .res 4
+    .res 3
 
 ;====================================================================================
 
@@ -4177,9 +4180,36 @@ SkipTime:
     lda #0
     sta TempPointX2
     jsr ResetTimesWhenItemsWerePicked
-    jsr DoFoodSpoilage
 
 @exit:
+
+    lda ParamTimeValue
+    lsr
+    lsr
+    lsr
+    lsr ;divide by 16
+    tax
+    cpx #0
+    beq @addHours
+@rotLoop:
+    stx TempRegX
+    jsr DoFoodSpoilage
+    ldx TempRegX
+    dex
+    bne @rotLoop
+    jmp @done
+@addHours:
+    lda RotFoodCounter
+    clc
+    adc ParamTimeValue
+    sta RotFoodCounter
+    cmp #INTERVAL_OF_FOOD_ROT
+    bcc @done
+    lda #0
+    sta RotFoodCounter
+    jsr DoFoodSpoilage
+
+@done:
     rts
 ;--------------------------------
 ;gets the item id that is spawned for the quest
@@ -4341,9 +4371,10 @@ RotFood:
     beq @nextItem       ;if empty
 
     asl
-    asl
+    asl ;index * 4
     tax
-    inx
+    inx ; palette idx
+    inx ; item type
     lda item_data, x
     cmp #ITEM_TYPE_FOOD
     bne @nextItem
@@ -4519,7 +4550,16 @@ RunTime:
     lda #>RamPalette
     sta PalettePtr + 1
     jsr AdaptBackgroundPaletteByTime
+
+    lda RotFoodCounter
+    clc
+    adc #1
+    cmp #INTERVAL_OF_FOOD_ROT
+    bcc @saveNexit
     jsr DoFoodSpoilage
+    lda #0
+@saveNexit:
+    sta RotFoodCounter
 
 @exit:
     rts
@@ -5885,6 +5925,7 @@ ResetVariables:
     sta StaminaDelay
 
     lda #0
+    sta RotFoodCounter
     sta StaminaToWarmthCounter
     sta SkipLastTileRowsInIndoorMaps
     sta NametableOffsetInBytes

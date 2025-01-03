@@ -91,7 +91,7 @@
 
     HOURS_MAX                  = 240
     MINUTES_MAX                = 60
-    SLEEP_TIME                 = 60
+    SLEEP_TIME                 = 64
     COOKING_TIME               = 5
     CRAFTING_TIME              = 6
 
@@ -405,8 +405,7 @@
 
     RECIPES_SIZE               = 55
 
-    ROT_AMOUNT_RAW_MEAT        = 32
-    ROT_AMOUNT_COOKED_MEAT     = 16
+    INTERVAL_OF_FOOD_ROT       = 16
 
     FISHING_CATCH_OFFSET_Y     = 18
     FISHING_BITE_TIMER_MAX     = 15
