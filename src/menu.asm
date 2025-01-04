@@ -3088,7 +3088,6 @@ ToolMenuInputAtHome:
     sta pointer + 1
     jsr EquipItem
     beq @hidemenu ;return 0
-    jsr PlaySfx_Equip
     jmp @clearItem ;return 1
 
 @equipClothes:
@@ -3098,7 +3097,6 @@ ToolMenuInputAtHome:
     sta pointer + 1
     jsr EquipItem
     beq @hidemenu ;return 0
-    jsr PlaySfx_Equip
     jmp @clearItem ;return 1
 
 
@@ -3314,6 +3312,8 @@ SpawnSpecialReward:
 ;pointer - EquipedItem or EquipedClothing
 EquipItem:
 
+    jsr PlaySfx_Equip
+
     ldy #0
     lda (pointer), y
     sta Temp
@@ -3323,6 +3323,7 @@ EquipItem:
     ;--
     lda StashActivated
     beq @inventory
+
     lda Storage, x
     ldy #0
     sta (pointer), y
