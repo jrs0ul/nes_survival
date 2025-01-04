@@ -4068,6 +4068,8 @@ StartSleep:
     lda #0
     sta PaletteFadeTimer
     sta FadeIdx
+    sta FirstTime
+    sta MustUpdateTextBaloon
 
 @exit:
     rts

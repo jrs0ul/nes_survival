@@ -3317,6 +3317,7 @@ FadeAfterSleep:
     jsr bankswitch_y
     lda #0
     sta MustSleepAfterFadeOut
+
     lda #PALETTE_STATE_FADE_IN
     sta PaletteFadeAnimationState
     lda #PALETTE_FADE_MAX_ITERATION
