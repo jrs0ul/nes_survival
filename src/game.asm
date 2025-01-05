@@ -3632,13 +3632,15 @@ RoutinesAfterFadeOut:
 
     jsr OnExitVillagerHut
     ;------------------------
-    ;26. Boss room entrance
+    ;26 & 55. Boss room entrance
 @next24:
 
     lda ActiveMapEntryIndex
     cmp #26
+    beq @doBoss
+    cmp #55
     bne @next25
-
+@doBoss:
     lda #<alien_palette
     sta PalettePtr
     lda #>alien_palette
@@ -3656,6 +3658,13 @@ RoutinesAfterFadeOut:
     lda #0
     sta NpcCount
     jsr LoadNpcs
+
+    ldy #12
+    lda #1
+    sta ModifiedTiles, y
+    iny
+    sta ModifiedTiles, y
+    sta MustUpdateDestructibles
 
 
     jmp @next25
@@ -3743,28 +3752,28 @@ RoutinesAfterFadeOut:
 
     jsr TurnDarkPaletteOn
     ;---------------------------
-    ;37 from dark cave 2 to dark cave 1
+    ;38 from dark cave 2 to dark cave 1
 @next36:
     lda ActiveMapEntryIndex
-    cmp #37
+    cmp #38
     bne @next37
 
     jsr TurnDarkPaletteOn
     ;-------------------
-    ;41 exit from alien lobby to dark cave 2
+    ;42 exit from alien lobby to dark cave 2
 @next37:
     lda ActiveMapEntryIndex
-    cmp #41
+    cmp #42
     bne @next38
 
     lda #1
     sta MustCopyMainChr
     jsr TurnDarkPaletteOn
     ;---------------------
-    ;43. entrance to the crashsite from the path
+    ;44. entrance to the crashsite from the path
 @next38:
     lda ActiveMapEntryIndex
-    cmp #43
+    cmp #44
     bne @next39
 
     lda #1
