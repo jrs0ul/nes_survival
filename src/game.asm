@@ -72,6 +72,7 @@ game_logo_chr     :  .incbin "chr/game_logo_tiles.lz4"
 .include "data/maps/cropped/pre_alien_base0_crop.asm"
 .include "data/maps/cropped/pre_alien_base1_crop.asm"
 .include "data/maps/cropped/pre_alien_base2_crop.asm"
+.include "data/maps/cropped/alien_tunnel_crop.asm"
 .include "data/mod_tiles_alien_base_pre.asm"
 .include "data/item_list_crashsite.asm"
 .include "data/item_list_alien_puzzle.asm"
@@ -97,6 +98,7 @@ boss_sprites_chr:  .incbin "chr/boss_sprites.lz4"
 .include "data/maps/cropped/wood_location_0_crop.asm"
 .include "data/maps/cropped/wood_location_1_crop.asm"
 .include "data/item_list_wood_location.asm"
+.include "data/mod_tiles_bossroom.asm"
 .include "data/AnimalSpawnPositions.asm"
 
 
@@ -1355,7 +1357,7 @@ RotFoodCounter:
     .res 1
 
 BSS_Free_Bytes:
-    .res 3
+    .res 1
 
 ;====================================================================================
 
@@ -3732,37 +3734,37 @@ RoutinesAfterFadeOut:
 
     jsr TurnDarkPaletteOn
     ;------------------------
-    ;33 dark cave 2
+    ;34 dark cave 2
 @next35:
 
     lda ActiveMapEntryIndex
-    cmp #33
+    cmp #34
     bne @next36
 
     jsr TurnDarkPaletteOn
     ;---------------------------
-    ;36 from dark cave 2 to dark cave 1
+    ;37 from dark cave 2 to dark cave 1
 @next36:
     lda ActiveMapEntryIndex
-    cmp #36
+    cmp #37
     bne @next37
 
     jsr TurnDarkPaletteOn
     ;-------------------
-    ;40 exit from alien lobby to dark cave 2
+    ;41 exit from alien lobby to dark cave 2
 @next37:
     lda ActiveMapEntryIndex
-    cmp #40
+    cmp #41
     bne @next38
 
     lda #1
     sta MustCopyMainChr
     jsr TurnDarkPaletteOn
     ;---------------------
-    ;42. entrance to the crashsite from the path
+    ;43. entrance to the crashsite from the path
 @next38:
     lda ActiveMapEntryIndex
-    cmp #42
+    cmp #43
     bne @next39
 
     lda #1

@@ -25,6 +25,7 @@ location_map_pos: ;index where the pointer to the first screen of each location 
     .byte 41 ;21 lonely cave
     .byte 42 ;22 wood location
     .byte 44 ;23 alien base hallway
+    .byte 47 ;24 alien tunnel
 
 map_list_low:
     .byte <field_bg            ; 0
@@ -96,6 +97,8 @@ map_list_low:
     .byte <abase_hall_0        ;44
     .byte <abase_hall_1
     .byte <abase_hall_2
+
+    .byte <alien_tunnel        ;47
 
 
 
@@ -169,3 +172,5 @@ map_list_high:
     .byte >abase_hall_0
     .byte >abase_hall_1
     .byte >abase_hall_2
+
+    .byte >alien_tunnel
