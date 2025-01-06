@@ -1031,8 +1031,13 @@ OnCollisionWithAttackRect:
     cmp #NPC_IDX_BOSS
     bne @dontAgitateBoss
 
+    ldx #12
+    lda #0
+    sta ModifiedTiles, x
+
     lda #1
     sta BossAgitated
+    sta MustUpdateDestructibles
     jsr ClearTextBaloon
 
 @dontAgitateBoss:

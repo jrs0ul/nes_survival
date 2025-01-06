@@ -4849,9 +4849,10 @@ ExitMenuState:
 @loadOutside:
     lda #1
     sta MustLoadOutside
-    sta MustUpdateDestructibles
     sta MustLoadSomething
 @exit:
+    lda #1
+    sta MustUpdateDestructibles
     ldx LocationIndex
     ldy LocationBanks, x
     jsr bankswitch_y

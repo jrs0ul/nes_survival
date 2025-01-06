@@ -3732,12 +3732,15 @@ RoutinesAfterFadeOut:
     ldy oldbank
     jsr bankswitch_y
     ;---------------------
-    ;22 secret cave entrance
+    ;22 secret cave entrance / 56. alien tunnel entrance
 @next28:
     lda ActiveMapEntryIndex
     cmp #22
+    beq @makeDark
+    cmp #56
     bne @next35
 
+@makeDark:
     lda #1
     sta MustCopyMainChr
 
@@ -3798,7 +3801,6 @@ RoutinesAfterFadeOut:
     beq @itsAnIndoorMap
     lda #1
     sta MustLoadOutside
-    sta MustUpdateDestructibles
 
     jmp @finish
 @itsAnIndoorMap:
@@ -3807,6 +3809,7 @@ RoutinesAfterFadeOut:
 
 @finish:
     lda #1
+    sta MustUpdateDestructibles
     sta MustLoadSomething ; activate location loading in NMI
     sta MustUpdateSunMoon
     lda #255
