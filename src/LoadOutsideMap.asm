@@ -404,7 +404,7 @@ LoadOutsideMap:
 ;*****************************************
 
 @loadRest:
-    
+
     lda #255
     sta OldStamina
 

@@ -3817,7 +3817,10 @@ RoutinesAfterFadeOut:
     sta OldSourceMapIdx
     sta OldAttribColumnIdxToUpdate
     sta TaintedSprites
-    jsr CalcMapColumnToUpdate
+    jsr CalcMapColumnToUpdate ; this is neccessery for map loading
+    lda #0
+    sta MustUpdateMapAttributeColumn ; we don't really need to update the column right away
+    sta MustUpdateMapColumn
 
     rts
 ;------------------------------
