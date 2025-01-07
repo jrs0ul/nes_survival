@@ -117,7 +117,7 @@ entry_points_loc14: ; secret cave
     ;35. Secret cave exit
     .byte 35, 0, 0, 255, 0, 255, 222, 255
     ;36. Alien tunnel entrance from secret cave
-    .byte 36, 0, 120, 255, 0, 255, 0, 40
+    .byte 36, 0, 74, 96, 0, 255, 31, 64
     ;-------------------------------------
 entry_points_loc15:
     ;37. Mine room exit
@@ -404,7 +404,7 @@ MapSpawnPoint:
     .byte 96, 155, 12, 1, LOCATION_TYPE_VILLAGER, SONG_BOSS, 3, 0, 0
     .byte 0, <alien_palette, >alien_palette, 0, 0, 0, 0
     ;entrance to secret cave
-    .byte 105, 27, 14, 1, LOCATION_TYPE_CAVE, SONG_OUTSIDE_NIGHT, 4, 0, 0
+    .byte 64, 45, 14, 1, LOCATION_TYPE_CAVE, SONG_OUTSIDE_NIGHT, 4, 0, 0
     .byte 0, <cave_palette, >cave_palette, 0, 0, 0, 0
 
 
