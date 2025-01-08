@@ -423,6 +423,7 @@
     MAX_VILLAGERS              = 4
 
     VILLAGER_IDX_ERIKA         = 1
+    VILLAGER_IDX_BOSS          = 3
 
 
     SUBMENU_FOOD               = 1

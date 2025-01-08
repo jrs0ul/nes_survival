@@ -1,16 +1,16 @@
-.include "data/intro_bg_mowdens_comp.asm"
-.include "data/intro_bg_cockpit_comp.asm"
-.include "data/intro_bg_boom_comp.asm"
-.include "data/intro_bg_mowdens_base_comp.asm"
-.include "data/intro_bg_mowdens_top_comp.asm"
+.include "data/cutscene_bg/intro_bg_mowdens_comp.asm"
+.include "data/cutscene_bg/intro_bg_cockpit_comp.asm"
+.include "data/cutscene_bg/intro_bg_boom_comp.asm"
+.include "data/cutscene_bg/intro_bg_mowdens_base_comp.asm"
+.include "data/cutscene_bg/intro_bg_mowdens_top_comp.asm"
 
-.include "data/outro_bg_sos_comp.asm"
-.include "data/outro_bg_that_same_day_comp.asm"
-.include "data/outro_bg_chopper_comes_comp.asm"
-.include "data/outro_bg_busted_comp.asm"
-.include "data/outro_bg_victory_comp.asm"
+.include "data/cutscene_bg/outro_bg_sos_comp.asm"
+.include "data/cutscene_bg/outro_bg_that_same_day_comp.asm"
+.include "data/cutscene_bg/outro_bg_chopper_comes_comp.asm"
+.include "data/cutscene_bg/outro_bg_busted_comp.asm"
+.include "data/cutscene_bg/outro_bg_victory_comp.asm"
 
-.include "data/outro_bg_beam_me_up.asm"
+.include "data/cutscene_bg/outro_bg_beam_me_up.asm"
 
 ;ALL cutscenes
 cutscenes:

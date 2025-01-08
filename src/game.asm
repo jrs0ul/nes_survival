@@ -39,11 +39,11 @@ main_bg_tiles       : .incbin "chr/main_bg_tiles.lz4"
 .include "data/maps/cropped/alien_base_lobby_crop.asm"
 .include "data/maps/cropped/field2_bg_crop.asm"
 .include "data/maps/cropped/field2_bg1_crop.asm"
-.include "data/item_list_Outside1.asm"
-.include "data/item_list_Outside3.asm"
-.include "data/mod_tiles_first.asm"
-.include "data/mod_tiles_alien_lobby.asm"
-.include "data/item_list_outside2.asm"
+.include "data/item_lists/item_list_Outside1.asm"
+.include "data/item_lists/item_list_Outside3.asm"
+.include "data/mod_tiles/mod_tiles_first.asm"
+.include "data/mod_tiles/mod_tiles_alien_lobby.asm"
+.include "data/item_lists/item_list_outside2.asm"
 
 
 ;===========================================================
@@ -57,7 +57,7 @@ main_bg_tiles       : .incbin "chr/main_bg_tiles.lz4"
 .include "data/maps/cropped/abase_hall_0_crop.asm"
 .include "data/maps/cropped/abase_hall_1_crop.asm"
 .include "data/maps/cropped/abase_hall_2_crop.asm"
-.include "data/npc_list_abase_hall.asm"
+.include "data/npc_lists/npc_list_abase_hall.asm"
 
 ;============================================================
 .segment "ROM2"
@@ -73,9 +73,9 @@ game_logo_chr     :  .incbin "chr/game_logo_tiles.lz4"
 .include "data/maps/cropped/pre_alien_base1_crop.asm"
 .include "data/maps/cropped/pre_alien_base2_crop.asm"
 .include "data/maps/cropped/alien_tunnel_crop.asm"
-.include "data/mod_tiles_alien_base_pre.asm"
-.include "data/item_list_crashsite.asm"
-.include "data/item_list_alien_puzzle.asm"
+.include "data/mod_tiles/mod_tiles_alien_base_pre.asm"
+.include "data/item_lists/item_list_crashsite.asm"
+.include "data/item_lists/item_list_alien_puzzle.asm"
 
 ;============================================================
 .segment "ROM3" ; indoors
@@ -89,16 +89,16 @@ boss_sprites_chr:  .incbin "chr/boss_sprites.lz4"
 .include "data/maps/cropped/grannys_hut_crop.asm"
 .include "data/maps/cropped/alien_bossroom_crop.asm"
 .include "data/maps/cropped/mine_room_crop.asm"
-.include "data/npc_list_alien_bossroom.asm"
-.include "data/npc_list_bjorn_house.asm"
-.include "data/npc_list_erikas_house.asm"
-.include "data/npc_list_grannys_house.asm"
-.include "data/npc_list_lonely_cave.asm"
+.include "data/npc_lists/npc_list_alien_bossroom.asm"
+.include "data/npc_lists/npc_list_bjorn_house.asm"
+.include "data/npc_lists/npc_list_erikas_house.asm"
+.include "data/npc_lists/npc_list_grannys_house.asm"
+.include "data/npc_lists/npc_list_lonely_cave.asm"
 .include "data/maps/cropped/lonely_cave_crop.asm"
 .include "data/maps/cropped/wood_location_0_crop.asm"
 .include "data/maps/cropped/wood_location_1_crop.asm"
-.include "data/item_list_wood_location.asm"
-.include "data/mod_tiles_bossroom.asm"
+.include "data/item_lists/item_list_wood_location.asm"
+.include "data/mod_tiles/mod_tiles_bossroom.asm"
 .include "data/AnimalSpawnPositions.asm"
 
 
@@ -122,16 +122,16 @@ alien_sprites_chr: .incbin "chr/alien_sprites.lz4"
 .include "data/maps/cropped/dark_cave2_1_crop.asm"
 .include "data/maps/cropped/dark_cave2_2_crop.asm"
 .include "data/maps/cropped/secret_cave0_crop.asm"
-.include "data/mod_tiles_secret_cave.asm"
-.include "data/mod_tiles_mine.asm"
-.include "data/mod_tiles_alien_base.asm"
-.include "data/mod_tiles_dark_cave2.asm"
-.include "data/item_list_dark_cave2.asm"
-.include "data/item_list_secret_cave.asm"
-.include "data/item_list_mine.asm"
-.include "data/npc_list_mine.asm"
-.include "data/npc_list_alien_base.asm"
-.include "data/npc_list_dark_cave.asm"
+.include "data/mod_tiles/mod_tiles_secret_cave.asm"
+.include "data/mod_tiles/mod_tiles_mine.asm"
+.include "data/mod_tiles/mod_tiles_alien_base.asm"
+.include "data/mod_tiles/mod_tiles_dark_cave2.asm"
+.include "data/item_lists/item_list_dark_cave2.asm"
+.include "data/item_lists/item_list_secret_cave.asm"
+.include "data/item_lists/item_list_mine.asm"
+.include "data/npc_lists/npc_list_mine.asm"
+.include "data/npc_lists/npc_list_alien_base.asm"
+.include "data/npc_lists/npc_list_dark_cave.asm"
 
 
 
@@ -213,9 +213,9 @@ game_over_hints:
 .include "data/maps/cropped/location_with_cave3_crop.asm"
 .include "data/maps/cropped/path_to_crashsite_crop.asm"
 
-.include "data/item_list_path_to_crashsite.asm"
-.include "data/item_list_mine_location.asm"
-.include "data/item_list_granny_location.asm"
+.include "data/item_lists/item_list_path_to_crashsite.asm"
+.include "data/item_lists/item_list_mine_location.asm"
+.include "data/item_lists/item_list_granny_location.asm"
 
 ;=============================================================
 .segment "ROM6"
@@ -287,11 +287,11 @@ knockBackValuesFractions:
     .byte 10
 
 
-.include "data/house_palette.asm"
-.include "data/main_palette.asm"
-.include "data/alien_palette.asm"
-.include "data/dark_cave_palette.asm"
-.include "data/normal_cave_palette.asm"
+.include "data/palettes/house_palette.asm"
+.include "data/palettes/main_palette.asm"
+.include "data/palettes/alien_palette.asm"
+.include "data/palettes/dark_cave_palette.asm"
+.include "data/palettes/normal_cave_palette.asm"
 .include "data/destructible_tiles.asm"
 
 zero_sprite:
@@ -3678,14 +3678,18 @@ RoutinesAfterFadeOut:
 
     lda ActiveMapEntryIndex
     cmp #31
+    beq @exitBoss
+    cmp #32
     bne @next27
 
+@exitBoss:
     jsr OnBossDefeat
 
     ldy #3
     lda ItemIGave, y
     cmp #ITEM_GRANNYS_HEAD
     bne @justExit
+
     lda #1
     sta PlayerWins
 

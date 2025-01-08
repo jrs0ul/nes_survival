@@ -3376,6 +3376,8 @@ PlayQuestCompleteSfx:
     rts
 
 ;-------------------------------------
+;Gives item to a villager
+;Puts 0 to register A if it's impossible to give the item
 GiveItem:
     stx TempRegX
 
@@ -3385,14 +3387,26 @@ GiveItem:
     lda VillagerIndex
     bne @continue  ; no giving at night to Bjorn
 
+    lda #0
     rts
 
 @continue:
     ldy VillagerIndex
 
+    cpy #VILLAGER_IDX_BOSS
+    bne @cont2
+    lda BossAgitated
+    beq @cont2
+
+    lda #0
+    rts
+
+@cont2:
+
     lda VillagerKilled, y
     beq @notKilled
 
+    lda #0
     rts
 
 @notKilled:
