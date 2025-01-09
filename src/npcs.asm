@@ -424,25 +424,34 @@ SingleNpcVSPlayerCollision:
     and #%00000011 ; let's ignore agitation and damage bits
     sta TempNpcState
     cmp #0
-    beq @exit ; it's dead
+    bne @cont
+    rts ; it's dead
 
+@cont:
     lda Npcs, y ; let's get DB index
     lsr
     lsr
     lsr
     lsr;eliminate 4 state bits
 
-
+    sta TempNpcIndex
     sty TempNpcDataIdxForCollision
+
+    asl ; idx * 2
+    tay
+    lda npc_bbox_width, y
+    sta TempNpcAgitated; will gonna use this for x offset
+    iny
+    lda npc_bbox_width, y
+    sta TempNpcWidth
+
+
+    lda TempNpcIndex
     asl
     asl
     asl
     tay
-    lda npc_data, y ; tiles in a row
-    asl
-    asl
-    asl ; multiply by 8
-    sta TempNpcWidth
+
     iny
     lda npc_data, y ; tile rows
     sta TempNpcRows ; save row count
@@ -513,6 +522,9 @@ SingleNpcVSPlayerCollision:
 PlayerNpcCollision:
 
     lda TempPointX
+    clc
+    adc TempNpcAgitated ; x offset
+    sta TempPointX
     clc
     adc TempNpcWidth
     sta TempPointX2
@@ -629,17 +641,22 @@ CheckSingleNpcAgainstPlayerHit:
     lsr
     lsr ;eliminate 3 state bits
 
-    sta TempNpcIndex ; state the npc kind for item dropping
+    sta TempNpcIndex ; save the npc kind for item dropping
     sty TempNpcPosInRam
-    asl
-    asl
+
     asl
     tay
-    lda npc_data, y ; tiles in a row
-    asl
-    asl
-    asl ; rows * 8
+    lda npc_bbox_width, y
+    sta TempNpcAgitated
+    iny
+    lda npc_bbox_width, y
     sta TempNpcWidth
+
+    lda TempNpcIndex
+    asl
+    asl
+    asl  ; npcidx * 8
+    tay
     iny
     lda npc_data, y ; tile rows
     sta TempNpcRows ; save row count
@@ -666,12 +683,14 @@ CheckSingleNpcAgainstPlayerHit:
     lda CurrentMapSegmentIndex
     cmp ItemMapScreenIndex
     beq @NpcMatchesScreen
-    
+
     ;X1
     lda Npcs, y ; x
     sec
     sbc ScrollX
     bcs @exit
+    clc
+    adc TempNpcAgitated
     sta TempPointX
     jmp @calcY
 @NpcMatchesScreen:
@@ -680,6 +699,8 @@ CheckSingleNpcAgainstPlayerHit:
     bcc @exit
     sec
     sbc ScrollX
+    clc
+    adc TempNpcAgitated
     sta TempPointX
 
 @calcY: ; Y1

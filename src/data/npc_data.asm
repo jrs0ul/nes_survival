@@ -24,6 +24,20 @@ npc_data:
     .byte 2, 3, 17, 1, 7,   8, <npc_BARAKA_frames,  >npc_BARAKA_frames      ;11 Baraka
     .byte 2, 2, 9,  0, 255, 0, <npc_CAT_frames,     >npc_CAT_frames         ;12 Cat
 
+npc_bbox_width:
+    .byte 0, 16 ;0
+    .byte 0, 16 ;1
+    .byte 0, 16 ;2
+    .byte 0, 16 ;3
+    .byte 0, 16 ;4
+    .byte 0, 16 ;5
+    .byte 0, 16 ;6
+    .byte 0, 16 ;7
+    .byte 6, 20 ;8
+    .byte 0, 16 ;9
+    .byte 0, 24 ;10
+    .byte 0, 16 ;11
+    .byte 0, 16 ;12
 
 ;0 reg. speed int
 ;1 reg. speed fraction,
