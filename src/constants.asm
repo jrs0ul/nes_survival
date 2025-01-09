@@ -84,7 +84,7 @@
     OUTRO_SCENE_MAX            = 4
     OUTRO_ALIEN_SCENE_MAX      = 3
 
-    IMPORTANT_ITEM_TIME        = 96
+    IMPORTANT_ITEM_TIME        = 76
 
 
     DAYTIME_NIGHT              = $40

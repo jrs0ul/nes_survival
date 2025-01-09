@@ -100,7 +100,7 @@ important_items:
     .byte 0   ;raw meat
     .byte 0   ;cooked meat
     .byte 0   ;rowan berries
-    .byte 1   ;jam
+    .byte 0   ;potion
     .byte 0   ;rock
     .byte 0   ;spear
     .byte 1   ;knife

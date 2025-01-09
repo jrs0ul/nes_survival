@@ -389,8 +389,14 @@ AddAndDeactivateItems:
     lsr
     sta TempItemIndex
     tay
+
+    lda LocationType
+    cmp #LOCATION_TYPE_VILLAGER
+    beq @important ; all items are important in a villager house
+
     lda important_items, y
     beq @not_important
+@important:
     ;it's important
     lda #IMPORTANT_ITEM_TIME
     sta ImportantItemTimer
