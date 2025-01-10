@@ -3524,27 +3524,40 @@ ItemMenuInput:
     lda #>ItemMenuIndex
     sta pointer + 1
 
-    lda LocationType
-    cmp #LOCATION_TYPE_HOUSE
-    beq @house
-    cmp #LOCATION_TYPE_VILLAGER
-    beq @house ;same amount of items
 
     jsr CanItemBeUsedOutdoors
-    beq @Confirm_pressed
+    sta Temp
 
+    lda LocationType
+    cmp #LOCATION_TYPE_HOUSE
+    beq @three ; use, store, drop
+
+    cmp #LOCATION_TYPE_VILLAGER
+    beq @InVillagerHouse
+
+@outdoors:
+    lda Temp
+    beq @Confirm_pressed ; only one option: drop
+    jmp @two
+
+@InVillagerHouse:
+    lda Temp
+    bne @three ;tree options: use, give, drop
+
+@two:
     lda #112
     sta MenuLowerLimit
     lda #2 ; use, drop
     sta MenuMaxItem
     jmp @updown
 
-@house:
+@three:
     lda #128
     sta MenuLowerLimit
 
     lda #3 ; use, store, drop
     sta MenuMaxItem
+
 @updown:
     jsr MenuInputUpDownCheck
 
