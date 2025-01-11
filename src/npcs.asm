@@ -77,8 +77,6 @@ PlayDamageSfx:
 
     rts
 
-
-
 ;-----------------
 ; Calls the routine from the BANK 3
 GenerateNpcs:

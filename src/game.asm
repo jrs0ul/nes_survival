@@ -392,6 +392,7 @@ npcs_ram_lookup: ;npc position in ram by index, max 16 npcs
     .byte 154
     .byte 165
 
+
 projectiles_ram_lookup: ; max 10 projectiles
     .byte 0
     .byte 6
@@ -2208,9 +2209,8 @@ CheckModTileScroll:
 
     lda ScrollX
     cmp (pointer2), y
-    
-    rts
 
+    rts
 ;--------------------------------------------
 StoreModTileToDraw:
     lda (pointer2), y
@@ -7195,53 +7195,39 @@ useHammerOnEnvironment:
     cmp #ROCK_TILE_4
     beq @spawn_rock
 ;wood
-    jsr IsTree
-    bne @spawn_wood
-    jmp @exit
+    cmp #$87
+    beq @spawn_wood
+    cmp #$88
+    beq @spawn_wood
+    cmp #$DC
+    beq @spawn_wood
+    cmp #$DD
+    beq @spawn_wood
+    cmp #$CE
+    beq @spawn_wood
+    cmp #$CF
+    beq @spawn_wood
+    cmp #$CC
+    beq @spawn_wood
+    cmp #$CD
+    beq @spawn_wood
+    bne @exit
+
 @spawn_rock:
 
-    jsr WearWeapon
-
     lda #%00001101
-    sta TempItemIndex
-    jsr SpawnItem
-    jmp @exit
+    jmp @spawnIt
+
 @spawn_wood:
-    jsr WearWeapon
-
     lda #%00000011
-    sta TempItemIndex
-    jsr SpawnItem
 
+@spawnIt:
+    sta TempItemIndex
+    jsr WearWeapon
+    jsr SpawnItem
 
 @exit:
 
-    rts
-;---------------------------------
-IsTree:
-    cmp #$87
-    beq @yes
-    cmp #$88
-    beq @yes
-    cmp #$DC
-    beq @yes
-    cmp #$DD
-    beq @yes
-    cmp #$CE
-    beq @yes
-    cmp #$CF
-    beq @yes
-    cmp #$CC
-    beq @yes
-    cmp #$CD
-    beq @yes
-    bne @nope
-@yes:
-    lda #1
-    jmp @end
-@nope:
-    lda #0
-@end:
     rts
 
 ;----------------------------------
@@ -7336,8 +7322,26 @@ ActivateFishingRod:
     lda FishingRodActive
     bne @pullout
 
-    jsr CanCastRodHere
-    bne @exit
+    ;let's check if I can throw there
+
+    lda LocationType
+    cmp #LOCATION_TYPE_OUTDOORS
+    beq @cont
+
+    rts
+
+@cont:
+    lda #4
+    sta TempYOffset
+    jsr CalcTileAddressInFrontOfPlayer
+
+    lda (pointer), y
+    cmp #ICE_TILE_B
+    beq @throwThere
+    cmp #ICE_TILE_A
+    beq @throwThere
+
+    rts
 
 @throwThere:
 
@@ -7482,35 +7486,6 @@ CalcTileAddressInFrontOfPlayer:
 
 
     rts
-;----------------------------------
-;A -> 0 = can, 1 = can't
-CanCastRodHere:
-    ;let's check if I can throw there
-
-    lda LocationType
-    cmp #LOCATION_TYPE_OUTDOORS
-    bne @exit
-
-    lda #4
-    sta TempYOffset
-    jsr CalcTileAddressInFrontOfPlayer
-
-    lda (pointer), y
-    cmp #ICE_TILE_B
-    beq @throwThere
-    cmp #ICE_TILE_A
-    bne @exit
-
-@throwThere:
-
-    lda #0
-    jmp @end
-@exit:
-    lda #1
-
-@end:
-
-    rts
 
 ;----------------------------------
 PullOutRod:
@@ -7571,7 +7546,7 @@ ShootSlingshot:
     lda Projectiles, x
     lsr
     bcc @reuseProjectile
-    
+
     dey
     bpl @checkLoop
 
