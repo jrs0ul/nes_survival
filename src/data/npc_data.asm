@@ -33,7 +33,7 @@ npc_bbox_width:
     .byte 0, 16 ;5
     .byte 0, 16 ;6
     .byte 0, 16 ;7
-    .byte 6, 20 ;8
+    .byte 5, 22 ;8
     .byte 0, 16 ;9
     .byte 0, 24 ;10
     .byte 0, 16 ;11

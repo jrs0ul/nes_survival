@@ -99,7 +99,7 @@
 
     INPUT_DELAY                = 100
     ITEM_DELAY                 = 220
-    NPC_AI_DELAY               = 150
+    NPC_AI_DELAY               = 165
     NPC_COLLISION_DELAY        = 255
     FISHING_DELAY              = 2
     STAMINA_DELAY              = 2
@@ -176,6 +176,8 @@
     PALETTE_FADE_MAX_ITERATION = 5
 
     MAX_CRAFTING_INDEX          = 4 ; Max items in a crafting recipe
+
+    CRAFTING_INGREDIENT_MATCHES = 250
 
 
     OUTDOORS_LOC1_SCREEN_COUNT  = 4

@@ -440,7 +440,7 @@ SingleNpcVSPlayerCollision:
     asl ; idx * 2
     tay
     lda npc_bbox_width, y
-    sta TempNpcAgitated; will gonna use this for x offset
+    sta TempBboxOffset; will gonna use this for x offset
     iny
     lda npc_bbox_width, y
     sta TempNpcWidth
@@ -523,7 +523,7 @@ PlayerNpcCollision:
 
     lda TempPointX
     clc
-    adc TempNpcAgitated ; x offset
+    adc TempBboxOffset ; x offset
     sta TempPointX
     clc
     adc TempNpcWidth
@@ -647,7 +647,7 @@ CheckSingleNpcAgainstPlayerHit:
     asl
     tay
     lda npc_bbox_width, y
-    sta TempNpcAgitated
+    sta TempBboxOffset
     iny
     lda npc_bbox_width, y
     sta TempNpcWidth
@@ -690,7 +690,7 @@ CheckSingleNpcAgainstPlayerHit:
     sbc ScrollX
     bcs @exit
     clc
-    adc TempNpcAgitated
+    adc TempBboxOffset
     sta TempPointX
     jmp @calcY
 @NpcMatchesScreen:
@@ -700,7 +700,7 @@ CheckSingleNpcAgainstPlayerHit:
     sec
     sbc ScrollX
     clc
-    adc TempNpcAgitated
+    adc TempBboxOffset
     sta TempPointX
 
 @calcY: ; Y1

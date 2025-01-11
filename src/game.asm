@@ -714,7 +714,7 @@ MustCopyMainChr:
 PlayerFrame:
     .res 1
 
-ZP_Free:
+ZPFree:
     .res 1
 
 ;--------------
@@ -770,6 +770,7 @@ DemoModeOn              = DialogTextContainer + 11 ; demo mode enabled, basicall
 TitleScreenTimer        = DialogTextContainer + 12
 LogoY                   = DialogTextContainer + 13
 LogoMovementDelay       = DialogTextContainer + 14
+SnowFrame               = DialogTextContainer + 15
 
 
 CurrentPaletteDecrementValue: ;a helper value to prevent doing too much of palette changing
@@ -810,7 +811,7 @@ NpcsKilledByPlayer: ; kills by a single strike
 TempNpcFrame:
     .res 1
 
-SnowFrame:
+TempBboxOffset:
     .res 1
 FoodToStamina:
     .res 1

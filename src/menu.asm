@@ -1645,7 +1645,6 @@ MenuInput:
     lda StashActivated
     bne @DoInventoryInput
 
-    
 @RegularInput:
     jsr DoRegularInput
     jmp @exit
@@ -2097,11 +2096,11 @@ TestAllIngredients:
     cmp Ingredients, x
     beq @found
     inx
-    cpx #4
+    cpx #MAX_CRAFTING_INDEX
     bcc @ComponentLoop
     jmp @exit
 @found:
-    lda #250 ; ingredient matches
+    lda #CRAFTING_INGREDIENT_MATCHES ; ingredient matches
 @exit:
 
     rts
@@ -2116,6 +2115,11 @@ CraftFromSelectedComponents:
     inx
     cpx #RECIPES_SIZE
     bcc @cont
+    ;gone through all recipes, nothing matches
+    lda #1
+    sta MustPlaySfx
+    lda #SFX_INVENTORY_FULL
+    sta SfxName
     rts
 @cont: ;store ingredients and the result into RAM
     ldy #0
@@ -2139,7 +2143,7 @@ CraftFromSelectedComponents:
     lda Inventory, y
 
     jsr TestAllIngredients
-    cmp #250
+    cmp #CRAFTING_INGREDIENT_MATCHES
     bne @loop ; no matches, next recipe
     sta Ingredients, x
 
@@ -2150,7 +2154,7 @@ CraftFromSelectedComponents:
     lda Inventory, y
 
     jsr TestAllIngredients
-    cmp #250
+    cmp #CRAFTING_INGREDIENT_MATCHES
     bne @loop
     sta Ingredients, x
 
@@ -2165,7 +2169,7 @@ CraftFromSelectedComponents:
 @justCompareWithC:
 
     jsr TestAllIngredients
-    cmp #250
+    cmp #CRAFTING_INGREDIENT_MATCHES
     bne @loop
     sta Ingredients, x
 
@@ -2179,7 +2183,7 @@ CraftFromSelectedComponents:
 @justCompareWithD:
 
     jsr TestAllIngredients
-    cmp #250
+    cmp #CRAFTING_INGREDIENT_MATCHES
     bne @loop
     sta Ingredients, x
 
