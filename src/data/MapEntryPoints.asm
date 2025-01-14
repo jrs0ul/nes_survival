@@ -62,7 +62,7 @@ entry_points_loc6:
     ;16.alien base entrance top
     .byte 16, 2, 207, 230, 0, 255, 43, 63
     ;17. Mine room entrance
-    .byte 17, 0, 118, 123, 22, 28, 120, 130
+    .byte 17, 0, 117, 125, 22, 28, 100, 131
     ;--------------------------
 entry_points_loc7:
     ;18.crashsite exit to cave
@@ -95,7 +95,7 @@ entry_points_loc11:
     ;27.exit from cave location to bjorn's location
     .byte 27, 2, 0, 255, 0,255, 222, 255
     ;28.cave entrance from location 11
-    .byte 28, 2, 117, 122, 21, 28, 40, 50
+    .byte 28, 2, 116, 123, 21, 28, 10, 50
     ;29. entrance to the path to the crashsite
     .byte 29, 0, 0, 255, 0, 255, 0, 22
     ;30. entrance to the segment where Bjorn's house is

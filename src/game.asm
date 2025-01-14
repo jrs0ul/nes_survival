@@ -3737,7 +3737,7 @@ RoutinesAfterFadeOut:
     ldy oldbank
     jsr bankswitch_y
     ;---------------------
-    ;22 secret cave entrance / 56. alien tunnel entrance
+    ;22 secret cave entrance / 56. secret cave entrance from alien tunnel
 @next28:
     lda ActiveMapEntryIndex
     cmp #22
@@ -3750,6 +3750,8 @@ RoutinesAfterFadeOut:
     sta MustCopyMainChr
 
     jsr TurnDarkPaletteOn
+    lda #0
+    sta CheckpointSaved ; reset checkpoint
     ;------------------------
     ;34 dark cave 2
 @next35:

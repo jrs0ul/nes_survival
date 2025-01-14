@@ -14,7 +14,10 @@ LoadMenu:
     sta MustLoadSomething
     jmp @exit
 @cont:
-    lda #$00
+
+    lda #0
+    sta ModifiedTilesToDraw
+
     sta $2000
     sta $2001
 

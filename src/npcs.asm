@@ -459,11 +459,11 @@ SingleNpcVSPlayerCollision:
     sta TempNpcType
     ldy TempNpcDataIdxForCollision
 
-    iny
-    iny
-    iny
-    iny
-    iny
+    iny ;x
+    iny ;x2
+    iny ;y
+    iny ;y2
+    iny ;screen
     lda Npcs, y ; screen index where npc resides
     dey ;y2
     dey ;y
