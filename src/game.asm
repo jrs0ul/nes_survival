@@ -5064,11 +5064,11 @@ CalcMapColumnToUpdate:
 @LeftDir:
     lda #0
 @SaveDir:
-    sta Temp
+    sta BSS_Free_Bytes
 ;---
     lda CurrentMapSegmentIndex
     clc
-    adc Temp
+    adc BSS_Free_Bytes
     sta SourceMapIdx
     ldx FirstNametableAddr
     jmp @storeIdx
@@ -5086,12 +5086,12 @@ CalcMapColumnToUpdate:
 @LeftDir1:
     lda #255 ; -1 ?
 @SaveDir1:
-    sta Temp
+    sta BSS_Free_Bytes
 
 ;---
     lda CurrentMapSegmentIndex
     clc
-    adc Temp
+    adc BSS_Free_Bytes
     sta SourceMapIdx
     ldx SecondNametableAddr
 
